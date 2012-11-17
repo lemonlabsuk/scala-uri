@@ -1,0 +1,14 @@
+target/
+*.iml
+*.ipr
+*.iws
+.idea/
+
+.project
+
+# OS X
+Icon
+Thumbs.db
+.DS_Store
+
+.history

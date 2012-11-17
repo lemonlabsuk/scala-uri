@@ -1,5 +1,7 @@
 # Scala scala-uri
 
+[![Build Status](https://secure.travis-ci.org/theon/scala-uri.png?branch=master)](https://travis-ci.org/theon/scala-uri)
+
 `scala-uri` is a small self contained Scala library that helps you work with URIs. It can be used outside a servlet environment as it has zero dependencies on the servlet spec or existing web frameworks.
 
 ## Including in your project

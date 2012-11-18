@@ -1,4 +1,4 @@
-# Scala scala-uri
+# scala-uri
 
 [![Build Status](https://secure.travis-ci.org/theon/scala-uri.png?branch=master)](https://travis-ci.org/theon/scala-uri)
 

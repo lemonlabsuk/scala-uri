@@ -17,3 +17,7 @@ TODO: Put in repo. Add SBT config
 
     import com.github.theon.uri.Uri._
     val uri = parseUri("http://theon.github.com/scala-uri?param1=1&param2=2")
+
+# License
+
+`scala-uri` is open source software released under the [Apache 2 License](http://www.apache.org/licenses/LICENSE-2.0).

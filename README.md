@@ -8,9 +8,9 @@
 
 ```scala
 import com.github.theon.uri.Uri._
-val uri = "http://theon.github.com/scala-uri" ? ("param1" -> "1") & ("param2" -> Some("2")) & ("param3" -> None)
+val uri = "http://theon.github.com/scala-uri" ? ("param1" -> "one") & ("param2" -> 2) & ("param3" -> true)
 
-uri.toString //Prints http://theon.github.com/scala-uri?param1=1&param2=2
+uri.toString //Prints http://theon.github.com/scala-uri?param1=one&param2=2&param3=true
 ```
 
 * By importing `com.github.theon.uri.Uri._`, Strings can be _implicitly_ converted to URIs.
@@ -30,6 +30,17 @@ You can parse URIs as Strings into a `Uri` instance like so:
 ```scala
 import com.github.theon.uri.Uri._
 val uri = parseUri("http://theon.github.com/scala-uri?param1=1&param2=2")
+```
+
+## Options and Query String Parameters
+
+You can specify an `Option` as the value of a query string parameter. It will get rendered if it is `Some(x)` and won't get rendered if it is `None`
+
+```scala
+import com.github.theon.uri.Uri._
+val uri = "http://theon.github.com/scala-uri" ? ("param1" -> Some("1")) & ("param2" -> None)
+
+uri.toString //Prints http://theon.github.com/scala-uri?param1=1
 ```
 
 ## URL Percent Encoding

@@ -2,7 +2,6 @@ package com.github.theon.urlutils
 
 import org.scalatest._
 import org.scalatest.matchers._
-import com.github.theon.uri.Uri
 import com.github.theon.uri.Uri._
 
 class ParsingTests extends FlatSpec with ShouldMatchers {

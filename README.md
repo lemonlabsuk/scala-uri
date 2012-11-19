@@ -75,8 +75,10 @@ uri.toString //This is: http://example.com/path?param=2
 
 To get the query string parameters as a `Map[String,List[String]]` you can do the following:
 
+```scala
 val uri = "http://example.com/path" ? ("param" -> "1") & ("param2" -> 2)
 uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
+```
 
 ## Including scala-uri your SBT project
 

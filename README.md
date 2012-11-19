@@ -12,9 +12,9 @@
 
 ```scala
 import com.github.theon.uri.Uri._
-val uri = "http://theon.github.com/scala-uri" ? ("param1" -> "one") & ("param2" -> 2) & ("param3" -> true)
+val uri = "http://theon.github.com/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
 
-uri.toString //This is: http://theon.github.com/scala-uri?param1=one&param2=2&param3=true
+uri.toString //This is: http://theon.github.com/scala-uri?p1=one&p2=2&p3=true
 ```
 
 By importing `com.github.theon.uri.Uri._`, Strings can be _implicitly_ converted to URIs.

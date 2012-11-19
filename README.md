@@ -4,9 +4,21 @@
 
 `scala-uri` is a small self contained Scala library that helps you work with URIs. It has a DSL for building URIs and a parser to parse URIs in Strings. It can be used outside a servlet environment as it has zero dependencies on the servlet spec or existing web frameworks.
 
-## Including in your project
+## Including scala-uri your SBT project
 
-TODO: Put in repo. Add SBT config
+Add the following dependency:
+
+    "com.github.theon" %% "scala-uri" % "0.1"
+
+### Latest snapshot builds
+
+Add the Sonatype OSS repo to your SBT build configuration:
+
+    resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/public"
+
+Add the following dependency:
+
+    "com.github.theon" %% "scala-uri" % "0.2-SNAPSHOT"
 
 ## Building URIs with the DSL
 

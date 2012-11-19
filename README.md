@@ -14,7 +14,7 @@
 import com.github.theon.uri.Uri._
 val uri = "http://theon.github.com/scala-uri" ? ("param1" -> "one") & ("param2" -> 2) & ("param3" -> true)
 
-uri.toString //Prints http://theon.github.com/scala-uri?param1=one&param2=2&param3=true
+uri.toString //This is: http://theon.github.com/scala-uri?param1=one&param2=2&param3=true
 ```
 
 By importing `com.github.theon.uri.Uri._`, Strings can be _implicitly_ converted to URIs.
@@ -45,7 +45,7 @@ You can specify an `Option` as the value of a query string parameter. It will ge
 import com.github.theon.uri.Uri._
 val uri = "http://theon.github.com/scala-uri" ? ("param1" -> Some("1")) & ("param2" -> None)
 
-uri.toString //Prints http://theon.github.com/scala-uri?param1=1
+uri.toString //This is: http://theon.github.com/scala-uri?param1=1
 ```
 
 ## URL Percent Encoding
@@ -55,9 +55,9 @@ By Default, `scala-uri` will URL percent encode paths and query string parameter
 ```scala
 val uri = "http://example.com/path with space" ? ("param" -> "üri")
 
-uri.toString //Prints http://example.com/path%20with%20space?param=%C3%BCri
+uri.toString //This is: http://example.com/path%20with%20space?param=%C3%BCri
 
-uri.toStringRaw //Prints http://example.com/path with space?param=üri
+uri.toStringRaw //This is: http://example.com/path with space?param=üri
 ```
 
 ## Replacing Query String Parameters
@@ -68,8 +68,15 @@ The `?` and `&` methods can be used to add query string parameters, however if y
 val uri = "http://example.com/path" ? ("param" -> "1")
 uri.replace("param", "2")
 
-uri.toString //Prints http://example.com/path?param=2
+uri.toString //This is: http://example.com/path?param=2
 ```
+
+## Get query string parameters
+
+To get the query string parameters as a `Map[String,List[String]]` you can do the following:
+
+val uri = "http://example.com/path" ? ("param" -> "1") & ("param2" -> 2)
+uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
 
 ## Including scala-uri your SBT project
 

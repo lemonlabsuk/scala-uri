@@ -2,7 +2,11 @@
 
 [![Build Status](https://secure.travis-ci.org/theon/scala-uri.png?branch=master)](https://travis-ci.org/theon/scala-uri)
 
-`scala-uri` is a small self contained Scala library that helps you work with URIs. It has a DSL for building URIs and a parser to parse URIs in Strings. It can be used outside a servlet environment as it has zero dependencies on the servlet spec or existing web frameworks.
+`scala-uri` is a small self contained Scala library that helps you work with URIs with the following features:
+
+ * A DSL for building URIs
+ * A parser to parse URIs from Strings.
+ * Can be used outside a servlet environment as it has zero dependencies on the servlet spec or existing web frameworks.
 
 ## Building URIs with the DSL
 
@@ -13,8 +17,9 @@ val uri = "http://theon.github.com/scala-uri" ? ("param1" -> "one") & ("param2" 
 uri.toString //Prints http://theon.github.com/scala-uri?param1=one&param2=2&param3=true
 ```
 
-* By importing `com.github.theon.uri.Uri._`, Strings can be _implicitly_ converted to URIs.
-* To add query string parameters, use either the `?` or `&` method and pass a `Tuple2` as an argument. The first value in the Tuple is a name of the query string parameter, the second is the value. If a parameter value is an `Option`, it will only be rendered provided it is not `None`.
+By importing `com.github.theon.uri.Uri._`, Strings can be _implicitly_ converted to URIs.
+
+To add query string parameters, use either the `?` or `&` method and pass a `Tuple2` as an argument. The first value in the Tuple is a name of the query string parameter, the second is the value. If a parameter value is an `Option`, it will only be rendered provided it is not `None`.
 
 To _explicitly_ create a `Uri`, you can use the following constructors:
 

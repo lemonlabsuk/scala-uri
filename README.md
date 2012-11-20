@@ -2,7 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/theon/scala-uri.png?branch=master)](https://travis-ci.org/theon/scala-uri)
 
-`scala-uri` is a small self contained Scala library that helps you work with URIs with the following features:
+`scala-uri` is a small self contained Scala library that helps you work with URIs. It has the following features:
 
  * A DSL for building URIs
  * A parser to parse URIs from Strings.

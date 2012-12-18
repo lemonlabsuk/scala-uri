@@ -76,6 +76,7 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
 }
 
 object Uri {
+  import scala.language.implicitConversions
   implicit def stringToUri(s:String) = parseUri(s)
   implicit def uriToString(uri:Uri):String = uri.toString
 

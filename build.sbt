@@ -4,7 +4,7 @@ organization  := "com.github.theon"
 
 version       := "0.2-SNAPSHOT"
 
-scalaVersion  := "2.9.2"
+scalaVersion  := "2.10.0-RC5"
 
 publishMavenStyle := true
 
@@ -12,10 +12,10 @@ publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
 
-scalacOptions := Seq("-Ydependent-method-types", "-unchecked", "-deprecation", "-encoding", "utf8")
+scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "1.8" % "test"
+  "org.scalatest" % "scalatest_2.10.0-RC5" % "2.0.M5-B1" % "test"
 )
 
 publishTo <<= version { (v: String) =>

@@ -2,14 +2,27 @@ package com.github.theon.urlutils
 
 import org.scalatest._
 import org.scalatest.matchers._
-import com.github.theon.uri.Uri
+import com.github.theon.uri.{Encoders, PercentEncoder, Uri}
 import com.github.theon.uri.Uri._
+import java.net.URI
+import com.github.theon.uri.Encoders._
 
 class EncodingTests extends FlatSpec with ShouldMatchers {
 
   "URI paths" should "be percent encoded" in {
     val uri:Uri = "http://theon.github.com/üris-in-scàla.html"
     uri.toString should equal ("http://theon.github.com/%C3%BCris-in-sc%C3%A0la.html")
+  }
+
+  "URI path spaces" should "be percent encoded by default" in {
+    val uri:Uri = "http://theon.github.com/uri with space"
+    uri.toString should equal ("http://theon.github.com/uri%20with%20space")
+  }
+
+  "URI path spaces" should "be plus encoded if configured" in {
+    implicit val encoder = PercentEncoder + EncodeSpaceAsPlus
+    val uri:Uri = "http://theon.github.com/uri with space"
+    uri.toString should equal ("http://theon.github.com/uri+with+space")
   }
 
   "Querystring parameters" should "be percent encoded" in {

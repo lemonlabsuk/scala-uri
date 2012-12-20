@@ -60,6 +60,17 @@ uri.toString //This is: http://example.com/path%20with%20space?param=%C3%BCri
 uri.toStringRaw //This is: http://example.com/path with space?param=üri
 ```
 
+### Encoding spaces as pluses
+
+The default behaviour with scala uri, is to encode spaces as `%20`, however if you instead wish them to be encoded as the `+` symbol, then simply add the following `implicit val` to your code:
+
+```scala
+implicit val encoder = PercentEncoder + EncodeSpaceAsPlus
+
+val uri:Uri = "http://theon.github.com/uri with space"
+uri.toString //This is http://theon.github.com/uri+with+space
+```
+
 ## Replacing Query String Parameters
 
 The `?` and `&` methods can be used to add query string parameters, however if you wish to replace all existing query string parameters with the same name, you can use the `uri.replace()` method:

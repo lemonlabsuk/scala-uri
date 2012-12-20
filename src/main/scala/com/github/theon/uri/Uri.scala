@@ -1,11 +1,20 @@
 package com.github.theon.uri
 
-import java.net.{URLDecoder, URLEncoder, URI}
 import com.github.theon.uri.Uri._
+import com.github.theon.uri.Encoders.PercentEncoder
+import com.github.theon.uri.Encoders.encode
 
-case class Uri(protocol:Option[String], host:Option[String], path:String, query:Querystring = Querystring()) {
+case class Uri (
+  protocol:Option[String],
+  host:Option[String],
+  port:Option[Int],
+  pathParts:List[String],
+  query:Querystring
+) {
 
-  lazy val pathParts = path.split("/")
+  def this(protocol:Option[String], host:Option[String], path:String, query:Querystring = Querystring()) = {
+    this(protocol, host, None, path.split('/').toList, query)
+  }
 
   def param(kv:(String, Any)) = {
     val (k,v) = kv
@@ -20,20 +29,27 @@ case class Uri(protocol:Option[String], host:Option[String], path:String, query:
   def ?(kv:(String, Any)) = param(kv)
   def &(kv:(String, Any)) = param(kv)
 
+  def pathRaw = path(None)
+  def path(implicit e:Enc = PercentEncoder):String = path(Some(e))
+
+  def path(e:Option[Enc]):String = {
+    pathParts.map(p => {
+      if(e.isDefined) encode(p, e.get) else p
+    }).mkString("/")
+  }
+
   def replace(k:String, v:String) = {
     copy(query = query.replace(k, v))
   }
 
-  override def toString = toString(true)
-  def toStringRaw = toString(false)
+  def toString(implicit e:Enc = PercentEncoder):String = toString(Some(e))
+  def toStringRaw():String = toString(None)
 
-  def toString(enc:Boolean) = {
-    val encPath = if(enc) pathParts.map(uriEncode(_)).mkString("/") else path
-
+  def toString(e:Option[Enc]):String = {
     protocol.map(_ + "://").getOrElse("") +
     host.getOrElse("") +
-    encPath +
-    query.toString("?", enc)
+    path(e) +
+    query.toString("?", e)
   }
 }
 
@@ -54,22 +70,22 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
     }
   }
 
-  override def toString = toString(true)
-  def toStringRaw = toString(false)
+  def toString(e:Enc = PercentEncoder):String = toString(Some(e))
+  def toStringRaw():String = toString(None)
 
-  def toString(prefix:String, enc:Boolean):String = {
+  def toString(prefix:String, e:Option[Enc]):String = {
     if(params.isEmpty) {
       ""
     } else {
-      prefix + toString(enc)
+      prefix + toString(e)
     }
   }
 
-  def toString(enc:Boolean) = {
+  def toString(e:Option[Enc]) = {
     params.flatMap(kv => {
       val (k,v) = kv
-      if(enc) {
-        v.map(uriEncode(k) + "=" + uriEncode(_))
+      if(e.isDefined) {
+        v.map(encode(k, e.get) + "=" + encode(_, e.get))
       } else {
         v.map(k + "=" + _)
       }
@@ -78,46 +94,24 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
 }
 
 object Uri {
+
+  type Enc = UriEncoder
+
   implicit def stringToUri(s:String) = parseUri(s)
-  implicit def uriToString(uri:Uri):String = uri.toString
+  implicit def uriToString(uri:Uri)(implicit e:UriEncoder):String = uri.toString
+  implicit def encoderToChainerEncoder(enc:UriEncoder) = ChainedUriEncoder(enc :: Nil)
 
-  def parseUri(s:String) = {
-    val uri = new URI(s)
-    val q = parseQuery(Option(uri.getQuery))
-    Uri(Option(uri.getScheme), Option(uri.getAuthority), uri.getPath, q)
-  }
-
-  def parseQuery(qsOpt:Option[String]) = {
-    qsOpt match {
-      case None => Querystring()
-      case Some(qs) => {
-        val tuples = qs.split("&").map(pairStr => {
-          val pair = pairStr.split("=")
-          (pair(0), pair(1))
-        }).toList
-
-        val map = tuples.groupBy(_._1).map(kv => {
-          val (k,v) = kv
-          (k,v.map(_._2))
-        })
-
-        Querystring(map)
-      }
-    }
-  }
-
-  def uriEncode(s:String) = URLEncoder.encode(s, "UTF-8").replaceAll("\\+", "%20").replaceAll("\\*", "%2A")
-  def uriDecode(s:String) = URLDecoder.decode(s.replaceAll("%20", "+").replaceAll("%2A", "*"), "UTF-8")
+  def parseUri(s:String) = UriParser.parse(s)
 
   def apply(protocol:String, host:String, path:String):Uri =
-    Uri(Some(protocol), Some(host), path)
+    new Uri(Some(protocol), Some(host), path)
 
   def apply(protocol:String, host:String, path:String, query:Querystring):Uri =
-    Uri(Some(protocol), Some(host), path, query)
+    new Uri(Some(protocol), Some(host), path, query)
 
   def apply(path:String):Uri =
-    Uri(None, None, path)
+    new Uri(None, None, path)
 
   def apply(path:String, query:Querystring):Uri =
-    Uri(None, None, path, query)
+    new Uri(None, None, path, query)
 }

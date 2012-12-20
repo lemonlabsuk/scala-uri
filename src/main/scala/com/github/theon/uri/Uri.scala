@@ -1,9 +1,11 @@
 package com.github.theon.uri
 
-import java.net.URI
+import java.net.{URLDecoder, URLEncoder, URI}
 import com.github.theon.uri.Uri._
 
 case class Uri(protocol:Option[String], host:Option[String], path:String, query:Querystring = Querystring()) {
+
+  lazy val pathParts = path.split("/")
 
   def param(kv:(String, Any)) = {
     val (k,v) = kv
@@ -22,11 +24,11 @@ case class Uri(protocol:Option[String], host:Option[String], path:String, query:
     copy(query = query.replace(k, v))
   }
 
-  override def toString() = toString(true)
-  def toStringRaw() = toString(false)
+  override def toString = toString(true)
+  def toStringRaw = toString(false)
 
   def toString(enc:Boolean) = {
-    val encPath = if(enc) uriEncode(path) else path
+    val encPath = if(enc) pathParts.map(uriEncode(_)).mkString("/") else path
 
     protocol.map(_ + "://").getOrElse("") +
     host.getOrElse("") +
@@ -52,8 +54,8 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
     }
   }
 
-  override def toString() = toString(true)
-  def toStringRaw() = toString(false)
+  override def toString = toString(true)
+  def toStringRaw = toString(false)
 
   def toString(prefix:String, enc:Boolean):String = {
     if(params.isEmpty) {
@@ -104,8 +106,8 @@ object Uri {
     }
   }
 
-  def uriEncode(s:String) = new URI(null, s, null).toASCIIString
-  def uriDecode(s:String) = URI.create(s).getPath
+  def uriEncode(s:String) = URLEncoder.encode(s, "UTF-8").replaceAll("\\+", "%20").replaceAll("\\*", "%2A")
+  def uriDecode(s:String) = URLDecoder.decode(s.replaceAll("%20", "+").replaceAll("%2A", "*"), "UTF-8")
 
   def apply(protocol:String, host:String, path:String):Uri =
     Uri(Some(protocol), Some(host), path)

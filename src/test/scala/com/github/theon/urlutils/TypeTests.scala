@@ -4,13 +4,6 @@ import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import com.github.theon.uri.Uri._
 
-/**
- * Created with IntelliJ IDEA.
- * User: I.Forsey@net-a-porter.com
- * Date: 19/11/2012
- * Time: 21:30
- * To change this template use File | Settings | File Templates.
- */
 class TypeTests extends FlatSpec with ShouldMatchers {
 
   "String" should "render correctly" in {

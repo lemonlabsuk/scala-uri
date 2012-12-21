@@ -1,7 +1,7 @@
 package com.github.theon.urlutils
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.FlatSpec
+import org.scalatest.matchers.ShouldMatchers
 import com.github.theon.uri.Uri
 import com.github.theon.uri.Uri._
 import com.github.theon.uri.Encoders._

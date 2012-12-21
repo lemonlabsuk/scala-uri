@@ -2,9 +2,8 @@ package com.github.theon.urlutils
 
 import org.scalatest._
 import org.scalatest.matchers._
-import com.github.theon.uri.{Encoders, PercentEncoder, Uri}
+import com.github.theon.uri.Uri
 import com.github.theon.uri.Uri._
-import java.net.URI
 import com.github.theon.uri.Encoders._
 
 class EncodingTests extends FlatSpec with ShouldMatchers {

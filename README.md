@@ -93,7 +93,9 @@ uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
 
 ## Including scala-uri your SBT project
 
-Add the following dependency:
+**Note:** scala-uri 0.1 was only built for scala `2.9.2`. For Scala `2.10.0`, use the [0.2-SNAPSHOT](#latest-snapshot-builds)
+
+Release builds are available in maven central. Just add the following dependency:
 
 ```scala
 "com.github.theon" %% "scala-uri" % "0.1"
@@ -101,7 +103,7 @@ Add the following dependency:
 
 ### Latest snapshot builds
 
-Add the Sonatype OSS repo to your SBT build configuration:
+For the latest snapshot builds, add the Sonatype OSS repo to your SBT build configuration:
 
 ```scala
 resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/public"

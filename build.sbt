@@ -16,9 +16,7 @@ pomIncludeRepository := { _ => false }
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
-libraryDependencies ++= Seq(
-  "org.scalatest" % "scalatest_2.10.0-RC5" % "2.0.M5-B1" % "test"
-)
+libraryDependencies <+= scalaVersion(scalatestDependency(_))
 
 publishTo <<= version { (v: String) =>
   val nexus = "https://oss.sonatype.org/"

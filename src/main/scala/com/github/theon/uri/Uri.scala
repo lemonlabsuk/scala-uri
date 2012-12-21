@@ -48,6 +48,7 @@ case class Uri (
   def toString(e:Option[Enc]):String = {
     protocol.map(_ + "://").getOrElse("") +
     host.getOrElse("") +
+    port.map(":" + _).getOrElse("") +
     path(e) +
     query.toString("?", e)
   }

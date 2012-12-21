@@ -94,7 +94,8 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
 }
 
 object Uri {
-  import scala.language.implicitConversions
+  //TODO: uncomment when 2.9.2 support is dropped
+  //import scala.language.implicitConversions
 
   type Enc = UriEncoder
 

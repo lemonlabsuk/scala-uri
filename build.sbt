@@ -6,6 +6,8 @@ version       := "0.2-SNAPSHOT"
 
 scalaVersion  := "2.10.0-RC5"
 
+crossScalaVersions := Seq("2.9.2", "2.10.0")
+
 publishMavenStyle := true
 
 publishArtifact in Test := false

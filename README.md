@@ -53,6 +53,7 @@ uri.toString //This is: http://theon.github.com/scala-uri?param1=1
 By Default, `scala-uri` will URL percent encode paths and query string parameters. To prevent this, you can call the `uri.toStringRaw` method:
 
 ```scala
+import com.github.theon.uri.Uri._
 val uri = "http://example.com/path with space" ? ("param" -> "üri")
 
 uri.toString //This is: http://example.com/path%20with%20space?param=%C3%BCri
@@ -65,6 +66,8 @@ uri.toStringRaw //This is: http://example.com/path with space?param=üri
 The default behaviour with scala uri, is to encode spaces as `%20`, however if you instead wish them to be encoded as the `+` symbol, then simply add the following `implicit val` to your code:
 
 ```scala
+import com.github.theon.uri.Uri._
+import com.github.theon.uri.Encoders._
 implicit val encoder = PercentEncoder + EncodeSpaceAsPlus
 
 val uri:Uri = "http://theon.github.com/uri with space"
@@ -76,6 +79,7 @@ uri.toString //This is http://theon.github.com/uri+with+space
 The `?` and `&` methods can be used to add query string parameters, however if you wish to replace all existing query string parameters with the same name, you can use the `uri.replace()` method:
 
 ```scala
+import com.github.theon.uri.Uri._
 val uri = "http://example.com/path" ? ("param" -> "1")
 uri.replace("param", "2")
 
@@ -87,6 +91,7 @@ uri.toString //This is: http://example.com/path?param=2
 To get the query string parameters as a `Map[String,List[String]]` you can do the following:
 
 ```scala
+import com.github.theon.uri.Uri._
 val uri = "http://example.com/path" ? ("param" -> "1") & ("param2" -> 2)
 uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
 ```

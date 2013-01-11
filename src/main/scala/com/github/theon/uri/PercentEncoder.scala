@@ -21,7 +21,7 @@ object Encoders {
 class PercentEncoder extends UriEncoder {
   val RESERVED_CHARS = Set (
     ' ', '%', '$', '&', '+', ',', '/', ':', ';', '=', '?', '@', '<', '>', '[', ']', '(', ')', '#', '%', '!', '\'', '*',
-    '{', '}'
+    '{', '}', '\n', '\r', '^', '`', '|', '~'
   )
 
   def shouldEncode(ch:Char) = {

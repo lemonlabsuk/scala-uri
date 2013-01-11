@@ -18,4 +18,9 @@ class GithubIssueTests  extends FlatSpec with ShouldMatchers {
     val uri = "http://theon.github.com:8080/test" ? ("p" -> "1")
     uri.toString should equal ("http://theon.github.com:8080/test?p=1")
   }
+
+  "Github Issue #5" should " now be fixed. The characters {} should now be percent encoded" in {
+    val uri = "http://theon.github.com:8080/{}" ? ("{}" -> "{}")
+    uri.toString should equal ("http://theon.github.com:8080/%7B%7D?%7B%7D=%7B%7D")
+  }
 }

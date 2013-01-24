@@ -101,7 +101,7 @@ object Uri {
   type Enc = UriEncoder
 
   implicit def stringToUri(s:String) = parseUri(s)
-  implicit def uriToString(uri:Uri)(implicit e:UriEncoder):String = uri.toString
+  implicit def uriToString(uri:Uri)(implicit e:UriEncoder=PercentEncoder):String = uri.toString
   implicit def encoderToChainerEncoder(enc:UriEncoder) = ChainedUriEncoder(enc :: Nil)
 
   def parseUri(s:String) = UriParser.parse(s)

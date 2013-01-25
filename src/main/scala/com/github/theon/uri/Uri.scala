@@ -42,6 +42,7 @@ case class Uri (
     copy(query = query.replace(k, v))
   }
 
+  override def toString = toString(PercentEncoder)
   def toString(implicit e:Enc = PercentEncoder):String = toString(Some(e))
   def toStringRaw():String = toString(None)
 

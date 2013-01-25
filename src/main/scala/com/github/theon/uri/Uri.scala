@@ -71,7 +71,8 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
     }
   }
 
-  def toString(e:Enc = PercentEncoder):String = toString(Some(e))
+  override def toString() = toString(PercentEncoder)
+  def toString(e:Enc):String = toString(Some(e))
   def toStringRaw():String = toString(None)
 
   def toString(prefix:String, e:Option[Enc]):String = {
@@ -101,7 +102,7 @@ object Uri {
   type Enc = UriEncoder
 
   implicit def stringToUri(s:String) = parseUri(s)
-  implicit def uriToString(uri:Uri)(implicit e:UriEncoder=PercentEncoder):String = uri.toString
+  implicit def uriToString(uri:Uri)(implicit e:UriEncoder=PercentEncoder):String = uri.toString(e)
   implicit def encoderToChainerEncoder(enc:UriEncoder) = ChainedUriEncoder(enc :: Nil)
 
   def parseUri(s:String) = UriParser.parse(s)

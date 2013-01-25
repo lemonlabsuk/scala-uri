@@ -29,4 +29,9 @@ class GithubIssueTests  extends FlatSpec with ShouldMatchers {
     val uriString:String = uri
     uriString should equal ("/blah?blah=blah")
   }
+
+  "Github Issue #7" should " now be fixed. Calling uri.toString() (with parentheses) should now behave the same as uri.toString " in {
+    val uri = "/blah" ? ("blah" -> "blah")
+    uri.toString() should equal ("/blah?blah=blah")
+  }
 }

@@ -34,4 +34,12 @@ class GithubIssueTests  extends FlatSpec with ShouldMatchers {
     val uri = "/blah" ? ("blah" -> "blah")
     uri.toString() should equal ("/blah?blah=blah")
   }
+
+  "Github Issue #8" should " now be fixed. Parsed relative uris should have no protocol" in {
+    val uri = parseUri("abc")
+
+    uri.protocol should equal (None)
+    uri.host should equal (None)
+    uri.path should equal ("abc")
+  }
 }

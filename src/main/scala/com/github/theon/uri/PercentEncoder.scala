@@ -4,7 +4,7 @@ import java.nio.charset.Charset
 
 object Encoders {
   val PercentEncoder = new PercentEncoder()
-  val EncodeSpaceAsPlus = new EncodeSpaceAsPlus()
+  val EncodeSpaceAsPlus = EncodeCharAs(' ', "+")
 
   def encode(s:String, encoder:UriEncoder) = {
     val chars = s.getBytes(Charset.forName("UTF-8")).map(_.toChar)
@@ -34,9 +34,9 @@ class PercentEncoder extends UriEncoder {
   def ascii(ch:Char) = ch > 0 && ch < 128
 }
 
-class EncodeSpaceAsPlus extends UriEncoder {
-  def shouldEncode(ch:Char) = ch == ' '
-  def encode(ch:Char) = "+"
+case class EncodeCharAs(ch:Char,as:String) extends UriEncoder {
+  def shouldEncode(x:Char) = x == ch
+  def encode(x:Char) = as
 }
 
 case class ChainedUriEncoder(encoders:List[UriEncoder]) extends UriEncoder {

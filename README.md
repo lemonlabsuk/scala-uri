@@ -30,7 +30,14 @@ val uri = Uri("/scala-uri") //Relative URI
 
 ## Parsing URIs
 
-You can parse URIs as Strings into a `Uri` instance like so:
+Provided you have the import `com.github.theon.uri.Uri._`, Strings will be implicitly parsed into `Uri` instances:
+
+```scala
+import com.github.theon.uri.Uri._
+val uri:Uri = "http://theon.github.com/scala-uri?param1=1&param2=2"
+```
+
+However, if you prefer, you can call `parseUri()` explicitly:
 
 ```scala
 import com.github.theon.uri.Uri._
@@ -73,6 +80,20 @@ implicit val encoder = PercentEncoder + EncodeSpaceAsPlus
 val uri:Uri = "http://theon.github.com/uri with space"
 uri.toString //This is http://theon.github.com/uri+with+space
 ```
+
+### Custom encoding
+
+If you would like to do some custom encoding for specific characters, you can use the `EncodeCharAs` encoder.
+
+```scala
+import com.github.theon.uri.Uri._
+import com.github.theon.uri.Encoders._
+implicit val encoder = PercentEncoder + EncodeCharAs(' ', "_")
+
+val uri:Uri = "http://theon.github.com/uri with space"
+uri.toString //This is http://theon.github.com/uri_with_space
+```
+
 
 ## Replacing Query String Parameters
 

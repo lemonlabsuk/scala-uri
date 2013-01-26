@@ -12,8 +12,8 @@ case class Uri (
   query:Querystring
 ) {
 
-  def this(protocol:Option[String], host:Option[String], path:String, query:Querystring = Querystring()) = {
-    this(protocol, host, None, path.split('/').toList, query)
+  def this(scheme:Option[String], host:Option[String], path:String, query:Querystring = Querystring()) = {
+    this(scheme, host, None, path.split('/').toList, query)
   }
 
   def param(kv:(String, Any)) = {
@@ -25,6 +25,8 @@ case class Uri (
         copy(query = query & (k, Some(v)))
     }
   }
+
+  def scheme = protocol
 
   def ?(kv:(String, Any)) = param(kv)
   def &(kv:(String, Any)) = param(kv)
@@ -47,7 +49,7 @@ case class Uri (
   def toStringRaw():String = toString(None)
 
   def toString(e:Option[Enc]):String = {
-    protocol.map(_ + "://").getOrElse("") +
+    scheme.map(_ + "://").getOrElse("") +
     host.getOrElse("") +
     port.map(":" + _).getOrElse("") +
     path(e) +
@@ -108,11 +110,11 @@ object Uri {
 
   def parseUri(s:String) = UriParser.parse(s)
 
-  def apply(protocol:String, host:String, path:String):Uri =
-    new Uri(Some(protocol), Some(host), path)
+  def apply(scheme:String, host:String, path:String):Uri =
+    new Uri(Some(scheme), Some(host), path)
 
-  def apply(protocol:String, host:String, path:String, query:Querystring):Uri =
-    new Uri(Some(protocol), Some(host), path, query)
+  def apply(scheme:String, host:String, path:String, query:Querystring):Uri =
+    new Uri(Some(scheme), Some(host), path, query)
 
   def apply(path:String):Uri =
     new Uri(None, None, path)

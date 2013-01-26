@@ -33,7 +33,7 @@ val uri = Uri("/scala-uri") //Relative URI
 Provided you have the import `com.github.theon.uri.Uri._`, Strings will be implicitly parsed into `Uri` instances:
 
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.Uri.parseUri
 val uri:Uri = "http://theon.github.com/scala-uri?param1=1&param2=2"
 ```
 

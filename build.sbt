@@ -2,7 +2,7 @@ name := "scala-uri"
 
 organization  := "com.github.theon"
 
-version       := "0.3.3-SNAPSHOT"
+version       := "0.3.3"
 
 scalaVersion  := "2.10.0"
 

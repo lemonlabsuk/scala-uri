@@ -31,4 +31,58 @@ class DslTests extends FlatSpec with ShouldMatchers {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testOne" -> "2")
     uri.toString should equal ("/uris-in-scala.html?testOne=2&testOne=1")
   }
+
+  "Legacy replace method" should "stil replace parameters for the meantime" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1")
+    val newUri = uri.replace("testOne", "2")
+    newUri.toString should equal ("/uris-in-scala.html?testOne=2")
+  }
+
+  "Replace param method" should "replace single parameters with a String argument" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1")
+    val newUri = uri.replaceParams("testOne", "2")
+    newUri.toString should equal ("/uris-in-scala.html?testOne=2")
+  }
+
+  "Replace param method" should "replace multiple parameters with a String argument" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testOne" -> "2")
+    val newUri = uri.replaceParams("testOne", "2")
+    newUri.toString should equal ("/uris-in-scala.html?testOne=2")
+  }
+
+  "Replace param method" should "replace parameters with a Some argument" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1")
+    val newUri = uri.replaceParams("testOne", Some("2"))
+    newUri.toString should equal ("/uris-in-scala.html?testOne=2")
+  }
+
+  "Replace param method" should "remove parameters with a None argument" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1")
+    val newUri = uri.replaceParams("testOne", None)
+    newUri.toString should equal ("/uris-in-scala.html")
+  }
+
+  "Replace param method" should "not affect other parameters" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val newUri = uri.replaceParams("testOne", "3")
+    newUri.toString should equal ("/uris-in-scala.html?testOne=3&testTwo=2")
+  }
+
+  "Remove param method" should "remove multiple parameters" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testOne" -> "2")
+    val newUri = uri.removeParams("testOne")
+    newUri.toString should equal ("/uris-in-scala.html")
+  }
+
+  "Remove param method" should "remove single parameters" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1")
+    val newUri = uri.removeParams("testOne")
+    newUri.toString should equal ("/uris-in-scala.html")
+  }
+
+  "Remove param method" should "not remove other parameters" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val newUri = uri.removeParams("testOne")
+    newUri.toString should equal ("/uris-in-scala.html?testTwo=2")
+  }
 }

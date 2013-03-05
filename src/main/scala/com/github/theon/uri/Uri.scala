@@ -40,8 +40,25 @@ case class Uri (
     }).mkString("/")
   }
 
+  def replaceParams(k:String, v:Any) = {
+    v match {
+      case valueOpt:Option[_] =>
+        copy(query = query.replaceParams(k, valueOpt))
+      case _ =>
+        copy(query = query.replaceParams(k, Some(v)))
+    }
+  }
+
+  def removeParams(k:String) = {
+    copy(query = query.removeParams(k))
+  }
+
+  /**
+   * @deprecated Use replaceParam() instead
+   */
+  @Deprecated
   def replace(k:String, v:String) = {
-    copy(query = query.replace(k, v))
+    copy(query = query.replaceParams(k, Some(v)))
   }
 
   override def toString = toString(PercentEncoder)
@@ -59,8 +76,23 @@ case class Uri (
 
 case class Querystring(params:Map[String,List[String]] = Map()) {
 
+  /**
+   * @deprecated Use replaceParam() instead
+   */
+  @Deprecated
   def replace(k:String, v:String) = {
     copy(params = params + (k -> List(v)))
+  }
+
+  def replaceParams(k:String, v:Option[Any]) = {
+    v match {
+      case Some(v) => copy(params = params + (k -> List(v.toString)))
+      case None => removeParams(k)
+    }
+  }
+
+  def removeParams(k:String) = {
+    copy(params = params.filterNot(_._1 == k))
   }
 
   def &(kv:(String, Option[Any])) = {

@@ -136,7 +136,7 @@ scala-uri is currently built with support for scala `2.9.2` and `2.10.0`
 Release builds are available in maven central. Just add the following dependency:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.3.3"
+"com.github.theon" %% "scala-uri" % "0.3.4"
 ```
 
 ### Latest snapshot builds
@@ -150,7 +150,7 @@ resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/public"
 Add the following dependency:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.3.4-SNAPSHOT"
+"com.github.theon" %% "scala-uri" % "0.3.5-SNAPSHOT"
 ```
 
 # License

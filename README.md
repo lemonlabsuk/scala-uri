@@ -97,14 +97,26 @@ uri.toString //This is http://theon.github.com/uri_with_space
 
 ## Replacing Query String Parameters
 
-The `?` and `&` methods can be used to add query string parameters, however if you wish to replace all existing query string parameters with the same name, you can use the `uri.replace()` method:
+If you wish to replace all existing query string parameters with a given name, you can use the `uri.replaceParams()` method:
 
 ```scala
 import com.github.theon.uri.Uri._
 val uri = "http://example.com/path" ? ("param" -> "1")
-uri.replace("param", "2")
+val newUri = uri.replaceParams("param", "2")
 
-uri.toString //This is: http://example.com/path?param=2
+newUri.toString //This is: http://example.com/path?param=2
+```
+
+## Removing Query String Parameters
+
+If you wish to remove all existing query string parameters with a given name, you can use the `uri.removeParams()` method:
+
+```scala
+import com.github.theon.uri.Uri._
+val uri = "http://example.com/path" ? ("param" -> "1") & ("param2" -> "2")
+val newUri = uri.removeParams("param")
+
+newUri.toString //This is: http://example.com/path?param2=2
 ```
 
 ## Get query string parameters

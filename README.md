@@ -1,6 +1,7 @@
 # scala-uri
 
 [![Build Status](https://secure.travis-ci.org/theon/scala-uri.png?branch=master)](https://travis-ci.org/theon/scala-uri)
+[![Coverage Status](https://coveralls.io/repos/theon/scala-uri/badge.png?branch=master)](https://coveralls.io/r/theon/scala-uri)
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 

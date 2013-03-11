@@ -1,7 +1,7 @@
 import sbt._
 import sbt.Keys._
 
-object ScalaMockBuild extends Build {
+object ScalaUriBuild extends Build {
 
   lazy val scalaUri = Project(
     id = "scala-uri",

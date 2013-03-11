@@ -18,6 +18,8 @@ scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
 libraryDependencies <+= scalaVersion(scalatestDependency(_))
 
+seq(ScctPlugin.instrumentSettings : _*)
+
 publishTo <<= version { (v: String) =>
   val nexus = "https://oss.sonatype.org/"
   if (v.trim.endsWith("SNAPSHOT"))

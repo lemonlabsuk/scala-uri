@@ -4,7 +4,11 @@ import util.parsing.combinator.RegexParsers
 
 class UriParser extends RegexParsers {
 
-  val scheme =  "[a-zA-Z0-9]+".r <~ "://"
+  val relScheme =  "://" ^^ { x => None }
+
+  val absScheme =  "[a-zA-Z0-9]+".r <~ "://" ^^ { Some(_) }
+
+  val scheme = absScheme | relScheme
 
   val hostname =  "[^:/]+".r
 
@@ -18,7 +22,7 @@ class UriParser extends RegexParsers {
 
   val uri = (scheme ~ hostname).? ~ (":" ~> port).? ~ repsep(pathSegment, "/") ~ "?".? ~ repsep(queryKeyValue, "&") ^^ {
     case schemeHost ~ port ~ pathSegments ~ question ~ queryPairs => {
-      new Uri(schemeHost.map(_._1), schemeHost.map(_._2), port, pathSegments, tuplesToQuerystring(queryPairs))
+      new Uri(schemeHost.flatMap(_._1), schemeHost.map(_._2), port, pathSegments, tuplesToQuerystring(queryPairs))
     }
   }
 

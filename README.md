@@ -9,6 +9,12 @@
  * A parser to parse URIs from Strings.
  * Can be used outside a servlet environment as it has zero dependencies on the servlet spec or existing web frameworks.
 
+To include it in your SBT project from maven central:
+
+```scala
+"com.github.theon" %% "scala-uri" % "0.3.4"
+```
+
 ## Building URIs with the DSL
 
 ```scala
@@ -128,6 +134,19 @@ To get the query string parameters as a `Map[String,List[String]]` you can do th
 import com.github.theon.uri.Uri._
 val uri = "http://example.com/path" ? ("param" -> "1") & ("param2" -> 2)
 uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
+```
+
+## Protocol Relative URLs
+
+**New feature currently in 0.3.5-SNAPSHOT**
+
+[Protocol Relative URLs](http://paulirish.com/2010/the-protocol-relative-url/) are supported in `scala-uri`. A `Uri` object with a protocol of `None`, but a host of `Some(x)` will be considered a protocol relative URL.
+
+```scala
+import com.github.theon.uri.Uri._
+val uri:Uri = "//example.com/path"
+uri.scheme //This is: None
+uri.host //This is: Some("example.com")
 ```
 
 ## Including scala-uri your SBT project

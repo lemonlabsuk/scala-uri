@@ -66,11 +66,12 @@ case class Uri (
   def toStringRaw():String = toString(None)
 
   def toString(e:Option[Enc]):String = {
-    scheme.map(_ + "://").getOrElse("") +
-    host.getOrElse("") +
-    port.map(":" + _).getOrElse("") +
-    path(e) +
-    query.toString("?", e)
+    //If there is no scheme, we use protocol relative
+    val schemeStr = scheme.map(_ + "://").getOrElse("//")
+    host.map(schemeStr + _).getOrElse("") +
+      port.map(":" + _).getOrElse("") +
+      path(e) +
+      query.toString("?", e)
   }
 }
 
@@ -147,6 +148,12 @@ object Uri {
 
   def apply(scheme:String, host:String, path:String, query:Querystring):Uri =
     new Uri(Some(scheme), Some(host), path, query)
+
+  def apply(scheme:Option[String], host:String, path:String):Uri =
+    new Uri(scheme, Some(host), path)
+
+  def apply(scheme:Option[String], host:String, path:String, query:Querystring):Uri =
+    new Uri(scheme, Some(host), path, query)
 
   def apply(path:String):Uri =
     new Uri(None, None, path)

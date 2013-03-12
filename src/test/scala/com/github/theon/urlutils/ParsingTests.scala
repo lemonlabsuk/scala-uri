@@ -29,4 +29,10 @@ class ParsingTests extends FlatSpec with ShouldMatchers {
       )
     )
   }
+
+  "Parsing a url with relative protocol" should "result in a Uri with None for protocol" in {
+    val uri = parseUri("//theon.github.com/uris-in-scala.html")
+    uri.protocol should equal (None)
+    uri.toString should equal ("//theon.github.com/uris-in-scala.html")
+  }
 }

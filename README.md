@@ -5,9 +5,12 @@
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
- * A DSL for building URIs
- * A parser to parse URIs from Strings.
+ * A [DSL](#building-uris-with-the-dsl) for building URIs
+ * A [parser](#parsing-uris) to parse URIs from Strings.
  * Can be used outside a servlet environment as it has zero dependencies on the servlet spec or existing web frameworks.
+ * Ability to [replacing](#replacing-query-string-parameters) and [removing](#removing-query-string-parameters) query string parameters
+ * Support for [custom encoding](#custom-encoding) such as encoding [spaces as pluses](#encoding-spaces-as-pluses)
+ * Support for [protocol relative urls](#protocol-relative-urls)
 
 To include it in your SBT project from maven central:
 

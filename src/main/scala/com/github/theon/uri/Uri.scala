@@ -54,7 +54,7 @@ case class Uri (
   }
 
   /**
-   * @deprecated Use replaceParam() instead
+   * @deprecated Use replaceParams() instead
    */
   @Deprecated
   def replace(k:String, v:String) = {
@@ -78,7 +78,7 @@ case class Uri (
 case class Querystring(params:Map[String,List[String]] = Map()) {
 
   /**
-   * @deprecated Use replaceParam() instead
+   * @deprecated Use replaceParams() instead
    */
   @Deprecated
   def replace(k:String, v:String) = {

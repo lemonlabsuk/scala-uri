@@ -13,6 +13,16 @@ class EncodingTests extends FlatSpec with ShouldMatchers {
     uri.toString should equal ("http://theon.github.com/%C3%BCris-in-sc%C3%A0la.html")
   }
 
+  "Raw paths" should "not be encoded" in {
+    val uri:Uri = "http://theon.github.com/üris-in-scàla.html" ? ("càsh" -> "£50")
+    uri.pathRaw should equal ("/üris-in-scàla.html?càsh=£50")
+  }
+
+  "toStringRaw" should "not be encoded" in {
+    val uri:Uri = "http://theon.github.com/üris-in-scàla.html" ? ("càsh" -> "£50")
+    uri.toStringRaw should equal ("http://theon.github.com/üris-in-scàla.html?càsh=£50")
+  }
+
   "URI path spaces" should "be percent encoded by default" in {
     val uri:Uri = "http://theon.github.com/uri with space"
     uri.toString should equal ("http://theon.github.com/uri%20with%20space")

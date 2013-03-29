@@ -14,8 +14,8 @@ class EncodingTests extends FlatSpec with ShouldMatchers {
   }
 
   "Raw paths" should "not be encoded" in {
-    val uri:Uri = "http://theon.github.com/üris-in-scàla.html" ? ("càsh" -> "£50")
-    uri.pathRaw should equal ("/üris-in-scàla.html?càsh=£50")
+    val uri:Uri = "http://theon.github.com/üris-in-scàla.html"
+    uri.pathRaw should equal ("/üris-in-scàla.html")
   }
 
   "toStringRaw" should "not be encoded" in {

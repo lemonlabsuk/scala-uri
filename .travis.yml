@@ -1,7 +1,15 @@
+--- 
 language: scala
-scala:
-  - "2.9.2"
-  - "2.10.0"
-jdk:
-  - oraclejdk7
-  - openjdk7
+script: "sbt coveralls test"
+jdk: 
+- oraclejdk7
+- openjdk7
+scala: 
+- 2.9.2
+- 2.10.0
+env: 
+  global: 
+  - secure: |-
+      c49SM5+Urv9BX9Wb3MrJDX7TuVCsOqVOj6kEeD6AliVZZdwuYLw0xFuHU78J
+      BAe/WZWMxhbBqV3VbuT42yAZOGfNQrZsQ8mwPJcUR/ake4MdVCsTvTNXeZsQ
+      C3xDdLtoaBxDnjrMj1oIlB8zUvAJRKJqj3cPmc19LbKHqUDfzZY=

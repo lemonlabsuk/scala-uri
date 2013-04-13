@@ -3,6 +3,7 @@ package com.github.theon.urlutils
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import com.github.theon.uri.Uri._
+import org.parboiled.errors.ParsingException
 
 class ParsingTests extends FlatSpec with ShouldMatchers {
 

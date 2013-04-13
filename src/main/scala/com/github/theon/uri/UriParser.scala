@@ -5,13 +5,13 @@ import org.parboiled.errors.{ErrorUtils, ParsingException}
 
 object UriParser extends Parser {
 
-  def scheme = rule { optional(oneOrMore(alphaNumeric)) ~> extract ~ "://" }
+  def scheme = rule { oneOrMore(alphaNumeric) ~> extract ~ "://" }
 
   def alphaNumeric = rule { "0" - "9" | "a" - "z" | "A" - "Z" }
 
-  def hostname = rule { zeroOrMore(!anyOf(":/") ~ ANY) ~> extract }
+  def hostname = rule { oneOrMore(!anyOf(":/") ~ ANY) ~> extract }
 
-  def port = rule { ":" ~ (zeroOrMore("0" - "9") ~> (_.toInt)) }
+  def port = rule { ":" ~ (oneOrMore("0" - "9") ~> (_.toInt)) }
 
   def pathSegment = rule { zeroOrMore(!anyOf("/?") ~ ANY) ~> extract }
 

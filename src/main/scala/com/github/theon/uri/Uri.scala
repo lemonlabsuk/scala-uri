@@ -16,6 +16,12 @@ case class Uri (
     this(scheme, host, None, path.dropWhile(_ == '/').split('/').toList, query)
   }
 
+  /**
+   * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
+   * Query String parameter will not be rendered in calls to toString or toStringRaw
+   * @param kv Tuple2 representing the querystring parameter
+   * @return A new Uri with the new Query String parameter
+   */
   def param(kv:(String, Any)) = {
     val (k,v) = kv
     v match {
@@ -28,19 +34,50 @@ case class Uri (
 
   def scheme = protocol
 
+  /**
+   * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
+   * Query String parameter will not be rendered in calls to toString or toStringRaw
+   * @param kv Tuple2 representing the querystring parameter
+   * @return A new Uri with the new Query String parameter
+   */
   def ?(kv:(String, Any)) = param(kv)
+
+  /**
+   * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
+   * Query String parameter will not be rendered in calls to toString or toStringRaw
+   * @param kv Tuple2 representing the querystring parameter
+   * @return A new Uri with the new Query String parameter
+   */
   def &(kv:(String, Any)) = param(kv)
 
+  /**
+   * Returns the path with no encoding taking place (e.g. non ASCII characters will not be percent encoded)
+   * @return String containing the raw path for this Uri
+   */
   def pathRaw = path(None)
+
+  /**
+   * Returns the encoded path. By default non ASCII characters in the path are percent encoded.
+   * @return String containing the path for this Uri
+   */
   def path(implicit e:Enc = PercentEncoder):String = path(Some(e))
 
-  def path(e:Option[Enc]):String = {
+  protected def path(e:Option[Enc]):String = {
     "/" +
     pathParts.map(p => {
       if(e.isDefined) encode(p, e.get) else p
     }).mkString("/")
   }
 
+  /**
+   * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
+   * with the specified value. If the value passed in is None, then all Query String parameters with the specified key
+   * are removed
+   *
+   * @param k Key for the Query String parameter(s) to replace
+   * @param v value to replace with
+   * @return A new Uri with the result of the replace
+   */
   def replaceParams(k:String, v:Any) = {
     v match {
       case valueOpt:Option[_] =>
@@ -50,11 +87,19 @@ case class Uri (
     }
   }
 
+  /**
+   * Removes all Query String parameters with the specified key
+   * @param k Key for the Query String parameter(s) to remove
+   * @return
+   */
   def removeParams(k:String) = {
     copy(query = query.removeParams(k))
   }
 
   /**
+   * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
+   * with the specified value.
+   *
    * @deprecated Use replaceParams() instead
    */
   @Deprecated
@@ -64,9 +109,15 @@ case class Uri (
 
   override def toString = toString(PercentEncoder)
   def toString(implicit e:Enc = PercentEncoder):String = toString(Some(e))
+
+  /**
+   * Returns the string representation of this Uri with no encoding taking place
+   * (e.g. non ASCII characters will not be percent encoded)
+   * @return String containing this Uri in it's raw form
+   */
   def toStringRaw():String = toString(None)
 
-  def toString(e:Option[Enc]):String = {
+  protected def toString(e:Option[Enc]):String = {
     //If there is no scheme, we use protocol relative
     val schemeStr = scheme.map(_ + "://").getOrElse("//")
     host.map(schemeStr + _).getOrElse("") +
@@ -79,6 +130,9 @@ case class Uri (
 case class Querystring(params:Map[String,List[String]] = Map()) {
 
   /**
+   * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
+   * with the specified value.
+   *
    * @deprecated Use replaceParams() instead
    */
   @Deprecated
@@ -86,6 +140,15 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
     copy(params = params + (k -> List(v)))
   }
 
+  /**
+   * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
+   * with the specified value. If the value passed in is None, then all Query String parameters with the specified key
+   * are removed
+   *
+   * @param k Key for the Query String parameter(s) to replace
+   * @param v value to replace with
+   * @return A new QueryString with the result of the replace
+   */
   def replaceParams(k:String, v:Option[Any]) = {
     v match {
       case Some(v) => copy(params = params + (k -> List(v.toString)))
@@ -93,10 +156,21 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
     }
   }
 
+  /**
+   * Removes all Query String parameters with the specified key
+   * @param k Key for the Query String parameter(s) to remove
+   * @return
+   */
   def removeParams(k:String) = {
     copy(params = params.filterNot(_._1 == k))
   }
 
+  /**
+   * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
+   * Query String parameter will not be rendered in calls to toString or toStringRaw
+   * @param kv Tuple2 representing the querystring parameter
+   * @return A new Query String with the new Query String parameter
+   */
   def &(kv:(String, Option[Any])) = {
     val (k,vOpt) = kv
     vOpt match {
@@ -110,6 +184,12 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
 
   override def toString() = toString(PercentEncoder)
   def toString(e:Enc):String = toString(Some(e))
+
+  /**
+   * Returns the string representation of this QueryString with no encoding taking place
+   * (e.g. non ASCII characters will not be percent encoded)
+   * @return String containing this QueryString in it's raw form
+   */
   def toStringRaw():String = toString(None)
 
   def toString(prefix:String, e:Option[Enc]):String = {
@@ -120,7 +200,7 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
     }
   }
 
-  def toString(e:Option[Enc]) = {
+  protected def toString(e:Option[Enc]) = {
     params.flatMap(kv => {
       val (k,v) = kv
       if(e.isDefined) {

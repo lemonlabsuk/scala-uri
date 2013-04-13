@@ -13,7 +13,7 @@ case class Uri (
 ) {
 
   def this(scheme:Option[String], host:Option[String], path:String, query:Querystring = Querystring()) = {
-    this(scheme, host, None, path.split('/').toList, query)
+    this(scheme, host, None, path.dropWhile(_ == '/').split('/').toList, query)
   }
 
   def param(kv:(String, Any)) = {
@@ -35,6 +35,7 @@ case class Uri (
   def path(implicit e:Enc = PercentEncoder):String = path(Some(e))
 
   def path(e:Option[Enc]):String = {
+    "/" +
     pathParts.map(p => {
       if(e.isDefined) encode(p, e.get) else p
     }).mkString("/")
@@ -132,9 +133,6 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
 }
 
 object Uri {
-  //TODO: uncomment when 2.9.2 support is dropped
-  //import scala.language.implicitConversions
-
   type Enc = UriEncoder
 
   implicit def stringToUri(s:String) = parseUri(s)

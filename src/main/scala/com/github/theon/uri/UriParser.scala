@@ -1,29 +1,35 @@
 package com.github.theon.uri
 
-import util.parsing.combinator.RegexParsers
+import org.parboiled.scala._
+import org.parboiled.errors.{ErrorUtils, ParsingException}
 
-class UriParser extends RegexParsers {
+object UriParser extends Parser {
 
-  val relScheme =  "://" ^^ { x => None }
+  def scheme = rule { optional(oneOrMore(alphaNumeric)) ~> extract ~ "://" }
 
-  val absScheme =  "[a-zA-Z0-9]+".r <~ "://" ^^ { Some(_) }
+  def alphaNumeric = rule { "0" - "9" | "a" - "z" | "A" - "Z" }
 
-  val scheme = absScheme | relScheme
+  def hostname = rule { zeroOrMore(!anyOf(":/") ~ ANY) ~> extract }
 
-  val hostname =  "[^:/]+".r
+  def port = rule { ":" ~ (zeroOrMore("0" - "9") ~> (_.toInt)) }
 
-  val port = "[0-9]+".r ^^ { _.toInt }
+  def pathSegment = rule { zeroOrMore(!anyOf("/?") ~ ANY) ~> extract }
 
-  val pathSegment = "[^/\\?]*".r
+  def queryKeyValue = group(zeroOrMore(!anyOf("=&") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf("=&") ~ ANY) ~> extract)
 
-  val queryKeyValue = "[^=&]+".r ~ "=" ~ "[^=&]+".r ^^ {
-    case key ~ equals ~ value => (key, value)
-  }
+  def queryString = optional("?") ~ zeroOrMore(queryKeyValue, separator = "&") ~~> (tuples => tuplesToQuerystring(tuples))
 
-  val uri = (scheme ~ hostname).? ~ (":" ~> port).? ~ repsep(pathSegment, "/") ~ "?".? ~ repsep(queryKeyValue, "&") ^^ {
-    case schemeHost ~ port ~ pathSegments ~ question ~ queryPairs => {
-      new Uri(schemeHost.flatMap(_._1), schemeHost.map(_._2), port, pathSegments, tuplesToQuerystring(queryPairs))
-    }
+  /**
+   * Anyone have a cleaner way extract strings?
+   */
+  def extract = (x:String) => x
+
+  lazy val uri: Rule1[Uri] = rule {
+    optional(scheme ~ hostname) ~
+      optional(port) ~
+      optional("/") ~
+      zeroOrMore(pathSegment, separator = "/") ~
+      queryString ~~> ((schemeHost, p, pp, qs) => new Uri(schemeHost.map(_._1), schemeHost.map(_._2), p, pp, qs))
   }
 
   def tuplesToQuerystring(tuples:List[(String,String)]) = {
@@ -34,36 +40,12 @@ class UriParser extends RegexParsers {
 
     Querystring(map)
   }
-}
-object UriParser {
-  /**
-   * When thread safety issues mentioned in https://issues.scala-lang.org/browse/SI-4929 are fixed,
-   * we won't need to make a new UriParser for every parse, we can reuse a single UriParser for better
-   * performance.
-   * I was going to make reuse of a single UriParser for 2.10 (as the thread safety issues don't exist in 2.10),
-   * however there is talk of reintroducing these issues to avoid a memory leak... (so I will just keep and eye on the
-   * SI-4929 ticket for the meantime)
-   */
-  def parse(s: CharSequence) = {
-    val parser = new UriParser()
-    val res = parser.parseAll(parser.uri, s).get
-    cleanup
-    res
-  }
 
-  /**
-   * Cleanup to prevent memory leak mentioned in ticket https://issues.scala-lang.org/browse/SI-4929
-   */
-  def cleanup = {
-    try {
-      val field = getClass.getDeclaredField("scala$util$parsing$combinator$Parsers$$lastNoSuccessVar")
-      field.setAccessible(true)
-      val field2 = classOf[scala.util.DynamicVariable[_]].getDeclaredField("tl")
-      field2.setAccessible(true)
-      field2.get(field.get(this)).asInstanceOf[java.lang.ThreadLocal[_]].remove()
-      field.set(this, null)
-    } catch {
-      case e:NoSuchFieldException => //2.9.2 - no clean up required
+  def parse(s: String) = {
+    val parsingResult = ReportingParseRunner(uri).run(s)
+    parsingResult.result match {
+      case Some(astRoot) => astRoot
+      case None => throw new ParsingException("Invalid Uri:\n" + ErrorUtils.printParseErrors(parsingResult))
     }
   }
 }

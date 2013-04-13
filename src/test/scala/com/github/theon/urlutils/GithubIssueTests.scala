@@ -40,6 +40,6 @@ class GithubIssueTests  extends FlatSpec with ShouldMatchers {
 
     uri.protocol should equal (None)
     uri.host should equal (None)
-    uri.path should equal ("abc")
+    uri.path should equal ("/abc")
   }
 }

@@ -16,9 +16,13 @@ pomIncludeRepository := { _ => false }
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
+libraryDependencies += "org.parboiled" %% "parboiled-scala" % "1.1.4"
+
 libraryDependencies <+= scalaVersion(scalatestDependency(_))
 
 seq(ScctPlugin.instrumentSettings : _*)
+
+parallelExecution in Test := false
 
 publishTo <<= version { (v: String) =>
   val nexus = "https://oss.sonatype.org/"

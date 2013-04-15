@@ -52,3 +52,14 @@ pomExtra := (
       <url>http://theon.github.com</url>
     </developer>
   </developers>)
+
+resolvers += "Sonatype OSS Snapshots" at
+  "https://oss.sonatype.org/content/repositories/snapshots"
+
+libraryDependencies += "com.github.axel22" %% "scalameter" % "0.3"
+
+testFrameworks += new TestFramework("benchmarks.OnOffScalaMeterFramework")
+
+logBuffered := false
+
+testOptions in Test += Tests.Argument(new TestFramework("benchmarks.OnOffScalaMeterFramework"), "-Cbenchmarking false")

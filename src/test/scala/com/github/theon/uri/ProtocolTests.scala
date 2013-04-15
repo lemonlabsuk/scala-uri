@@ -1,8 +1,7 @@
-package com.github.theon.urlutils
+package com.github.theon.uri
 
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
-import com.github.theon.uri.Uri
 
 /**
  * Date: 12/03/2013

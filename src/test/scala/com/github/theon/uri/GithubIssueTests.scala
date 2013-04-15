@@ -1,4 +1,4 @@
-package com.github.theon.urlutils
+package com.github.theon.uri
 
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers

@@ -176,6 +176,27 @@ Add the following dependency:
 "com.github.theon" %% "scala-uri" % "0.3.5-SNAPSHOT"
 ```
 
+# Contributions
+
+Contributions to `scala-uri` are always welcome. Good ways to contribute include:
+
+ * Raising bugs and feature requests
+ * Fixing bugs and developing new features (I will attempt to merge in pull requests ASAP)
+ * Improving the performance of `scala-uri`. See the [Performance Tests](#performance-tests) section below for details of how to run the performance benchmarks.
+
+# Building scala-uri
+
+## Unit Tests
+
+The unit tests can be run from the sbt console by running the `test` command! Checking the unit tests all pass before sending pull requests will be much appreciated.
+
+Generate code coverage reports from the sbt console by running the `scct:test` command. The HTML reports should be generated at `target/scala-2.10/coverage-report/index.html`. Ideally pull requests shouldn't significantly decrease code coverage, but it's not the end of the world if they do. Contributions with no tests are better than no contributions :)
+
+## Performance Tests
+
+Performance tests can be run by running the `./benchmarks` script in the root of the repository. The HTML reports are
+generated in `target/benchmarks/parsing/report/index.html` and `target/benchmarks/rendering/report/index.html`.
+
 # License
 
 `scala-uri` is open source software released under the [Apache 2 License](http://www.apache.org/licenses/LICENSE-2.0).

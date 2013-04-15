@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+sbt "test-only benchmarks.ParsingBenchmark -- -Cbenchmarking true -CresultDir target/benchmarks/parsing"
+sbt "test-only benchmarks.RenderingBenchmark -- -Cbenchmarking true -CresultDir target/benchmarks/rendering"

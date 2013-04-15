@@ -62,4 +62,6 @@ testFrameworks += new TestFramework("benchmarks.OnOffScalaMeterFramework")
 
 logBuffered := false
 
+//The `-Cbenchmarking false` prevents the Performance Benchmarks running for the sbt command `test` and `scct:test`
+//See the benchmark script in the root of the repo for examples of how to run the Performance Benchmarks
 testOptions in Test += Tests.Argument(new TestFramework("benchmarks.OnOffScalaMeterFramework"), "-Cbenchmarking false")

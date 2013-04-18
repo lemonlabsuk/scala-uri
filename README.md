@@ -15,7 +15,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.3.4"
+"com.github.theon" %% "scala-uri" % "0.3.5"
 ```
 
 ## Building URIs with the DSL
@@ -141,8 +141,6 @@ uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
 
 ## Protocol Relative URLs
 
-**New feature currently in 0.3.5-SNAPSHOT**
-
 [Protocol Relative URLs](http://paulirish.com/2010/the-protocol-relative-url/) are supported in `scala-uri`. A `Uri` object with a protocol of `None`, but a host of `Some(x)` will be considered a protocol relative URL.
 
 ```scala
@@ -159,7 +157,7 @@ scala-uri is currently built with support for scala `2.9.2` and `2.10.0`
 Release builds are available in maven central. Just add the following dependency:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.3.4"
+"com.github.theon" %% "scala-uri" % "0.3.5"
 ```
 
 ### Latest snapshot builds
@@ -173,7 +171,7 @@ resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/public"
 Add the following dependency:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.3.5-SNAPSHOT"
+"com.github.theon" %% "scala-uri" % "0.3.6-SNAPSHOT"
 ```
 
 # Contributions

@@ -1,13 +1,14 @@
 package com.github.theon.uri
 
-import org.scalatest.FlatSpec
+import org.scalatest.{OptionValues, FlatSpec}
 import org.scalatest.matchers.ShouldMatchers
 import com.github.theon.uri.Uri._
+import org.scalatest.PartialFunctionValues._
 
 /**
  * Test Suite to ensure that bugs raised by awesome github peeps NEVER come back
  */
-class GithubIssueTests  extends FlatSpec with ShouldMatchers {
+class GithubIssueTests  extends FlatSpec with ShouldMatchers with OptionValues {
 
   "Github Issue #2" should " now be fixed. Pluses in querystrings should be encoded" in {
     val uri = "http://theon.github.com/+" ? ("+" -> "+")
@@ -41,5 +42,17 @@ class GithubIssueTests  extends FlatSpec with ShouldMatchers {
     uri.protocol should equal (None)
     uri.host should equal (None)
     uri.path should equal ("/abc")
+  }
+
+  "Github Issue #15" should " now be fixed. Empty Query String values are parsed" in {
+    val uri = parseUri("http://localhost:8080/ping?oi=TscV16GUGtlU&ppc=&bpc=")
+
+    uri.protocol.value should equal ("http")
+    uri.host.value should equal ("localhost")
+    uri.port.value should equal (8080)
+    uri.path should equal ("/ping")
+    uri.query.params("oi") should equal (List("TscV16GUGtlU"))
+    uri.query.params("ppc") should equal (List(""))
+    uri.query.params("bpc") should equal (List(""))
   }
 }

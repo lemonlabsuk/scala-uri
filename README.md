@@ -180,7 +180,7 @@ Contributions to `scala-uri` are always welcome. Good ways to contribute include
 
  * Raising bugs and feature requests
  * Fixing bugs and developing new features (I will attempt to merge in pull requests ASAP)
- * Improving the performance of `scala-uri`. See the [Performance Tests](#performance-tests) section below for details of how to run the performance benchmarks.
+ * Improving the performance of `scala-uri`. See the [Performance Tests](https://github.com/theon/scala-uri-benchmarks) project for details of how to run the `scala-uri` performance benchmarks.
 
 # Building scala-uri
 
@@ -192,8 +192,7 @@ Generate code coverage reports from the sbt console by running the `scct:test` c
 
 ## Performance Tests
 
-Performance tests can be run by running the `./benchmarks` script in the root of the repository. The HTML reports are
-generated in `target/benchmarks/parsing/report/index.html` and `target/benchmarks/rendering/report/index.html`.
+For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https://github.com/theon/scala-uri-benchmarks) github project
 
 # License
 

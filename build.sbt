@@ -18,7 +18,7 @@ scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
 libraryDependencies += "org.parboiled" %% "parboiled-scala" % "1.1.4"
 
-libraryDependencies <+= scalaVersion(scalatestDependency(_))
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.0.M5b" % "test"
 
 seq(ScctPlugin.instrumentSettings : _*)
 
@@ -52,16 +52,3 @@ pomExtra := (
       <url>http://theon.github.com</url>
     </developer>
   </developers>)
-
-resolvers += "Sonatype OSS Snapshots" at
-  "https://oss.sonatype.org/content/repositories/snapshots"
-
-libraryDependencies += "com.github.axel22" %% "scalameter" % "0.3"
-
-testFrameworks += new TestFramework("benchmarks.OnOffScalaMeterFramework")
-
-logBuffered := false
-
-//The `-Cbenchmarking false` prevents the Performance Benchmarks running for the sbt command `test` and `scct:test`
-//See the benchmark script in the root of the repo for examples of how to run the Performance Benchmarks
-testOptions in Test += Tests.Argument(new TestFramework("benchmarks.OnOffScalaMeterFramework"), "-Cbenchmarking false")

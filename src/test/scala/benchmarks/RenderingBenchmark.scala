@@ -25,7 +25,7 @@ object RenderingBenchmark extends PerformanceTest {
   lazy val reporter = HtmlReporter(HtmlReporter.Renderer.Info(), HtmlReporter.Renderer.BigO(), HtmlReporter.Renderer.Chart(ChartFactory.XYLine()))
   lazy val persistor = Persistor.None
 
-  val lengths = Gen.range("size")(1, 5000, 500)
+  val lengths = Gen.range("size")(1, 100000, 10000)
   val testData = lengths.map(i => Random.alphanumeric.take(i).mkString)
 
   val testLongPaths = testData.map(data => Uri("/" + data))

@@ -7,7 +7,7 @@
 //   * Used when testing changes to the xsbt-coveralls-plugin
 //   * Uncomment this, and comment out
 //   *
-//   * addSbtPlugin("com.github.theon" %% "xsbt-coveralls-plugin" % "0.0.1-SNAPSHOT")
+//   * addSbtPlugin("com.github.theon" %% "xsbt-coveralls-plugin" % "x.x.x")
 //   *
 //   * in scala-uri/project/build.sbt
 //   */

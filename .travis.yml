@@ -1,6 +1,6 @@
 --- 
 language: scala
-script: "sbt coveralls test"
+script: "sbt coveralls"
 jdk: 
 - oraclejdk7
 - openjdk7

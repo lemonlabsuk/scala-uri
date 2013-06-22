@@ -22,6 +22,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.0.M5b" % "test"
 
 seq(ScctPlugin.instrumentSettings : _*)
 
+seq(com.github.theon.coveralls.CoverallsPlugin.coverallsSettings: _*)
+
 parallelExecution in Test := false
 
 publishTo <<= version { (v: String) =>

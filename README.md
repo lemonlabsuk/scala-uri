@@ -150,14 +150,24 @@ uri.scheme //This is: None
 uri.host //This is: Some("example.com")
 ```
 
-## Including scala-uri your SBT project
+## Including scala-uri your project
 
 scala-uri is currently built with support for scala `2.9.2` and `2.10.0`
 
-Release builds are available in maven central. Just add the following dependency:
+Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
 "com.github.theon" %% "scala-uri" % "0.3.5"
+```
+
+For maven users you should use (for 2.10.x):
+
+```xml
+<dependency>
+    <groupId>com.github.theon</groupId>
+    <artifactId>scala-uri_2.10</artifactId>
+    <version>0.3.5</version>
+</dependency>
 ```
 
 ### Latest snapshot builds

@@ -84,4 +84,22 @@ class DslTests extends FlatSpec with ShouldMatchers {
     val newUri = uri.removeParams("testOne")
     newUri.toString should equal ("/uris-in-scala.html?testTwo=2")
   }
+
+  "Scheme setter method" should "copy the URI with the new scheme" in {
+    val uri = "http://coldplay.com/chris-martin.html" ? ("testOne" -> "1")
+    val newUri = uri.scheme("https")
+    newUri.toString should equal ("https://coldplay.com/chris-martin.html?testOne=1")
+  }
+
+  "Host setter method" should "copy the URI with the new host" in {
+    val uri = "http://coldplay.com/chris-martin.html" ? ("testOne" -> "1")
+    val newUri = uri.host("jethrotull.com")
+    newUri.toString should equal ("http://jethrotull.com/chris-martin.html?testOne=1")
+  }
+
+  "Port setter method" should "copy the URI with the new port" in {
+    val uri = "http://coldplay.com/chris-martin.html" ? ("testOne" -> "1")
+    val newUri = uri.port(8080)
+    newUri.toString should equal ("http://coldplay.com:8080/chris-martin.html?testOne=1")
+  }
 }

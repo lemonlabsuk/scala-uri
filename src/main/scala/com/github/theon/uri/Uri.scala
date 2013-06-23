@@ -35,6 +35,30 @@ case class Uri (
   def scheme = protocol
 
   /**
+   * Copies this Uri but with the scheme set the given value.
+   *
+   * @param scheme the new scheme to set
+   * @return a new Uri with the specified scheme
+   */
+  def scheme(scheme: String): Uri = copy(protocol = Option(scheme))
+
+  /**
+   * Copies this Uri but with the host set the given value.
+   *
+   * @param host the new host to set
+   * @return a new Uri with the specified host
+   */
+  def host(host: String): Uri = copy(host = Option(host))
+
+  /**
+   * Copies this Uri but with the port set the given value.
+   *
+   * @param port the new host to set
+   * @return a new Uri with the specified port
+   */
+  def port(port: Int): Uri = copy(port = Option(port))
+
+  /**
    * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
    * Query String parameter will not be rendered in calls to toString or toStringRaw
    * @param kv Tuple2 representing the querystring parameter

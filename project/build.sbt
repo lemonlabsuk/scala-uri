@@ -7,4 +7,4 @@ resolvers ++= Seq(
 
 addSbtPlugin("reaktor" %% "sbt-scct" % "0.2-SNAPSHOT")
 
-addSbtPlugin("com.github.theon" %% "xsbt-coveralls-plugin" % "0.0.3-SNAPSHOT")
+addSbtPlugin("com.github.theon" %% "xsbt-coveralls-plugin" % "0.0.3")

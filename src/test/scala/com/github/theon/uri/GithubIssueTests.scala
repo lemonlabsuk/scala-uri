@@ -27,7 +27,7 @@ class GithubIssueTests  extends FlatSpec with ShouldMatchers with OptionValues {
 
   "Github Issue #6" should " now be fixed. No implicit Encoder val required for implicit Uri -> String conversion " in {
     val uri = "/blah" ? ("blah" -> "blah")
-    val uriString:String = uri
+    val uriString: String = uri
     uriString should equal ("/blah?blah=blah")
   }
 

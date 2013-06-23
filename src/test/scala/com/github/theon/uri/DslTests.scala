@@ -7,12 +7,12 @@ import com.github.theon.uri.Uri._
 class DslTests extends FlatSpec with ShouldMatchers {
 
   "A simple absolute URI" should "render correctly" in {
-    val uri:Uri = "http://theon.github.com/uris-in-scala.html"
+    val uri: Uri = "http://theon.github.com/uris-in-scala.html"
     uri.toString should equal ("http://theon.github.com/uris-in-scala.html")
   }
 
   "A simple relative URI" should "render correctly" in {
-    val uri:Uri = "/uris-in-scala.html"
+    val uri: Uri = "/uris-in-scala.html"
     uri.toString should equal ("/uris-in-scala.html")
   }
 

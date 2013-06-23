@@ -8,34 +8,34 @@ import com.github.theon.uri.Encoders._
 class EncodingTests extends FlatSpec with ShouldMatchers {
 
   "URI paths" should "be percent encoded" in {
-    val uri:Uri = "http://theon.github.com/üris-in-scàla.html"
+    val uri: Uri = "http://theon.github.com/üris-in-scàla.html"
     uri.toString should equal ("http://theon.github.com/%C3%BCris-in-sc%C3%A0la.html")
   }
 
   "Raw paths" should "not be encoded" in {
-    val uri:Uri = "http://theon.github.com/üris-in-scàla.html"
+    val uri: Uri = "http://theon.github.com/üris-in-scàla.html"
     uri.pathRaw should equal ("/üris-in-scàla.html")
   }
 
   "toStringRaw" should "not be encoded" in {
-    val uri:Uri = "http://theon.github.com/üris-in-scàla.html" ? ("càsh" -> "£50")
+    val uri: Uri = "http://theon.github.com/üris-in-scàla.html" ? ("càsh" -> "£50")
     uri.toStringRaw should equal ("http://theon.github.com/üris-in-scàla.html?càsh=£50")
   }
 
   "URI path spaces" should "be percent encoded by default" in {
-    val uri:Uri = "http://theon.github.com/uri with space"
+    val uri: Uri = "http://theon.github.com/uri with space"
     uri.toString should equal ("http://theon.github.com/uri%20with%20space")
   }
 
   "URI path spaces" should "be plus encoded if configured" in {
     implicit val encoder = PercentEncoder + EncodeSpaceAsPlus
-    val uri:Uri = "http://theon.github.com/uri with space"
+    val uri: Uri = "http://theon.github.com/uri with space"
     uri.toString should equal ("http://theon.github.com/uri+with+space")
   }
 
   "Path chars" should "be encoded as custom strings if configured" in {
     implicit val encoder = PercentEncoder + EncodeCharAs(' ', "_")
-    val uri:Uri = "http://theon.github.com/uri with space"
+    val uri: Uri = "http://theon.github.com/uri with space"
     uri.toString should equal ("http://theon.github.com/uri_with_space")
   }
 

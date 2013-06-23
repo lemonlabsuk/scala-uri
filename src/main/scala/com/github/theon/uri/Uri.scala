@@ -5,14 +5,14 @@ import com.github.theon.uri.Encoders.PercentEncoder
 import com.github.theon.uri.Encoders.encode
 
 case class Uri (
-  protocol:Option[String],
-  host:Option[String],
-  port:Option[Int],
-  pathParts:List[String],
-  query:Querystring
+  protocol: Option[String],
+  host: Option[String],
+  port: Option[Int],
+  pathParts: List[String],
+  query: Querystring
 ) {
 
-  def this(scheme:Option[String], host:Option[String], path:String, query:Querystring = Querystring()) = {
+  def this(scheme: Option[String], host: Option[String], path: String, query: Querystring = Querystring()) = {
     this(scheme, host, None, path.dropWhile(_ == '/').split('/').toList, query)
   }
 
@@ -22,10 +22,10 @@ case class Uri (
    * @param kv Tuple2 representing the querystring parameter
    * @return A new Uri with the new Query String parameter
    */
-  def param(kv:(String, Any)) = {
+  def param(kv: (String, Any)) = {
     val (k,v) = kv
     v match {
-      case valueOpt:Option[_] =>
+      case valueOpt: Option[_] =>
         copy(query = query & (k, valueOpt))
       case _ =>
         copy(query = query & (k, Some(v)))
@@ -40,7 +40,7 @@ case class Uri (
    * @param kv Tuple2 representing the querystring parameter
    * @return A new Uri with the new Query String parameter
    */
-  def ?(kv:(String, Any)) = param(kv)
+  def ?(kv: (String, Any)) = param(kv)
 
   /**
    * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
@@ -48,7 +48,7 @@ case class Uri (
    * @param kv Tuple2 representing the querystring parameter
    * @return A new Uri with the new Query String parameter
    */
-  def &(kv:(String, Any)) = param(kv)
+  def &(kv: (String, Any)) = param(kv)
 
   /**
    * Returns the path with no encoding taking place (e.g. non ASCII characters will not be percent encoded)
@@ -60,9 +60,9 @@ case class Uri (
    * Returns the encoded path. By default non ASCII characters in the path are percent encoded.
    * @return String containing the path for this Uri
    */
-  def path(implicit e:Enc = PercentEncoder):String = path(Some(e))
+  def path(implicit e: Enc = PercentEncoder): String = path(Some(e))
 
-  protected def path(e:Option[Enc]):String = {
+  protected def path(e: Option[Enc]): String = {
     "/" +
     pathParts.map(p => {
       if(e.isDefined) encode(p, e.get) else p
@@ -78,9 +78,9 @@ case class Uri (
    * @param v value to replace with
    * @return A new Uri with the result of the replace
    */
-  def replaceParams(k:String, v:Any) = {
+  def replaceParams(k: String, v: Any) = {
     v match {
-      case valueOpt:Option[_] =>
+      case valueOpt: Option[_] =>
         copy(query = query.replaceParams(k, valueOpt))
       case _ =>
         copy(query = query.replaceParams(k, Some(v)))
@@ -92,7 +92,7 @@ case class Uri (
    * @param k Key for the Query String parameter(s) to remove
    * @return
    */
-  def removeParams(k:String) = {
+  def removeParams(k: String) = {
     copy(query = query.removeParams(k))
   }
 
@@ -103,21 +103,21 @@ case class Uri (
    * @deprecated Use replaceParams() instead
    */
   @Deprecated
-  def replace(k:String, v:String) = {
+  def replace(k: String, v: String) = {
     copy(query = query.replaceParams(k, Some(v)))
   }
 
   override def toString = toString(PercentEncoder)
-  def toString(implicit e:Enc = PercentEncoder):String = toString(Some(e))
+  def toString(implicit e: Enc = PercentEncoder): String = toString(Some(e))
 
   /**
    * Returns the string representation of this Uri with no encoding taking place
    * (e.g. non ASCII characters will not be percent encoded)
    * @return String containing this Uri in it's raw form
    */
-  def toStringRaw():String = toString(None)
+  def toStringRaw(): String = toString(None)
 
-  protected def toString(e:Option[Enc]):String = {
+  protected def toString(e: Option[Enc]): String = {
     //If there is no scheme, we use protocol relative
     val schemeStr = scheme.map(_ + "://").getOrElse("//")
     host.map(schemeStr + _).getOrElse("") +
@@ -127,7 +127,7 @@ case class Uri (
   }
 }
 
-case class Querystring(params:Map[String,List[String]] = Map()) {
+case class Querystring(params: Map[String,List[String]] = Map()) {
 
   /**
    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
@@ -136,7 +136,7 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
    * @deprecated Use replaceParams() instead
    */
   @Deprecated
-  def replace(k:String, v:String) = {
+  def replace(k: String, v: String) = {
     copy(params = params + (k -> List(v)))
   }
 
@@ -149,7 +149,7 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
    * @param v value to replace with
    * @return A new QueryString with the result of the replace
    */
-  def replaceParams(k:String, v:Option[Any]) = {
+  def replaceParams(k: String, v: Option[Any]) = {
     v match {
       case Some(v) => copy(params = params + (k -> List(v.toString)))
       case None => removeParams(k)
@@ -161,7 +161,7 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
    * @param k Key for the Query String parameter(s) to remove
    * @return
    */
-  def removeParams(k:String) = {
+  def removeParams(k: String) = {
     copy(params = params.filterNot(_._1 == k))
   }
 
@@ -171,7 +171,7 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
    * @param kv Tuple2 representing the querystring parameter
    * @return A new Query String with the new Query String parameter
    */
-  def &(kv:(String, Option[Any])) = {
+  def &(kv: (String, Option[Any])) = {
     val (k,vOpt) = kv
     vOpt match {
       case Some(v) => {
@@ -183,16 +183,16 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
   }
 
   override def toString() = toString(PercentEncoder)
-  def toString(e:Enc):String = toString(Some(e))
+  def toString(e: Enc): String = toString(Some(e))
 
   /**
    * Returns the string representation of this QueryString with no encoding taking place
    * (e.g. non ASCII characters will not be percent encoded)
    * @return String containing this QueryString in it's raw form
    */
-  def toStringRaw():String = toString(None)
+  def toStringRaw(): String = toString(None)
 
-  def toString(prefix:String, e:Option[Enc]):String = {
+  def toString(prefix: String, e: Option[Enc]): String = {
     if(params.isEmpty) {
       ""
     } else {
@@ -200,7 +200,7 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
     }
   }
 
-  protected def toString(e:Option[Enc]) = {
+  protected def toString(e: Option[Enc]) = {
     params.flatMap(kv => {
       val (k,v) = kv
       if(e.isDefined) {
@@ -215,27 +215,27 @@ case class Querystring(params:Map[String,List[String]] = Map()) {
 object Uri {
   type Enc = UriEncoder
 
-  implicit def stringToUri(s:String) = parseUri(s)
-  implicit def uriToString(uri:Uri)(implicit e:UriEncoder=PercentEncoder):String = uri.toString(e)
-  implicit def encoderToChainerEncoder(enc:UriEncoder) = ChainedUriEncoder(enc :: Nil)
+  implicit def stringToUri(s: String) = parseUri(s)
+  implicit def uriToString(uri: Uri)(implicit e: UriEncoder = PercentEncoder): String = uri.toString(e)
+  implicit def encoderToChainerEncoder(enc: UriEncoder) = ChainedUriEncoder(enc :: Nil)
 
-  def parseUri(s:CharSequence) :Uri = UriParser.parse(s.toString)
+  def parseUri(s: CharSequence): Uri = UriParser.parse(s.toString)
 
-  def apply(scheme:String, host:String, path:String):Uri =
+  def apply(scheme: String, host: String, path: String): Uri =
     new Uri(Some(scheme), Some(host), path)
 
-  def apply(scheme:String, host:String, path:String, query:Querystring):Uri =
+  def apply(scheme: String, host: String, path: String, query: Querystring): Uri =
     new Uri(Some(scheme), Some(host), path, query)
 
-  def apply(scheme:Option[String], host:String, path:String):Uri =
+  def apply(scheme: Option[String], host: String, path: String): Uri =
     new Uri(scheme, Some(host), path)
 
-  def apply(scheme:Option[String], host:String, path:String, query:Querystring):Uri =
+  def apply(scheme: Option[String], host: String, path: String, query: Querystring): Uri =
     new Uri(scheme, Some(host), path, query)
 
-  def apply(path:String):Uri =
+  def apply(path: String): Uri =
     new Uri(None, None, path)
 
-  def apply(path:String, query:Querystring):Uri =
+  def apply(path: String, query: Querystring): Uri =
     new Uri(None, None, path, query)
 }

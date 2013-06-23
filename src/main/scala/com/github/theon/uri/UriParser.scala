@@ -22,7 +22,7 @@ object UriParser extends Parser {
   /**
    * Anyone have a cleaner way extract strings?
    */
-  def extract = (x:String) => x
+  def extract = (x: String) => x
 
   lazy val uri: Rule1[Uri] = rule {
     optional(scheme ~ hostname) ~
@@ -32,7 +32,7 @@ object UriParser extends Parser {
       queryString ~~> ((schemeHost, p, pp, qs) => new Uri(schemeHost.map(_._1), schemeHost.map(_._2), p, pp, qs))
   }
 
-  def tuplesToQuerystring(tuples:List[(String,String)]) = {
+  def tuplesToQuerystring(tuples: List[(String,String)]) = {
     val map = tuples.groupBy(_._1).map(kv => {
       val (k,v) = kv
       (k,v.map(_._2))

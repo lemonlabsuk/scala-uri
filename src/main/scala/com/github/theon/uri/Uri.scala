@@ -219,7 +219,8 @@ object Uri {
   implicit def uriToString(uri:Uri)(implicit e:UriEncoder=PercentEncoder):String = uri.toString(e)
   implicit def encoderToChainerEncoder(enc:UriEncoder) = ChainedUriEncoder(enc :: Nil)
 
-  def parseUri(s:String) = UriParser.parse(s)
+  def parseUri(s:CharSequence) :Uri = parseUri(s.toString)
+  def parseUri(s:String) :Uri = UriParser.parse(s)
 
   def apply(scheme:String, host:String, path:String):Uri =
     new Uri(Some(scheme), Some(host), path)

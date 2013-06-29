@@ -231,6 +231,7 @@ For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https:/
 
 `scala-uri` is open source software released under the [Apache 2 License](http://www.apache.org/licenses/LICENSE-2.0).
 
+<meta name="google-site-verification" content="Z7KPUf1sgM9ETHZoxWhThBrjeHgM16BKRD5jIrEOd5s" />
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

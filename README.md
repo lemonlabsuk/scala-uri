@@ -231,14 +231,4 @@ For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https:/
 
 `scala-uri` is open source software released under the [Apache 2 License](http://www.apache.org/licenses/LICENSE-2.0).
 
-<meta name="google-site-verification" content="Z7KPUf1sgM9ETHZoxWhThBrjeHgM16BKRD5jIrEOd5s" />
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-42118232-1', 'github.com');
-  ga('send', 'pageview');
-
-</script>
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/6379a8269f03e9dc2cc994c9493eecc0 "githalytics.com")](http://githalytics.com/theon/scala-uri)

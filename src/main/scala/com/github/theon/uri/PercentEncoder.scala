@@ -1,9 +1,10 @@
 package com.github.theon.uri
 
 import java.nio.charset.Charset
+import PercentEncoderDefaults._
 
 object Encoders {
-  val PercentEncoder = new PercentEncoder()
+  val PercentEncoder = new PercentEncoder(DEFAULT_CHARS_TO_ENCODE)
   val EncodeSpaceAsPlus = EncodeCharAs(' ', "+")
 
   def encode(s: String, encoder: UriEncoder) = {
@@ -18,14 +19,17 @@ object Encoders {
   }
 }
 
-class PercentEncoder extends UriEncoder {
-  val RESERVED_CHARS = Set (
+object PercentEncoderDefaults {
+  val DEFAULT_CHARS_TO_ENCODE = Set (
     ' ', '%', '$', '&', '+', ',', '/', ':', ';', '=', '?', '@', '<', '>', '[', ']', '(', ')', '#', '%', '!', '\'', '*',
     '{', '}', '\n', '\r', '^', '`', '|', '~', '\\'
   )
+}
+
+class PercentEncoder(val charsToEncode: Set[Char]) extends UriEncoder {
 
   def shouldEncode(ch: Char) = {
-    !ascii(ch) || RESERVED_CHARS.contains(ch)
+    !ascii(ch) || charsToEncode.contains(ch)
   }
 
   def encode(ch: Char) = "%" + toHex(ch)

@@ -104,6 +104,29 @@ val uri:Uri = "http://theon.github.com/uri with space"
 uri.toString //This is http://theon.github.com/uri_with_space
 ```
 
+## URL Percent Decoding
+
+By Default, `scala-uri` will URL percent decode paths and query string parameters during parsing:
+
+```scala
+import com.github.theon.uri.Uri._
+val uri: Uri = "http://example.com/i-have-%25been%25-percent-encoded"
+
+uri.toString //This is: http://example.com/i-havent-%25been%25-percent-encoded
+
+uri.toStringRaw //This is: http://example.com/i-havent-%been%-percent-encoded
+```
+
+To prevent this, you can bring the following implicit into scope:
+
+```scala
+implicit val decoder = NoopDecoder
+val uri: Uri = "http://example.com/i-havent-%been%-percent-encoded"
+
+uri.toString //This is: http://example.com/i-havent-%25been%25-percent-encoded
+
+uri.toStringRaw //This is: http://example.com/i-havent-%been%-percent-encoded
+```
 
 ## Replacing Query String Parameters
 

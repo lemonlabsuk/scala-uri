@@ -239,11 +239,12 @@ case class Querystring(params: Map[String,List[String]] = Map()) {
 object Uri {
   type Enc = UriEncoder
 
-  implicit def stringToUri(s: String) = parseUri(s)
+  implicit def stringToUri(s: String)(implicit d: UriDecoder = PercentDecoder) = parseUri(s)
   implicit def uriToString(uri: Uri)(implicit e: UriEncoder = PercentEncoder): String = uri.toString(e)
   implicit def encoderToChainerEncoder(enc: UriEncoder) = ChainedUriEncoder(enc :: Nil)
 
-  def parseUri(s: CharSequence): Uri = UriParser.parse(s.toString)
+  def parseUri(s: CharSequence)(implicit d: UriDecoder = PercentDecoder): Uri =
+    UriParser.parse(s.toString, d)
 
   def apply(scheme: String, host: String, path: String): Uri =
     new Uri(Some(scheme), Some(host), path)

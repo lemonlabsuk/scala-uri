@@ -41,10 +41,10 @@ object UriParser extends Parser {
     Querystring(map)
   }
 
-  def parse(s: String) = {
+  def parse(s: String, decoder: UriDecoder) = {
     val parsingResult = ReportingParseRunner(uri).run(s)
     parsingResult.result match {
-      case Some(astRoot) => astRoot
+      case Some(uri) => decoder.decode(uri)
       case None => throw new ParsingException("Invalid Uri:\n" + ErrorUtils.printParseErrors(parsingResult))
     }
   }

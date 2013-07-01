@@ -8,7 +8,6 @@
  * A [DSL](#building-uris-with-the-dsl) for building URIs
  * A [parser](#parsing-uris) to parse URIs from Strings.
  * Can be used outside a servlet environment as it has zero dependencies on the servlet spec or existing web frameworks.
- * [Performant](https://github.com/theon/scala-uri-benchmarks/blob/master/src/main/scala/com/github/theon/uri/BasicProfiling.scala) - A smallish URL parses in a few thousandths of a millisecond
  * Ability to [replace](#replacing-query-string-parameters) and [remove](#removing-query-string-parameters) query string parameters
  * Support for [custom encoding](#custom-encoding) such as encoding [spaces as pluses](#encoding-spaces-as-pluses)
  * Support for [protocol relative urls](#protocol-relative-urls)

@@ -42,6 +42,8 @@ To add query string parameters, use either the `?` or `&` method and pass a `Tup
 
 ### Fragments
 
+**New in `0.3.6-SNAPSHOT`**
+
 To set the fragment, use either the ``#`` operator:
 
 ```scala
@@ -118,6 +120,8 @@ uri.toString //This is http://theon.github.com/uri_with_space
 ```
 
 ## URL Percent Decoding
+
+**New in `0.3.6-SNAPSHOT`**
 
 By Default, `scala-uri` will URL percent decode paths and query string parameters during parsing:
 

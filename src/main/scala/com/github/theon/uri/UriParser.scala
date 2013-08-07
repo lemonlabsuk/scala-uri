@@ -2,6 +2,7 @@ package com.github.theon.uri
 
 import org.parboiled.scala._
 import org.parboiled.errors.{ErrorUtils, ParsingException}
+import scala.collection.immutable.ListMap
 
 object UriParser extends Parser {
 

@@ -7,12 +7,17 @@ package com.github.theon.uri
  */
 object PercentDecoder extends UriDecoder {
 
-  def decode(u: Uri) = u.copy (
-    pathParts = u.pathParts.map(decodeString),
-    query = u.query.copy (
-      u.query.params.map(kv => decodeString(kv._1) -> kv._2.map(decodeString))
-    )
-  )
+  def decode(u: Uri) =
+    try {
+      u.copy (
+        pathParts = u.pathParts.map(decodeString),
+        query = u.query.copy (
+          u.query.params.map(kv => decodeString(kv._1) -> kv._2.map(decodeString))
+        )
+      )
+    } catch {
+      case e: NumberFormatException => throw new UriDecodeException("Encountered '%' followed by a non hex number. It looks like this URL isn't Percent Encoded. If so look at using the NoopDecoder")
+    }
 
   protected def decodeString(s: String) = {
     val segments = s.split('%')
@@ -24,10 +29,24 @@ object PercentDecoder extends UriDecoder {
   }
 }
 
+object PermissiveDecoder extends Permissive(PercentDecoder)
+
 object NoopDecoder extends UriDecoder {
   def decode(u: Uri) = u
 }
 
-trait UriDecoder {
-  def decode(s: Uri): Uri
+class Permissive(child: UriDecoder) extends UriDecoder {
+  def decode(u: Uri) = {
+    try {
+      child.decode(u)
+    } catch {
+      case e: UriDecodeException => u
+    }
+  }
 }
+
+trait UriDecoder {
+  def decode(u: Uri): Uri
+}
+
+class UriDecodeException(message: String) extends Exception(message)

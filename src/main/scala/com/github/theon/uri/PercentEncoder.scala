@@ -7,15 +7,23 @@ object Encoders {
   val PercentEncoder = new PercentEncoder(DEFAULT_CHARS_TO_ENCODE)
   val EncodeSpaceAsPlus = EncodeCharAs(' ', "+")
 
+  object NoopEncoder extends UriEncoder {
+    def shouldEncode(ch: Char) = false
+    def encode(ch: Char) = ch.toString
+  }
+
   def encode(s: String, encoder: UriEncoder) = {
-    val chars = s.getBytes(Charset.forName("UTF-8")).map(_.toChar)
-    chars.map(ch => {
+    val chars = s.getBytes("UTF-8").map(_.toChar)
+
+    val encChars = chars.flatMap(ch => {
       if (encoder.shouldEncode(ch)) {
-         encoder.encode(ch)
+         encoder.encode(ch).getBytes("UTF-8")
       } else {
-        ch.toString
+        Array(ch.toByte)
       }
-    }).mkString
+    })
+
+    new String(encChars, "UTF-8")
   }
 }
 

@@ -1,8 +1,7 @@
 package com.github.theon.uri
 
 import com.github.theon.uri.Uri._
-import com.github.theon.uri.Encoders.PercentEncoder
-import com.github.theon.uri.Encoders.encode
+import com.github.theon.uri.Encoders.{NoopEncoder, PercentEncoder, encode}
 
 case class Uri (
   protocol: Option[String],
@@ -78,20 +77,14 @@ case class Uri (
    * Returns the path with no encoding taking place (e.g. non ASCII characters will not be percent encoded)
    * @return String containing the raw path for this Uri
    */
-  def pathRaw = path(None)
+  def pathRaw = path(NoopEncoder)
 
   /**
    * Returns the encoded path. By default non ASCII characters in the path are percent encoded.
    * @return String containing the path for this Uri
    */
-  def path(implicit e: Enc = PercentEncoder): String = path(Some(e))
-
-  protected def path(e: Option[Enc]): String = {
-    "/" +
-    pathParts.map(p => {
-      if(e.isDefined) encode(p, e.get) else p
-    }).mkString("/")
-  }
+  def path(implicit e: Enc = PercentEncoder): String =
+    "/" + pathParts.map(encode(_, e)).mkString("/")
 
   /**
    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
@@ -132,16 +125,7 @@ case class Uri (
   }
 
   override def toString = toString(PercentEncoder)
-  def toString(implicit e: Enc = PercentEncoder): String = toString(Some(e))
-
-  /**
-   * Returns the string representation of this Uri with no encoding taking place
-   * (e.g. non ASCII characters will not be percent encoded)
-   * @return String containing this Uri in it's raw form
-   */
-  def toStringRaw(): String = toString(None)
-
-  protected def toString(e: Option[Enc]): String = {
+  def toString(implicit e: Enc = PercentEncoder): String = {
     //If there is no scheme, we use protocol relative
     val schemeStr = scheme.map(_ + "://").getOrElse("//")
     host.map(schemeStr + _).getOrElse("") +
@@ -149,6 +133,13 @@ case class Uri (
       path(e) +
       query.toString("?", e)
   }
+
+  /**
+   * Returns the string representation of this Uri with no encoding taking place
+   * (e.g. non ASCII characters will not be percent encoded)
+   * @return String containing this Uri in it's raw form
+   */
+  def toStringRaw(): String = toString(NoopEncoder)
 }
 
 case class Querystring(params: Map[String,List[String]] = Map()) {
@@ -207,32 +198,26 @@ case class Querystring(params: Map[String,List[String]] = Map()) {
   }
 
   override def toString() = toString(PercentEncoder)
-  def toString(e: Enc): String = toString(Some(e))
+  def toString(e: Enc): String = {
+    params.flatMap(kv => {
+      val (k,v) = kv
+      v.map(encode(k, e) + "=" + encode(_, e))
+    }).mkString("&")
+  }
 
   /**
    * Returns the string representation of this QueryString with no encoding taking place
    * (e.g. non ASCII characters will not be percent encoded)
    * @return String containing this QueryString in it's raw form
    */
-  def toStringRaw(): String = toString(None)
+  def toStringRaw(): String = toString(NoopEncoder)
 
-  def toString(prefix: String, e: Option[Enc]): String = {
+  def toString(prefix: String, e: Enc): String = {
     if(params.isEmpty) {
       ""
     } else {
       prefix + toString(e)
     }
-  }
-
-  protected def toString(e: Option[Enc]) = {
-    params.flatMap(kv => {
-      val (k,v) = kv
-      if(e.isDefined) {
-        v.map(encode(k, e.get) + "=" + encode(_, e.get))
-      } else {
-        v.map(k + "=" + _)
-      }
-    }).mkString("&")
   }
 }
 

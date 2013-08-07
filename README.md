@@ -20,15 +20,6 @@ To include it in your SBT project from maven central:
 
 ## Building URIs with the DSL
 
-By importing `com.github.theon.uri.Uri._`, Strings can be _implicitly_ converted to URIs.
-
-To _explicitly_ create a `Uri`, you can use the factory methods:
-
-```scala
-val uri = Uri("http", "theon.github.com", "/scala-uri") //Absolute URI
-val uri = Uri("/scala-uri") //Relative URI
-```
-
 ### Query Strings
 
 ```scala
@@ -59,7 +50,7 @@ Provided you have the import `com.github.theon.uri.Uri._`, Strings will be impli
 
 ```scala
 import com.github.theon.uri.Uri._
-val uri:Uri = "http://theon.github.com/scala-uri?param1=1&param2=2"
+val uri: Uri = "http://theon.github.com/scala-uri?param1=1&param2=2"
 ```
 
 However, if you prefer, you can call `parseUri()` explicitly:
@@ -102,7 +93,7 @@ import com.github.theon.uri.Uri._
 import com.github.theon.uri.Encoders._
 implicit val encoder = PercentEncoder + EncodeSpaceAsPlus
 
-val uri:Uri = "http://theon.github.com/uri with space"
+val uri: Uri = "http://theon.github.com/uri with space"
 uri.toString //This is http://theon.github.com/uri+with+space
 ```
 
@@ -115,7 +106,7 @@ import com.github.theon.uri.Uri._
 import com.github.theon.uri.Encoders._
 implicit val encoder = PercentEncoder + EncodeCharAs(' ', "_")
 
-val uri:Uri = "http://theon.github.com/uri with space"
+val uri: Uri = "http://theon.github.com/uri with space"
 uri.toString //This is http://theon.github.com/uri_with_space
 ```
 
@@ -185,7 +176,7 @@ uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
 
 ```scala
 import com.github.theon.uri.Uri._
-val uri:Uri = "//example.com/path"
+val uri: Uri = "//example.com/path"
 uri.scheme //This is: None
 uri.host //This is: Some("example.com")
 ```

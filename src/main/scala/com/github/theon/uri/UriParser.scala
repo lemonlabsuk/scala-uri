@@ -2,7 +2,6 @@ package com.github.theon.uri
 
 import org.parboiled.scala._
 import org.parboiled.errors.{ErrorUtils, ParsingException}
-import scala.collection.immutable.ListMap
 
 object UriParser extends Parser {
 
@@ -14,11 +13,13 @@ object UriParser extends Parser {
 
   def port = rule { ":" ~ (oneOrMore("0" - "9") ~> (_.toInt)) }
 
-  def pathSegment = rule { zeroOrMore(!anyOf("/?") ~ ANY) ~> extract }
+  def pathSegment = rule { zeroOrMore(!anyOf("/?#") ~ ANY) ~> extract }
 
-  def queryKeyValue = group(zeroOrMore(!anyOf("=&") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf("=&") ~ ANY) ~> extract)
+  def queryKeyValue = group(zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract)
 
   def queryString = optional("?") ~ zeroOrMore(queryKeyValue, separator = "&") ~~> (tuples => tuplesToQuerystring(tuples))
+
+  def fragment = rule { "#" ~ (zeroOrMore(!anyOf("#") ~ ANY) ~> extract) }
 
   /**
    * Anyone have a cleaner way extract strings?
@@ -30,7 +31,8 @@ object UriParser extends Parser {
       optional(port) ~
       optional("/") ~
       zeroOrMore(pathSegment, separator = "/") ~
-      queryString ~~> ((schemeHost, p, pp, qs) => new Uri(schemeHost.map(_._1), schemeHost.map(_._2), p, pp, qs))
+      queryString ~
+      optional(fragment) ~~> ((schemeHost, p, pp, qs, f) => new Uri(schemeHost.map(_._1), schemeHost.map(_._2), p, pp, qs, f))
   }
 
   def tuplesToQuerystring(tuples: List[(String,String)]) = {

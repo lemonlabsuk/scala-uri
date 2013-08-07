@@ -102,4 +102,14 @@ class DslTests extends FlatSpec with ShouldMatchers {
     val newUri = uri.port(8080)
     newUri.toString should equal ("http://coldplay.com:8080/chris-martin.html?testOne=1")
   }
+
+  "Path with fragment" should "render correctly" in {
+    val uri = "http://google.com/test" `#` "fragment"
+    uri.toString should equal ("http://google.com/test#fragment")
+  }
+
+  "Path with query string and fragment" should "render correctly" in {
+    val uri = "http://google.com/test" ? ("q" -> "scala-uri") `#` "fragment"
+    uri.toString should equal ("http://google.com/test?q=scala-uri#fragment")
+  }
 }

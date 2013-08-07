@@ -58,4 +58,9 @@ class EncodingTests extends FlatSpec with ShouldMatchers {
     val uri = "http://theon.github.com/uris-in-scala.html" ? ("russian" -> "Скала")
     uri.toString should equal ("http://theon.github.com/uris-in-scala.html?russian=%D0%A1%D0%BA%D0%B0%D0%BB%D0%B0")
   }
+
+  "Fragments" should "be percent encoded" in {
+    val uri = "http://theon.github.com/uris-in-scala.html" ? ("chinese" -> "网址")
+    uri.toString should equal ("http://theon.github.com/uris-in-scala.html?chinese=%E7%BD%91%E5%9D%80")
+  }
 }

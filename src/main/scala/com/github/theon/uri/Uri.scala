@@ -8,11 +8,12 @@ case class Uri (
   host: Option[String],
   port: Option[Int],
   pathParts: List[String],
-  query: Querystring
+  query: Querystring,
+  fragment: Option[String] = None
 ) {
 
   def this(scheme: Option[String], host: Option[String], path: String, query: Querystring = Querystring()) = {
-    this(scheme, host, None, path.dropWhile(_ == '/').split('/').toList, query)
+    this(scheme, host, None, path.dropWhile(_ == '/').split('/').toList, query, None)
   }
 
   /**
@@ -74,6 +75,13 @@ case class Uri (
   def &(kv: (String, Any)) = param(kv)
 
   /**
+   * Adds a fragment to the end of the uri
+   * @param fragment String representing the fragment
+   * @return A new Uri with this fragment
+   */
+  def `#`(fragment: String) = copy(fragment = Some(fragment))
+
+  /**
    * Returns the path with no encoding taking place (e.g. non ASCII characters will not be percent encoded)
    * @return String containing the raw path for this Uri
    */
@@ -131,7 +139,8 @@ case class Uri (
     host.map(schemeStr + _).getOrElse("") +
       port.map(":" + _).getOrElse("") +
       path(e) +
-      query.toString("?", e)
+      query.toString("?", e) +
+      fragment.map(f => "#" + encode(f, e)).getOrElse("")
   }
 
   /**

@@ -20,7 +20,7 @@ class ParsingTests extends FlatSpec with ShouldMatchers {
     uri.path should equal ("/uris-in-scala.html")
   }
 
-  "Parsing a URI with querystring paramteres" should "result in a valid Uri object" in {
+  "Parsing a URI with querystring parameters" should "result in a valid Uri object" in {
     val uri = parseUri("/uris-in-scala.html?query_param_one=hello&query_param_one=goodbye&query_param_two=false")
     uri.query.params should equal (
       Map(
@@ -34,5 +34,25 @@ class ParsingTests extends FlatSpec with ShouldMatchers {
     val uri = parseUri("//theon.github.com/uris-in-scala.html")
     uri.protocol should equal (None)
     uri.toString should equal ("//theon.github.com/uris-in-scala.html")
+  }
+
+  "Parsing a url with a fragment" should "result in a Uri with Some for fragment" in {
+    val uri = parseUri("//theon.github.com/uris-in-scala.html#fragged")
+    uri.fragment should equal (Some("fragged"))
+  }
+
+  "Parsing a url with a query string and fragment" should "result in a Uri with Some for fragment" in {
+    val uri = parseUri("//theon.github.com/uris-in-scala.html?ham=true#fragged")
+    uri.fragment should equal (Some("fragged"))
+  }
+
+  "Parsing a url without a fragment" should "result in a Uri with None for fragment" in {
+    val uri = parseUri("//theon.github.com/uris-in-scala.html")
+    uri.fragment should equal (None)
+  }
+
+  "Parsing a url without an empty fragment" should "result in a Uri with Some(empty string) for fragment" in {
+    val uri = parseUri("//theon.github.com/uris-in-scala.html#")
+    uri.fragment should equal (Some(""))
   }
 }

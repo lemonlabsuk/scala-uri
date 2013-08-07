@@ -44,7 +44,7 @@ To add query string parameters, use either the `?` or `&` method and pass a `Tup
 
 **New in `0.3.6-SNAPSHOT`**
 
-To set the fragment, use either the ``#`` operator:
+To set the fragment, use the `` `#` `` operator:
 
 ```scala
 import com.github.theon.uri.Uri._

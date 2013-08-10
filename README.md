@@ -11,6 +11,7 @@
  * Ability to [replace](#replacing-query-string-parameters) and [remove](#removing-query-string-parameters) query string parameters
  * Support for [custom encoding](#custom-encoding) such as encoding [spaces as pluses](#encoding-spaces-as-pluses)
  * Support for [protocol relative urls](#protocol-relative-urls)
+ * Support for [user information](#user-information) e.g. `ftp://user:password@mysite.com`
 
 To include it in your SBT project from maven central:
 
@@ -169,6 +170,10 @@ import com.github.theon.uri.Uri._
 val uri = "http://example.com/path" ? ("param" -> "1") & ("param2" -> 2)
 uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
 ```
+
+## User Information
+
+
 
 ## Protocol Relative URLs
 

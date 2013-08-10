@@ -36,6 +36,16 @@ class ParsingTests extends FlatSpec with ShouldMatchers {
     uri.toString should equal ("//theon.github.com/uris-in-scala.html")
   }
 
+  "Parsing a url with relative protocol" should "result in the correct host" in {
+    val uri = parseUri("//theon.github.com/uris-in-scala.html")
+    uri.host should equal(Some("theon.github.com"))
+  }
+
+  "Parsing a url with relative protocol" should "result in the correct path" in {
+    val uri = parseUri("//theon.github.com/uris-in-scala.html")
+    uri.pathParts should equal("uris-in-scala.html" :: Nil)
+  }
+
   "Parsing a url with a fragment" should "result in a Uri with Some for fragment" in {
     val uri = parseUri("//theon.github.com/uris-in-scala.html#fragged")
     uri.fragment should equal (Some("fragged"))
@@ -54,5 +64,30 @@ class ParsingTests extends FlatSpec with ShouldMatchers {
   "Parsing a url without an empty fragment" should "result in a Uri with Some(empty string) for fragment" in {
     val uri = parseUri("//theon.github.com/uris-in-scala.html#")
     uri.fragment should equal (Some(""))
+  }
+
+  "Parsing a url with user" should "result in a Uri with the username" in {
+    val uri = parseUri("mailto://theon@github.com")
+    uri.scheme should equal(Some("mailto"))
+    uri.user should equal(Some("theon"))
+    uri.host should equal(Some("github.com"))
+  }
+
+  "Parsing a with user and password" should "result in a Uri with the user and password" in {
+    val uri = parseUri("ftp://theon:password@github.com")
+    uri.scheme should equal(Some("ftp"))
+    uri.user should equal(Some("theon"))
+    uri.password should equal(Some("password"))
+    uri.host should equal(Some("github.com"))
+  }
+
+  "Protocol relative url with authority" should "parse correctly" in {
+    val uri = parseUri("//user:pass@www.mywebsite.com/index.html")
+    uri.scheme should equal(None)
+    uri.user should equal(Some("user"))
+    uri.password should equal(Some("pass"))
+    uri.subdomain should equal(Some("www"))
+    uri.host should equal(Some("www.mywebsite.com"))
+    uri.pathParts should equal("index.html" :: Nil)
   }
 }

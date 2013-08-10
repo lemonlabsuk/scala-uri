@@ -5,6 +5,8 @@ import com.github.theon.uri.Encoders.{NoopEncoder, PercentEncoder, encode}
 
 case class Uri (
   protocol: Option[String],
+  user: Option[String],
+  password:  Option[String],
   host: Option[String],
   port: Option[Int],
   pathParts: List[String],
@@ -16,10 +18,10 @@ case class Uri (
     host.map(_.split('.').toVector).getOrElse(Vector.empty)
 
   def this(scheme: Option[String], host: Option[String], path: String, query: Querystring = Querystring()) = {
-    this(scheme, host, None, path.dropWhile(_ == '/').split('/').toList, query, None)
+    this(scheme, None, None, host, None, path.dropWhile(_ == '/').split('/').toList, query, None)
   }
 
-  def subdomain = hostParts.head
+  def subdomain = hostParts.headOption
 
   /**
    * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
@@ -40,7 +42,7 @@ case class Uri (
   def scheme = protocol
 
   /**
-   * Copies this Uri but with the scheme set the given value.
+   * Copies this Uri but with the scheme set as the given value.
    *
    * @param scheme the new scheme to set
    * @return a new Uri with the specified scheme
@@ -48,7 +50,7 @@ case class Uri (
   def scheme(scheme: String): Uri = copy(protocol = Option(scheme))
 
   /**
-   * Copies this Uri but with the host set the given value.
+   * Copies this Uri but with the host set as the given value.
    *
    * @param host the new host to set
    * @return a new Uri with the specified host
@@ -56,7 +58,23 @@ case class Uri (
   def host(host: String): Uri = copy(host = Option(host))
 
   /**
-   * Copies this Uri but with the port set the given value.
+   * Copies this Uri but with the user set as the given value.
+   *
+   * @param user the new user to set
+   * @return a new Uri with the specified user
+   */
+  def user(user: String): Uri = copy(user = Option(user))
+
+  /**
+   * Copies this Uri but with the password set as the given value.
+   *
+   * @param password the new password to set
+   * @return a new Uri with the specified password
+   */
+  def password(password: String): Uri = copy(password = Option(password))
+
+  /**
+   * Copies this Uri but with the port set as the given value.
    *
    * @param port the new host to set
    * @return a new Uri with the specified port
@@ -64,17 +82,17 @@ case class Uri (
   def port(port: Int): Uri = copy(port = Option(port))
 
   /**
-   * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
+   * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
    * Query String parameter will not be rendered in calls to toString or toStringRaw
-   * @param kv Tuple2 representing the querystring parameter
+   * @param kv Tuple2 representing the query string parameter
    * @return A new Uri with the new Query String parameter
    */
   def ?(kv: (String, Any)) = param(kv)
 
   /**
-   * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
+   * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
    * Query String parameter will not be rendered in calls to toString or toStringRaw
-   * @param kv Tuple2 representing the querystring parameter
+   * @param kv Tuple2 representing the query string parameter
    * @return A new Uri with the new Query String parameter
    */
   def &(kv: (String, Any)) = param(kv)
@@ -141,7 +159,8 @@ case class Uri (
   def toString(implicit e: Enc = PercentEncoder): String = {
     //If there is no scheme, we use protocol relative
     val schemeStr = scheme.map(_ + "://").getOrElse("//")
-    host.map(schemeStr + _).getOrElse("") +
+    val userInfo = user.map(_ + password.map(":" + _).getOrElse("") + "@").getOrElse("")
+    host.map(schemeStr + userInfo + _).getOrElse("") +
       port.map(":" + _).getOrElse("") +
       path(e) +
       query.toString("?", e) +

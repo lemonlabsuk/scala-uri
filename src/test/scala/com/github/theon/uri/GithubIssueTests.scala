@@ -57,8 +57,10 @@ class GithubIssueTests extends FlatSpec with ShouldMatchers with OptionValues {
   }
 
   "Github Issue #12" should "now be fixed. Parsing URIs parse percent escapes" in {
-    val source = com.github.theon.uri.Uri(
+    val source = Uri(
       Some("http"),
+      None,
+      None,
       Some("xn--ls8h.example.net"),
       None,
       List("", "path with spaces"),

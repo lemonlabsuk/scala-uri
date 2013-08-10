@@ -120,6 +120,22 @@ class DslTests extends FlatSpec with ShouldMatchers {
 
   "subdomain" should "return the first dot separated part of the host" in {
     val uri = "http://theon.github.com/test" ? ("q" -> "scala-uri")
-    uri.subdomain should equal ("theon")
+    uri.subdomain should equal (Some("theon"))
   }
+
+  "Uri with user info" should "render correctly" in {
+    val uri = "http://user:password@moonpig.com/" `#` "hi"
+    uri.toString should equal ("http://user:password@moonpig.com/#hi")
+  }
+
+  "Uri with a changed user" should "render correctly" in {
+    val uri = "http://user:password@moonpig.com/" `#` "hi"
+    uri.user("ian").toString should equal ("http://ian:password@moonpig.com/#hi")
+  }
+
+  "Uri with a changed password" should "render correctly" in {
+    val uri = "http://user:password@moonpig.com/" `#` "hi"
+    uri.password("secret").toString should equal ("http://user:secret@moonpig.com/#hi")
+  }
+
 }

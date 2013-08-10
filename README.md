@@ -193,17 +193,23 @@ uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
 
 Parsing URLs with user information:
 
-    val uri = "http://user:pass@host.com"
-    uri.user //This is Some("user")
-    uri.password //This is Some("pass")
+```scala
+val uri = "http://user:pass@host.com"
+uri.user //This is Some("user")
+uri.password //This is Some("pass")
+```
 
 Modifying user information:
 
-    val mailto = "mailto://user@host.com"
-    mailto.user("jack") //URL is now jack@host.com
+```scala
+val mailto = "mailto://user@host.com"
+mailto.user("jack") //URL is now jack@host.com
+```
 
-    val uri = "http://user:pass@host.com"
-    uri.password("secret") //URL is now http://user:secret@host.com
+```scala
+val uri = "http://user:pass@host.com"
+uri.password("secret") //URL is now http://user:secret@host.com
+```
 
 **Note:** that using clear text passwords in URLs is [ill advised](http://tools.ietf.org/html/rfc3986#section-3.2.1)
 

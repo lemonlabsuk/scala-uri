@@ -1,10 +1,11 @@
 package com.github.theon.uri
 
-import java.nio.charset.Charset
 import PercentEncoderDefaults._
 
 object Encoders {
   val PercentEncoder = new PercentEncoder(DEFAULT_CHARS_TO_ENCODE)
+  def PercentEncoder(chars: Char*) = new PercentEncoder(chars.toSet)
+
   val EncodeSpaceAsPlus = EncodeCharAs(' ', "+")
 
   object NoopEncoder extends UriEncoder {
@@ -44,6 +45,9 @@ class PercentEncoder(val charsToEncode: Set[Char]) extends UriEncoder {
   def toHex(ch: Char) = "%04x".format(ch.toInt).substring(2).toUpperCase
 
   def ascii(ch: Char) = ch > 0 && ch < 128
+
+  def --(chars: Char*) = new PercentEncoder(charsToEncode -- chars)
+  def ++(chars: Char*) = new PercentEncoder(charsToEncode ++ chars)
 }
 
 case class EncodeCharAs(ch: Char,as: String) extends UriEncoder {

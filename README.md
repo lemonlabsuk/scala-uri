@@ -85,6 +85,22 @@ uri.toString //This is: http://example.com/path%20with%20space?param=%C3%BCri
 uri.toStringRaw //This is: http://example.com/path with space?param=üri
 ```
 
+The characters that `scala-uri` will percent encode by default can be found [here](https://github.com/theon/scala-uri/blob/master/src/main/scala/com/github/theon/uri/PercentEncoder.scala#L31). You can modify which characters are percent encoded like so:
+
+Only percent encode the hash character
+
+    implicit val encoder = PercentEncoder('#')
+
+Percent encode all the default chars, except the plus character:
+
+    implicit val encoder = PercentEncoder -- '+'
+
+Encode all the default chars, and also encode the letters a and b:
+
+    implicit val encoder = PercentEncoder ++ ('a', 'b')
+
+Unit test examples are [here](https://github.com/theon/scala-uri/blob/master/src/test/scala/com/github/theon/uri/EncodingTests.scala#L67)
+
 ### Encoding spaces as pluses
 
 The default behaviour with scala uri, is to encode spaces as `%20`, however if you instead wish them to be encoded as the `+` symbol, then simply add the following `implicit val` to your code:
@@ -173,7 +189,23 @@ uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
 
 ## User Information
 
+`scala-uri` supports user information (username and password) encoded in URLs.
 
+Parsing URLs with user information:
+
+    val uri = "http://user:pass@host.com"
+    uri.user //This is Some("user")
+    uri.password //This is Some("pass")
+
+Modifying user information:
+
+    val mailto = "mailto://user@host.com"
+    mailto.user("jack") //URL is now jack@host.com
+
+    val uri = "http://user:pass@host.com"
+    uri.password("secret") //URL is now http://user:secret@host.com
+
+**Note:** that using clear text passwords in URLs is [ill advised](http://tools.ietf.org/html/rfc3986#section-3.2.1)
 
 ## Protocol Relative URLs
 

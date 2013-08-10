@@ -135,7 +135,7 @@ class DslTests extends FlatSpec with ShouldMatchers {
 
   "Uri with a changed password" should "render correctly" in {
     val uri = "http://user:password@moonpig.com/" `#` "hi"
-    uri.password("secret").toString should equal ("http://user:secret@moonpig.com/#hi")
+    uri.password("not-so-secret").toString should equal ("http://user:not-so-secret@moonpig.com/#hi")
   }
 
 }

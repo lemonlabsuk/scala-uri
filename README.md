@@ -194,6 +194,8 @@ uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
 
 ## User Information
 
+**New in `0.3.6-SNAPSHOT`**
+
 `scala-uri` supports user information (username and password) encoded in URLs.
 
 Parsing URLs with user information:

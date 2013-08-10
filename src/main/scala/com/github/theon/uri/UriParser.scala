@@ -39,7 +39,7 @@ object UriParser extends Parser {
         val authority = sa.map(_._2)
 
         new Uri(
-          protocol = scheme.flatten,
+          protocol = scheme.flatMap(x => x), //TODO: Change to scheme.flatten when 2.9.2 support is dropped
           user = authority.flatMap(_.user),
           password = authority.flatMap(_.password),
           host = authority.map(_.host),

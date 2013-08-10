@@ -14,8 +14,9 @@ case class Uri (
   fragment: Option[String] = None
 ) {
 
+  //TODO: Tidy to h.split('.').toVector when 2.9.2 support is dropped
   lazy val hostParts: Seq[String] =
-    host.map(_.split('.').toVector).getOrElse(Vector.empty)
+    host.map(h => Vector(h.split('.'): _*)).getOrElse(Vector.empty)
 
   def this(scheme: Option[String], host: Option[String], path: String, query: Querystring = Querystring()) = {
     this(scheme, None, None, host, None, path.dropWhile(_ == '/').split('/').toList, query, None)

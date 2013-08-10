@@ -81,6 +81,7 @@ The characters that `scala-uri` will percent encode by default can be found [her
 
 
 **New in `0.3.6-SNAPSHOT`**
+
 Only percent encode the hash character:
 
 ```scala
@@ -88,6 +89,7 @@ implicit val encoder = PercentEncoder('#')
 ```
 
 **New in `0.3.6-SNAPSHOT`**
+
 Percent encode all the default chars, except the plus character:
 
 ```scala
@@ -95,6 +97,7 @@ implicit val encoder = PercentEncoder -- '+'
 ```
 
 **New in `0.3.6-SNAPSHOT`**
+
 Encode all the default chars, and also encode the letters a and b:
 
 ```scala

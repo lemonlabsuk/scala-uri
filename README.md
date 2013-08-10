@@ -79,25 +79,23 @@ uri.toStringRaw //This is: http://example.com/path with space?param=üri
 
 The characters that `scala-uri` will percent encode by default can be found [here](https://github.com/theon/scala-uri/blob/master/src/main/scala/com/github/theon/uri/PercentEncoder.scala#L31). You can modify which characters are percent encoded like so:
 
-Only percent encode the hash character:
 
 **New in `0.3.6-SNAPSHOT`**
+Only percent encode the hash character:
 
 ```scala
 implicit val encoder = PercentEncoder('#')
 ```
 
-Percent encode all the default chars, except the plus character:
-
 **New in `0.3.6-SNAPSHOT`**
+Percent encode all the default chars, except the plus character:
 
 ```scala
 implicit val encoder = PercentEncoder -- '+'
 ```
 
-Encode all the default chars, and also encode the letters a and b:
-
 **New in `0.3.6-SNAPSHOT`**
+Encode all the default chars, and also encode the letters a and b:
 
 ```scala
 implicit val encoder = PercentEncoder ++ ('a', 'b')

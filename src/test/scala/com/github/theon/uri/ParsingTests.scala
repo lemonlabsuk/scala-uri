@@ -90,4 +90,10 @@ class ParsingTests extends FlatSpec with ShouldMatchers {
     uri.host should equal(Some("www.mywebsite.com"))
     uri.pathParts should equal("index.html" :: Nil)
   }
+
+  "Query string param with hash as value" should "be parsed as fragment" in {
+    val uri = parseUri("http://stackoverflow.com?q=#frag")
+    uri.query.params("q") should equal(List(""))
+    uri.fragment should equal(Some("frag"))
+  }
 }

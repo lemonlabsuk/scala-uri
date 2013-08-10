@@ -9,7 +9,7 @@ object UriParser extends Parser {
 
   def _alphaNumeric = rule { "0" - "9" | "a" - "z" | "A" - "Z" }
 
-  def _hostname = rule { oneOrMore(!anyOf(":/") ~ ANY) ~> extract }
+  def _hostname = rule { oneOrMore(!anyOf(":/?") ~ ANY) ~> extract }
 
   def _userInfo = (oneOrMore(!anyOf(":@") ~ ANY) ~> extract) ~ optional(":" ~ (oneOrMore(!anyOf("@") ~ ANY) ~> extract)) ~ "@"
 

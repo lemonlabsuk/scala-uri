@@ -12,9 +12,14 @@ case class Uri (
   fragment: Option[String] = None
 ) {
 
+  lazy val hostParts: Seq[String] =
+    host.map(_.split('.').toVector).getOrElse(Vector.empty)
+
   def this(scheme: Option[String], host: Option[String], path: String, query: Querystring = Querystring()) = {
     this(scheme, host, None, path.dropWhile(_ == '/').split('/').toList, query, None)
   }
+
+  def subdomain = hostParts.head
 
   /**
    * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this

@@ -25,9 +25,12 @@ To include it in your SBT project from maven central:
 
 ```scala
 import com.github.theon.uri.Uri._
-val uri = "http://theon.github.com/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
 
+val uri = "http://theon.github.com/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
 uri.toString //This is: http://theon.github.com/scala-uri?p1=one&p2=2&p3=true
+
+val uri2 = "http://theon.github.com/scala-uri" ? ("param1" -> Some("1")) & ("param2" -> None)
+uri2.toString //This is: http://theon.github.com/scala-uri?param1=1
 ```
 
 To add query string parameters, use either the `?` or `&` method and pass a `Tuple2` as an argument. The first value in the Tuple is a name of the query string parameter, the second is the value. If a parameter value is an `Option`, it will only be rendered provided it is not `None`.
@@ -59,17 +62,6 @@ However, if you prefer, you can call `parseUri()` explicitly:
 ```scala
 import com.github.theon.uri.Uri.parseUri
 val uri = parseUri("http://theon.github.com/scala-uri?param1=1&param2=2")
-```
-
-## Options and Query String Parameters
-
-You can specify an `Option` as the value of a query string parameter. It will get rendered if it is `Some(x)` and won't get rendered if it is `None`
-
-```scala
-import com.github.theon.uri.Uri._
-val uri = "http://theon.github.com/scala-uri" ? ("param1" -> Some("1")) & ("param2" -> None)
-
-uri.toString //This is: http://theon.github.com/scala-uri?param1=1
 ```
 
 ## URL Percent Encoding

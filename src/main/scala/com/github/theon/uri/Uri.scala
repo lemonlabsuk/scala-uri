@@ -109,14 +109,14 @@ case class Uri (
    * Returns the path with no encoding taking place (e.g. non ASCII characters will not be percent encoded)
    * @return String containing the raw path for this Uri
    */
-  def pathRaw = path(NoopEncoder)
+  def pathRaw = path("UTF-8", NoopEncoder)
 
   /**
    * Returns the encoded path. By default non ASCII characters in the path are percent encoded.
    * @return String containing the path for this Uri
    */
-  def path(implicit e: Enc = PercentEncoder): String =
-    "/" + pathParts.map(encode(_, e)).mkString("/")
+  def path(implicit enc: String = "UTF-8", e: Enc = PercentEncoder): String =
+    "/" + pathParts.map(encode(_, e, enc)).mkString("/")
 
   /**
    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
@@ -156,16 +156,16 @@ case class Uri (
     copy(query = query.replaceParams(k, Some(v)))
   }
 
-  override def toString = toString(PercentEncoder)
-  def toString(implicit e: Enc = PercentEncoder): String = {
+  override def toString = toString("UTF-8", PercentEncoder)
+  def toString(implicit enc: String = "UTF-8", e: Enc = PercentEncoder): String = {
     //If there is no scheme, we use protocol relative
     val schemeStr = scheme.map(_ + "://").getOrElse("//")
     val userInfo = user.map(_ + password.map(":" + _).getOrElse("") + "@").getOrElse("")
     host.map(schemeStr + userInfo + _).getOrElse("") +
       port.map(":" + _).getOrElse("") +
-      path(e) +
-      query.toString("?", e) +
-      fragment.map(f => "#" + encode(f, e)).getOrElse("")
+      path(enc, e) +
+      query.toString("?", e, enc) +
+      fragment.map(f => "#" + encode(f, e, enc)).getOrElse("")
   }
 
   /**
@@ -173,7 +173,7 @@ case class Uri (
    * (e.g. non ASCII characters will not be percent encoded)
    * @return String containing this Uri in it's raw form
    */
-  def toStringRaw(): String = toString(NoopEncoder)
+  def toStringRaw(enc: String = "UTF-8"): String = toString(enc, NoopEncoder)
 }
 
 case class Querystring(params: Map[String,List[String]] = Map()) {
@@ -232,10 +232,10 @@ case class Querystring(params: Map[String,List[String]] = Map()) {
   }
 
   override def toString() = toString(PercentEncoder)
-  def toString(e: Enc): String = {
+  def toString(e: Enc)(implicit enc: String = "UTF-8"): String = {
     params.flatMap(kv => {
       val (k,v) = kv
-      v.map(encode(k, e) + "=" + encode(_, e))
+      v.map(encode(k, e, enc) + "=" + encode(_, e, enc))
     }).mkString("&")
   }
 
@@ -246,11 +246,11 @@ case class Querystring(params: Map[String,List[String]] = Map()) {
    */
   def toStringRaw(): String = toString(NoopEncoder)
 
-  def toString(prefix: String, e: Enc): String = {
+  def toString(prefix: String, e: Enc, enc: String): String = {
     if(params.isEmpty) {
       ""
     } else {
-      prefix + toString(e)
+      prefix + toString(e)(enc)
     }
   }
 }
@@ -259,7 +259,7 @@ object Uri {
   type Enc = UriEncoder
 
   implicit def stringToUri(s: String)(implicit d: UriDecoder = PercentDecoder) = parseUri(s)
-  implicit def uriToString(uri: Uri)(implicit e: UriEncoder = PercentEncoder): String = uri.toString(e)
+  implicit def uriToString(uri: Uri)(implicit enc: String = "UTF-8", e: UriEncoder = PercentEncoder): String = uri.toString(enc, e)
   implicit def encoderToChainerEncoder(enc: UriEncoder) = ChainedUriEncoder(enc :: Nil)
 
   def parseUri(s: CharSequence)(implicit d: UriDecoder = PercentDecoder): Uri =

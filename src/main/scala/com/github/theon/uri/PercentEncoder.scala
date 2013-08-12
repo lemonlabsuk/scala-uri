@@ -13,18 +13,21 @@ object Encoders {
     def encode(ch: Char) = ch.toString
   }
 
-  def encode(s: String, encoder: UriEncoder) = {
-    val chars = s.getBytes("UTF-8").map(_.toChar)
+  def encode(s: String, encoder: UriEncoder, enc: String = "UTF-8") = {
+    val chars = s.getBytes(enc).map(_.toChar)
 
     val encChars = chars.flatMap(ch => {
       if (encoder.shouldEncode(ch)) {
-         encoder.encode(ch).getBytes("UTF-8")
+         encoder.encode(ch).getBytes(enc)
       } else {
         Array(ch.toByte)
       }
     })
 
-    new String(encChars, "UTF-8")
+    // DEBUG
+    println(s"Enc:$enc")
+
+    new String(encChars, enc)
   }
 }
 

@@ -24,9 +24,6 @@ object Encoders {
       }
     })
 
-    // DEBUG
-    println(s"Enc:$enc")
-
     new String(encChars, enc)
   }
 }

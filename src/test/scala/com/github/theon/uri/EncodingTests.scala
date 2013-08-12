@@ -19,9 +19,9 @@ class EncodingTests extends FlatSpec with ShouldMatchers {
 
   "toStringRaw" should "not be encoded" in {
     val uri: Uri = "http://theon.github.com/üris-in-scàla.html" ? ("càsh" -> "£50")
-    uri.toStringRaw should equal ("http://theon.github.com/üris-in-scàla.html?càsh=£50")
+    uri.toStringRaw() should equal ("http://theon.github.com/üris-in-scàla.html?càsh=£50")
   }
-
+ 
   "URI path spaces" should "be percent encoded by default" in {
     val uri: Uri = "http://theon.github.com/uri with space"
     uri.toString should equal ("http://theon.github.com/uri%20with%20space")
@@ -52,6 +52,11 @@ class EncodingTests extends FlatSpec with ShouldMatchers {
   "Chinese characters" should "be percent encoded" in {
     val uri = "http://theon.github.com/uris-in-scala.html" ? ("chinese" -> "网址")
     uri.toString should equal ("http://theon.github.com/uris-in-scala.html?chinese=%E7%BD%91%E5%9D%80")
+  }
+  
+  "Chinese characters with non-UTF8 encoding" should "be percent encoded" in {
+    val uri = "http://theon.github.com/uris-in-scala.html" ? ("chinese" -> "网址")
+    uri.toString("GB2312") should equal ("http://theon.github.com/uris-in-scala.html?chinese=%CD%F8%D6%B7")
   }
 
   "Russian characters" should "be percent encoded" in {

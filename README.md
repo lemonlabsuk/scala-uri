@@ -14,11 +14,12 @@
  * Support for [custom encoding](#custom-encoding) such as encoding [spaces as pluses](#encoding-spaces-as-pluses)
  * Support for [protocol relative urls](#protocol-relative-urls)
  * Support for [user information](#user-information) e.g. `ftp://user:password@mysite.com`
+ * Support for [matrix parameters](#matrix-parameters)
 
 To include it in your SBT project from maven central:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.3.5"
+"com.github.theon" %% "scala-uri" % "0.4.0-SNAPSHOT"
 ```
 
 ## Building URIs with the DSL
@@ -233,6 +234,8 @@ uri.host //This is: Some("example.com")
 ```
 
 ## Matrix Parameters
+
+**New in `0.4.0-SNAPSHOT`**
 
 [Matrix Parameters](http://www.w3.org/DesignIssues/MatrixURIs.html) are supported in `scala-uri`.
 

@@ -37,11 +37,20 @@ uri2.toString //This is: http://theon.github.com/scala-uri?param1=1
 
 To add query string parameters, use either the `?` or `&` method and pass a `Tuple2` as an argument. The first value in the Tuple is a name of the query string parameter, the second is the value. If a parameter value is an `Option`, it will only be rendered provided it is not `None`.
 
+### Paths
+
+```scala
+import com.github.theon.uri.Uri._
+
+val uri = "http://theon.github.com" / "scala-uri"
+uri.toString //This is: http://theon.github.com/scala-uri
+```
+
+To add path segments, use the `/` method
+
 ### Fragments
 
-**New in `0.3.6-SNAPSHOT`**
-
-To set the fragment, use the `` `#` `` operator:
+To set the fragment, use the `` `#` `` method:
 
 ```scala
 import com.github.theon.uri.Uri._
@@ -82,23 +91,17 @@ uri.toStringRaw //This is: http://example.com/path with space?param=üri
 The characters that `scala-uri` will percent encode by default can be found [here](https://github.com/theon/scala-uri/blob/master/src/main/scala/com/github/theon/uri/PercentEncoder.scala#L31). You can modify which characters are percent encoded like so:
 
 
-**New in `0.3.6-SNAPSHOT`**
-
 Only percent encode the hash character:
 
 ```scala
 implicit val encoder = PercentEncoder('#')
 ```
 
-**New in `0.3.6-SNAPSHOT`**
-
 Percent encode all the default chars, except the plus character:
 
 ```scala
 implicit val encoder = PercentEncoder -- '+'
 ```
-
-**New in `0.3.6-SNAPSHOT`**
 
 Encode all the default chars, and also encode the letters a and b:
 
@@ -135,8 +138,6 @@ uri.toString //This is http://theon.github.com/uri_with_space
 ```
 
 ## URL Percent Decoding
-
-**New in `0.3.6-SNAPSHOT`**
 
 By Default, `scala-uri` will URL percent decode paths and query string parameters during parsing:
 
@@ -196,8 +197,6 @@ uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
 
 ## User Information
 
-**New in `0.3.6-SNAPSHOT`**
-
 `scala-uri` supports user information (username and password) encoded in URLs.
 
 Parsing URLs with user information:
@@ -231,6 +230,28 @@ import com.github.theon.uri.Uri._
 val uri: Uri = "//example.com/path"
 uri.scheme //This is: None
 uri.host //This is: Some("example.com")
+```
+
+## Matrix Parameters
+
+[Matrix Parameters](http://www.w3.org/DesignIssues/MatrixURIs.html) are supported in `scala-uri`.
+
+```scala
+import com.github.theon.uri.Uri._
+val uri = "http://example.com/path;paramOne=value;paramTwo=value2/pathTwo;paramThree=value3"
+
+//Get parameters at the end of the path
+uri.matrixParams //This is Vector("paramThree" -> "value3")
+
+//Add parameters to end of path
+val uri2 = uri.matrixParam("paramFour", "value4")
+uri2.toString //This is http://example.com/path;paramOne=value;paramTwo=value2/pathTwo;paramThree=value3;paramFour=value4
+
+//Get parameters for mid path segment
+uri.pathPath("pathTwo").get.parameters //This is Vector("paramOne" -> "value", "paramTwo" -> "value2")
+
+//Add parameters for mid path segment
+val uri2 = uri.matrixParam("pathTwo", "paramFour", "value4")
 ```
 
 ## Including scala-uri your project

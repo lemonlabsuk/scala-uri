@@ -254,7 +254,7 @@ uri2.toString //This is http://example.com/path;paramOne=value;paramTwo=value2/p
 uri.pathPath("pathTwo").get.parameters //This is Vector("paramOne" -> "value", "paramTwo" -> "value2")
 
 //Add parameters for mid path segment
-val uri2 = uri.matrixParam("pathTwo", "paramFour", "value4")
+val uri3 = uri.matrixParam("pathTwo", "paramFour", "value4")
 ```
 
 ## Including scala-uri your project

@@ -16,7 +16,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.3.5"
+"com.github.theon" %% "scala-uri" % "0.3.6"
 ```
 
 ## Building URIs with the DSL
@@ -37,7 +37,7 @@ To add query string parameters, use either the `?` or `&` method and pass a `Tup
 
 ### Fragments
 
-**New in `0.3.6-SNAPSHOT`**
+**New in `0.3.6`**
 
 To set the fragment, use the `` `#` `` operator:
 
@@ -80,7 +80,7 @@ uri.toStringRaw //This is: http://example.com/path with space?param=üri
 The characters that `scala-uri` will percent encode by default can be found [here](https://github.com/theon/scala-uri/blob/master/src/main/scala/com/github/theon/uri/PercentEncoder.scala#L31). You can modify which characters are percent encoded like so:
 
 
-**New in `0.3.6-SNAPSHOT`**
+**New in `0.3.6`**
 
 Only percent encode the hash character:
 
@@ -88,7 +88,7 @@ Only percent encode the hash character:
 implicit val encoder = PercentEncoder('#')
 ```
 
-**New in `0.3.6-SNAPSHOT`**
+**New in `0.3.6`**
 
 Percent encode all the default chars, except the plus character:
 
@@ -96,7 +96,7 @@ Percent encode all the default chars, except the plus character:
 implicit val encoder = PercentEncoder -- '+'
 ```
 
-**New in `0.3.6-SNAPSHOT`**
+**New in `0.3.6`**
 
 Encode all the default chars, and also encode the letters a and b:
 
@@ -134,7 +134,7 @@ uri.toString //This is http://theon.github.com/uri_with_space
 
 ## URL Percent Decoding
 
-**New in `0.3.6-SNAPSHOT`**
+**New in `0.3.6`**
 
 By Default, `scala-uri` will URL percent decode paths and query string parameters during parsing:
 
@@ -194,7 +194,7 @@ uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
 
 ## User Information
 
-**New in `0.3.6-SNAPSHOT`**
+**New in `0.3.6`**
 
 `scala-uri` supports user information (username and password) encoded in URLs.
 
@@ -262,7 +262,7 @@ resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/public"
 Add the following dependency:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.3.6-SNAPSHOT"
+"com.github.theon" %% "scala-uri" % "0.3.7-SNAPSHOT"
 ```
 
 # Contributions

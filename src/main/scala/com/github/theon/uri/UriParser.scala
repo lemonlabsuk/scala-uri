@@ -17,13 +17,17 @@ object UriParser extends Parser {
 
   def _authority = (optional(_userInfo) ~ _hostname ~ optional(":" ~ _port)) ~~>  ((ui, h, p) => Authority(ui.map(_._1), ui.flatMap(_._2), h, p.map(_.toInt)))
 
-  def _pathSegment = rule { zeroOrMore(!anyOf("/?#") ~ ANY) ~> extract }
+  def _matrixParam = group(zeroOrMore(!anyOf(";/=?#") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf(";/=?#") ~ ANY) ~> extract)
 
-  def _path = zeroOrMore(_pathSegment, separator = "/")
+  def _plainPathPart = zeroOrMore(!anyOf(";/?#") ~ ANY) ~> extract
 
-  def _queryKeyValue = group(zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract)
+  def _pathSegment = _plainPathPart ~ optional(";") ~ zeroOrMore(_matrixParam, separator = ";")
 
-  def _queryString = optional("?") ~ zeroOrMore(_queryKeyValue, separator = "&") ~~> (tuples => tuplesToQuerystring(tuples))
+  def _path = zeroOrMore(_pathSegment, separator = "/") ~~> toPathParts _
+
+  def _queryParam = group(zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract)
+
+  def _queryString = optional("?") ~ zeroOrMore(_queryParam, separator = "&") ~~> toQuerystring _
 
   def _fragment = rule { "#" ~ (zeroOrMore(!anyOf("#") ~ ANY) ~> extract) }
 
@@ -57,14 +61,14 @@ object UriParser extends Parser {
    */
   protected  case class Authority(user: Option[String], password: Option[String], host: String, port: Option[Int])
 
-  def tuplesToQuerystring(tuples: List[(String,String)]) = {
-    val map = tuples.groupBy(_._1).map(kv => {
-      val (k,v) = kv
-      (k,v.map(_._2))
-    })
+  def toQuerystring(tuples: List[(String,String)]) =
+    QueryString(tuples.toVector)
 
-    Querystring(map)
-  }
+  def toPathParts(pathParts: List[(String,List[(String,String)])]) =
+    pathParts.map(pp => {
+      val (plain, matrixParams) = pp
+      if(matrixParams.isEmpty) StringPathPart(plain) else MatrixParams(plain, matrixParams.toVector)
+    }).toVector
 
   def parse(s: String, decoder: UriDecoder) = {
     val parsingResult = ReportingParseRunner(uri).run(s)

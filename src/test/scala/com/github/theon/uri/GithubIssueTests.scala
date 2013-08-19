@@ -51,9 +51,9 @@ class GithubIssueTests extends FlatSpec with ShouldMatchers with OptionValues {
     uri.host.value should equal ("localhost")
     uri.port.value should equal (8080)
     uri.path should equal ("/ping")
-    uri.query.params("oi") should equal (List("TscV16GUGtlU"))
-    uri.query.params("ppc") should equal (List(""))
-    uri.query.params("bpc") should equal (List(""))
+    uri.query.params("oi") should equal (Vector("TscV16GUGtlU"))
+    uri.query.params("ppc") should equal (Vector(""))
+    uri.query.params("bpc") should equal (Vector(""))
   }
 
   "Github Issue #12" should "now be fixed. Parsing URIs parse percent escapes" in {
@@ -63,8 +63,8 @@ class GithubIssueTests extends FlatSpec with ShouldMatchers with OptionValues {
       None,
       Some("xn--ls8h.example.net"),
       None,
-      List("", "path with spaces"),
-      com.github.theon.uri.Querystring(Map("a b" → List("c d")))
+      List(PathPart(""), PathPart("path with spaces")),
+      QueryString(Vector("a b" -> "c d"))
     )
     val parsed = parseUri(source.toString)
     parsed should equal(source)

@@ -3,6 +3,8 @@ package com.github.theon.uri
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import com.github.theon.uri.Uri._
+import scala._
+import scala.Some
 
 class ParsingTests extends FlatSpec with ShouldMatchers {
 
@@ -22,10 +24,11 @@ class ParsingTests extends FlatSpec with ShouldMatchers {
 
   "Parsing a URI with querystring parameters" should "result in a valid Uri object" in {
     val uri = parseUri("/uris-in-scala.html?query_param_one=hello&query_param_one=goodbye&query_param_two=false")
-    uri.query.params should equal (
-      Map(
-        ("query_param_two" -> List("false")),
-        ("query_param_one" -> List("hello", "goodbye"))
+    uri.query.parameters should equal (
+      Vector (
+        ("query_param_one" -> "hello"),
+        ("query_param_one" -> "goodbye"),
+        ("query_param_two" -> "false")
       )
     )
   }
@@ -43,7 +46,7 @@ class ParsingTests extends FlatSpec with ShouldMatchers {
 
   "Parsing a url with relative protocol" should "result in the correct path" in {
     val uri = parseUri("//theon.github.com/uris-in-scala.html")
-    uri.pathParts should equal("uris-in-scala.html" :: Nil)
+    uri.pathParts should equal(Vector(PathPart("uris-in-scala.html")))
   }
 
   "Parsing a url with a fragment" should "result in a Uri with Some for fragment" in {
@@ -88,12 +91,20 @@ class ParsingTests extends FlatSpec with ShouldMatchers {
     uri.password should equal(Some("pass"))
     uri.subdomain should equal(Some("www"))
     uri.host should equal(Some("www.mywebsite.com"))
-    uri.pathParts should equal("index.html" :: Nil)
+    uri.pathParts should equal(Vector(PathPart("index.html")))
   }
 
   "Query string param with hash as value" should "be parsed as fragment" in {
     val uri = parseUri("http://stackoverflow.com?q=#frag")
-    uri.query.params("q") should equal(List(""))
+    uri.query.params("q") should equal(Vector(""))
     uri.fragment should equal(Some("frag"))
+  }
+
+  "Path with matrix params" should "be parsed" in {
+    val uri = parseUri("http://stackoverflow.com/path;paramOne=value;paramTwo=value2/pathTwo;paramOne=value")
+    uri.pathParts should equal(Vector(
+      MatrixParams("path", Vector("paramOne" -> "value", "paramTwo" -> "value2")),
+      MatrixParams("pathTwo", Vector("paramOne" -> "value"))
+    ))
   }
 }

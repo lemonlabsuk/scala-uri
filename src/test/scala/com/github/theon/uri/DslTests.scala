@@ -16,25 +16,19 @@ class DslTests extends FlatSpec with ShouldMatchers {
     uri.toString should equal ("/uris-in-scala.html")
   }
 
-  "An absolute URI with querystring params" should "render correctly" in {
+  "An absolute URI with querystring parameters" should "render correctly" in {
     val uri = "http://theon.github.com/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
     uri.toString should equal ("http://theon.github.com/uris-in-scala.html?testOne=1&testTwo=2")
   }
 
-  "A relative URI with querystring params" should "render correctly" in {
+  "A relative URI with querystring parameters" should "render correctly" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
     uri.toString should equal ("/uris-in-scala.html?testOne=1&testTwo=2")
   }
 
-  "Multiple querystring params with the same key" should "render correctly" in {
+  "Multiple querystring parameters with the same key" should "render correctly" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testOne" -> "2")
-    uri.toString should equal ("/uris-in-scala.html?testOne=2&testOne=1")
-  }
-
-  "Legacy replace method" should "stil replace parameters for the meantime" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1")
-    val newUri = uri.replace("testOne", "2")
-    newUri.toString should equal ("/uris-in-scala.html?testOne=2")
+    uri.toString should equal ("/uris-in-scala.html?testOne=1&testOne=2")
   }
 
   "Replace param method" should "replace single parameters with a String argument" in {
@@ -64,7 +58,7 @@ class DslTests extends FlatSpec with ShouldMatchers {
   "Replace param method" should "not affect other parameters" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
     val newUri = uri.replaceParams("testOne", "3")
-    newUri.toString should equal ("/uris-in-scala.html?testOne=3&testTwo=2")
+    newUri.toString should equal ("/uris-in-scala.html?testTwo=2&testOne=3")
   }
 
   "Remove param method" should "remove multiple parameters" in {
@@ -138,4 +132,20 @@ class DslTests extends FlatSpec with ShouldMatchers {
     uri.password("not-so-secret").toString should equal ("http://user:not-so-secret@moonpig.com/#hi")
   }
 
+  "Matrix params" should "be added mid path" in {
+    val uri = "http://stackoverflow.com/pathOne/pathTwo"
+    val uriTwo = uri.matrixParam("pathOne", "key", "val")
+
+    uriTwo.pathPart("pathOne").get.parameters should equal(Vector("key" -> "val"))
+    uriTwo.toString should equal("http://stackoverflow.com/pathOne;key=val/pathTwo")
+  }
+
+  "Matrix params" should "be added to the end of the path" in {
+    val uri = "http://stackoverflow.com/pathOne/pathTwo"
+    val uriTwo = uri.matrixParam("key", "val")
+
+    uriTwo.matrixParams should equal(Vector("key" -> "val"))
+    uriTwo.pathPart("pathTwo").get.parameters should equal(Vector("key" -> "val"))
+    uriTwo.toString should equal("http://stackoverflow.com/pathOne/pathTwo;key=val")
+  }
 }

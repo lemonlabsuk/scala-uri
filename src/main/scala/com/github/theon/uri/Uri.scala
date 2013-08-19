@@ -4,25 +4,40 @@ import com.github.theon.uri.Uri._
 import com.github.theon.uri.Encoders.{NoopEncoder, PercentEncoder, encode}
 
 case class Uri (
-  protocol: Option[String],
-  user: Option[String],
-  password:  Option[String],
-  host: Option[String],
-  port: Option[Int],
-  pathParts: List[String],
-  query: Querystring,
+  protocol: Option[String] = None,
+  user: Option[String] = None,
+  password: Option[String] = None,
+  host: Option[String] = None,
+  port: Option[Int] = None,
+  pathParts: Seq[PathPart] = Seq.empty,
+  query: QueryString = QueryString(),
   fragment: Option[String] = None
 ) {
 
-  //TODO: Tidy to h.split('.').toVector when 2.9.2 support is dropped
   lazy val hostParts: Seq[String] =
-    host.map(h => Vector(h.split('.'): _*)).getOrElse(Vector.empty)
-
-  def this(scheme: Option[String], host: Option[String], path: String, query: Querystring = Querystring()) = {
-    this(scheme, None, None, host, None, path.dropWhile(_ == '/').split('/').toList, query, None)
-  }
+    host.map(h => h.split('.').toVector).getOrElse(Vector.empty)
 
   def subdomain = hostParts.headOption
+
+  def pathPart(name: String) =
+    pathParts.find(_.part == name)
+
+  def matrixParams =
+    pathParts.last match {
+      case MatrixParams(_, p) => p
+      case _ => Seq.empty
+    }
+
+  def matrixParam(pp: String, k: String, v: String) = copy (
+    pathParts = pathParts.map {
+      case p: PathPart if(p.part == pp) => p.addParam(k -> v)
+      case x => x
+    }
+  )
+
+  def matrixParam(k: String, v: String) = copy (
+    pathParts = pathParts.dropRight(1) :+ pathParts.last.addParam(k -> v)
+  )
 
   /**
    * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
@@ -105,6 +120,8 @@ case class Uri (
    */
   def `#`(fragment: String) = copy(fragment = Some(fragment))
 
+  def /(pp: String) = copy(pathParts = pathParts :+ StringPathPart(pp))
+
   /**
    * Returns the path with no encoding taking place (e.g. non ASCII characters will not be percent encoded)
    * @return String containing the raw path for this Uri
@@ -115,8 +132,8 @@ case class Uri (
    * Returns the encoded path. By default non ASCII characters in the path are percent encoded.
    * @return String containing the path for this Uri
    */
-  def path(implicit enc: String = "UTF-8", e: Enc = PercentEncoder): String =
-    "/" + pathParts.map(encode(_, e, enc)).mkString("/")
+  def path(implicit enc: String = "UTF-8", e: Enc = PercentEncoder) =
+    "/" + pathParts.map(_.encoded(e)).mkString("/")
 
   /**
    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
@@ -130,9 +147,9 @@ case class Uri (
   def replaceParams(k: String, v: Any) = {
     v match {
       case valueOpt: Option[_] =>
-        copy(query = query.replaceParams(k, valueOpt))
+        copy(query = query.replaceAll(k, valueOpt))
       case _ =>
-        copy(query = query.replaceParams(k, Some(v)))
+        copy(query = query.replaceAll(k, Some(v)))
     }
   }
 
@@ -142,18 +159,7 @@ case class Uri (
    * @return
    */
   def removeParams(k: String) = {
-    copy(query = query.removeParams(k))
-  }
-
-  /**
-   * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
-   * with the specified value.
-   *
-   * @deprecated Use replaceParams() instead
-   */
-  @Deprecated
-  def replace(k: String, v: String) = {
-    copy(query = query.replaceParams(k, Some(v)))
+    copy(query = query.removeAll(k))
   }
 
   override def toString = toString("UTF-8", PercentEncoder)
@@ -164,7 +170,7 @@ case class Uri (
     host.map(schemeStr + userInfo + _).getOrElse("") +
       port.map(":" + _).getOrElse("") +
       path(enc, e) +
-      query.toString("?", e, enc) +
+      query.encoded(e)(enc) +
       fragment.map(f => "#" + encode(f, e, enc)).getOrElse("")
   }
 
@@ -176,18 +182,45 @@ case class Uri (
   def toStringRaw(enc: String = "UTF-8"): String = toString(enc, NoopEncoder)
 }
 
-case class Querystring(params: Map[String,List[String]] = Map()) {
+case class QueryString(parameters: Seq[(String, String)] = Seq.empty) extends Parameters[QueryString] {
+
+  def separator = "&"
+  def withParams(params: Seq[(String, String)]) = copy(parameters = params)
+
+  def params(key: String) = parameters.collect {
+    case (k, v) if k == key => v
+  }
+
+  def param(key: String) = parameters.find(_._1 == key)
 
   /**
-   * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
-   * with the specified value.
-   *
-   * @deprecated Use replaceParams() instead
+   * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
+   * Query String parameter will not be rendered in calls to toString or toStringRaw
+   * @param kv Tuple2 representing the querystring parameter
+   * @return A new Query String with the new Query String parameter
    */
-  @Deprecated
-  def replace(k: String, v: String) = {
-    copy(params = params + (k -> List(v)))
+  def &(kv: (String, Option[_])) = kv match {
+    case (k, Some(v)) => withParams(parameters :+ (k -> v.toString))
+    case _ => this
   }
+
+  def encoded(e: Enc)(implicit enc: String = "UTF-8"): String = {
+    if(parameters.isEmpty) {
+      ""
+    } else {
+      "?" + paramsEncoded(e)
+    }
+  }
+}
+
+trait Parameters[+Self] {
+  this: Self =>
+
+  def separator: String
+  def parameters: Seq[(String,String)]
+  def withParams(params: Seq[(String,String)]): Self
+
+  def add(kv: (String, String)) = withParams(parameters :+ kv)
 
   /**
    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
@@ -198,10 +231,10 @@ case class Querystring(params: Map[String,List[String]] = Map()) {
    * @param v value to replace with
    * @return A new QueryString with the result of the replace
    */
-  def replaceParams(k: String, v: Option[Any]) = {
+  def replaceAll(k: String, v: Option[Any]) = {
     v match {
-      case Some(v) => copy(params = params + (k -> List(v.toString)))
-      case None => removeParams(k)
+      case Some(v) => withParams(parameters.filterNot(_._1 == k) :+ (k -> v.toString))
+      case None => removeAll(k)
     }
   }
 
@@ -210,49 +243,73 @@ case class Querystring(params: Map[String,List[String]] = Map()) {
    * @param k Key for the Query String parameter(s) to remove
    * @return
    */
-  def removeParams(k: String) = {
-    copy(params = params.filterNot(_._1 == k))
+  def removeAll(k: String) = {
+    withParams(parameters.filterNot(_._1 == k))
   }
 
-  /**
-   * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
-   * Query String parameter will not be rendered in calls to toString or toStringRaw
-   * @param kv Tuple2 representing the querystring parameter
-   * @return A new Query String with the new Query String parameter
-   */
-  def &(kv: (String, Option[Any])) = {
-    val (k,vOpt) = kv
-    vOpt match {
-      case Some(v) => {
-        val values = params.getOrElse(k, List())
-        copy(params = params + (k -> (v.toString :: values)))
-      }
-      case _ => this
-    }
-  }
-
-  override def toString() = toString(PercentEncoder)
-  def toString(e: Enc)(implicit enc: String = "UTF-8"): String = {
-    params.flatMap(kv => {
+  def paramsEncoded(e: Enc)(implicit enc: String = "UTF-8") =
+    parameters.map(kv => {
       val (k,v) = kv
-      v.map(encode(k, e, enc) + "=" + encode(_, e, enc))
-    }).mkString("&")
-  }
+      encode(k, e, enc) + "=" + encode(v, e, enc)
+    }).mkString(separator)
 
   /**
    * Returns the string representation of this QueryString with no encoding taking place
    * (e.g. non ASCII characters will not be percent encoded)
    * @return String containing this QueryString in it's raw form
    */
-  def toStringRaw(): String = toString(NoopEncoder)
+  def paramsRaw(): String = paramsEncoded(NoopEncoder)
+}
 
-  def toString(prefix: String, e: Enc, enc: String): String = {
-    if(params.isEmpty) {
-      ""
-    } else {
-      prefix + toString(e)(enc)
-    }
+case class StringPathPart(part: String) extends AnyVal with PathPart {
+  def parameters = Vector.empty
+
+  def addParam(kv: (String,String)) =
+    MatrixParams(part, Vector(kv))
+
+  def encoded(e: Enc)(implicit enc: String = "UTF-8") =
+    partEncoded(e)(enc)
+}
+
+case class MatrixParams(part: String, parameters: Seq[(String, String)]) extends PathPart with Parameters[MatrixParams] {
+  def separator = ";"
+  def withParams(params: Seq[(String, String)]) = copy(parameters = params)
+
+  def encoded(e: Enc)(implicit enc: String = "UTF-8") =
+    partEncoded(e) + ";" + paramsEncoded(e)
+
+  def addParam(kv: (String, String)) =
+    copy(parameters = parameters :+ kv)
+}
+
+trait PathPart extends Any {
+
+  /**
+   * The non-parameter part of this pathPart
+   *
+   * @return
+   */
+  def part: String
+
+  /**
+   * Adds a matrix parameter to the end of this path part
+   *
+   * @param kv
+   */
+  def addParam(kv: (String, String)): PathPart
+
+  def parameters: Seq[(String, String)]
+
+  def partEncoded(e: Enc)(implicit enc: String = "UTF-8") = {
+    encode(part, e, enc)
   }
+
+  def encoded(e: Enc)(implicit enc: String = "UTF-8"): String
+}
+
+object PathPart {
+  def apply(path: String, matrixParams: Seq[(String,String)] = Seq.empty) =
+    if(matrixParams.isEmpty) new StringPathPart(path) else MatrixParams(path, matrixParams)
 }
 
 object Uri {
@@ -264,22 +321,4 @@ object Uri {
 
   def parseUri(s: CharSequence)(implicit d: UriDecoder = PercentDecoder): Uri =
     UriParser.parse(s.toString, d)
-
-  def apply(scheme: String, host: String, path: String): Uri =
-    new Uri(Some(scheme), Some(host), path)
-
-  def apply(scheme: String, host: String, path: String, query: Querystring): Uri =
-    new Uri(Some(scheme), Some(host), path, query)
-
-  def apply(scheme: Option[String], host: String, path: String): Uri =
-    new Uri(scheme, Some(host), path)
-
-  def apply(scheme: Option[String], host: String, path: String, query: Querystring): Uri =
-    new Uri(scheme, Some(host), path, query)
-
-  def apply(path: String): Uri =
-    new Uri(None, None, path)
-
-  def apply(path: String, query: Querystring): Uri =
-    new Uri(None, None, path, query)
 }

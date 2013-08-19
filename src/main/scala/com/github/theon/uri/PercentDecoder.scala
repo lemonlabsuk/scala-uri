@@ -10,14 +10,22 @@ object PercentDecoder extends UriDecoder {
   def decode(u: Uri) =
     try {
       u.copy (
-        pathParts = u.pathParts.map(decodeString),
+        pathParts = u.pathParts.map(decodePathPart),
         query = u.query.copy (
-          u.query.params.map(kv => decodeString(kv._1) -> kv._2.map(decodeString))
+          u.query.parameters.map(decodeTuple)
         )
       )
     } catch {
       case e: NumberFormatException => throw new UriDecodeException("Encountered '%' followed by a non hex number. It looks like this URL isn't Percent Encoded. If so look at using the NoopDecoder")
     }
+
+  def decodePathPart(pp: PathPart) = pp match {
+    case StringPathPart(s) => StringPathPart(decodeString(s))
+    case MatrixParams(p, params) => MatrixParams(decodeString(p), params.map(decodeTuple))
+  }
+
+  def decodeTuple(kv: (String, String)) =
+    decodeString(kv._1) -> decodeString(kv._2)
 
   protected def decodeString(s: String) = {
     val segments = s.split('%')

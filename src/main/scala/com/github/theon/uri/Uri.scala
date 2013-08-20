@@ -40,6 +40,10 @@ case class Uri (
     }
   }
 
+  def params(kvs: Seq[(String,Any)]) = kvs.foldLeft(this) {
+    (uri, param) => uri ? param
+  }
+
   def scheme = protocol
 
   /**

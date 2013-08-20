@@ -1,7 +1,7 @@
 # scala-uri
 
-[![Build Status](https://secure.travis-ci.org/theon/scala-uri.png?branch=master)](https://travis-ci.org/theon/scala-uri)
-[![Coverage Status](https://coveralls.io/repos/theon/scala-uri/badge.png?branch=master)](https://coveralls.io/r/theon/scala-uri)
+[![Build Status](https://secure.travis-ci.org/theon/scala-uri.png?branch=0.3.x)](https://travis-ci.org/theon/scala-uri)
+[![Coverage Status](https://coveralls.io/repos/theon/scala-uri/badge.png?branch=0.3.x)](https://coveralls.io/r/theon/scala-uri)
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
@@ -34,6 +34,15 @@ uri2.toString //This is: http://theon.github.com/scala-uri?param1=1
 ```
 
 To add query string parameters, use either the `?` or `&` method and pass a `Tuple2` as an argument. The first value in the Tuple is a name of the query string parameter, the second is the value. If a parameter value is an `Option`, it will only be rendered provided it is not `None`.
+
+#### Adding multiple query parameters
+
+```scala
+import com.github.theon.uri.Uri._
+val p = ("key", true) :: ("key2", false) :: Nil
+val uri = "http://example.com".params(p)
+uri.toString //This is: http://example.com/?key=true&key2=false
+```
 
 ### Fragments
 

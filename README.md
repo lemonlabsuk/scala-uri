@@ -277,7 +277,7 @@ For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/theon/scala-uri
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.3.5"
+"com.github.theon" %% "scala-uri" % "0.3.6"
 ```
 
 For maven users you should use (for 2.10.x):

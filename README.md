@@ -40,6 +40,8 @@ To add query string parameters, use either the `?` or `&` method and pass a `Tup
 
 ### Paths
 
+**New in `0.4.0-SNAPSHOT`**
+
 ```scala
 import com.github.theon.uri.Uri._
 

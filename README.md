@@ -259,7 +259,9 @@ val uri3 = uri.matrixParam("pathTwo", "paramFour", "value4")
 
 ## Including scala-uri your project
 
-scala-uri is currently built with support for scala `2.9.2` and `2.10.0`
+`scala-uri` `0.4.x` is currently built with support for scala `2.10.x` (and will be with `2.11.x`)
+
+For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/theon/scala-uri/tree/0.3.x)
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 
@@ -273,7 +275,7 @@ For maven users you should use (for 2.10.x):
 <dependency>
     <groupId>com.github.theon</groupId>
     <artifactId>scala-uri_2.10</artifactId>
-    <version>0.3.5</version>
+    <version>0.3.6</version>
 </dependency>
 ```
 

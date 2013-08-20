@@ -148,4 +148,19 @@ class DslTests extends FlatSpec with ShouldMatchers {
     uriTwo.pathPart("pathTwo").get.parameters should equal(Vector("key" -> "val"))
     uriTwo.toString should equal("http://stackoverflow.com/pathOne/pathTwo;key=val")
   }
+
+  "A list of query params" should "get added successsfully" in {
+    val p = ("key", true) :: ("key2", false) :: Nil
+    val uri = "http://example.com".params(p)
+    uri.query.params("key") should equal("true" :: Nil)
+    uri.query.params("key2") should equal("false" :: Nil)
+    uri.toString should equal("http://example.com/?key=true&key2=false")
+  }
+
+  "A list of query params" should "get added to a URL already with query params successsfully" in {
+    val p = ("key", true) :: ("key2", false) :: Nil
+    val uri = ("http://example.com" ? ("key" -> "param1")).params(p)
+    uri.query.params("key") should equal(Vector("param1", "true"))
+    uri.query.params("key2") should equal("false" :: Nil)
+  }
 }

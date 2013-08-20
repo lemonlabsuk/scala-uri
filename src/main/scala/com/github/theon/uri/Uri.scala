@@ -45,14 +45,18 @@ case class Uri (
    * @param kv Tuple2 representing the querystring parameter
    * @return A new Uri with the new Query String parameter
    */
-  def param(kv: (String, Any)) = {
-    val (k,v) = kv
-    v match {
-      case valueOpt: Option[_] =>
-        copy(query = query & (k, valueOpt))
-      case _ =>
-        copy(query = query & (k, Some(v)))
+  def param(kv: (String, Any)) = kv match {
+    case (_, None) => this
+    case (k, Some(v)) => copy(query = query.addParam(k, v.toString))
+    case (k, v) => copy(query = query.addParam(k, v.toString))
+  }
+
+  def params(kvs: Seq[(String, Any)]) = {
+    val cleanKvs = kvs.filterNot(_._2 == None).map {
+      case (k, Some(v)) => (k, v.toString)
+      case (k, v) => (k, v.toString)
     }
+    copy(query = query.addParams(cleanKvs))
   }
 
   def scheme = protocol
@@ -196,13 +200,14 @@ case class QueryString(parameters: Seq[(String, String)] = Seq.empty) extends Pa
   /**
    * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
    * Query String parameter will not be rendered in calls to toString or toStringRaw
-   * @param kv Tuple2 representing the querystring parameter
+   *
    * @return A new Query String with the new Query String parameter
    */
-  def &(kv: (String, Option[_])) = kv match {
-    case (k, Some(v)) => withParams(parameters :+ (k -> v.toString))
-    case _ => this
-  }
+  def addParam(k: String, v: String) =
+    withParams(parameters :+ (k -> v.toString))
+
+  def addParams(kvs: Seq[(String, String)]) =
+    withParams(parameters ++ kvs)
 
   def encoded(e: Enc)(implicit enc: String = "UTF-8"): String = {
     if(parameters.isEmpty) {

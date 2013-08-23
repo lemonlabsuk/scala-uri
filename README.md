@@ -44,6 +44,8 @@ val uri = "http://example.com".params(p)
 uri.toString //This is: http://example.com/?key=true&key2=false
 ```
 
+To add a `Seq[(String,Any)]` as query parameters. Use the `params` method. Any `Tuple`s with a value of `None` will not be added.
+
 ### Fragments
 
 **New in `0.3.6`**

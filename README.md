@@ -1,6 +1,6 @@
 # scala-uri
 
- > Master is for `scala-uri` `0.4.x`. There are going to be breaking API changes in `0.4.0-SNAPSHOT`. If you would like something stable, please use [0.3.x](https://github.com/theon/scala-uri/tree/0.3.x).
+ > Master is for `scala-uri` `0.4.x`. There are making breaking API changes in `0.4.0-SNAPSHOT`. If you would like something stable, please use [0.3.x](https://github.com/theon/scala-uri/tree/0.3.x).
 
 [![Build Status](https://secure.travis-ci.org/theon/scala-uri.png?branch=master)](https://travis-ci.org/theon/scala-uri)
 [![Coverage Status](https://coveralls.io/repos/theon/scala-uri/badge.png?branch=master)](https://coveralls.io/r/theon/scala-uri)

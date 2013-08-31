@@ -9,45 +9,35 @@ import org.scalatest.matchers.ShouldMatchers
  */
 class ApplyTests extends FlatSpec with ShouldMatchers {
 
-  "Uri apply method" should "accept String scheme, String host and String path" in {
-    val uri = Uri(protocol = Some("http"), host = Some("theon.github.com")) / "blah"
+  "Uri apply method" should "accept String scheme, String host and path" in {
+    val uri = Uri(scheme = "http", host = "theon.github.com", pathParts = Seq(StringPathPart("blah")))
     uri.protocol should equal(Some("http"))
     uri.host should equal(Some("theon.github.com"))
     uri.path should equal("/blah")
-    uri.query should equal(QueryString())
+    uri.query should equal(EmptyQueryString)
   }
 
-  "Uri apply method" should "accept String scheme, String host, String path and QueryString" in {
+  "Uri apply method" should "accept String scheme, String host and QueryString" in {
     val qs = QueryString(Vector("testKey" -> "testVal"))
-    val uri = Uri(protocol = Some("http"), host = Some("theon.github.com"), query = qs) / "blah"
-    uri.protocol should equal(Some("http"))
-    uri.host should equal(Some("theon.github.com"))
-    uri.path should equal("/blah")
-    uri.query should equal(qs)
-  }
-
-  "Uri apply method" should "accept Option[String] scheme, String host, String path and QueryString" in {
-    val qs = QueryString(Vector("testKey" -> "testVal"))
-    val uri = Uri(protocol = Some("http"), host = Some("theon.github.com"), query = qs)
+    val uri = Uri(scheme = "http", host = "theon.github.com", query = qs)
     uri.protocol should equal(Some("http"))
     uri.host should equal(Some("theon.github.com"))
     uri.query should equal(qs)
   }
 
-  "Uri apply method" should "accept String path" in {
-    val uri = Uri() / "blah"
-    uri.protocol should equal(None)
-    uri.host should equal(None)
-    uri.path should equal("/blah")
-    uri.query should equal(QueryString())
+  "Uri apply method" should "accept Option[String] scheme, String host and QueryString" in {
+    val qs = QueryString(Vector("testKey" -> "testVal"))
+    val uri = Uri(scheme = "http", host = "theon.github.com", query = qs)
+    uri.scheme should equal(Some("http"))
+    uri.host should equal(Some("theon.github.com"))
+    uri.query should equal(qs)
   }
 
-  "Uri apply method" should "accept String path and QueryString" in {
+  "Uri apply method" should "accept QueryString" in {
     val qs = QueryString(Vector("testKey" -> "testVal"))
-    val uri = Uri(query = qs) / "blah"
+    val uri = Uri(query = qs)
     uri.protocol should equal(None)
     uri.host should equal(None)
-    uri.path should equal("/blah")
     uri.query should equal(qs)
   }
 }

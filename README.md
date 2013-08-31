@@ -19,7 +19,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.3.6"
+"com.github.theon" %% "scala-uri" % "0.4.0-SNAPSHOT"
 ```
 
 ## Building URIs with the DSL
@@ -27,7 +27,7 @@ To include it in your SBT project from maven central:
 ### Query Strings
 
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.dsl._
 
 val uri = "http://theon.github.com/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
 uri.toString //This is: http://theon.github.com/scala-uri?p1=one&p2=2&p3=true
@@ -41,18 +41,16 @@ To add query string parameters, use either the `?` or `&` method and pass a `Tup
 #### Adding multiple query parameters
 
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.dsl._
 val p = ("key", true) :: ("key2", false) :: Nil
-val uri = "http://example.com".params(p)
+val uri = "http://example.com".addParams(p)
 uri.toString //This is: http://example.com/?key=true&key2=false
 ```
 
 ### Paths
 
-**New in `0.4.0-SNAPSHOT`**
-
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.dsl._
 
 val uri = "http://theon.github.com" / "scala-uri"
 uri.toString //This is: http://theon.github.com/scala-uri
@@ -65,7 +63,7 @@ To add path segments, use the `/` method
 To set the fragment, use the `` `#` `` method:
 
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.dsl._
 val uri = "http://theon.github.com/scala-uri" `#` "fragments"
 
 uri.toString //This is: http://theon.github.com/scala-uri#fragments
@@ -73,18 +71,18 @@ uri.toString //This is: http://theon.github.com/scala-uri#fragments
 
 ## Parsing URIs
 
-Provided you have the import `com.github.theon.uri.Uri._`, Strings will be implicitly parsed into `Uri` instances:
+Provided you have the import `com.github.theon.uri.dsl._`, Strings will be implicitly parsed into `Uri` instances:
 
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.dsl._
 val uri: Uri = "http://theon.github.com/scala-uri?param1=1&param2=2"
 ```
 
 However, if you prefer, you can call `parseUri()` explicitly:
 
 ```scala
-import com.github.theon.uri.Uri.parseUri
-val uri = parseUri("http://theon.github.com/scala-uri?param1=1&param2=2")
+import com.github.theon.uri.Uri.parse
+val uri = parse("http://theon.github.com/scala-uri?param1=1&param2=2")
 ```
 
 ## URL Percent Encoding
@@ -92,7 +90,7 @@ val uri = parseUri("http://theon.github.com/scala-uri?param1=1&param2=2")
 By Default, `scala-uri` will URL percent encode paths and query string parameters. To prevent this, you can call the `uri.toStringRaw` method:
 
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.dsl._
 val uri = "http://example.com/path with space" ? ("param" -> "üri")
 
 uri.toString //This is: http://example.com/path%20with%20space?param=%C3%BCri
@@ -106,31 +104,34 @@ The characters that `scala-uri` will percent encode by default can be found [her
 Only percent encode the hash character:
 
 ```scala
-implicit val encoder = PercentEncoder('#')
+import com.github.theon.uri.encoding._
+implicit val config = UriConfig(encoder = percentEncode('#'))
 ```
 
 Percent encode all the default chars, except the plus character:
 
 ```scala
-implicit val encoder = PercentEncoder -- '+'
+import com.github.theon.uri.encoding._
+implicit val config = UriConfig(encoder = percentEncode -- '+')
 ```
 
 Encode all the default chars, and also encode the letters a and b:
 
 ```scala
-implicit val encoder = PercentEncoder ++ ('a', 'b')
+import com.github.theon.uri.encoding._
+implicit val config = UriConfig(encoder = percentEncode ++ ('a', 'b'))
 ```
 
-Unit test examples are [here](https://github.com/theon/scala-uri/blob/master/src/test/scala/com/github/theon/uri/EncodingTests.scala#L67)
+Unit test examples are [here](https://github.com/theon/scala-uri/blob/master/src/test/scala/com/github/theon/uri/EncodingTests.scala#L75)
 
 ### Encoding spaces as pluses
 
 The default behaviour with scala uri, is to encode spaces as `%20`, however if you instead wish them to be encoded as the `+` symbol, then simply add the following `implicit val` to your code:
 
 ```scala
-import com.github.theon.uri.Uri._
-import com.github.theon.uri.Encoders._
-implicit val encoder = PercentEncoder + EncodeSpaceAsPlus
+import com.github.theon.uri.dsl._
+import com.github.theon.uri.encoding._
+implicit val config = UriConfig(encoder = percentEncode + spaceAsPlus)
 
 val uri: Uri = "http://theon.github.com/uri with space"
 uri.toString //This is http://theon.github.com/uri+with+space
@@ -138,12 +139,12 @@ uri.toString //This is http://theon.github.com/uri+with+space
 
 ### Custom encoding
 
-If you would like to do some custom encoding for specific characters, you can use the `EncodeCharAs` encoder.
+If you would like to do some custom encoding for specific characters, you can use the `encodeCharAs` encoder.
 
 ```scala
-import com.github.theon.uri.Uri._
-import com.github.theon.uri.Encoders._
-implicit val encoder = PercentEncoder + EncodeCharAs(' ', "_")
+import com.github.theon.uri.dsl._
+import com.github.theon.uri.encoding._
+implicit val config = UriConfig(encoder = percentEncode + encodeCharAs(' ', "_"))
 
 val uri: Uri = "http://theon.github.com/uri with space"
 uri.toString //This is http://theon.github.com/uri_with_space
@@ -154,7 +155,7 @@ uri.toString //This is http://theon.github.com/uri_with_space
 By Default, `scala-uri` will URL percent decode paths and query string parameters during parsing:
 
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.dsl._
 val uri: Uri = "http://example.com/i-have-%25been%25-percent-encoded"
 
 uri.toString //This is: http://example.com/i-have-%25been%25-percent-encoded
@@ -165,7 +166,8 @@ uri.toStringRaw //This is: http://example.com/i-have-%been%-percent-encoded
 To prevent this, you can bring the following implicit into scope:
 
 ```scala
-implicit val decoder = NoopDecoder
+import com.github.theon.uri.dsl._
+implicit val c = UriConfig(decoder = NoopDecoder)
 val uri: Uri = "http://example.com/i-havent-%been%-percent-encoded"
 
 uri.toString //This is: http://example.com/i-havent-%25been%25-percent-encoded
@@ -178,7 +180,7 @@ uri.toStringRaw //This is: http://example.com/i-havent-%been%-percent-encoded
 If you wish to replace all existing query string parameters with a given name, you can use the `uri.replaceParams()` method:
 
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.dsl._
 val uri = "http://example.com/path" ? ("param" -> "1")
 val newUri = uri.replaceParams("param", "2")
 
@@ -190,7 +192,7 @@ newUri.toString //This is: http://example.com/path?param=2
 If you wish to remove all existing query string parameters with a given name, you can use the `uri.removeParams()` method:
 
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.dsl._
 val uri = "http://example.com/path" ? ("param" -> "1") & ("param2" -> "2")
 val newUri = uri.removeParams("param")
 
@@ -202,9 +204,9 @@ newUri.toString //This is: http://example.com/path?param2=2
 To get the query string parameters as a `Map[String,List[String]]` you can do the following:
 
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.dsl._
 val uri = "http://example.com/path" ? ("param" -> "1") & ("param2" -> 2)
-uri.query.params //This is: Map(param -> List(1), param2 -> List(2))
+uri.query.paramMap //This is: Map(param -> List(1), param2 -> List(2))
 ```
 
 ## User Information
@@ -222,13 +224,15 @@ uri.password //This is Some("pass")
 Modifying user information:
 
 ```scala
+import com.github.theon.uri.dsl._
 val mailto = "mailto://user@host.com"
-mailto.user("jack") //URL is now jack@host.com
+mailto.withUser("jack") //URL is now jack@host.com
 ```
 
 ```scala
+import com.github.theon.uri.dsl._
 val uri = "http://user:pass@host.com"
-uri.password("secret") //URL is now http://user:secret@host.com
+uri.withPassword("secret") //URL is now http://user:secret@host.com
 ```
 
 **Note:** that using clear text passwords in URLs is [ill advised](http://tools.ietf.org/html/rfc3986#section-3.2.1)
@@ -238,7 +242,7 @@ uri.password("secret") //URL is now http://user:secret@host.com
 [Protocol Relative URLs](http://paulirish.com/2010/the-protocol-relative-url/) are supported in `scala-uri`. A `Uri` object with a protocol of `None`, but a host of `Some(x)` will be considered a protocol relative URL.
 
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.dsl._
 val uri: Uri = "//example.com/path"
 uri.scheme //This is: None
 uri.host //This is: Some("example.com")
@@ -246,26 +250,41 @@ uri.host //This is: Some("example.com")
 
 ## Matrix Parameters
 
-**New in `0.4.0-SNAPSHOT`**
-
 [Matrix Parameters](http://www.w3.org/DesignIssues/MatrixURIs.html) are supported in `scala-uri`.
 
 ```scala
-import com.github.theon.uri.Uri._
+import com.github.theon.uri.dsl._
 val uri = "http://example.com/path;paramOne=value;paramTwo=value2/pathTwo;paramThree=value3"
 
 //Get parameters at the end of the path
 uri.matrixParams //This is Vector("paramThree" -> "value3")
 
 //Add parameters to end of path
-val uri2 = uri.matrixParam("paramFour", "value4")
+val uri2 = uri.addMatrixParam("paramFour", "value4")
 uri2.toString //This is http://example.com/path;paramOne=value;paramTwo=value2/pathTwo;paramThree=value3;paramFour=value4
 
 //Get parameters for mid path segment
-uri.pathPath("pathTwo").get.parameters //This is Vector("paramOne" -> "value", "paramTwo" -> "value2")
+uri.pathPart("pathTwo").params //This is Vector("paramOne" -> "value", "paramTwo" -> "value2")
 
 //Add parameters for mid path segment
-val uri3 = uri.matrixParam("pathTwo", "paramFour", "value4")
+val uri3 = uri.addMatrixParam("pathTwo", "paramFour", "value4")
+```
+
+## Character Sets
+
+By default `scala-uri` uses `UTF-8` charset encoding:
+
+```scala
+val uri = "http://theon.github.com/uris-in-scala.html" ? ("chinese" -> "网址")
+uri.toString //This is http://theon.github.com/uris-in-scala.html?chinese=%E7%BD%91%E5%9D%80
+```
+
+This can be changed like so:
+
+```scala
+implicit val conf = UriConfig(charset = "GB2312")
+val uri = "http://theon.github.com/uris-in-scala.html" ? ("chinese" -> "网址")
+uri.toString //This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F8%D6%B7
 ```
 
 ## Including scala-uri your project
@@ -323,6 +342,22 @@ Generate code coverage reports from the sbt console by running the `scct:test` c
 ## Performance Tests
 
 For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https://github.com/theon/scala-uri-benchmarks) github project
+
+# Migration guide from 0.3.x
+
+ * Package changes / import changes
+  * `scala-uri` has been organised into the following packages: `encoding`, `decoding`, `config` and `dsl`. You will need to update import statments.
+ * Name changes
+  * `PermissiveDecoder` renamed to `PermissivePercentDecoder`
+  * `QueryString` and `MatrixParams` constructor argument `parameters` shortened to `params`
+  * `Uri.parseUri` renamed to `Uri.parse`
+  * `protocol` constructor arg in `Uri` renamed to `scheme`
+ * Query String constructor argument `parameters` changed type from `Map[String, List[String]]` to `Seq[(String,String)]`
+ * `Uri` constructor argument `pathParts` changed type from `List` to `Vector`
+ * `Uri` method to add query string parameters renamed from `params` to `addParams`. Same with `matrixParams` -> `addMatrixParams`
+ * `PercentEncoderDefaults` object renamed to `PercentEncoder` companion object.
+ * Copy methods `user`/`password`/`port`/`host`/`scheme` now all prefixed with `with`, e.g. `withHost`
+ * New `UriConfig` case class used to specify encoders, decoders and charset to be used. See examples in [Custom encoding](#custom-encoding), [URL Percent Decoding](#url-percent-decoding) and [Character Sets](#character-sets)
 
 # License
 

@@ -6,6 +6,8 @@ import com.github.theon.uri.Uri._
 
 class TypeTests extends FlatSpec with ShouldMatchers {
 
+  import dsl._
+
   "String" should "render correctly" in {
     val uri = "/uris-in-scala.html" ? ("param" -> "hey")
     uri.toString should equal ("/uris-in-scala.html?param=hey")

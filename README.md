@@ -2,8 +2,8 @@
 
  > This branch is for `scala-uri` `0.4.x`. Currently there are breaking API changes being made in `0.4.0-SNAPSHOT`. If you would like something stable, please use [0.3.x](https://github.com/NET-A-PORTER/scala-uri).
 
-[![Build Status](https://secure.travis-ci.org/NET-A-PORTER/scala-uri.png?branch=master)](https://travis-ci.org/NET-A-PORTER/scala-uri)
-[![Coverage Status](https://coveralls.io/repos/theon/scala-uri/badge.png?branch=master)](https://coveralls.io/r/theon/scala-uri)
+[![Build Status](https://secure.travis-ci.org/NET-A-PORTER/scala-uri.png?branch=0.4.x)](https://travis-ci.org/NET-A-PORTER/scala-uri?branch=0.4.x)
+[![Coverage Status](https://coveralls.io/repos/NET-A-PORTER/scala-uri/badge.png?branch=0.4.x)](https://coveralls.io/r/NET-A-PORTER/scala-uri?branch=0.4.x)
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 

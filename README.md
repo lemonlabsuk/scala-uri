@@ -1,4 +1,4 @@
-# scala-uri 0.3.x
+# scala-uri
 
 [![Build Status](https://secure.travis-ci.org/NET-A-PORTER/scala-uri.png?branch=0.3.x)](https://travis-ci.org/NET-A-PORTER/scala-uri)
 [![Coverage Status](https://coveralls.io/repos/theon/scala-uri/badge.png?branch=0.3.x)](https://coveralls.io/r/theon/scala-uri)

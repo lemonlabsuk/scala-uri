@@ -1,4 +1,4 @@
-# scala-uri
+# scala-uri 0.4.x - WIP
 
  > This branch is for `scala-uri` `0.4.x`. Currently there are breaking API changes being made in `0.4.0-SNAPSHOT`. If you would like something stable, please use [0.3.x](https://github.com/NET-A-PORTER/scala-uri).
 

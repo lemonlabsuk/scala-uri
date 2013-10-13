@@ -29,7 +29,7 @@ class TransformTests extends WordSpec with ShouldMatchers {
     "flip query params" in {
       val uri = parse("/test?param_1=hello&param_2=goodbye&param_3=false")
       val uri2 = uri.mapQuery(_.swap)
-      uri2.toString should equal("/test?hello=1&goodbye=2&false=3")
+      uri2.toString should equal("/test?hello=param_1&goodbye=param_2&false=param_3")
     }
 
     "transform query param values" in {

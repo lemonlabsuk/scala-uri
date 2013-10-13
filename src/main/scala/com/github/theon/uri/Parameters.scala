@@ -9,7 +9,7 @@ import scala.collection.GenTraversableOnce
  * Trait use to represent a list of key value parameters, such as query string parameters and matrix parameters
  */
 trait Parameters {
-  type Self
+  type Self <: Parameters
 
   def separator: String
   def params: ParamSeq
@@ -129,9 +129,8 @@ trait Parameters {
    * @param k Key for the Query String parameter(s) to remove
    * @return
    */
-  def removeAll(k: String) = {
-    withParams(params.filterNot(_._1 == k))
-  }
+  def removeAll(k: String) =
+    filterParamsNames(_ != k)
 
   def paramsToString(e: UriEncoder, charset: String) =
     params.map(kv => {

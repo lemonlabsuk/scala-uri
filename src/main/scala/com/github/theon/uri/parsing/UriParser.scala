@@ -29,16 +29,16 @@ object UriParser extends Parser {
 
   def _pathSegment = rule { _plainPathPart ~ optional(";") ~ zeroOrMore(_matrixParam, separator = ";") }
 
-  def _path(decoder: UriDecoder) = zeroOrMore(_pathSegment, separator = "/") ~~> (pp => toPathParts(pp, decoder))
+  def _path = rule { zeroOrMore(_pathSegment, separator = "/") ~~> (pp => toPathParts(pp)) }
 
   def _queryParam = rule { group(zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract) }
 
-  def _queryString(decoder: UriDecoder) = optional("?") ~ zeroOrMore(_queryParam, separator = "&") ~~> (qs => toQueryString(qs, decoder))
+  def _queryString = rule { optional("?") ~ zeroOrMore(_queryParam, separator = "&") ~~> (qs => toQueryString(qs)) }
 
   def _fragment = rule { "#" ~ (zeroOrMore(!anyOf("#") ~ ANY) ~> extract) }
 
-  def _uri(config: UriConfig): Rule1[Uri] = {
-    optional(optional(_scheme ~ ":") ~ "//" ~ _authority) ~ optional("/") ~ _path(config.pathDecoder) ~ _queryString(config.queryDecoder) ~ optional(_fragment) ~~> {
+  lazy val _uri: Rule1[Uri] = rule {
+    optional(optional(_scheme ~ ":") ~ "//" ~ _authority) ~ optional("/") ~ _path ~ _queryString ~ optional(_fragment) ~~> {
       (sa, pp, qs, f) => {
         val scheme = sa.map(_._1)
         val authority = sa.map(_._2)
@@ -64,32 +64,40 @@ object UriParser extends Parser {
    */
   case class Authority(user: Option[String], password: Option[String], host: String, port: Option[Int])
 
-  def toQueryString(tuples: ParamSeq, decoder: UriDecoder) =
-    QueryString(tuples.map(decoder.decodeTuple).toVector)
+  def toQueryString(tuples: ParamSeq) =
+    QueryString(tuples.toVector)
 
-  def toPathParts(pathParts: List[(String,ParamSeq)], decoder: UriDecoder) = {
+  def toPathParts(pathParts: List[(String,ParamSeq)]) = {
     val pp = pathParts.map(pp => {
       val (plain, matrixParams) = pp
-      val decodedPlain = decoder.decode(plain)
-      val decodedMatrixParams = matrixParams.map(decoder.decodeTuple).toVector
-      PathPart(decodedPlain, decodedMatrixParams)
+      PathPart(plain, matrixParams.toVector)
     })
     pp.toVector
   }
 
   def parse(s: String, config: UriConfig) = {
     try {
-//      println(config.queryDecoder)
-      val ruleTree = _uri(config)
-      val parsingResult = ReportingParseRunner(ruleTree).run(s)
+      val parsingResult = ReportingParseRunner(_uri).run(s)
 
       parsingResult.result match {
-        case Some(uri) => uri
+        case Some(uri) => decode(uri, config)
         case None => throw new ParsingException("Invalid Uri:\n" + ErrorUtils.printParseErrors(parsingResult))
       }
     } catch {
       //Nicer way to do this?
       case e: ParserRuntimeException if e.getCause.isInstanceOf[UriDecodeException] => throw e.getCause
     }
+  }
+  
+  def decode(uri: Uri, config: UriConfig) = {
+    val pathDecoder = config.pathDecoder
+    val pathParts = uri.pathParts.map {
+      case p: StringPathPart => p.map(pathDecoder.decode)
+      case p: MatrixParams => p.map(pathDecoder.decode).mapParams(pathDecoder.decodeTuple)
+    }
+    val query = uri.query.mapParams(config.queryDecoder.decodeTuple)
+    val fragment = uri.fragment.map(config.fragmentDecoder.decode)
+
+    uri.copy(pathParts = pathParts, query = query, fragment = fragment)
   }
 }

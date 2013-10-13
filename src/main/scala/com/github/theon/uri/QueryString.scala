@@ -1,7 +1,7 @@
 package com.github.theon.uri
 
 import com.github.theon.uri.config.UriConfig
-import Parameters.ParamSeq
+import com.github.theon.uri.Parameters.{Param, ParamSeq}
 
 /**
  * Date: 28/08/2013
@@ -19,6 +19,9 @@ case class QueryString(params: ParamSeq) extends Parameters[QueryString] {
     } else {
       "?" + paramsToString(c.queryEncoder, c.charset)
     }
+
+  def mapParams(f: Param=>Param) =
+    QueryString(params.map(f))
 }
 
 object EmptyQueryString extends QueryString(Seq.empty)

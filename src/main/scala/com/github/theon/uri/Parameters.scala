@@ -1,7 +1,9 @@
 package com.github.theon.uri
 
 import com.github.theon.uri.encoding.UriEncoder
-import Parameters.ParamSeq
+import com.github.theon.uri.Parameters._
+import scala.Some
+
 /**
  * Trait use to represent a list of key value parameters, such as query string parameters and matrix parameters
  */
@@ -33,6 +35,8 @@ trait Parameters[+Self] {
   def param(key: String) = params.collectFirst {
     case (k, v) if k == key => v
   }
+
+  def mapParams(f: Param=>Param): Self
 
   /**
    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter

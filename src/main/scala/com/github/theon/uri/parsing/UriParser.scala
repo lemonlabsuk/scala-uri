@@ -84,8 +84,10 @@ object UriParser extends Parser {
         case None => throw new ParsingException("Invalid Uri:\n" + ErrorUtils.printParseErrors(parsingResult))
       }
     } catch {
-      //Nicer way to do this?
-      case e: ParserRuntimeException if e.getCause.isInstanceOf[UriDecodeException] => throw e.getCause
+      case e: ParserRuntimeException => e.getCause match {
+        case ude: UriDecodeException => throw ude
+        case _ => throw e
+      }
     }
   }
   

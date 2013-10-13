@@ -352,6 +352,7 @@ For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https:/
   * `QueryString` and `MatrixParams` constructor argument `parameters` shortened to `params`
   * `Uri.parseUri` renamed to `Uri.parse`
   * `protocol` constructor arg in `Uri` renamed to `scheme`
+  * `Querystring` renamed to `QueryString`
  * Query String constructor argument `parameters` changed type from `Map[String, List[String]]` to `Seq[(String,String)]`
  * `Uri` constructor argument `pathParts` changed type from `List` to `Vector`
  * `Uri` method to add query string parameters renamed from `params` to `addParams`. Same with `matrixParams` -> `addMatrixParams`

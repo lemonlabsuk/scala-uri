@@ -85,6 +85,58 @@ import com.github.theon.uri.Uri.parse
 val uri = parse("http://theon.github.com/scala-uri?param1=1&param2=2")
 ```
 
+## Transforming URIs
+
+### map
+
+The `mapQuery` method will transform the Query String of a URI by applying the specified Function to each Query String Parameter
+
+```scala
+val uri = "/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
+
+//Results in /scala-uri?p1_map=one_map&p2_map=2_map&p3_map=true_map
+uri.mapQuery {
+  case (n, v) => (n + "_map", v + "_map")
+}
+
+uri.mapQuery(_.swap) //Results in /scala-uri?one=p1&2=p2&true=p3
+```
+
+The `mapQueryNames` and `mapQueryValues` provide a more convenient way to transform just Query Parameter names or values
+
+```scala
+val uri = "/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
+
+uri.mapQueryNames(_.toUpperCase) //Results in /scala-uri?P1_map=one&P2=2&P3=true
+
+uri.mapQueryValues(_.replace("true", "false")) //Results in /scala-uri?p1=one&p2=2&p3=false
+```
+
+### filter
+
+The `filterQuery` method will remove any Query String Parameters for which the provided Function returns false
+
+```scala
+val uri = "/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
+
+//Results in /scala-uri?p2=2
+uri.filterQuery {
+  case (n, v) => n.contains("2") && v.contains("2")
+}
+
+uri.mapQuery(_._2 == "one") //Results in /scala-uri?p1=one
+```
+
+The `filterQueryNames` and `filterQueryValues` provide a more convenient way to filter just by Query Parameter name or value
+
+```scala
+val uri = "/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
+
+uri.filterQueryNames(_ > "p1") //Results in /scala-uri?p2=2&p3=true
+
+uri.filterQueryValues(_.length == 1) //Results in /scala-uri?p2=2
+```
+
 ## URL Percent Encoding
 
 By Default, `scala-uri` will URL percent encode paths and query string parameters. To prevent this, you can call the `uri.toStringRaw` method:

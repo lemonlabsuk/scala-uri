@@ -2,6 +2,8 @@ package com.github.theon.uri
 
 import com.github.theon.uri.parsing.UriParser
 import com.github.theon.uri.config.UriConfig
+import com.github.theon.uri.Parameters.Param
+import scala.collection.GenTraversableOnce
 
 /**
  * http://tools.ietf.org/html/rfc3986
@@ -154,6 +156,69 @@ case class Uri (
         copy(query = query.replaceAll(k, Some(v)))
     }
   }
+
+  /**
+   * Transforms the Query String by applying the specified Function to each Query String Parameter
+   *
+   * @param f A function that returns a new Parameter when applied to each Parameter
+   * @return
+   */
+  def mapQuery(f: Param=>Param) =
+    copy(query = query.mapParams(f))
+
+  /**
+   * Transforms the Query String by applying the specified Function to each Query String Parameter
+   *
+   * @param f A function that returns a collection of Parameters when applied to each parameter
+   * @return
+   */
+  def flatMapQuery(f: Param=>GenTraversableOnce[Param]) =
+    copy(query = query.flatMapParams(f))
+
+  /**
+   * Transforms the Query String by applying the specified Function to each Query String Parameter name
+   *
+   * @param f A function that returns a new Parameter name when applied to each Parameter name
+   * @return
+   */
+  def mapQueryNames(f: String=>String) =
+    copy(query = query.mapParamNames(f))
+
+  /**
+   * Transforms the Query String by applying the specified Function to each Query String Parameter value
+   *
+   * @param f A function that returns a new Parameter value when applied to each Parameter value
+   * @return
+   */
+  def mapQueryValues(f: String=>String) =
+    copy(query = query.mapParamValues(f))
+
+  /**
+   * Removes any Query String Parameters that return false when applied to the given Function
+   *
+   * @param f
+   * @return
+   */
+  def filterQuery(f: Param=>Boolean) =
+    copy(query = query.filterParams(f))
+
+  /**
+   * Removes any Query String Parameters that return false when their name is applied to the given Function
+   *
+   * @param f
+   * @return
+   */
+  def filterQueryNames(f: String=>Boolean) =
+    copy(query = query.filterParamsNames(f))
+
+  /**
+   * Removes any Query String Parameters that return false when their value is applied to the given Function
+   *
+   * @param f
+   * @return
+   */
+  def filterQueryValues(f: String=>Boolean) =
+    copy(query = query.filterParamsValues(f))
 
   /**
    * Removes all Query String parameters with the specified key

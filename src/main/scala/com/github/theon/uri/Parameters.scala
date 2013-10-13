@@ -3,12 +3,13 @@ package com.github.theon.uri
 import com.github.theon.uri.encoding.UriEncoder
 import com.github.theon.uri.Parameters._
 import scala.Some
+import scala.collection.GenTraversableOnce
 
 /**
  * Trait use to represent a list of key value parameters, such as query string parameters and matrix parameters
  */
-trait Parameters[+Self] {
-  this: Self =>
+trait Parameters {
+  type Self
 
   def separator: String
   def params: ParamSeq
@@ -36,7 +37,76 @@ trait Parameters[+Self] {
     case (k, v) if k == key => v
   }
 
-  def mapParams(f: Param=>Param): Self
+  /**
+   * Transforms each parameter by applying the specified Function
+   *
+   * @param f
+   * @return
+   */
+  def mapParams(f: Param=>Param) =
+    withParams(params.map(f))
+
+  /**
+   * Transforms each parameter by applying the specified Function
+   *
+   * @param f A function that returns a collection of Parameters when applied to each parameter
+   * @return
+   */
+  def flatMapParams(f: Param=>GenTraversableOnce[Param]) =
+    withParams(params.flatMap(f))
+
+  /**
+   * Transforms each parameter name by applying the specified Function
+   *
+   * @param f
+   * @return
+   */
+  def mapParamNames(f: String=>String) =
+    withParams(params.map {
+      case (n,v) => (f(n), v)
+    })
+
+  /**
+   * Transforms each parameter value by applying the specified Function
+   *
+   * @param f
+   * @return
+   */
+  def mapParamValues(f: String=>String) =
+    withParams(params.map {
+      case (n,v) => (n, f(v))
+    })
+
+  /**
+   * Filters out just the parameters for which the provided function holds true
+   *
+   * @param f
+   * @return
+   */
+  def filterParams(f: Param=>Boolean) =
+    withParams(params.filter(f))
+
+  /**
+   * Filters out just the parameters for which the provided function holds true when applied to the parameter name
+   *
+   * @param f
+   * @return
+   */
+  def filterParamsNames(f: String=>Boolean) =
+    withParams(params.filter {
+      case (n, _) => f(n)
+    })
+
+  /**
+   * Filters out just the parameters for which the provided function holds true when applied to the parameter value
+   *
+   * @param f
+   * @return
+   */
+  def filterParamsValues(f: String=>Boolean) =
+    withParams(params.filter {
+      case (_, v) => f(v)
+    })
 
   /**
    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter

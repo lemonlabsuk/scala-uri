@@ -33,6 +33,7 @@ trait PathPart extends Any {
 }
 
 case class StringPathPart(part: String) extends AnyVal with PathPart {
+
   type Self = StringPathPart
 
   def params = Vector.empty
@@ -47,11 +48,14 @@ case class StringPathPart(part: String) extends AnyVal with PathPart {
     StringPathPart(f(part))
 }
 
-case class MatrixParams(part: String, params: ParamSeq) extends PathPart with Parameters[MatrixParams] {
+case class MatrixParams(part: String, params: ParamSeq) extends PathPart with Parameters {
+
   type Self = MatrixParams
 
   def separator = ";"
-  def withParams(params: ParamSeq) = copy(params = params)
+
+  def withParams(paramsIn: ParamSeq) =
+    MatrixParams(part, paramsIn)
 
   def partToString(c: UriConfig) =
     c.pathEncoder.encode(part, c.charset) + ";" + paramsToString(c.pathEncoder, c.charset)
@@ -61,9 +65,6 @@ case class MatrixParams(part: String, params: ParamSeq) extends PathPart with Pa
 
   def map(f: String=>String) =
     MatrixParams(f(part), params)
-
-  def mapParams(f: Param=>Param) =
-    MatrixParams(part, params.map(f))
 }
 
 object PathPart {

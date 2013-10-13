@@ -11,19 +11,19 @@ object UriParser extends Parser {
 
   def _hostname = rule { oneOrMore(!anyOf(":/?") ~ ANY) ~> extract }
 
-  def _userInfo = (oneOrMore(!anyOf(":@") ~ ANY) ~> extract) ~ optional(":" ~ (oneOrMore(!anyOf("@") ~ ANY) ~> extract)) ~ "@"
+  def _userInfo = rule { (oneOrMore(!anyOf(":@") ~ ANY) ~> extract) ~ optional(":" ~ (oneOrMore(!anyOf("@") ~ ANY) ~> extract)) ~ "@" }
 
   def _port = rule { oneOrMore("0" - "9") ~> extract }
 
-  def _authority = (optional(_userInfo) ~ _hostname ~ optional(":" ~ _port)) ~~>  ((ui, h, p) => Authority(ui.map(_._1), ui.flatMap(_._2), h, p.map(_.toInt)))
+  def _authority = rule { (optional(_userInfo) ~ _hostname ~ optional(":" ~ _port)) ~~>  ((ui, h, p) => Authority(ui.map(_._1), ui.flatMap(_._2), h, p.map(_.toInt))) }
 
   def _pathSegment = rule { zeroOrMore(!anyOf("/?#") ~ ANY) ~> extract }
 
-  def _path = zeroOrMore(_pathSegment, separator = "/")
+  def _path = rule { zeroOrMore(_pathSegment, separator = "/") }
 
-  def _queryKeyValue = group(zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract)
+  def _queryKeyValue = rule { group(zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract) }
 
-  def _queryString = optional("?") ~ zeroOrMore(_queryKeyValue, separator = "&") ~~> (tuples => tuplesToQuerystring(tuples))
+  def _queryString = rule { optional("?") ~ zeroOrMore(_queryKeyValue, separator = "&") ~~> (tuples => tuplesToQuerystring(tuples)) }
 
   def _fragment = rule { "#" ~ (zeroOrMore(!anyOf("#") ~ ANY) ~> extract) }
 

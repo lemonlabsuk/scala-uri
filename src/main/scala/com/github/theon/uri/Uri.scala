@@ -209,6 +209,9 @@ case class Querystring(params: Map[String,List[String]] = Map()) {
     }
   }
 
+  def replaceAllParams(params: (String, Any)*): Querystring =
+    copy(params = params.groupBy(_._1).map(arg => (arg._1, arg._2.map(_._2.toString).toList)))
+
   /**
    * Removes all Query String parameters with the specified key
    * @param k Key for the Query String parameter(s) to remove

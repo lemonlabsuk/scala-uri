@@ -209,6 +209,12 @@ case class Querystring(params: Map[String,List[String]] = Map()) {
     }
   }
 
+  /**
+   * Replaces all query parameters with the new collection of parameters.
+   *
+   * @param params the new query parameters to set
+   * @return A new QueryString with the given parameters
+   */
   def replaceAllParams(params: (String, Any)*): Querystring =
     copy(params = params.groupBy(_._1).map(arg => (arg._1, arg._2.map(_._2.toString).toList)))
 

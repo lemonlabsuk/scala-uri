@@ -50,7 +50,7 @@ case class Uri (
    *
    * @return a new Uri with no parameters
    */
-  def removeParams : Uri = copy(query = query.removeParams)
+  def removeParams : Uri = copy(query = Querystring())
 
   def scheme = protocol
 
@@ -188,7 +188,7 @@ case class Uri (
   def toStringRaw(): String = toString(NoopEncoder)
 }
 
-case class Querystring(params: Map[String,List[String]] = Map()) {
+case class Querystring(params: Map[String,List[String]] = Map.empty) {
 
   /**
    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter

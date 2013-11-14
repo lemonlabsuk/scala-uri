@@ -44,6 +44,14 @@ case class Uri (
     (uri, param) => uri ? param
   }
 
+  /**
+   * Copies this Uri but with any parameters removed.
+   * Eg, www.domain.com?band=coldplay would result in www.domain.com
+   *
+   * @return a new Uri with no parameters
+   */
+  def removeParams : Uri = copy(query = query.removeParams)
+
   def scheme = protocol
 
   /**
@@ -226,6 +234,8 @@ case class Querystring(params: Map[String,List[String]] = Map()) {
   def removeParams(k: String) = {
     copy(params = params.filterNot(_._1 == k))
   }
+
+  def removeParams: Querystring = copy(params = Map.empty)
 
   /**
    * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this

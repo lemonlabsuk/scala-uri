@@ -44,6 +44,14 @@ case class Uri (
     (uri, param) => uri ? param
   }
 
+  /**
+   * Copies this Uri but with any parameters removed.
+   * Eg, www.domain.com?band=coldplay would result in www.domain.com
+   *
+   * @return a new Uri with no parameters
+   */
+  def removeParams : Uri = copy(query = Querystring())
+
   def scheme = protocol
 
   /**
@@ -180,7 +188,7 @@ case class Uri (
   def toStringRaw(): String = toString(NoopEncoder)
 }
 
-case class Querystring(params: Map[String,List[String]] = Map()) {
+case class Querystring(params: Map[String,List[String]] = Map.empty) {
 
   /**
    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
@@ -210,6 +218,15 @@ case class Querystring(params: Map[String,List[String]] = Map()) {
   }
 
   /**
+   * Replaces all query parameters with the new collection of parameters.
+   *
+   * @param params the new query parameters to set
+   * @return A new QueryString with the given parameters
+   */
+  def replaceAllParams(params: (String, Any)*): Querystring =
+    copy(params = params.groupBy(_._1).map(arg => (arg._1, arg._2.map(_._2.toString).toList)))
+
+  /**
    * Removes all Query String parameters with the specified key
    * @param k Key for the Query String parameter(s) to remove
    * @return
@@ -217,6 +234,8 @@ case class Querystring(params: Map[String,List[String]] = Map()) {
   def removeParams(k: String) = {
     copy(params = params.filterNot(_._1 == k))
   }
+
+  def removeParams: Querystring = copy(params = Map.empty)
 
   /**
    * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this

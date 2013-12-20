@@ -107,4 +107,10 @@ class ParsingTests extends FlatSpec with ShouldMatchers {
       MatrixParams("pathTwo", Vector("paramOne" -> "value"))
     ))
   }
+
+  "Empty path parts" should "be maintained during parsing" in {
+    val uri = parse("http://www.example.com/hi//bye")
+    uri.toString should equal("http://www.example.com/hi//bye")
+  }
+
 }

@@ -21,7 +21,7 @@ object UriParser extends Parser {
 
   def _port = rule { oneOrMore("0" - "9") ~> extract }
 
-  def _authority = rule { (optional(_userInfo) ~ _hostname ~ optional(":" ~ _port)) ~~>  ((ui, h, p) => Authority(ui.map(_._1), ui.flatMap(_._2), h, p.map(_.toInt))) }
+  def _authority = rule { optional((optional(_userInfo) ~ _hostname ~ optional(":" ~ _port)) ~~> ((ui, h, p) => Authority(ui.map(_._1), ui.flatMap(_._2), h, p.map(_.toInt)))) }
 
   def _matrixParam = rule { group(zeroOrMore(!anyOf(";/=?#") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf(";/=?#") ~ ANY) ~> extract) }
 
@@ -29,7 +29,15 @@ object UriParser extends Parser {
 
   def _pathSegment = rule { _plainPathPart ~ optional(";") ~ zeroOrMore(_matrixParam, separator = ";") }
 
-  def _path = rule { zeroOrMore(_pathSegment, separator = "/") ~~> (pp => toPathParts(pp)) }
+  /**
+   * A sequence of path parts that MUST start with a slash
+   */
+  def _abs_path = rule { zeroOrMore("/" ~ _pathSegment) ~~> (pp => toPathParts(pp)) }
+
+  /**
+   * A sequence of path parts optionally starting with a slash
+   */
+  def _rel_path = rule { optional("/") ~ zeroOrMore(_pathSegment, separator = "/") ~~> (pp => toPathParts(pp)) }
 
   def _queryParam = rule { group(zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract) }
 
@@ -37,25 +45,61 @@ object UriParser extends Parser {
 
   def _fragment = rule { "#" ~ (zeroOrMore(!anyOf("#") ~ ANY) ~> extract) }
 
-  lazy val _uri: Rule1[Uri] = rule {
-    optional(optional(_scheme ~ ":") ~ "//" ~ _authority) ~ optional("/") ~ _path ~ _queryString ~ optional(_fragment) ~~> {
-      (sa, pp, qs, f) => {
-        val scheme = sa.map(_._1)
-        val authority = sa.map(_._2)
-
-        new Uri(
-          scheme = scheme.flatten,
-          user = authority.flatMap(_.user),
-          password = authority.flatMap(_.password),
-          host = authority.map(_.host),
-          port = authority.flatMap(_.port),
-          pathParts = pp,
-          query = qs,
-          fragment = f
-       )
-     }
-    }
+  def _abs_uri: Rule1[Uri] = rule {
+    _scheme ~ "://" ~ _authority ~ _abs_path ~ _queryString ~ optional(_fragment) ~~> extractAbsUri
   }
+
+  def _protocol_rel_uri: Rule1[Uri] = rule {
+    "//" ~ _authority ~ _abs_path ~ _queryString ~ optional(_fragment) ~~> extractProtocolRelUri
+  }
+
+  def _rel_uri: Rule1[Uri] = rule {
+    _rel_path ~ _queryString ~ optional(_fragment) ~~> extractRelUri
+  }
+
+  lazy val _uri: Rule1[Uri] = rule {
+    _abs_uri | _protocol_rel_uri | _rel_uri
+  }
+
+  def extractAbsUri(scheme: String, authority: Option[Authority], pp: Seq[PathPart], qs: QueryString, f: Option[String]) =
+    extractUri (
+      scheme = Some(scheme),
+      authority = authority,
+      pathParts = pp,
+      query = qs,
+      fragment = f
+    )
+
+  def extractProtocolRelUri(authority: Option[Authority], pp: Seq[PathPart], qs: QueryString, f: Option[String]) =
+    extractUri (
+      authority = authority,
+      pathParts = pp,
+      query = qs,
+      fragment = f
+    )
+
+  def extractRelUri(pp: Seq[PathPart], qs: QueryString, f: Option[String]) =
+    extractUri (
+      pathParts = pp,
+      query = qs,
+      fragment = f
+    )
+
+  def extractUri(scheme: Option[String] = None,
+                 authority: Option[Authority] = None,
+                 pathParts: Seq[PathPart],
+                 query: QueryString,
+                 fragment: Option[String]) =
+    new Uri(
+      scheme = scheme,
+      user = authority.flatMap(_.user),
+      password = authority.flatMap(_.password),
+      host = authority.map(_.host),
+      port = authority.flatMap(_.port),
+      pathParts = pathParts,
+      query = query,
+      fragment = fragment
+    )
 
   def extract = (x: String) => x
 

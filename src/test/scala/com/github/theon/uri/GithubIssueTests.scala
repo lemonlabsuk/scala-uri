@@ -86,4 +86,9 @@ class GithubIssueTests extends FlatSpec with ShouldMatchers with OptionValues {
     val u = parse(uri)(conf)
     u.query.param("query").value should equal("abc%yum")
   }
+
+  "Github Issue #37" should "now be fixed" in {
+    val uri = "http://test.com:8080" / "something"
+    uri.toString should equal("http://test.com:8080/something")
+  }
 }

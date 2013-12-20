@@ -155,7 +155,7 @@ class DslTests extends FlatSpec with ShouldMatchers {
     val uri = "http://example.com".addParams(p)
     uri.query.params("name") should equal("true" :: Nil)
     uri.query.params("key2") should equal("false" :: Nil)
-    uri.toString should equal("http://example.com/?name=true&key2=false")
+    uri.toString should equal("http://example.com?name=true&key2=false")
   }
 
   "A list of query params" should "get added to a URL already with query params successsfully" in {

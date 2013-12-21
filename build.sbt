@@ -4,9 +4,9 @@ organization  := "com.github.theon"
 
 version       := "0.4.0-SNAPSHOT"
 
-scalaVersion  := "2.10.0"
+scalaVersion  := "2.10.3"
 
-crossScalaVersions := Seq("2.10.0")
+crossScalaVersions := Seq("2.10.3")
 
 publishMavenStyle := true
 
@@ -16,7 +16,7 @@ pomIncludeRepository := { _ => false }
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
-libraryDependencies += "org.parboiled" %% "parboiled-scala" % "1.1.4"
+libraryDependencies += "org.parboiled" %% "parboiled" % "2.0-M1"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.0.M5b" % "test"
 

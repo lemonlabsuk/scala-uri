@@ -1,67 +1,91 @@
 package com.github.theon.uri.parsing
 
-import org.parboiled.scala._
-import org.parboiled.errors.{ParserRuntimeException, ErrorUtils, ParsingException}
-import com.github.theon.uri.decoding.{UriDecodeException, UriDecoder}
+import org.parboiled2._
 import com.github.theon.uri._
 import com.github.theon.uri.config.UriConfig
+import com.github.theon.uri.Parameters._
+import scala.Predef._
 import com.github.theon.uri.QueryString
 import scala.Some
-import Parameters._
 
-object UriParser extends Parser {
+class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
 
-  def _scheme = rule { oneOrMore(_alphaNumeric) ~> extract }
+  def _scheme: Rule1[String] = rule {
+    capture(oneOrMore(CharPredicate.AlphaNum))
+  }
 
-  def _alphaNumeric = rule { "0" - "9" | "a" - "z" | "A" - "Z" }
+  def _host_name: Rule1[String] = rule {
+    capture(oneOrMore(!anyOf(":/?") ~ ANY))
+  }
 
-  def _hostname = rule { oneOrMore(!anyOf(":/?") ~ ANY) ~> extract }
+  def _userInfo: Rule1[UserInfo] = rule {
+    capture(oneOrMore(!anyOf(":@") ~ ANY)) ~ optional(":" ~ capture(oneOrMore(!anyOf("@") ~ ANY))) ~ "@" ~> extractUserInfo
+  }
 
-  def _userInfo = rule { (oneOrMore(!anyOf(":@") ~ ANY) ~> extract) ~ optional(":" ~ (oneOrMore(!anyOf("@") ~ ANY) ~> extract)) ~ "@" }
+  //TODO Try harder to make this a Rule1[Int] using ~> extractInt
+  def _port: Rule1[String] = rule {
+    ":" ~ capture(oneOrMore(CharPredicate.Digit))
+  }
 
-  def _port = rule { oneOrMore("0" - "9") ~> extract }
+  def _authority: Rule1[Authority] = rule {
+    optional(_userInfo) ~ _host_name ~ optional(_port) ~> extractAuthority
+  }
 
-  def _authority = rule { optional((optional(_userInfo) ~ _hostname ~ optional(":" ~ _port)) ~~> ((ui, h, p) => Authority(ui.map(_._1), ui.flatMap(_._2), h, p.map(_.toInt)))) }
+  def _matrixParam: Rule1[Param] = rule {
+    capture(zeroOrMore(!anyOf(";/=?#") ~ ANY)) ~ "=" ~ capture(zeroOrMore(!anyOf(";/=?#") ~ ANY)) ~> extractTuple
+  }
 
-  def _matrixParam = rule { group(zeroOrMore(!anyOf(";/=?#") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf(";/=?#") ~ ANY) ~> extract) }
+  def _plainPathPart: Rule1[String] = rule {
+    capture(zeroOrMore(!anyOf(";/?#") ~ ANY))
+  }
 
-  def _plainPathPart = rule { zeroOrMore(!anyOf(";/?#") ~ ANY) ~> extract }
-
-  def _pathSegment = rule { _plainPathPart ~ optional(";") ~ zeroOrMore(_matrixParam, separator = ";") }
+  def _pathSegment: Rule1[PathPart] = rule {
+    _plainPathPart ~ optional(";") ~ zeroOrMore(_matrixParam).separatedBy(";") ~> extractPathPart
+  }
 
   /**
    * A sequence of path parts that MUST start with a slash
    */
-  def _abs_path = rule { zeroOrMore("/" ~ _pathSegment) ~~> (pp => toPathParts(pp)) }
+  def _abs_path: Rule1[Vector[PathPart]] = rule {
+    zeroOrMore("/" ~ _pathSegment) ~> extractPathParts
+  }
 
   /**
    * A sequence of path parts optionally starting with a slash
    */
-  def _rel_path = rule { optional("/") ~ zeroOrMore(_pathSegment, separator = "/") ~~> (pp => toPathParts(pp)) }
+  def _rel_path: Rule1[Vector[PathPart]] = rule {
+    optional("/") ~ zeroOrMore(_pathSegment).separatedBy("/") ~> extractPathParts
+  }
 
-  def _queryParam = rule { group(zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract ~ "=" ~ zeroOrMore(!anyOf("=&#") ~ ANY) ~> extract) }
+  def _queryParam: Rule1[Param] = rule {
+    capture(zeroOrMore(!anyOf("=&#") ~ ANY)) ~ "=" ~ capture(zeroOrMore(!anyOf("=&#") ~ ANY)) ~> extractTuple
+  }
 
-  def _queryString = rule { optional("?") ~ zeroOrMore(_queryParam, separator = "&") ~~> (qs => toQueryString(qs)) }
+  def _queryString: Rule1[QueryString] = rule {
+    optional("?") ~ zeroOrMore(_queryParam).separatedBy("&") ~> extractQueryString
+  }
 
-  def _fragment = rule { "#" ~ (zeroOrMore(!anyOf("#") ~ ANY) ~> extract) }
+  def _fragment: Rule1[String] = rule {
+    "#" ~ capture(zeroOrMore(!anyOf("#") ~ ANY))
+  }
 
   def _abs_uri: Rule1[Uri] = rule {
-    _scheme ~ "://" ~ _authority ~ _abs_path ~ _queryString ~ optional(_fragment) ~~> extractAbsUri
+    _scheme ~ "://" ~ optional(_authority) ~ _abs_path ~ _queryString ~ optional(_fragment) ~> extractAbsUri
   }
 
   def _protocol_rel_uri: Rule1[Uri] = rule {
-    "//" ~ _authority ~ _abs_path ~ _queryString ~ optional(_fragment) ~~> extractProtocolRelUri
+    "//" ~ optional(_authority) ~ _abs_path ~ _queryString ~ optional(_fragment) ~> extractProtocolRelUri
   }
 
   def _rel_uri: Rule1[Uri] = rule {
-    _rel_path ~ _queryString ~ optional(_fragment) ~~> extractRelUri
+    _rel_path ~ _queryString ~ optional(_fragment) ~> extractRelUri
   }
 
-  lazy val _uri: Rule1[Uri] = rule {
-    _abs_uri | _protocol_rel_uri | _rel_uri
+  def _uri: Rule1[Uri] = rule {
+    (_abs_uri | _protocol_rel_uri | _rel_uri) ~ EOI
   }
 
-  def extractAbsUri(scheme: String, authority: Option[Authority], pp: Seq[PathPart], qs: QueryString, f: Option[String]) =
+  val extractAbsUri = (scheme: String, authority: Option[Authority], pp: Seq[PathPart], qs: QueryString, f: Option[String]) =>
     extractUri (
       scheme = Some(scheme),
       authority = authority,
@@ -70,7 +94,7 @@ object UriParser extends Parser {
       fragment = f
     )
 
-  def extractProtocolRelUri(authority: Option[Authority], pp: Seq[PathPart], qs: QueryString, f: Option[String]) =
+  val extractProtocolRelUri = (authority: Option[Authority], pp: Seq[PathPart], qs: QueryString, f: Option[String]) =>
     extractUri (
       authority = authority,
       pathParts = pp,
@@ -78,7 +102,7 @@ object UriParser extends Parser {
       fragment = f
     )
 
-  def extractRelUri(pp: Seq[PathPart], qs: QueryString, f: Option[String]) =
+  val extractRelUri = (pp: Seq[PathPart], qs: QueryString, f: Option[String]) =>
     extractUri (
       pathParts = pp,
       query = qs,
@@ -101,49 +125,45 @@ object UriParser extends Parser {
       fragment = fragment
     )
 
-  def extract = (x: String) => x
+  val extractInt = (num: String) =>
+    num.toInt
+
+  val extractUserInfo = (user: String, pass: Option[String]) =>
+    UserInfo(user, pass)
+
+  val extractAuthority = (userInfo: Option[UserInfo], host: String, port: Option[String]) =>
+    Authority(userInfo.map(_.user), userInfo.flatMap(_.pass), host, port.map(_.toInt))
+
+  val extractFragment = (x: String) =>
+    fragmentDecoder.decode(x)
+  
+  val extractQueryString = (tuples: ParamSeq) =>
+    QueryString(tuples.toVector.map(queryDecoder.decodeTuple))
+
+  val extractPathPart = (pathPart: String, matrixParams: ParamSeq) => {
+    val decodedPathPart = pathDecoder.decode(pathPart)
+    val decodedMatrixParams = matrixParams.map(pathDecoder.decodeTuple)
+    PathPart(decodedPathPart, decodedMatrixParams.toVector)
+  }
+
+  val extractPathParts = (pp: Seq[PathPart]) =>
+    pp.toVector
+
+  val extractTuple = (k: String, v: String) =>
+    k -> v
 
   /**
    * Used to made parsing easier to follow
    */
   case class Authority(user: Option[String], password: Option[String], host: String, port: Option[Int])
+  case class UserInfo(user: String, pass: Option[String])
 
-  def toQueryString(tuples: ParamSeq) =
-    QueryString(tuples.toVector)
+  def pathDecoder = conf.pathDecoder
+  def queryDecoder = conf.queryDecoder
+  def fragmentDecoder = conf.fragmentDecoder
+}
 
-  def toPathParts(pathParts: List[(String,ParamSeq)]) = {
-    val pp = pathParts.map(pp => {
-      val (plain, matrixParams) = pp
-      PathPart(plain, matrixParams.toVector)
-    })
-    pp.toVector
-  }
-
-  def parse(s: String, config: UriConfig) = {
-    try {
-      val parsingResult = ReportingParseRunner(_uri).run(s)
-
-      parsingResult.result match {
-        case Some(uri) => decode(uri, config)
-        case None => throw new ParsingException("Invalid Uri:\n" + ErrorUtils.printParseErrors(parsingResult))
-      }
-    } catch {
-      case e: ParserRuntimeException => e.getCause match {
-        case ude: UriDecodeException => throw ude
-        case _ => throw e
-      }
-    }
-  }
-  
-  def decode(uri: Uri, config: UriConfig) = {
-    val pathDecoder = config.pathDecoder
-    val pathParts = uri.pathParts.map {
-      case p: StringPathPart => p.map(pathDecoder.decode)
-      case p: MatrixParams => p.map(pathDecoder.decode).mapParams(pathDecoder.decodeTuple)
-    }
-    val query = uri.query.mapParams(config.queryDecoder.decodeTuple)
-    val fragment = uri.fragment.map(config.fragmentDecoder.decode)
-
-    uri.copy(pathParts = pathParts, query = query, fragment = fragment)
-  }
+object UriParser {
+  def parse(s: String, config: UriConfig) =
+    new UriParser(s, config)._uri.run().get
 }

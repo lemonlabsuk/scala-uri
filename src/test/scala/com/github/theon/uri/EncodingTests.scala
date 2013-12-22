@@ -1,10 +1,9 @@
 package com.github.theon.uri
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{Matchers, FlatSpec}
 import com.github.theon.uri.config.UriConfig
 
-class EncodingTests extends FlatSpec with ShouldMatchers {
+class EncodingTests extends FlatSpec with Matchers {
 
   import dsl._
   import encoding._

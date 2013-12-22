@@ -1,12 +1,11 @@
 package com.github.theon.uri
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{Matchers, FlatSpec}
 import com.github.theon.uri.Uri._
 import scala._
 import scala.Some
 
-class ParsingTests extends FlatSpec with ShouldMatchers {
+class ParsingTests extends FlatSpec with Matchers {
 
   "Parsing an absolute URI" should "result in a valid Uri object" in {
     val uri = parse("http://theon.github.com/uris-in-scala.html")

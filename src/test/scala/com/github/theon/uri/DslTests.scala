@@ -1,9 +1,8 @@
 package com.github.theon.uri
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{Matchers, FlatSpec}
 
-class DslTests extends FlatSpec with ShouldMatchers {
+class DslTests extends FlatSpec with Matchers {
 
   import dsl._
 

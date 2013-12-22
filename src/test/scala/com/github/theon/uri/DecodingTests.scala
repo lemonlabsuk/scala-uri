@@ -1,7 +1,6 @@
 package com.github.theon.uri
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{Matchers, FlatSpec}
 import com.github.theon.uri.decoding.{UriDecodeException, NoopDecoder}
 import com.github.theon.uri.config.UriConfig
 
@@ -9,7 +8,7 @@ import com.github.theon.uri.config.UriConfig
  * Date: 29/06/2013
  * Time: 17:41
  */
-class DecodingTests extends FlatSpec with ShouldMatchers {
+class DecodingTests extends FlatSpec with Matchers {
 
   "Reserved characters" should "be percent decoded during parsing" in {
     val uri = Uri.parse("http://theon.github.com/uris-in-scala.html?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D")

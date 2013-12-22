@@ -1,16 +1,14 @@
 package com.github.theon.uri
 
-import org.scalatest.{OptionValues, FlatSpec}
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{Matchers, OptionValues, FlatSpec}
 import com.github.theon.uri.Uri._
-import org.scalatest.PartialFunctionValues._
 import com.github.theon.uri.decoding.PermissivePercentDecoder
 import com.github.theon.uri.config.UriConfig
 
 /**
  * Test Suite to ensure that bugs raised by awesome github peeps NEVER come back
  */
-class GithubIssueTests extends FlatSpec with ShouldMatchers with OptionValues {
+class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
 
   import dsl._
 

@@ -1,13 +1,13 @@
 package com.github.theon.uri
 
 import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 /**
  * Date: 13/04/2013
  * Time: 15:58
  */
-class ApplyTests extends FlatSpec with ShouldMatchers {
+class ApplyTests extends FlatSpec with Matchers {
 
   "Uri apply method" should "accept String scheme, String host and path" in {
     val uri = Uri(scheme = "http", host = "theon.github.com", pathParts = Seq(StringPathPart("blah")))

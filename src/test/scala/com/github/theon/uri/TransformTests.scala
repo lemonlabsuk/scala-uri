@@ -1,14 +1,13 @@
 package com.github.theon.uri
 
-import org.scalatest.WordSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{Matchers, WordSpec}
 import com.github.theon.uri.Uri._
 
 /**
  * Date: 13/10/2013
  * Time: 22:30
  */
-class TransformTests extends WordSpec with ShouldMatchers {
+class TransformTests extends WordSpec with Matchers {
 
   "mapQuery" should {
 

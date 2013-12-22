@@ -19,7 +19,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.4.0-SNAPSHOT"
+"com.netaporter" %% "scala-uri" % "0.4.0-SNAPSHOT"
 ```
 
 ## Building URIs with the DSL
@@ -27,7 +27,7 @@ To include it in your SBT project from maven central:
 ### Query Strings
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 
 val uri = "http://theon.github.com/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
 uri.toString //This is: http://theon.github.com/scala-uri?p1=one&p2=2&p3=true
@@ -41,7 +41,7 @@ To add query string parameters, use either the `?` or `&` method and pass a `Tup
 #### Adding multiple query parameters
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 val p = ("key", true) :: ("key2", false) :: Nil
 val uri = "http://example.com".addParams(p)
 uri.toString //This is: http://example.com/?key=true&key2=false
@@ -50,7 +50,7 @@ uri.toString //This is: http://example.com/?key=true&key2=false
 ### Paths
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 
 val uri = "http://theon.github.com" / "scala-uri"
 uri.toString //This is: http://theon.github.com/scala-uri
@@ -63,7 +63,7 @@ To add path segments, use the `/` method
 To set the fragment, use the `` `#` `` method:
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 val uri = "http://theon.github.com/scala-uri" `#` "fragments"
 
 uri.toString //This is: http://theon.github.com/scala-uri#fragments
@@ -71,17 +71,17 @@ uri.toString //This is: http://theon.github.com/scala-uri#fragments
 
 ## Parsing URIs
 
-Provided you have the import `com.github.theon.uri.dsl._`, Strings will be implicitly parsed into `Uri` instances:
+Provided you have the import `com.netaporter.uri.dsl._`, Strings will be implicitly parsed into `Uri` instances:
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 val uri: Uri = "http://theon.github.com/scala-uri?param1=1&param2=2"
 ```
 
 However, if you prefer, you can call `parseUri()` explicitly:
 
 ```scala
-import com.github.theon.uri.Uri.parse
+import com.netaporter.uri.Uri.parse
 val uri = parse("http://theon.github.com/scala-uri?param1=1&param2=2")
 ```
 
@@ -142,7 +142,7 @@ uri.filterQueryValues(_.length == 1) //Results in /scala-uri?p2=2
 By Default, `scala-uri` will URL percent encode paths and query string parameters. To prevent this, you can call the `uri.toStringRaw` method:
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 val uri = "http://example.com/path with space" ? ("param" -> "üri")
 
 uri.toString //This is: http://example.com/path%20with%20space?param=%C3%BCri
@@ -150,39 +150,36 @@ uri.toString //This is: http://example.com/path%20with%20space?param=%C3%BCri
 uri.toStringRaw //This is: http://example.com/path with space?param=üri
 ```
 
-The characters that `scala-uri` will percent encode by default can be found [here](https://github.com/theon/scala-uri/blob/master/src/main/scala/com/github/theon/uri/PercentEncoder.scala#L31). You can modify which characters are percent encoded like so:
-
+The characters that `scala-uri` will percent encode by default can be found [here](https://github.com/NET-A-PORTER/scala-uri/blob/0.4.x/src/main/scala/com/netaporter/uri/encoding/PercentEncoder.scala#L21). You can modify which characters are percent encoded like so:
 
 Only percent encode the hash character:
 
 ```scala
-import com.github.theon.uri.encoding._
+import com.netaporter.uri.encoding._
 implicit val config = UriConfig(encoder = percentEncode('#'))
 ```
 
 Percent encode all the default chars, except the plus character:
 
 ```scala
-import com.github.theon.uri.encoding._
+import com.netaporter.uri.encoding._
 implicit val config = UriConfig(encoder = percentEncode -- '+')
 ```
 
 Encode all the default chars, and also encode the letters a and b:
 
 ```scala
-import com.github.theon.uri.encoding._
+import com.netaporter.uri.encoding._
 implicit val config = UriConfig(encoder = percentEncode ++ ('a', 'b'))
 ```
-
-Unit test examples are [here](https://github.com/theon/scala-uri/blob/master/src/test/scala/com/github/theon/uri/EncodingTests.scala#L75)
 
 ### Encoding spaces as pluses
 
 The default behaviour with scala uri, is to encode spaces as `%20`, however if you instead wish them to be encoded as the `+` symbol, then simply add the following `implicit val` to your code:
 
 ```scala
-import com.github.theon.uri.dsl._
-import com.github.theon.uri.encoding._
+import com.netaporter.uri.dsl._
+import com.netaporter.uri.encoding._
 implicit val config = UriConfig(encoder = percentEncode + spaceAsPlus)
 
 val uri: Uri = "http://theon.github.com/uri with space"
@@ -194,8 +191,8 @@ uri.toString //This is http://theon.github.com/uri+with+space
 If you would like to do some custom encoding for specific characters, you can use the `encodeCharAs` encoder.
 
 ```scala
-import com.github.theon.uri.dsl._
-import com.github.theon.uri.encoding._
+import com.netaporter.uri.dsl._
+import com.netaporter.uri.encoding._
 implicit val config = UriConfig(encoder = percentEncode + encodeCharAs(' ', "_"))
 
 val uri: Uri = "http://theon.github.com/uri with space"
@@ -207,7 +204,7 @@ uri.toString //This is http://theon.github.com/uri_with_space
 By Default, `scala-uri` will URL percent decode paths and query string parameters during parsing:
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 val uri: Uri = "http://example.com/i-have-%25been%25-percent-encoded"
 
 uri.toString //This is: http://example.com/i-have-%25been%25-percent-encoded
@@ -218,7 +215,7 @@ uri.toStringRaw //This is: http://example.com/i-have-%been%-percent-encoded
 To prevent this, you can bring the following implicit into scope:
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 implicit val c = UriConfig(decoder = NoopDecoder)
 val uri: Uri = "http://example.com/i-havent-%been%-percent-encoded"
 
@@ -232,7 +229,7 @@ uri.toStringRaw //This is: http://example.com/i-havent-%been%-percent-encoded
 If you wish to replace all existing query string parameters with a given name, you can use the `uri.replaceParams()` method:
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 val uri = "http://example.com/path" ? ("param" -> "1")
 val newUri = uri.replaceParams("param", "2")
 
@@ -244,7 +241,7 @@ newUri.toString //This is: http://example.com/path?param=2
 If you wish to remove all existing query string parameters with a given name, you can use the `uri.removeParams()` method:
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 val uri = "http://example.com/path" ? ("param" -> "1") & ("param2" -> "2")
 val newUri = uri.removeParams("param")
 
@@ -256,7 +253,7 @@ newUri.toString //This is: http://example.com/path?param2=2
 To get the query string parameters as a `Map[String,List[String]]` you can do the following:
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 val uri = "http://example.com/path" ? ("param" -> "1") & ("param2" -> 2)
 uri.query.paramMap //This is: Map(param -> List(1), param2 -> List(2))
 ```
@@ -276,13 +273,13 @@ uri.password //This is Some("pass")
 Modifying user information:
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 val mailto = "mailto://user@host.com"
 mailto.withUser("jack") //URL is now jack@host.com
 ```
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 val uri = "http://user:pass@host.com"
 uri.withPassword("secret") //URL is now http://user:secret@host.com
 ```
@@ -294,7 +291,7 @@ uri.withPassword("secret") //URL is now http://user:secret@host.com
 [Protocol Relative URLs](http://paulirish.com/2010/the-protocol-relative-url/) are supported in `scala-uri`. A `Uri` object with a protocol of `None`, but a host of `Some(x)` will be considered a protocol relative URL.
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 val uri: Uri = "//example.com/path"
 uri.scheme //This is: None
 uri.host //This is: Some("example.com")
@@ -305,7 +302,7 @@ uri.host //This is: Some("example.com")
 [Matrix Parameters](http://www.w3.org/DesignIssues/MatrixURIs.html) are supported in `scala-uri`.
 
 ```scala
-import com.github.theon.uri.dsl._
+import com.netaporter.uri.dsl._
 val uri = "http://example.com/path;paramOne=value;paramTwo=value2/pathTwo;paramThree=value3"
 
 //Get parameters at the end of the path
@@ -343,19 +340,19 @@ uri.toString //This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F8
 
 `scala-uri` `0.4.x` is currently built with support for scala `2.10.x` (and will be with `2.11.x`)
 
-For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/theon/scala-uri/tree/0.3.x)
+For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/net-a-porter/scala-uri/tree/0.3.x)
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.3.6"
+"com.netaporter" %% "scala-uri" % "0.3.6"
 ```
 
 For maven users you should use (for 2.10.x):
 
 ```xml
 <dependency>
-    <groupId>com.github.theon</groupId>
+    <groupId>com.netaporter</groupId>
     <artifactId>scala-uri_2.10</artifactId>
     <version>0.3.6</version>
 </dependency>
@@ -372,7 +369,7 @@ resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/public"
 Add the following dependency:
 
 ```scala
-"com.github.theon" %% "scala-uri" % "0.4.0-SNAPSHOT"
+"com.netaporter" %% "scala-uri" % "0.4.0-SNAPSHOT"
 ```
 
 # Contributions
@@ -381,7 +378,7 @@ Contributions to `scala-uri` are always welcome. Good ways to contribute include
 
  * Raising bugs and feature requests
  * Fixing bugs and developing new features (I will attempt to merge in pull requests ASAP)
- * Improving the performance of `scala-uri`. See the [Performance Tests](https://github.com/theon/scala-uri-benchmarks) project for details of how to run the `scala-uri` performance benchmarks.
+ * Improving the performance of `scala-uri`. See the [Performance Tests](https://github.com/net-a-porter/scala-uri-benchmarks) project for details of how to run the `scala-uri` performance benchmarks.
 
 # Building scala-uri
 
@@ -393,11 +390,12 @@ Generate code coverage reports from the sbt console by running the `scct:test` c
 
 ## Performance Tests
 
-For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https://github.com/theon/scala-uri-benchmarks) github project
+For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https://github.com/net-a-porter/scala-uri-benchmarks) github project
 
 # Migration guide from 0.3.x
 
  * Package changes / import changes
+  * All code moved from `com.netaporter`to `com.netaporter` package
   * `scala-uri` has been organised into the following packages: `encoding`, `decoding`, `config` and `dsl`. You will need to update import statments.
  * Name changes
   * `PermissiveDecoder` renamed to `PermissivePercentDecoder`
@@ -416,4 +414,4 @@ For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https:/
 
 `scala-uri` is open source software released under the [Apache 2 License](http://www.apache.org/licenses/LICENSE-2.0).
 
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/6379a8269f03e9dc2cc994c9493eecc0 "githalytics.com")](http://githalytics.com/theon/scala-uri)
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/6379a8269f03e9dc2cc994c9493eecc0 "githalytics.com")](http://githalytics.com/net-a-porter/scala-uri)

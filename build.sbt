@@ -1,6 +1,6 @@
 name := "scala-uri"
 
-organization  := "com.github.theon"
+organization  := "com.netaporter"
 
 version       := "0.4.0-SNAPSHOT"
 
@@ -14,7 +14,7 @@ publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
 
-scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
+scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
 libraryDependencies += "org.parboiled" %% "parboiled" % "2.0-M1"
 
@@ -33,7 +33,7 @@ publishTo <<= version { (v: String) =>
 }
 
 pomExtra := (
-  <url>https://github.com/theon/scala-uri</url>
+  <url>https://github.com/net-a-porter/scala-uri</url>
   <licenses>
     <license>
       <name>Apache 2</name>
@@ -42,13 +42,13 @@ pomExtra := (
     </license>
   </licenses>
   <scm>
-    <url>git@github.com:theon/scala-uri.git</url>
-    <connection>scm:git@github.com:theon/scala-uri.git</connection>
+    <url>git@github.com:net-a-porter/scala-uri.git</url>
+    <connection>scm:git@github.com:net-a-porter/scala-uri.git</connection>
   </scm>
   <developers>
     <developer>
       <id>theon</id>
       <name>Ian Forsey</name>
-      <url>http://theon.github.com</url>
+      <url>http://theon.github.io</url>
     </developer>
   </developers>)

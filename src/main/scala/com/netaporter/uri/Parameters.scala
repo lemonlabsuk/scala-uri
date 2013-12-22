@@ -117,12 +117,11 @@ trait Parameters {
    * @param vOpt value to replace with
    * @return A new QueryString with the result of the replace
    */
-  def replaceAll(k: String, vOpt: Option[Any]) = {
+  def replaceAll(k: String, vOpt: Option[Any]): Self =
     vOpt match {
       case Some(v) => withParams(params.filterNot(_._1 == k) :+ (k -> v.toString))
       case None => removeAll(k)
     }
-  }
 
   /**
    * Removes all Query String parameters with the specified key
@@ -131,6 +130,9 @@ trait Parameters {
    */
   def removeAll(k: String) =
     filterParamsNames(_ != k)
+
+  def removeAll() =
+    withParams(Seq.empty)
 
   def paramsToString(e: UriEncoder, charset: String) =
     params.map(kv => {

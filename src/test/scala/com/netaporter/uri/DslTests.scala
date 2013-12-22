@@ -67,6 +67,12 @@ class DslTests extends FlatSpec with Matchers {
     newUri.toString should equal ("/uris-in-scala.html")
   }
 
+  "Replace all params method" should "replace all query params" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val newUri = uri.replaceAllParams("testThree" -> "3", "testFour" -> "4")
+    newUri.toString should equal ("/uris-in-scala.html?testThree=3&testFour=4")
+  }
+
   "Remove param method" should "remove single parameters" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1")
     val newUri = uri.removeParams("testOne")
@@ -77,6 +83,12 @@ class DslTests extends FlatSpec with Matchers {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
     val newUri = uri.removeParams("testOne")
     newUri.toString should equal ("/uris-in-scala.html?testTwo=2")
+  }
+
+  "Remove all params method" should "remove all query params" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val newUri = uri.removeAllParams
+    newUri.toString should equal ("/uris-in-scala.html")
   }
 
   "Scheme setter method" should "copy the URI with the new scheme" in {

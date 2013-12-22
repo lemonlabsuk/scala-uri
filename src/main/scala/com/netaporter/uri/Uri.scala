@@ -158,6 +158,12 @@ case class Uri (
   }
 
   /**
+   * Replaces the all existing Query String parameters with a new set of query params
+   */
+  def replaceAllParams(params: Param*) =
+    copy(query = query.withParams(params))
+
+  /**
    * Transforms the Query String by applying the specified Function to each Query String Parameter
    *
    * @param f A function that returns a new Parameter when applied to each Parameter
@@ -227,6 +233,14 @@ case class Uri (
    */
   def removeParams(k: String) = {
     copy(query = query.removeAll(k))
+  }
+
+  /**
+   * Removes all Query String parameters
+   * @return
+   */
+  def removeAllParams() = {
+    copy(query = query.removeAll())
   }
 
   override def toString = toString(UriConfig.default)

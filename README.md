@@ -1,7 +1,5 @@
 # scala-uri 0.4.x - WIP
 
- > This branch is for `scala-uri` `0.4.x`. Currently there are breaking API changes being made in `0.4.0-SNAPSHOT`. If you would like something stable, please use [0.3.x](https://github.com/NET-A-PORTER/scala-uri).
-
 [![Build Status](https://secure.travis-ci.org/NET-A-PORTER/scala-uri.png?branch=0.4.x)](https://travis-ci.org/NET-A-PORTER/scala-uri?branch=0.4.x)
 [![Coverage Status](https://coveralls.io/repos/NET-A-PORTER/scala-uri/badge.png?branch=0.4.x)](https://coveralls.io/r/NET-A-PORTER/scala-uri?branch=0.4.x)
 
@@ -19,7 +17,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.0-SNAPSHOT"
+"com.netaporter" %% "scala-uri" % "0.4.0"
 ```
 
 ## Building URIs with the DSL
@@ -345,7 +343,7 @@ For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/net-a-porter/sc
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.3.6"
+"com.netaporter" %% "scala-uri" % "0.4.0"
 ```
 
 For maven users you should use (for 2.10.x):
@@ -369,7 +367,7 @@ resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/public"
 Add the following dependency:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.0-SNAPSHOT"
+"com.netaporter" %% "scala-uri" % "0.4.1-SNAPSHOT"
 ```
 
 # Contributions

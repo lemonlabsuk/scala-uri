@@ -1,7 +1,7 @@
-# scala-uri 0.4.x - WIP
+# scala-uri
 
-[![Build Status](https://secure.travis-ci.org/NET-A-PORTER/scala-uri.png?branch=0.4.x)](https://travis-ci.org/NET-A-PORTER/scala-uri?branch=0.4.x)
-[![Coverage Status](https://coveralls.io/repos/NET-A-PORTER/scala-uri/badge.png?branch=0.4.x)](https://coveralls.io/r/NET-A-PORTER/scala-uri?branch=0.4.x)
+[![Build Status](https://secure.travis-ci.org/NET-A-PORTER/scala-uri.png?branch=master)](https://travis-ci.org/NET-A-PORTER/scala-uri?branch=master)
+[![Coverage Status](https://coveralls.io/repos/NET-A-PORTER/scala-uri/badge.png?branch=master)](https://coveralls.io/r/NET-A-PORTER/scala-uri?branch=master)
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
@@ -148,7 +148,7 @@ uri.toString //This is: http://example.com/path%20with%20space?param=%C3%BCri
 uri.toStringRaw //This is: http://example.com/path with space?param=üri
 ```
 
-The characters that `scala-uri` will percent encode by default can be found [here](https://github.com/NET-A-PORTER/scala-uri/blob/0.4.x/src/main/scala/com/netaporter/uri/encoding/PercentEncoder.scala#L21). You can modify which characters are percent encoded like so:
+The characters that `scala-uri` will percent encode by default can be found [here](https://github.com/NET-A-PORTER/scala-uri/blob/master/src/main/scala/com/netaporter/uri/encoding/PercentEncoder.scala#L21). You can modify which characters are percent encoded like so:
 
 Only percent encode the hash character:
 

@@ -78,7 +78,7 @@ import com.netaporter.uri.dsl._
 val uri: Uri = "http://theon.github.com/scala-uri?param1=1&param2=2"
 ```
 
-However, if you prefer, you can call `parseUri()` explicitly:
+However, if you prefer, you can call `Uri.parse()` explicitly:
 
 ```scala
 import com.netaporter.uri.Uri.parse
@@ -124,7 +124,7 @@ uri.filterQuery {
   case (n, v) => n.contains("2") && v.contains("2")
 }
 
-uri.mapQuery(_._2 == "one") //Results in /scala-uri?p1=one
+uri.filterQuery(_._2 == "one") //Results in /scala-uri?p1=one
 ```
 
 The `filterQueryNames` and `filterQueryValues` provide a more convenient way to filter just by Query Parameter name or value
@@ -395,7 +395,7 @@ For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https:/
 # Migration guide from 0.3.x
 
  * Package changes / import changes
-  * All code moved from `com.netaporter`to `com.netaporter` package
+  * All code moved from `com.github.theon` package to `com.netaporter` package
   * `scala-uri` has been organised into the following packages: `encoding`, `decoding`, `config` and `dsl`. You will need to update import statments.
  * Name changes
   * `PermissiveDecoder` renamed to `PermissivePercentDecoder`

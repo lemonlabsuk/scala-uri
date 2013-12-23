@@ -336,7 +336,7 @@ uri.toString //This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F8
 
 ## Including scala-uri your project
 
-`scala-uri` `0.4.x` is currently built with support for scala `2.10.x` (and will be with `2.11.x`)
+`scala-uri` `0.4.x` is currently built with support for scala `2.10.x` (and will support `2.11.x`)
 
 For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/net-a-porter/scala-uri/tree/0.3.x)
 
@@ -352,7 +352,7 @@ For maven users you should use (for 2.10.x):
 <dependency>
     <groupId>com.netaporter</groupId>
     <artifactId>scala-uri_2.10</artifactId>
-    <version>0.3.6</version>
+    <version>0.4.0</version>
 </dependency>
 ```
 

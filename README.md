@@ -1,4 +1,6 @@
-# scala-uri
+# scala-uri 0.3.x
+
+> This is `scala-uri` 0.3.x maintained for Scala 2.9 support. If you are using Scala 2.10.3+ it is recommended you upgrade to [0.4.x](https://github.com/NET-A-PORTER/scala-uri)
 
 [![Build Status](https://secure.travis-ci.org/NET-A-PORTER/scala-uri.png?branch=master)](https://travis-ci.org/NET-A-PORTER/scala-uri)
 [![Coverage Status](https://coveralls.io/repos/NET-A-PORTER/scala-uri/badge.png?branch=master)](https://coveralls.io/r/NET-A-PORTER/scala-uri?branch=master)

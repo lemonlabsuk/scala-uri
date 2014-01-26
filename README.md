@@ -361,7 +361,7 @@ For maven users you should use (for 2.10.x):
 For the latest snapshot builds, add the Sonatype OSS repo to your SBT build configuration:
 
 ```scala
-resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/public"
+resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/repositories/snapshots"
 ```
 
 Add the following dependency:

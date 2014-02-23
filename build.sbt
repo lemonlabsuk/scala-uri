@@ -2,7 +2,7 @@ name := "scala-uri"
 
 organization  := "com.netaporter"
 
-version       := "0.4.1-SNAPSHOT"
+version       := "0.4.1"
 
 scalaVersion  := "2.10.3"
 
@@ -20,13 +20,9 @@ resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/reposi
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
-libraryDependencies += "org.parboiled" %% "parboiled" % "2.0-M1"
+libraryDependencies += "org.parboiled" %% "parboiled" % "2.0-M2"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
-
-CoverallsPlugin.singleProject
-//ScctPlugin.instrumentSettings
-//ScoverageSbtPlugin.instrumentSettings
 
 parallelExecution in Test := false
 

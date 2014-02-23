@@ -15,8 +15,8 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
   import uri.dsl._
 
   "Github Issue #2" should "now be fixed. Pluses in querystrings should be encoded" in {
-    val uri = "http://theon.github.com/+" ? ("+" -> "+")
-    uri.toString should equal ("http://theon.github.com/%2B?%2B=%2B")
+    val uri = "http://theon.github.com/" ? ("+" -> "+")
+    uri.toString should equal ("http://theon.github.com/?%2B=%2B")
   }
 
   "Github Issue #4" should "now be fixed. Port numbers should be rendered by toString" in {

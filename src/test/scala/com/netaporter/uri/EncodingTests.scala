@@ -88,4 +88,9 @@ class EncodingTests extends FlatSpec with Matchers {
     val uri: Uri = "http://theon.github.com/abcde"
     uri.toString should equal ("http://theon.github.com/%61%62cde")
   }
+
+  "URI path pchars" should "not be encoded by default" in {
+    val uri: Uri = "http://example.com/-._~!$&'()*+,;=:@/test"
+    uri.toString should equal("http://example.com/-._~!$&'()*+,;=:@/test")
+  }
 }

@@ -23,12 +23,19 @@ case class UriConfig(pathEncoder: UriEncoder,
 object UriConfig {
 
   val default = UriConfig(pathEncoder = PercentEncoder(PATH_CHARS_TO_ENCODE),
-                          queryEncoder = PercentEncoder(),
+                          queryEncoder = PercentEncoder(QUERY_CHARS_TO_ENCODE),
                           fragmentEncoder = PercentEncoder(),
                           pathDecoder = PercentDecoder,
                           queryDecoder = PercentDecoder,
                           fragmentDecoder = PercentDecoder,
                           charset = "UTF-8")
+
+
+  /**
+   * Probably more than you need to percent encode. Wherever possible try to use a tighter Set of characters
+   * to encode depending on your use case
+   */
+  val conservative = UriConfig(PercentEncoder(), PercentDecoder)
 
   def apply(encoder: UriEncoder = PercentEncoder(),
             decoder: UriDecoder = PercentDecoder,

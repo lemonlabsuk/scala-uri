@@ -11,7 +11,10 @@ case class PercentEncoder(charsToEncode: Set[Char] = DEFAULT_CHARS_TO_ENCODE) ex
   def encodeChar(ch: Char) = "%" + toHex(ch)
   def toHex(ch: Char) = "%04x".format(ch.toInt).substring(2).toUpperCase
 
-  def ascii(ch: Char) = ch > 0 && ch < 128
+  /**
+   * Determines if this character is in the ASCII range (excluding control characters)
+   */
+  def ascii(ch: Char) = ch > 31 && ch < 127
 
   def --(chars: Char*) = new PercentEncoder(charsToEncode -- chars)
   def ++(chars: Char*) = new PercentEncoder(charsToEncode ++ chars)
@@ -19,11 +22,20 @@ case class PercentEncoder(charsToEncode: Set[Char] = DEFAULT_CHARS_TO_ENCODE) ex
 
 object PercentEncoder {
   val PATH_CHARS_TO_ENCODE = Set (
-    ' ', '%', '?', '<', '>', '[', ']', '#', '%', '{', '}', '\n', '\r', '^', '`', '|', '\\'
+    ' ', '%', '?', '<', '>', '[', ']', '#', '%', '{', '}', '^', '`', '|'
   )
 
-  val DEFAULT_CHARS_TO_ENCODE = Set (
-    ' ', '%', '$', '&', '+', ',', '/', ':', ';', '=', '?', '@', '<', '>', '[', ']', '(', ')', '#', '%',
-    '!', '\'', '*', '{', '}', '\n', '\r', '^', '`', '|', '~', '\\'
+  val QUERY_CHARS_TO_ENCODE = Set (
+    '&', ' ', '%', '<', '>', '[', ']', '#', '%', '{', '}', '^', '`', '|', '\\'
   )
+
+  val GEN_DELIMS = Set(':', '/', '?',  '#', '[', ']', '@')
+  val SUB_DELIMS  = Set('!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=')
+  val RESERVED = GEN_DELIMS ++ SUB_DELIMS
+  
+  /**
+   * Probably more than you need to percent encode. Wherever possible try to use a tighter Set of characters
+   * to encode depending on your use case
+   */
+  val DEFAULT_CHARS_TO_ENCODE = RESERVED ++ PATH_CHARS_TO_ENCODE ++ QUERY_CHARS_TO_ENCODE
 }

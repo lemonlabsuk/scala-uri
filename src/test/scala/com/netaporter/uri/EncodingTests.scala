@@ -45,9 +45,9 @@ class EncodingTests extends FlatSpec with Matchers {
     uri.toString should equal ("http://theon.github.com/uris-in-scala.html?c%C3%A0sh=%C2%A350&%C2%A9opyright=false")
   }
 
-  "Reserved characters" should "be percent encoded" in {
+  "Reserved characters" should "be percent encoded when using conservative encoder" in {
     val uri = "http://theon.github.com/uris-in-scala.html" ? ("reserved" -> ":/?#[]@!$&'()*+,;={}\\\n\r")
-    uri.toString should equal ("http://theon.github.com/uris-in-scala.html?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D")
+    uri.toString(UriConfig.conservative) should equal ("http://theon.github.com/uris-in-scala.html?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D")
   }
 
   "Chinese characters" should "be percent encoded" in {
@@ -73,8 +73,8 @@ class EncodingTests extends FlatSpec with Matchers {
 
   "Percent encoding with custom reserved characters" should "be easy" in {
     implicit val config = UriConfig(encoder = percentEncode('#'))
-    val uri = "http://theon.github.com/uris-in-scala.html" ? ("reserved" -> ":/?#[]@!$&'()*+,;={}\\\n\r")
-    uri.toString should equal ("http://theon.github.com/uris-in-scala.html?reserved=:/?%23[]@!$&'()*+,;={}\\\n\r")
+    val uri = "http://theon.github.com/uris-in-scala.html" ? ("reserved" -> ":/?#[]@!$&'()*+,;={}\\")
+    uri.toString should equal ("http://theon.github.com/uris-in-scala.html?reserved=:/?%23[]@!$&'()*+,;={}\\")
   }
 
   "Percent encoding with a few less reserved characters that the defaults" should "be easy" in {
@@ -92,5 +92,10 @@ class EncodingTests extends FlatSpec with Matchers {
   "URI path pchars" should "not be encoded by default" in {
     val uri: Uri = "http://example.com/-._~!$&'()*+,;=:@/test"
     uri.toString should equal("http://example.com/-._~!$&'()*+,;=:@/test")
+  }
+
+  "Query parameters" should "have control characters encoded" in {
+    val uri = "http://example.com/" ? ("control" -> "\u0019\u007F")
+    uri.toString should equal("http://example.com/?control=%19%7F")
   }
 }

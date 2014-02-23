@@ -9,11 +9,11 @@ object PercentDecoder extends UriDecoder {
 
   def decode(s: String) = try {
     val segments = s.split('%')
-    val decodedSegments = segments.tail.map(seg => {
+    val decodedSegments = segments.tail.flatMap(seg => {
       val percentByte = Integer.parseInt(seg.substring(0, 2), 16).toByte
-      new String(Array(percentByte), "UTF-8") + seg.substring(2)
+      percentByte +: seg.substring(2).getBytes("UTF-8")
     })
-    segments.head + decodedSegments.mkString
+    segments.head + new String(decodedSegments, "UTF-8")
   } catch {
     case e: NumberFormatException => throw new UriDecodeException("Encountered '%' followed by a non hex number. It looks like this URL isn't Percent Encoded. If so, look at using the NoopDecoder")
   }

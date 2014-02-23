@@ -16,7 +16,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.0"
+"com.netaporter" %% "scala-uri" % "0.4.1"
 ```
 
 ## Building URIs with the DSL
@@ -342,7 +342,7 @@ For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/net-a-porter/sc
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.0"
+"com.netaporter" %% "scala-uri" % "0.4.1"
 ```
 
 For maven users you should use (for 2.10.x):
@@ -351,7 +351,7 @@ For maven users you should use (for 2.10.x):
 <dependency>
     <groupId>com.netaporter</groupId>
     <artifactId>scala-uri_2.10</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
 </dependency>
 ```
 

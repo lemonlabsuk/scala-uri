@@ -14,13 +14,19 @@ publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
 
+resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+
+resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases"
+
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
 libraryDependencies += "org.parboiled" %% "parboiled" % "2.0-M1"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
 
-seq(CoverallsPlugin.singleProject: _*)
+CoverallsPlugin.singleProject
+//ScctPlugin.instrumentSettings
+//ScoverageSbtPlugin.instrumentSettings
 
 parallelExecution in Test := false
 

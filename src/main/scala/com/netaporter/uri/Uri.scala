@@ -263,6 +263,13 @@ case class Uri (
    */
   def toStringRaw(implicit config: UriConfig = UriConfig.default): String =
     toString(config.withNoEncoding)
+
+  /**
+   * Converts to a Java URI.
+   * This involves a toString + URI.parse because the specific URI constructors do not deal properly with encoded elements
+   * @return a URI matching this Uri
+   */
+  def toURI(implicit c: UriConfig = UriConfig.conservative) = new java.net.URI(toString())
 }
 
 object Uri {
@@ -288,4 +295,6 @@ object Uri {
         Option(fragment)
       )
   }
+
+  def apply(javaUri: java.net.URI): Uri = parse(javaUri.toASCIIString())
 }

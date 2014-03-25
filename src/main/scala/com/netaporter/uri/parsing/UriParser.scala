@@ -128,7 +128,7 @@ class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
     num.toInt
 
   val extractUserInfo = (user: String, pass: Option[String]) =>
-    UserInfo(user, pass)
+    UserInfo(pathDecoder.decode(user), pass.map(pathDecoder.decode))
 
   val extractAuthority = (userInfo: Option[UserInfo], host: String, port: Option[String]) =>
     Authority(userInfo.map(_.user), userInfo.flatMap(_.pass), host, port.map(_.toInt))

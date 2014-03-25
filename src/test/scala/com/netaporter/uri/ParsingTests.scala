@@ -4,6 +4,7 @@ import org.scalatest.{Matchers, FlatSpec}
 import Uri._
 import scala._
 import scala.Some
+import com.netaporter.uri.parsing._
 
 class ParsingTests extends FlatSpec with Matchers {
 
@@ -112,4 +113,17 @@ class ParsingTests extends FlatSpec with Matchers {
     uri.toString should equal("http://www.example.com/hi//bye")
   }
 
+  "exotic/reserved characters in query string" should "be decoded" in {
+    val q = "weird%3D%26key=strange%25value&arrow=%E2%87%94"
+    val parsedQueryString = new UriParser(q, config.UriConfig.default)._queryString.run().get
+    parsedQueryString.params("weird=&key") should equal(Seq("strange%value"))
+    parsedQueryString.params("arrow") should equal(Seq("⇔"))
+  }
+
+  "exotic/reserved characters in user info" should "be decoded" in {
+    val userInfo = "user%3A:p%40ssword%E2%87%94@"
+    val parsedUserInfo = new UriParser(userInfo, config.UriConfig.default)._userInfo.run().get
+    parsedUserInfo.user should equal("user:")
+    parsedUserInfo.pass should equal(Some("p@ssword⇔"))
+  }
 }

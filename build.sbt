@@ -4,7 +4,7 @@ organization  := "com.netaporter"
 
 version       := "0.4.2-SNAPSHOT"
 
-scalaVersion  := "2.10.3"
+scalaVersion  := "2.11.0"
 
 crossScalaVersions := Seq("2.10.3")
 
@@ -20,9 +20,11 @@ resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/reposi
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
-libraryDependencies += "org.parboiled" %% "parboiled" % "2.0-M2"
+libraryDependencies += "org.parboiled" %% "parboiled" % "2.0.0-RC1"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
+libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.11.0"
+
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.4" % "test"
 
 parallelExecution in Test := false
 

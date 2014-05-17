@@ -57,7 +57,7 @@ class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
   }
 
   def _queryParam: Rule1[Param] = rule {
-    capture(zeroOrMore(!anyOf("=&#") ~ ANY)) ~ "=" ~ capture(zeroOrMore(!anyOf("=&#") ~ ANY)) ~> extractTuple
+    capture(zeroOrMore(!anyOf("=&#") ~ ANY)) ~ "=" ~ capture(zeroOrMore(!anyOf("&#") ~ ANY)) ~> extractTuple
   }
 
   def _queryString: Rule1[QueryString] = rule {

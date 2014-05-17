@@ -137,7 +137,11 @@ trait Parameters {
   def paramsToString(e: UriEncoder, charset: String) =
     params.map(kv => {
       val (k,v) = kv
-      e.encode(k, charset) + "=" + e.encode(v, charset)
+      if(v.isEmpty) {
+        e.encode(k, charset)
+      } else {
+        e.encode(k, charset) + "=" + e.encode(v, charset)
+      }
     }).mkString(separator)
 }
 

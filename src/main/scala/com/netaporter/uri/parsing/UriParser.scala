@@ -60,8 +60,12 @@ class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
     capture(zeroOrMore(!anyOf("=&#") ~ ANY)) ~ "=" ~ capture(zeroOrMore(!anyOf("=&#") ~ ANY)) ~> extractTuple
   }
 
+  def _queryTok: Rule1[Param] = rule {
+    capture(oneOrMore(!anyOf("=&#") ~ ANY)) ~> extractTok
+  }
+
   def _queryString: Rule1[QueryString] = rule {
-    optional("?") ~ zeroOrMore(_queryParam).separatedBy("&") ~> extractQueryString
+    optional("?") ~ zeroOrMore(_queryParam | _queryTok).separatedBy("&") ~> extractQueryString
   }
 
   def _fragment: Rule1[String] = rule {
@@ -150,6 +154,8 @@ class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
 
   val extractTuple = (k: String, v: String) =>
     k -> v
+
+  val extractTok = (k: String) => k -> ""
 
   /**
    * Used to made parsing easier to follow

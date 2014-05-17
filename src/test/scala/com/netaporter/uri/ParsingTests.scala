@@ -100,6 +100,27 @@ class ParsingTests extends FlatSpec with Matchers {
     uri.fragment should equal(Some("frag"))
   }
 
+  "Parsing a url with a query string that doesn't have a value" should "not throw an exception" in {
+        val uri = parse("//theon.github.com/uris-in-scala.html?ham")
+        uri.host should equal (Some("theon.github.com"))
+        uri.query.params("ham") should equal(Vector(""))
+        uri.toString should equal("//theon.github.com/uris-in-scala.html?ham")
+
+        val uri2 = parse("//cythrawll.github.com/scala-uri.html?q=foo&ham")
+        uri2.host should equal (Some("cythrawll.github.com"))
+        uri2.query.params("ham") should equal(Vector(""))
+        uri2.query.params("q")   should equal(Vector("foo"))
+        uri2.toString should equal("//cythrawll.github.com/scala-uri.html?q=foo&ham")
+
+
+    val uri3 = parse("//cythrawll.github.com/scala-uri.html?ham&q=foo")
+        uri3.host should equal (Some("cythrawll.github.com"))
+        uri3.query.params("ham") should equal(Vector(""))
+        uri3.query.params("q")   should equal(Vector("foo"))
+        uri3.toString should equal("//cythrawll.github.com/scala-uri.html?ham&q=foo")
+  }
+
+
   "Path with matrix params" should "be parsed" in {
     val uri = parse("http://stackoverflow.com/path;paramOne=value;paramTwo=value2/pathTwo;paramOne=value")
     uri.pathParts should equal(Vector(

@@ -33,6 +33,16 @@ class ParsingTests extends FlatSpec with Matchers {
     )
   }
 
+   "Parsing a URI with not properly URL-encoded querystring parameters" should "result in a valid Uri object" in {
+      val uri = parse("/uris-in-scala.html?query_param_one=hello=world&query_param_two=false")
+      uri.query.params should equal (
+         Vector (
+            ("query_param_one" -> "hello=world"),
+            ("query_param_two" -> "false")
+         )
+      )
+   }
+
   "Parsing a url with relative scheme" should "result in a Uri with None for scheme" in {
     val uri = parse("//theon.github.com/uris-in-scala.html")
     uri.scheme should equal (None)

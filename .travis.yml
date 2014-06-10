@@ -6,3 +6,4 @@ jdk:
 - openjdk7
 scala: 
 - 2.10.0
+- 2.11.0

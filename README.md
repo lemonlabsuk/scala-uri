@@ -16,7 +16,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.1"
+"com.netaporter" %% "scala-uri" % "0.4.2"
 ```
 
 ## Building URIs with the DSL
@@ -353,14 +353,14 @@ uri.toString //This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F8
 
 ## Including scala-uri your project
 
-`scala-uri` `0.4.x` is currently built with support for scala `2.10.x` (and will support `2.11.x`)
+`scala-uri` `0.4.x` is currently built with support for scala `2.10.x` and `2.11.x`
 
 For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/net-a-porter/scala-uri/tree/0.3.x)
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.1"
+"com.netaporter" %% "scala-uri" % "0.4.2"
 ```
 
 For maven users you should use (for 2.10.x):
@@ -384,7 +384,7 @@ resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/repositories/sna
 Add the following dependency:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.1-SNAPSHOT"
+"com.netaporter" %% "scala-uri" % "0.4.3-SNAPSHOT"
 ```
 
 # Contributions

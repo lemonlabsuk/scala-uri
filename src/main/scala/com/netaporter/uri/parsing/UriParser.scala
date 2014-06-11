@@ -6,6 +6,7 @@ import com.netaporter.uri.config.UriConfig
 import Parameters._
 import scala.Predef._
 import scala.Some
+import scala.util.{Failure, Success}
 
 class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
 
@@ -170,5 +171,14 @@ class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
 
 object UriParser {
   def parse(s: String, config: UriConfig) =
-    new UriParser(s, config)._uri.run().get
+    new UriParser(s, config)._uri.run() match {
+      case Success(uri) =>
+        uri
+
+      case Failure(pe @ ParseError(position, _)) =>
+        throw new java.net.URISyntaxException(s, "Invalid URI could not be parsed. " + pe.formatTraces, position.index)
+
+      case Failure(e) =>
+        throw e
+    }
 }

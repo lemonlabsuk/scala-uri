@@ -97,4 +97,11 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
     uri.query.param("gquery").value should equal("filter(time_before_closing<=45)")
     uri.toString should equal("http://localhost:9002/iefjiefjief-efefeffe-fefefee/toto?access_token=ijifjijef-fekieifj-fefoejfoef&gquery=filter(time_before_closing%3C=45)")
   }
+
+  "Github Issue #56" should "now be fixed" in {
+    val ex = the [java.net.URISyntaxException] thrownBy Uri.parse("http://test.net/##")
+    ex.getIndex should equal(18)
+    ex.getMessage should startWith("Invalid URI could not be parsed. 3 rules mismatched at error location:")
+    ex.getMessage should endWith("at index 18: http://test.net/##")
+  }
 }

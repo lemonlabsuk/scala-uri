@@ -89,11 +89,11 @@ class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
   }
 
   def _queryTok: Rule1[Param] = rule {
-    capture(oneOrMore(_queryKeyChars)) ~> extractTok
+    capture(zeroOrMore(_queryKeyChars)) ~> extractTok
   }
 
   def _queryString: Rule1[QueryString] = rule {
-    optional("?") ~ zeroOrMore(_queryParam | _queryTok).separatedBy("&") ~> extractQueryString
+    "?" ~ zeroOrMore(_queryParam | _queryTok).separatedBy("&") ~> extractQueryString
   }
 
   def _fragment: Rule1[String] = rule {
@@ -101,22 +101,22 @@ class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
   }
 
   def _abs_uri: Rule1[Uri] = rule {
-    _scheme ~ "://" ~ optional(_authority) ~ _abs_path ~ _queryString ~ optional(_fragment) ~> extractAbsUri
+    _scheme ~ "://" ~ optional(_authority) ~ _abs_path ~ optional(_queryString) ~ optional(_fragment) ~> extractAbsUri
   }
 
   def _protocol_rel_uri: Rule1[Uri] = rule {
-    "//" ~ optional(_authority) ~ _abs_path ~ _queryString ~ optional(_fragment) ~> extractProtocolRelUri
+    "//" ~ optional(_authority) ~ _abs_path ~ optional(_queryString) ~ optional(_fragment) ~> extractProtocolRelUri
   }
 
   def _rel_uri: Rule1[Uri] = rule {
-    _rel_path ~ _queryString ~ optional(_fragment) ~> extractRelUri
+    _rel_path ~ optional(_queryString) ~ optional(_fragment) ~> extractRelUri
   }
 
   def _uri: Rule1[Uri] = rule {
     (_abs_uri | _protocol_rel_uri | _rel_uri) ~ EOI
   }
 
-  val extractAbsUri = (scheme: String, authority: Option[Authority], pp: Seq[PathPart], qs: QueryString, f: Option[String]) =>
+  val extractAbsUri = (scheme: String, authority: Option[Authority], pp: Seq[PathPart], qs: Option[QueryString], f: Option[String]) =>
     extractUri (
       scheme = Some(scheme),
       authority = authority,
@@ -125,7 +125,7 @@ class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
       fragment = f
     )
 
-  val extractProtocolRelUri = (authority: Option[Authority], pp: Seq[PathPart], qs: QueryString, f: Option[String]) =>
+  val extractProtocolRelUri = (authority: Option[Authority], pp: Seq[PathPart], qs: Option[QueryString], f: Option[String]) =>
     extractUri (
       authority = authority,
       pathParts = pp,
@@ -133,7 +133,7 @@ class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
       fragment = f
     )
 
-  val extractRelUri = (pp: Seq[PathPart], qs: QueryString, f: Option[String]) =>
+  val extractRelUri = (pp: Seq[PathPart], qs: Option[QueryString], f: Option[String]) =>
     extractUri (
       pathParts = pp,
       query = qs,
@@ -143,7 +143,7 @@ class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
   def extractUri(scheme: Option[String] = None,
                  authority: Option[Authority] = None,
                  pathParts: Seq[PathPart],
-                 query: QueryString,
+                 query: Option[QueryString],
                  fragment: Option[String]) =
     new Uri(
       scheme = scheme,
@@ -152,7 +152,7 @@ class UriParser(val input: ParserInput, conf: UriConfig) extends Parser {
       host = authority.map(_.host),
       port = authority.flatMap(_.port),
       pathParts = pathParts,
-      query = query,
+      query = query.getOrElse(EmptyQueryString),
       fragment = fragment
     )
 

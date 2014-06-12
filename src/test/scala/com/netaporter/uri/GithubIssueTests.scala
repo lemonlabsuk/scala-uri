@@ -110,4 +110,9 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
     ex.getMessage should startWith("Invalid URI could not be parsed. 2 rules mismatched at error location:")
     ex.getMessage should endWith("at index 17: http://test.net/##")
   }
+
+  "Github Issue #65" should "now be fixed" in {
+    val uri = Uri.parse("http://localhost:9000/?foo=test&&bar=test")
+    uri.toString should equal("http://localhost:9000/?foo=test&&bar=test")
+  }
 }

@@ -41,8 +41,8 @@ class EncodingTests extends FlatSpec with Matchers {
   }
 
   "Querystring parameters" should "be percent encoded" in {
-    val uri = "http://theon.github.com/uris-in-scala.html" ? ("càsh" -> "£50") & ("©opyright" -> "false")
-    uri.toString should equal ("http://theon.github.com/uris-in-scala.html?c%C3%A0sh=%C2%A350&%C2%A9opyright=false")
+    val uri = "http://theon.github.com/uris-in-scala.html" ? ("càsh" -> "+£50") & ("©opyright" -> "false")
+    uri.toString should equal ("http://theon.github.com/uris-in-scala.html?c%C3%A0sh=%2B%C2%A350&%C2%A9opyright=false")
   }
 
   "Reserved characters" should "be percent encoded when using conservative encoder" in {

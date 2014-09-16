@@ -22,6 +22,8 @@ scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-featur
 
 libraryDependencies += "org.parboiled" %% "parboiled" % "2.0.1"
 
+libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.10.4"
+
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.4" % "test"
 
 parallelExecution in Test := false

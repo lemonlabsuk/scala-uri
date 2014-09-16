@@ -1,9 +1,14 @@
 --- 
 language: scala
 script: "sbt test"
-jdk: 
-- oraclejdk7
-- openjdk7
-scala: 
-- 2.10.0
-- 2.11.0
+
+jdk:
+  - oraclejdk7
+  - openjdk7
+
+scala:
+  - 2.10.4
+  - 2.11.2
+
+env:
+  - SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:PermSize=256m -XX:MaxPermSize=512m"

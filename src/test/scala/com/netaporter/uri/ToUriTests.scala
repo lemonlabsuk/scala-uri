@@ -49,7 +49,7 @@ class ToUriTests extends WordSpec with Matchers {
       javaUri.getHost() should equal("www.example.com")
       javaUri.getPath() should equal("/test")
       javaUri.getQuery() should equal("weird=&key=strange%value&arrow=⇔")
-      javaUri.getRawQuery() should equal("weird=%26key=strange%25value&arrow=%E2%87%94")
+      javaUri.getRawQuery() should equal("weird%3D%26key=strange%25value&arrow=%E2%87%94")
       javaUri.toString() should equal(uri.toString)
       javaUri.toASCIIString() should equal(uri.toString)
     }

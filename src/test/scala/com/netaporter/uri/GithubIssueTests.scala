@@ -103,7 +103,7 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
   "Github Issue #55" should "now be fixed" in {
     val uri: Uri = "http://localhost:9002/iefjiefjief-efefeffe-fefefee/toto?access_token=ijifjijef-fekieifj-fefoejfoef&gquery=filter(time_before_closing%3C=45)"
     uri.query.param("gquery").value should equal("filter(time_before_closing<=45)")
-    uri.toString should equal("http://localhost:9002/iefjiefjief-efefeffe-fefefee/toto?access_token=ijifjijef-fekieifj-fefoejfoef&gquery=filter(time_before_closing%3C=45)")
+    uri.toString should equal("http://localhost:9002/iefjiefjief-efefeffe-fefefee/toto?access_token=ijifjijef-fekieifj-fefoejfoef&gquery=filter(time_before_closing%3C%3D45)")
   }
 
   "Github Issue #56" should "now be fixed" in {
@@ -142,5 +142,10 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
   "Github Issue #65 example 6" should "now be fixed" in {
     val uri = Uri.parse("http://localhost/offers.xml?id=10748337&np=1&#anchor")
     uri.toString should equal("http://localhost/offers.xml?id=10748337&np=1&#anchor")
+  }
+
+  "Github Issue #68" should "now be fixed" in {
+    val uri = ("http://example.com/path" ? ("param" -> "something==")).toString
+    uri.toString should equal("http://example.com/path?param=something%3D%3D")
   }
 }

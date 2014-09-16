@@ -4,9 +4,9 @@ organization  := "com.netaporter"
 
 version       := "0.4.3-SNAPSHOT"
 
-scalaVersion  := "2.10.3"
+scalaVersion  := "2.10.4"
 
-crossScalaVersions := Seq("2.10.3", "2.11.1")
+crossScalaVersions := Seq("2.10.4", "2.11.2")
 
 publishMavenStyle := true
 
@@ -20,9 +20,7 @@ resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/reposi
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
-libraryDependencies += "org.parboiled" %% "parboiled" % "2.0.0-RC2"
-
-libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.10.3"
+libraryDependencies += "org.parboiled" %% "parboiled" % "2.0.1"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.4" % "test"
 

@@ -14,6 +14,7 @@ case class UriConfig(pathEncoder: UriEncoder,
                      pathDecoder: UriDecoder,
                      queryDecoder: UriDecoder,
                      fragmentDecoder: UriDecoder,
+                     matrixParams: Boolean,
                      charset: String) {
 
   def withNoEncoding = copy(pathEncoder = NoopEncoder, queryEncoder = NoopEncoder, fragmentEncoder = NoopEncoder)
@@ -28,6 +29,7 @@ object UriConfig {
                           pathDecoder = PercentDecoder,
                           queryDecoder = PercentDecoder,
                           fragmentDecoder = PercentDecoder,
+                          matrixParams = false,
                           charset = "UTF-8")
 
 
@@ -39,6 +41,7 @@ object UriConfig {
 
   def apply(encoder: UriEncoder = PercentEncoder(),
             decoder: UriDecoder = PercentDecoder,
+            matrixParams: Boolean = false,
             charset: String = "UTF-8"): UriConfig =
-    UriConfig(encoder, encoder, encoder, decoder, decoder, decoder, charset)
+    UriConfig(encoder, encoder, encoder, decoder, decoder, decoder, matrixParams, charset)
 }

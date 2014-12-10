@@ -314,10 +314,13 @@ uri.host //This is: Some("example.com")
 
 ## Matrix Parameters
 
-[Matrix Parameters](http://www.w3.org/DesignIssues/MatrixURIs.html) are supported in `scala-uri`.
+[Matrix Parameters](http://www.w3.org/DesignIssues/MatrixURIs.html) are supported in `scala-uri`. Support is enabled
+using a`UriConfig` with `matrixParams = true` like so:
 
 ```scala
 import com.netaporter.uri.dsl._
+
+implicit val config = UriConfig(matrixParams = true)
 val uri = "http://example.com/path;paramOne=value;paramTwo=value2/pathTwo;paramThree=value3"
 
 //Get parameters at the end of the path

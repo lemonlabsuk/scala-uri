@@ -19,7 +19,7 @@ To include it in your SBT project from maven central:
 "com.netaporter" %% "scala-uri" % "0.4.4"
 ```
 
-*Note:* This library works well with all URLs when using Scala `2.11.2+`. Due a bug in olders versions of Scala, this library  can result in `StackOverflowException`s for very large URLs when using versions of Scala olders than `2.11.2`. [More details](https://github.com/NET-A-PORTER/scala-uri/issues/51#issuecomment-45759462)
+*Note:* This library works best when using Scala `2.11.2+`. Due a bug in olders versions of Scala, this library  can result in `StackOverflowException`s for very large URLs when using versions of Scala olders than `2.11.2`. [More details](https://github.com/NET-A-PORTER/scala-uri/issues/51#issuecomment-45759462)
 
 ## Building URIs with the DSL
 

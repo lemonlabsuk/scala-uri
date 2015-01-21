@@ -57,9 +57,9 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
     uri.port.value should equal (8080)
     uri.path should equal ("/ping")
     println(uri.query.params)
-    uri.query.params("oi") should equal (Vector("TscV16GUGtlU"))
-    uri.query.params("ppc") should equal (Vector(""))
-    uri.query.params("bpc") should equal (Vector(""))
+    uri.query.params("oi") should equal (Vector(Some("TscV16GUGtlU")))
+    uri.query.params("ppc") should equal (Vector(Some("")))
+    uri.query.params("bpc") should equal (Vector(Some("")))
   }
 
   "Github Issue #12" should "now be fixed. Parsing URIs parse percent escapes" in {
@@ -70,7 +70,7 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
       Some("xn--ls8h.example.net"),
       None,
       List(PathPart(""), PathPart("path with spaces")),
-      QueryString(Vector("a b" -> "c d")),
+      QueryString(Vector("a b" -> Some("c d"))),
       None
     )
     val parsed = parse(source.toString)
@@ -86,7 +86,7 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
     val uri = "http://lesswrong.com/index.php?query=abc%yum&john=hello"
     val conf = UriConfig(decoder = PermissivePercentDecoder)
     val u = parse(uri)(conf)
-    u.query.param("query").value should equal("abc%yum")
+    u.query.param("query") should equal(Some("abc%yum"))
   }
 
   "Github Issue #37" should "now be fixed" in {
@@ -102,7 +102,7 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
 
   "Github Issue #55" should "now be fixed" in {
     val uri: Uri = "http://localhost:9002/iefjiefjief-efefeffe-fefefee/toto?access_token=ijifjijef-fekieifj-fefoejfoef&gquery=filter(time_before_closing%3C=45)"
-    uri.query.param("gquery").value should equal("filter(time_before_closing<=45)")
+    uri.query.param("gquery") should equal(Some("filter(time_before_closing<=45)"))
     uri.toString should equal("http://localhost:9002/iefjiefjief-efefeffe-fefefee/toto?access_token=ijifjijef-fekieifj-fefoejfoef&gquery=filter(time_before_closing%3C%3D45)")
   }
 

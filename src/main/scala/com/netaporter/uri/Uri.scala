@@ -38,13 +38,13 @@ case class Uri (
 
   def addMatrixParam(pp: String, k: String, v: String) = copy (
     pathParts = pathParts.map {
-      case p: PathPart if p.part == pp => p.addParam(k -> v)
+      case p: PathPart if p.part == pp => p.addParam(k -> Some(v))
       case x => x
     }
   )
 
   def addMatrixParam(k: String, v: String) = copy (
-    pathParts = pathParts.dropRight(1) :+ pathParts.last.addParam(k -> v)
+    pathParts = pathParts.dropRight(1) :+ pathParts.last.addParam(k -> Some(v))
   )
 
   /**
@@ -56,14 +56,14 @@ case class Uri (
    */
   def addParam(name: String, value: Any) = (name, value) match {
     case (_, None) => this
-    case (n, Some(v)) => copy(query = query.addParam(n, v.toString))
-    case (n, v) => copy(query = query.addParam(n, v.toString))
+    case (n, Some(v)) => copy(query = query.addParam(n, Some(v.toString)))
+    case (n, v) => copy(query = query.addParam(n, Some(v.toString)))
   }
 
   def addParams(kvs: Seq[(String, Any)]) = {
     val cleanKvs = kvs.filterNot(_._2 == None).map {
-      case (k, Some(v)) => (k, v.toString)
-      case (k, v) => (k, v.toString)
+      case (k, Some(v)) => (k, Some(v.toString))
+      case (k, v) => (k, Some(v.toString))
     }
     copy(query = query.addParams(cleanKvs))
   }

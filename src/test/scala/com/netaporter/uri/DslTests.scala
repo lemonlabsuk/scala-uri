@@ -49,12 +49,6 @@ class DslTests extends FlatSpec with Matchers {
     newUri.toString should equal ("/uris-in-scala.html?testOne=2")
   }
 
-  "Replace param method" should "remove parameters with a None argument" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1")
-    val newUri = uri.replaceParams("testOne", None)
-    newUri.toString should equal ("/uris-in-scala.html")
-  }
-
   "Replace param method" should "not affect other parameters" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
     val newUri = uri.replaceParams("testOne", "3")
@@ -69,7 +63,7 @@ class DslTests extends FlatSpec with Matchers {
 
   "Replace all params method" should "replace all query params" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
-    val newUri = uri.replaceAllParams("testThree" -> "3", "testFour" -> "4")
+    val newUri = uri.replaceAllParams("testThree" -> Some("3"), "testFour" -> Some("4"))
     newUri.toString should equal ("/uris-in-scala.html?testThree=3&testFour=4")
   }
 
@@ -148,7 +142,7 @@ class DslTests extends FlatSpec with Matchers {
     val uri = "http://stackoverflow.com/pathOne/pathTwo"
     val uriTwo = uri.addMatrixParam("pathOne", "name", "val")
 
-    uriTwo.pathPart("pathOne").params should equal(Vector("name" -> "val"))
+    uriTwo.pathPart("pathOne").params should equal(Vector("name" -> Some("val")))
     uriTwo.toString should equal("http://stackoverflow.com/pathOne;name=val/pathTwo")
   }
 
@@ -156,23 +150,23 @@ class DslTests extends FlatSpec with Matchers {
     val uri = "http://stackoverflow.com/pathOne/pathTwo"
     val uriTwo = uri.addMatrixParam("name", "val")
 
-    uriTwo.matrixParams should equal(Vector("name" -> "val"))
-    uriTwo.pathPart("pathTwo").params should equal(Vector("name" -> "val"))
+    uriTwo.matrixParams should equal(Vector("name" -> Some("val")))
+    uriTwo.pathPart("pathTwo").params should equal(Vector("name" -> Some("val")))
     uriTwo.toString should equal("http://stackoverflow.com/pathOne/pathTwo;name=val")
   }
 
   "A list of query params" should "get added successsfully" in {
     val p = ("name", true) :: ("key2", false) :: Nil
     val uri = "http://example.com".addParams(p)
-    uri.query.params("name") should equal("true" :: Nil)
-    uri.query.params("key2") should equal("false" :: Nil)
+    uri.query.params("name") should equal(Some("true") :: Nil)
+    uri.query.params("key2") should equal(Some("false") :: Nil)
     uri.toString should equal("http://example.com?name=true&key2=false")
   }
 
   "A list of query params" should "get added to a URL already with query params successsfully" in {
     val p = ("name", true) :: ("key2", false) :: Nil
-    val uri = ("http://example.com" ? ("name" -> "param1")).addParams(p)
-    uri.query.params("name") should equal(Vector("param1", "true"))
-    uri.query.params("key2") should equal("false" :: Nil)
+    val uri = ("http://example.com" ? ("name" -> Some("param1"))).addParams(p)
+    uri.query.params("name") should equal(Vector(Some("param1"), Some("true")))
+    uri.query.params("key2") should equal(Some("false") :: Nil)
   }
 }

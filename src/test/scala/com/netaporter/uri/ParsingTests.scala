@@ -27,9 +27,9 @@ class ParsingTests extends FlatSpec with Matchers {
     val uri = parse("/uris-in-scala.html?query_param_one=hello&query_param_one=goodbye&query_param_two=false")
     uri.query.params should equal (
       Vector (
-        ("query_param_one" -> "hello"),
-        ("query_param_one" -> "goodbye"),
-        ("query_param_two" -> "false")
+        ("query_param_one" -> Some("hello")),
+        ("query_param_one" -> Some("goodbye")),
+        ("query_param_two" -> Some("false"))
       )
     )
   }
@@ -38,11 +38,21 @@ class ParsingTests extends FlatSpec with Matchers {
       val uri = parse("/uris-in-scala.html?query_param_one=hello=world&query_param_two=false")
       uri.query.params should equal (
          Vector (
-            ("query_param_one" -> "hello=world"),
-            ("query_param_two" -> "false")
+            ("query_param_one" -> Some("hello=world")),
+            ("query_param_two" -> Some("false"))
          )
       )
    }
+
+  "Parsing a URI with a zero-length querystring parameter" should "result in a valid Uri object" in {
+    val uri = parse("/uris-in-scala.html?query_param_one=&query_param_two=false")
+    uri.query.params should equal (
+      Vector (
+        ("query_param_one" -> Some("")),
+        ("query_param_two" -> Some("false"))
+      )
+    )
+  }
 
   "Parsing a url with relative scheme" should "result in a Uri with None for scheme" in {
     val uri = parse("//theon.github.com/uris-in-scala.html")
@@ -107,28 +117,37 @@ class ParsingTests extends FlatSpec with Matchers {
 
   "Query string param with hash as value" should "be parsed as fragment" in {
     val uri = parse("http://stackoverflow.com?q=#frag")
-    uri.query.params("q") should equal(Vector(""))
+    uri.query.params("q") should equal(Vector(Some("")))
     uri.fragment should equal(Some("frag"))
   }
 
   "Parsing a url with a query string that doesn't have a value" should "not throw an exception" in {
-        val uri = parse("//theon.github.com/uris-in-scala.html?ham")
-        uri.host should equal (Some("theon.github.com"))
-        uri.query.params("ham") should equal(Vector(""))
-        uri.toString should equal("//theon.github.com/uris-in-scala.html?ham")
+    val uri = parse("//theon.github.com/uris-in-scala.html?ham")
+    uri.host should equal(Some("theon.github.com"))
+    uri.query.params("ham") should equal(Vector(None))
+    uri.toString should equal("//theon.github.com/uris-in-scala.html?ham")
 
-        val uri2 = parse("//cythrawll.github.com/scala-uri.html?q=foo&ham")
-        uri2.host should equal (Some("cythrawll.github.com"))
-        uri2.query.params("ham") should equal(Vector(""))
-        uri2.query.params("q")   should equal(Vector("foo"))
-        uri2.toString should equal("//cythrawll.github.com/scala-uri.html?q=foo&ham")
+    val uri2 = parse("//cythrawll.github.com/scala-uri.html?q=foo&ham")
+    uri2.host should equal(Some("cythrawll.github.com"))
+    uri2.query.params("ham") should equal(Vector(None))
+    uri2.query.params("q") should equal(Vector(Some("foo")))
+    uri2.toString should equal("//cythrawll.github.com/scala-uri.html?q=foo&ham")
 
 
     val uri3 = parse("//cythrawll.github.com/scala-uri.html?ham&q=foo")
-        uri3.host should equal (Some("cythrawll.github.com"))
-        uri3.query.params("ham") should equal(Vector(""))
-        uri3.query.params("q")   should equal(Vector("foo"))
-        uri3.toString should equal("//cythrawll.github.com/scala-uri.html?ham&q=foo")
+    uri3.host should equal(Some("cythrawll.github.com"))
+    uri3.query.params("ham") should equal(Vector(None))
+    uri3.query.params("q") should equal(Vector(Some("foo")))
+    uri3.toString should equal("//cythrawll.github.com/scala-uri.html?ham&q=foo")
+  }
+
+  "Parsing a url with two query strings that doesn't have a value in different ways" should "work and preserve the difference" in {
+    val uri4 = parse("//cythrawll.github.com/scala-uri.html?ham&jam=&q=foo")
+    uri4.host should equal (Some("cythrawll.github.com"))
+    uri4.query.params("ham") should equal(Vector(None))
+    uri4.query.params("jam") should equal(Vector(Some("")))
+    uri4.query.params("q")   should equal(Vector(Some("foo")))
+    uri4.toString should equal("//cythrawll.github.com/scala-uri.html?ham&jam=&q=foo")
   }
 
 
@@ -136,8 +155,8 @@ class ParsingTests extends FlatSpec with Matchers {
     implicit val config = UriConfig(matrixParams = true)
     val uri = parse("http://stackoverflow.com/path;paramOne=value;paramTwo=value2/pathTwo;paramOne=value")
     uri.pathParts should equal(Vector(
-      MatrixParams("path", Vector("paramOne" -> "value", "paramTwo" -> "value2")),
-      MatrixParams("pathTwo", Vector("paramOne" -> "value"))
+      MatrixParams("path", Vector("paramOne" -> Some("value"), "paramTwo" -> Some("value2"))),
+      MatrixParams("pathTwo", Vector("paramOne" -> Some("value")))
     ))
   }
 
@@ -157,8 +176,8 @@ class ParsingTests extends FlatSpec with Matchers {
   "exotic/reserved characters in query string" should "be decoded" in {
     val q = "?weird%3D%26key=strange%25value&arrow=%E2%87%94"
     val parsedQueryString = new DefaultUriParser(q, config.UriConfig.default)._queryString.run().get
-    parsedQueryString.params("weird=&key") should equal(Seq("strange%value"))
-    parsedQueryString.params("arrow") should equal(Seq("⇔"))
+    parsedQueryString.params("weird=&key") should equal(Seq(Some("strange%value")))
+    parsedQueryString.params("arrow") should equal(Seq(Some("⇔")))
   }
 
   "exotic/reserved characters in user info" should "be decoded" in {

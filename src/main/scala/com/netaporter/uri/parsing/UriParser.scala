@@ -42,9 +42,9 @@ trait UriParser {
     pp.toVector
 
   val extractTuple = (k: String, v: String) =>
-    k -> v
+    k -> Some(v)
 
-  val extractTok = (k: String) => k -> ""
+  val extractTok = (k: String) => (k -> None):(String,Option[String])
 
   /**
    * Used to made parsing easier to follow

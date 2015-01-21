@@ -14,7 +14,7 @@ class TransformTests extends WordSpec with Matchers {
     "transform query params" in {
       val uri = parse("/test?param_1=hello&param_2=goodbye&param_3=false")
       val uri2 = uri.mapQuery {
-        case (k, v) => (k, v + "TEST")
+        case (k, v) => (k, v map (_+ "TEST"))
       }
       uri2.toString should equal("/test?param_1=helloTEST&param_2=goodbyeTEST&param_3=falseTEST")
     }
@@ -27,7 +27,7 @@ class TransformTests extends WordSpec with Matchers {
 
     "flip query params" in {
       val uri = parse("/test?param_1=hello&param_2=goodbye&param_3=false")
-      val uri2 = uri.mapQuery(_.swap)
+      val uri2 = uri.mapQuery(_ match { case (k,Some(v)) => v->Some(k) case o => o})
       uri2.toString should equal("/test?hello=param_1&goodbye=param_2&false=param_3")
     }
 
@@ -43,7 +43,8 @@ class TransformTests extends WordSpec with Matchers {
     "filter query params" in {
       val uri = parse("/test?param_1=hello&param_2=goodbye&param_3=false")
       val uri2 = uri.filterQuery {
-        case (k, v) => (k + v).length > 13
+        case (k, Some(v)) => (k + v).length > 13
+        case (k, None) => k.length > 13
       }
       uri2.toString should equal("/test?param_2=goodbye")
     }

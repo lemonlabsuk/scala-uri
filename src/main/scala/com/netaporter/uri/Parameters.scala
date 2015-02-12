@@ -156,6 +156,9 @@ trait Parameters {
   def removeAll(k: String) =
     filterParamsNames(_ != k)
 
+  def removeAll(a: Array[String]) =
+    filterParamsNames(!a.contains(_))
+
   def removeAll() =
     withParams(Seq.empty)
 

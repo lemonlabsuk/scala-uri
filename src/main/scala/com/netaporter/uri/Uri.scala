@@ -236,6 +236,15 @@ case class Uri (
   }
 
   /**
+   * Removes all Query String parameters with the specified key contained in the a (Array)
+   * @param a an Array of Keys for the Query String parameter(s) to remove
+   * @return
+   */
+  def removeParams(a: Array[String]) = {
+    copy(query = query.removeAll(a))
+  }
+
+  /**
    * Removes all Query String parameters
    * @return
    */

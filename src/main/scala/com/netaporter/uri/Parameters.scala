@@ -4,6 +4,7 @@ import com.netaporter.uri.encoding.UriEncoder
 import com.netaporter.uri.Parameters._
 import scala.Some
 import scala.collection.GenTraversableOnce
+import scala.collection.Seq
 
 /**
  * Trait use to represent a list of key value parameters, such as query string parameters and matrix parameters
@@ -156,7 +157,7 @@ trait Parameters {
   def removeAll(k: String) =
     filterParamsNames(_ != k)
 
-  def removeAll(a: Array[String]) =
+  def removeAll(a: Seq[String]) =
     filterParamsNames(!a.contains(_))
 
   def removeAll() =

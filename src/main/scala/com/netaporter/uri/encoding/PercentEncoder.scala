@@ -32,10 +32,12 @@ object PercentEncoder {
   val GEN_DELIMS = Set(':', '/', '?',  '#', '[', ']', '@')
   val SUB_DELIMS  = Set('!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=')
   val RESERVED = GEN_DELIMS ++ SUB_DELIMS
-  
+
+  val EXCLUDED = Set('"') // RFC 2396 section 2.4.3
+
   /**
    * Probably more than you need to percent encode. Wherever possible try to use a tighter Set of characters
    * to encode depending on your use case
    */
-  val DEFAULT_CHARS_TO_ENCODE = RESERVED ++ PATH_CHARS_TO_ENCODE ++ QUERY_CHARS_TO_ENCODE
+  val DEFAULT_CHARS_TO_ENCODE = RESERVED ++ PATH_CHARS_TO_ENCODE ++ QUERY_CHARS_TO_ENCODE ++ EXCLUDED
 }

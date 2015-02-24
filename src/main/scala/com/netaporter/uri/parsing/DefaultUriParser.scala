@@ -25,7 +25,7 @@ class DefaultUriParser(val input: ParserInput, conf: UriConfig) extends Parser w
   }
 
   def _authority: Rule1[Authority] = rule {
-    optional(_userInfo) ~ _host_name ~ optional(_port) ~> extractAuthority
+    ((optional(_userInfo) ~ _host_name ~ optional(_port)) | (push[Option[UserInfo]](None) ~ _host_name ~ optional(_port))) ~> extractAuthority
   }
 
   def _pathSegment: Rule1[PathPart] = rule {

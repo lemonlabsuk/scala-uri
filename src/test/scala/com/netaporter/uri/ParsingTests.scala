@@ -34,15 +34,15 @@ class ParsingTests extends FlatSpec with Matchers {
     )
   }
 
-   "Parsing a URI with not properly URL-encoded querystring parameters" should "result in a valid Uri object" in {
-      val uri = parse("/uris-in-scala.html?query_param_one=hello=world&query_param_two=false")
-      uri.query.params should equal (
-         Vector (
-            ("query_param_one" -> Some("hello=world")),
-            ("query_param_two" -> Some("false"))
-         )
+  "Parsing a URI with not properly URL-encoded querystring parameters" should "result in a valid Uri object" in {
+    val uri = parse("/uris-in-scala.html?query_param_one=hello=world&query_param_two=false")
+    uri.query.params should equal (
+      Vector (
+        ("query_param_one" -> Some("hello=world")),
+        ("query_param_two" -> Some("false"))
       )
-   }
+    )
+  }
 
   "Parsing a URI with a zero-length querystring parameter" should "result in a valid Uri object" in {
     val uri = parse("/uris-in-scala.html?query_param_one=&query_param_two=false")
@@ -113,6 +113,12 @@ class ParsingTests extends FlatSpec with Matchers {
     uri.subdomain should equal(Some("www"))
     uri.host should equal(Some("www.mywebsite.com"))
     uri.pathParts should equal(Vector(PathPart("index.html")))
+  }
+
+  "Url with @ in query string" should "parse correctly" in {
+    val uri = parse("http://www.mywebsite.com?a=b@")
+    uri.scheme should equal(Some("http"))
+    uri.host should equal (Some("www.mywebsite.com"))
   }
 
   "Query string param with hash as value" should "be parsed as fragment" in {

@@ -16,7 +16,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.4"
+"com.netaporter" %% "scala-uri" % "0.4.5"
 ```
 
 *Note:* This library works best when using Scala `2.11.2+`. Due a bug in olders versions of Scala, this library  can result in `StackOverflowException`s for very large URLs when using versions of Scala olders than `2.11.2`. [More details](https://github.com/NET-A-PORTER/scala-uri/issues/51#issuecomment-45759462)
@@ -365,7 +365,7 @@ For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/net-a-porter/sc
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.4"
+"com.netaporter" %% "scala-uri" % "0.4.5"
 ```
 
 For maven users you should use (for 2.10.x):
@@ -374,7 +374,7 @@ For maven users you should use (for 2.10.x):
 <dependency>
     <groupId>com.netaporter</groupId>
     <artifactId>scala-uri_2.10</artifactId>
-    <version>0.4.4</version>
+    <version>0.4.5</version>
 </dependency>
 ```
 
@@ -389,7 +389,7 @@ resolvers += "Sonatype OSS" at "http://oss.sonatype.org/content/repositories/sna
 Add the following dependency:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.5-SNAPSHOT"
+"com.netaporter" %% "scala-uri" % "0.4.6-SNAPSHOT"
 ```
 
 # Contributions

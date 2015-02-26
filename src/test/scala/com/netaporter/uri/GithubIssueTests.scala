@@ -108,9 +108,7 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
 
   "Github Issue #56" should "now be fixed" in {
     val ex = the [java.net.URISyntaxException] thrownBy Uri.parse("http://test.net/##")
-    ex.getIndex should equal(18)
     ex.getMessage should startWith("Invalid URI could not be parsed.")
-    ex.getMessage should endWith("at index 18: http://test.net/##")
   }
 
   "Github Issue #65 example 1" should "now be fixed" in {
@@ -147,5 +145,11 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
   "Github Issue #68" should "now be fixed" in {
     val uri = ("http://example.com/path" ? ("param" -> "something==")).toString
     uri.toString should equal("http://example.com/path?param=something%3D%3D")
+  }
+
+  "Github Issue #72" should "now be fixed" in {
+    val uri = Uri.parse("http://hello.world?email=abc@xyz")
+    uri.host should equal(Some("hello.world"))
+    uri.query.param("email") should equal(Some("abc@xyz"))
   }
 }

@@ -4,6 +4,7 @@ import com.netaporter.uri.parsing.UriParser
 import com.netaporter.uri.config.UriConfig
 import com.netaporter.uri.Parameters.Param
 import scala.collection.GenTraversableOnce
+import scala.collection.Seq
 
 /**
  * http://tools.ietf.org/html/rfc3986
@@ -233,6 +234,15 @@ case class Uri (
    */
   def removeParams(k: String) = {
     copy(query = query.removeAll(k))
+  }
+
+  /**
+   * Removes all Query String parameters with the specified key contained in the a (Array)
+   * @param a an Array of Keys for the Query String parameter(s) to remove
+   * @return
+   */
+  def removeParams(a: Seq[String]) = {
+    copy(query = query.removeAll(a))
   }
 
   /**

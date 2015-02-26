@@ -79,6 +79,24 @@ class DslTests extends FlatSpec with Matchers {
     newUri.toString should equal ("/uris-in-scala.html?testTwo=2")
   }
 
+  "Remove param method" should "remove parameters contained in SeqLike" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val newUri = uri.removeParams(List("testOne", "testTwo"))
+    newUri.toString should equal ("/uris-in-scala.html")
+  }
+
+  "Remove param method" should "not remove parameters uncontained in List" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val newUri = uri.removeParams(List("testThree", "testFour"))
+    newUri.toString should equal ("/uris-in-scala.html?testOne=1&testTwo=2")
+  }
+
+  "Remove param method" should "remove parameters contained in List and not remove parameters uncontained in List" in {
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val newUri = uri.removeParams(List("testOne", "testThree"))
+    newUri.toString should equal ("/uris-in-scala.html?testTwo=2")
+  }
+
   "Remove all params method" should "remove all query params" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
     val newUri = uri.removeAllParams

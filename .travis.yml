@@ -12,3 +12,11 @@ scala:
 
 env:
   - SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:PermSize=256m -XX:MaxPermSize=512m"
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/a3d21b4ef5b88d789383
+    on_success: change  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: false     # default: false

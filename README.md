@@ -268,12 +268,12 @@ newUri.toString //This is: http://example.com/path?param2=2
 
 ## Get query string parameters
 
-To get the query string parameters as a `Map[String,List[String]]` you can do the following:
+To get the query string parameters as a `Map[String,Seq[String]]` you can do the following:
 
 ```scala
-import com.netaporter.uri.dsl._
-val uri = "http://example.com/path" ? ("param" -> "1") & ("param2" -> 2)
-uri.query.paramMap //This is: Map(param -> List(1), param2 -> List(2))
+import com.netaporter.uri.Uri
+val uri = Uri.parse("http://example.com/path?a=b&a=c&d=e")
+uri.query.paramMap //This is: Map("a" -> Seq("b", "c"), "d" -> Seq("e"))
 ```
 
 ## User Information

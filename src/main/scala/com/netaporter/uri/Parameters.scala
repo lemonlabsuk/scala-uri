@@ -18,7 +18,18 @@ trait Parameters {
 
   def withParams(params: ParamSeq): Self
 
-  lazy val paramMap = params.groupBy(_._1)
+  lazy val paramMap = params.foldLeft(Map.empty[String, Seq[String]]) {
+
+    case (m, (k, Some(v))) =>
+      val values = m.getOrElse(k, Nil)
+      m + (k -> (values :+ v))
+
+    // For query parameters with no value (e.g. /blah?q), Put at explicit Nil into the Map
+    // If there is already an entry in the Map from a previous parameter with the same name, maintain it
+    case (m, (k, None)) =>
+      val values = m.getOrElse(k, Nil)
+      m + (k -> values)
+  }
 
   /**
    * Adds a new parameter key-value pair.

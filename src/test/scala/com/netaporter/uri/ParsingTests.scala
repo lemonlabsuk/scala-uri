@@ -192,4 +192,15 @@ class ParsingTests extends FlatSpec with Matchers {
     parsedUserInfo.user should equal("user:")
     parsedUserInfo.pass should equal(Some("p@ssword⇔"))
   }
+
+  "Uri.parse" should "provide paramMap as a Map of String to Seq of String" in {
+    val parsed = Uri.parse("/?a=b&a=c&d=&e&f&f=g")
+
+    parsed.query.paramMap should be (Map(
+      "a" -> Seq("b", "c"),
+      "d" -> Seq(""),
+      "e" -> Seq.empty,
+      "f" -> Seq("g")
+    ))
+  }
 }

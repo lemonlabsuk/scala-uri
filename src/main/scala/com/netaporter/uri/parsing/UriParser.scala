@@ -63,8 +63,8 @@ object UriParser {
       case Success(uri) =>
         uri
 
-      case Failure(pe@ParseError(position, _)) =>
-        throw new java.net.URISyntaxException(s, "Invalid URI could not be parsed. " + pe.formatTraces, position.index)
+      case Failure(pe@ParseError(position, _, formatTraces)) =>
+        throw new java.net.URISyntaxException(s, "Invalid URI could not be parsed. " + formatTraces, position.index)
 
       case Failure(e) =>
         throw e

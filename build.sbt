@@ -2,7 +2,7 @@ name := "scala-uri"
 
 organization  := "com.netaporter"
 
-version       := "0.4.8"
+version       := "0.4.9-SNAPSHOT"
 
 scalaVersion  := "2.10.4"
 

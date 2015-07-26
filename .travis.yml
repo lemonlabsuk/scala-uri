@@ -3,8 +3,7 @@ language: scala
 script: "sbt coverage test"
 
 jdk:
-  - oraclejdk7
-  - openjdk7
+  - oraclejdk8
 
 scala:
   - 2.10.4

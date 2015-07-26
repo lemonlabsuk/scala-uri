@@ -1,12 +1,19 @@
+import scoverage.ScoverageSbtPlugin.ScoverageKeys._
+
 name := "scala-uri"
 
 organization  := "com.netaporter"
 
 version       := "0.4.9-SNAPSHOT"
 
-scalaVersion  := "2.10.4"
+scalaVersion  := "2.11.7"
 
-crossScalaVersions := Seq("2.10.4", "2.11.2")
+crossScalaVersions := Seq("2.10.5", "2.11.7")
+
+coverageHighlighting := (scalaVersion.value match {
+  case v if v startsWith "2.10" => false
+  case _ => true
+})
 
 publishMavenStyle := true
 

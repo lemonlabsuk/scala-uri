@@ -6,11 +6,8 @@ jdk:
   - oraclejdk8
 
 scala:
-  - 2.10.4
-  - 2.11.2
-
-env:
-  - SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:PermSize=256m -XX:MaxPermSize=512m"
+  - 2.10.5
+  - 2.11.7
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

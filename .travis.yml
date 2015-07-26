@@ -13,6 +13,9 @@ scala:
 env:
   - SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:PermSize=256m -XX:MaxPermSize=512m"
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 notifications:
   webhooks:
     urls:

@@ -10,10 +10,16 @@ scalaVersion  := "2.11.7"
 
 crossScalaVersions := Seq("2.10.5", "2.11.7")
 
-coverageHighlighting := (scalaVersion.value match {
+def coverageEnabled(scalaVersion: String) = scalaVersion match {
   case v if v startsWith "2.10" => false
   case _ => true
-})
+}
+
+coverageOutputXML := coverageEnabled(scalaVersion.value)
+
+coverageOutputCobertua := coverageEnabled(scalaVersion.value)
+
+coverageHighlighting := coverageEnabled(scalaVersion.value)
 
 publishMavenStyle := true
 

@@ -1,6 +1,6 @@
 --- 
 language: scala
-script: "sbt coverage test"
+script: "sbt ++$TRAVIS_SCALA_VERSION coverage test"
 
 jdk:
   - oraclejdk8
@@ -8,6 +8,8 @@ jdk:
 scala:
   - 2.10.5
   - 2.11.7
+
+sudo: false # Enable new travis container-based infrastructure
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

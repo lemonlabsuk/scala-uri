@@ -21,8 +21,8 @@ trait UriParser {
   val extractInt = (num: String) =>
     num.toInt
 
-  val extractUserInfo = (user: String, pass: Option[String]) =>
-    UserInfo(pathDecoder.decode(user), pass.map(pathDecoder.decode))
+  val extractUserInfo = (user: String, pass: Option[Option[String]]) =>
+    UserInfo(pathDecoder.decode(user), pass.map(_.fold("")(pathDecoder.decode)))
 
   val extractAuthority = (userInfo: Option[UserInfo], host: String, port: Option[String]) =>
     Authority(userInfo.map(_.user), userInfo.flatMap(_.pass), host, port.map(_.toInt))

@@ -105,6 +105,14 @@ class ParsingTests extends FlatSpec with Matchers {
     uri.host should equal(Some("github.com"))
   }
 
+  "Parsing a with user and empty password" should "result in a Uri with the user and empty password" in {
+    val uri = parse("ftp://theon:@github.com")
+    uri.scheme should equal(Some("ftp"))
+    uri.user should equal(Some("theon"))
+    uri.password should equal(Some(""))
+    uri.host should equal(Some("github.com"))
+  }
+
   "Protocol relative url with authority" should "parse correctly" in {
     val uri = parse("//user:pass@www.mywebsite.com/index.html")
     uri.scheme should equal(None)

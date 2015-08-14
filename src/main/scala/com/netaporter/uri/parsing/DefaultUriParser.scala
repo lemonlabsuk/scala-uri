@@ -16,7 +16,7 @@ class DefaultUriParser(val input: ParserInput, conf: UriConfig) extends Parser w
   }
 
   def _userInfo: Rule1[UserInfo] = rule {
-    capture(oneOrMore(!anyOf(":/?@") ~ ANY)) ~ optional(":" ~ capture(oneOrMore(!anyOf("@") ~ ANY))) ~ "@" ~> extractUserInfo
+    capture(oneOrMore(!anyOf(":/?@") ~ ANY)) ~ optional(":" ~ optional(capture(oneOrMore(!anyOf("@") ~ ANY)))) ~ "@" ~> extractUserInfo
   }
 
   //TODO Try harder to make this a Rule1[Int] using ~> extractInt

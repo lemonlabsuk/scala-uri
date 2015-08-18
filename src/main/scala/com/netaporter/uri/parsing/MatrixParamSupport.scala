@@ -16,7 +16,9 @@ trait MatrixParamSupport {
   }
 
   override def _pathSegment: Rule1[PathPart] = rule {
-    _plainPathPart ~ optional(";") ~ zeroOrMore(_matrixParam).separatedBy(";") ~> extractPathPartWithMatrixParams
+    _plainPathPart ~ zeroOrMore(";") ~
+    zeroOrMore(_matrixParam).separatedBy(oneOrMore(";")) ~
+    zeroOrMore(";") ~> extractPathPartWithMatrixParams
   }
 
   val extractPathPartWithMatrixParams = (pathPart: String, matrixParams: ParamSeq) => {

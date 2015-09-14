@@ -18,5 +18,7 @@ package object dsl {
   implicit def stringToUri(s: String)(implicit c: UriConfig = UriConfig.default) = Uri.parse(s)(c)
   implicit def stringToUriDsl(s: String)(implicit c: UriConfig = UriConfig.default) = new UriDsl(stringToUri(s)(c))
 
+  implicit def queryParamToUriDsl(kv: (String, Any))(implicit c: UriConfig = UriConfig.default) = new UriDsl(Uri.empty.addParam(kv._1, kv._2))
+
   implicit def uriToString(uri: Uri)(implicit c: UriConfig = UriConfig.default): String = uri.toString(c)
 }

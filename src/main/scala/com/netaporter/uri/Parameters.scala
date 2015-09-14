@@ -55,6 +55,9 @@ trait Parameters {
    */
   def addParam(k: String): Self = addParam(k, None: Option[String])
 
+  def addParams(other: Parameters) =
+    withParams(params ++ other.params)
+
   def addParams(kvs: ParamSeq) =
     withParams(params ++ kvs)
 

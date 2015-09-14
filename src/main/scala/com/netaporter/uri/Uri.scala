@@ -306,5 +306,7 @@ object Uri {
       )
   }
 
+  def empty = apply()
+
   def apply(javaUri: java.net.URI): Uri = parse(javaUri.toASCIIString())
 }

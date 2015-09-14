@@ -187,4 +187,24 @@ class DslTests extends FlatSpec with Matchers {
     uri.query.params("name") should equal(Vector(Some("param1"), Some("true")))
     uri.query.params("key2") should equal(Some("false") :: Nil)
   }
+
+  "Path and query DSL" should "be possible to use together" in {
+    val uri = "http://host" / "path" / "to" / "resource" ? ("a" -> "1" ) & ("b" -> "2")
+    uri.toString should equal("http://host/path/to/resource?a=1&b=2")
+  }
+
+  "Path and fragment DSL" should "be possible to use together" in {
+    val uri = "http://host" / "path" / "to" / "resource" `#` "hellyeah"
+    uri.toString should equal("http://host/path/to/resource#hellyeah")
+  }
+
+  "Path and query and fragment DSL" should "be possible to use together" in {
+    val uri = "http://host" / "path" / "to" / "resource" ? ("a" -> "1" ) & ("b" -> "2") `#` "wow"
+    uri.toString should equal("http://host/path/to/resource?a=1&b=2#wow")
+  }
+
+  "Latter fragments DSLs" should "overwrite earlier fragments" in {
+    val uri = "http://host" / "path" / "to" `#` "weird" / "resource" ? ("a" -> "1" ) & ("b" -> "2") `#` "wow"
+    uri.toString should equal("http://host/path/to/resource?a=1&b=2#wow")
+  }
 }

@@ -39,24 +39,6 @@ uri2.toString //This is: http://theon.github.com/scala-uri?param1=1
 
 To add query string parameters, use either the `?` or `&` method and pass a `Tuple2` as an argument. The first value in the Tuple is a name of the query string parameter, the second is the value. If a parameter value is an `Option`, it will only be rendered provided it is not `None`.
 
-#### Shortcoming with the DSL
-
-> **Note** there is currently a shortcoming the the DSL when defining a path with both the `/` operator and the `?` operator. A URI defined like so:
->
-> ```"http://host" / "path" / "to" / "resource" ? ("a" -> "1" ) & ("b" -> "2")```
->
-> Leads to an unexpected result:
->
-> ```res1: com.netaporter.uri.Uri = http://host/path/to/%2Fresource%3Fa%3D1?b=2```
->
-> To work around, you must use parentheses like so:
->
-> ```("http://host" / "path" / "to" / "resource") ? ("a" -> "1" ) & ("b" -> "2")```
->
-> ```res2: com.netaporter.uri.Uri = http://host/path/to/resource?a=1&b=2```
->
-> There is a plan to fix this in the future.
-
 #### Adding multiple query parameters
 
 ```scala

@@ -174,6 +174,16 @@ class ParsingTests extends FlatSpec with Matchers {
     ))
   }
 
+  "Path with matrix params" should "accept empty params and trailing semi-colons" in {
+    implicit val config = UriConfig(matrixParams = true)
+    val uri = parse("http://stackoverflow.com/path;;paramOne=value;paramTwo=value2;;paramThree=;")
+    uri.pathParts should equal(Vector(
+      MatrixParams("path", Vector("paramOne"   -> Some("value"),
+                                  "paramTwo"   -> Some("value2"),
+                                  "paramThree" -> Some("")))
+    ))
+  }
+
   it should "not be parsed by default" in {
     val uri = parse("http://stackoverflow.com/path;paramOne=value;paramTwo=value2/pathTwo;paramOne=value")
     uri.pathParts should equal(Vector(

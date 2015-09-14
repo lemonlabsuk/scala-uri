@@ -8,7 +8,7 @@ import Parameters._
 class DefaultUriParser(val input: ParserInput, conf: UriConfig) extends Parser with UriParser {
 
   def _scheme: Rule1[String] = rule {
-    capture(oneOrMore(CharPredicate.AlphaNum))
+    capture(CharPredicate.Alpha ~ zeroOrMore(CharPredicate.AlphaNum | anyOf("+-.")))
   }
 
   def _host_name: Rule1[String] = rule {

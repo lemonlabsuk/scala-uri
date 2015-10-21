@@ -158,4 +158,14 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
     uri.scheme should equal(Some("a1+-."))
     uri.host should equal(Some("localhost"))
   }
+
+  "Github Issue #106" should "now be fixed" in {
+    val p = "http://localhost:1234"
+
+    val withPath = p / "some/path/segments"
+    withPath.toString should equal("http://localhost:1234/some/path/segments")
+
+    val withPathAndQuery = p / "some/path/segments" ? ("returnUrl" -> "http://localhost:1234/some/path/segments")
+    withPathAndQuery.toString should equal("http://localhost:1234/some/path/segments?returnUrl=http://localhost:1234/some/path/segments")
+  }
 }

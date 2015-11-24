@@ -7,7 +7,7 @@
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
  * A [DSL](#building-uris-with-the-dsl) for building URIs
- * A [parser](#parsing-uris) to parse URIs from Strings.
+ * A [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt) compliant [parser](#parsing-uris) to parse URIs from Strings.
  * Can be used outside a servlet environment as it has zero dependencies on the servlet spec or existing web frameworks.
  * Ability to [replace](#replacing-query-string-parameters) and [remove](#removing-query-string-parameters) query string parameters
  * Support for [custom encoding](#custom-encoding) such as encoding [spaces as pluses](#encoding-spaces-as-pluses)
@@ -21,7 +21,7 @@ To include it in your SBT project from maven central:
 "com.netaporter" %% "scala-uri" % "0.4.11"
 ```
 
-*Note:* This library works best when using Scala `2.11.2+`. Due a bug in olders versions of Scala, this library  can result in `StackOverflowException`s for very large URLs when using versions of Scala olders than `2.11.2`. [More details](https://github.com/NET-A-PORTER/scala-uri/issues/51#issuecomment-45759462)
+*Note:* This library works best when using Scala `2.11.2+`. Due a bug in older versions of Scala, this library  can result in `StackOverflowException`s for very large URLs when using versions of Scala olders than `2.11.2`. [More details](https://github.com/NET-A-PORTER/scala-uri/issues/51#issuecomment-45759462)
 
 ## Building URIs with the DSL
 

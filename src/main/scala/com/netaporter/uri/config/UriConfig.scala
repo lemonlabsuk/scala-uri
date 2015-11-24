@@ -25,7 +25,7 @@ object UriConfig {
 
   val default = UriConfig(pathEncoder = PercentEncoder(PATH_CHARS_TO_ENCODE),
                           queryEncoder = PercentEncoder(QUERY_CHARS_TO_ENCODE),
-                          fragmentEncoder = PercentEncoder(),
+                          fragmentEncoder = PercentEncoder(FRAGMENT_CHARS_TO_ENCODE),
                           pathDecoder = PercentDecoder,
                           queryDecoder = PercentDecoder,
                           fragmentDecoder = PercentDecoder,

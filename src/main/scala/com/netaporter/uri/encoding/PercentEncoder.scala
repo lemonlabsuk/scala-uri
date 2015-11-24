@@ -29,6 +29,9 @@ object PercentEncoder {
     '&', ' ', '%', '<', '>', '[', ']', '#', '%', '{', '}', '^', '`', '|', '\\', '+', '='
   )
 
+  val FRAGMENT_CHARS_TO_ENCODE = Set('#')
+
+
   val GEN_DELIMS = Set(':', '/', '?',  '#', '[', ']', '@')
   val SUB_DELIMS  = Set('!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=')
   val RESERVED = GEN_DELIMS ++ SUB_DELIMS

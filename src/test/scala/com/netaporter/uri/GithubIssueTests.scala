@@ -153,6 +153,11 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
     uri.query.param("email") should equal(Some("abc@xyz"))
   }
 
+  "Github Issue #99" should "now be fixed" in {
+    val uri = Uri.parse("https://www.foo.com/#/myPage?token=bar")
+    uri.toString should equal("https://www.foo.com/#/myPage?token=bar")
+  }
+
   "Github Issue #104" should "now be fixed" in {
     val uri = Uri.parse("a1+-.://localhost")
     uri.scheme should equal(Some("a1+-."))

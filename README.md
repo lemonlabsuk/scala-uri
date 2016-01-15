@@ -14,6 +14,7 @@
  * Support for [protocol relative urls](#protocol-relative-urls)
  * Support for [user information](#user-information) e.g. `ftp://user:password@mysite.com`
  * Support for [matrix parameters](#matrix-parameters)
+ * Support for extracting TLDs and [public suffixes](#public-suffixes) such as `.com` and `.co.uk` from hosts
 
 To include it in your SBT project from maven central:
 
@@ -339,6 +340,27 @@ implicit val conf = UriConfig(charset = "GB2312")
 val uri = "http://theon.github.com/uris-in-scala.html" ? ("chinese" -> "网址")
 uri.toString //This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F8%D6%B7
 ```
+
+## Public Suffixes
+
+`scala-uri` used the list of public suffixes from [publicsuffix.org](https://publicsuffix.org) to allow you to identify 
+the TLD of your absolute URIs.
+
+The `publicSuffix` method returns the longest public suffix from your URI
+ 
+```
+val uri = Uri.parse("http://www.google.co.uk/blah")
+uri.publicSuffix == Some("co.uk")
+```
+
+The `publicSuffixes` method returns all the public suffixes from your URI
+ 
+```
+val uri = Uri.parse("http://www.google.co.uk/blah")
+uri.publicSuffixes == Seq("co.uk", "uk")
+```
+
+These methods return `None` and `Seq.empty`, respectively for relative URIs
 
 ## Including scala-uri your project
 

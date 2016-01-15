@@ -2,10 +2,6 @@ package com.netaporter.uri
 
 import org.scalatest.{Matchers, FlatSpec}
 
-/**
- * Date: 12/03/2013
- * Time: 17:33
- */
 class ProtocolTests extends FlatSpec with Matchers {
 
   import dsl._

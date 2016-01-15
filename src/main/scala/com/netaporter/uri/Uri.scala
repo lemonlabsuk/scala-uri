@@ -1,5 +1,6 @@
 package com.netaporter.uri
 
+import com.netaporter.uri.inet.PublicSuffixes
 import com.netaporter.uri.parsing.UriParser
 import com.netaporter.uri.config.UriConfig
 import com.netaporter.uri.Parameters.Param
@@ -251,6 +252,20 @@ case class Uri (
    */
   def removeAllParams() = {
     copy(query = query.removeAll())
+  }
+
+  def publicSuffix: Option[String] = {
+    for {
+      h <- host
+      longestMatch <- PublicSuffixes.trie.longestMatch(h.reverse)
+    } yield longestMatch.reverse
+  }
+
+  def publicSuffixes: Seq[String] = {
+    for {
+      h <- host.toSeq
+      m <- PublicSuffixes.trie.matches(h.reverse)
+    } yield m.reverse
   }
 
   override def toString = toString(UriConfig.default)

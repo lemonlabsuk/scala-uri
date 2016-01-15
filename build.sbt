@@ -15,6 +15,10 @@ def coverageEnabled(scalaVersion: String) = scalaVersion match {
   case _ => true
 }
 
+lazy val updatePublicSuffixes = taskKey[Unit]("Updates the public suffix Trie at com.netaporter.uri.internet.PublicSuffixes")
+
+updatePublicSuffixes := UpdatePublicSuffixTrie.generate()
+
 coverageOutputXML := coverageEnabled(scalaVersion.value)
 
 coverageOutputCobertua := coverageEnabled(scalaVersion.value)
@@ -34,6 +38,8 @@ resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/reposi
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
 libraryDependencies += "org.parboiled" %% "parboiled" % "2.1.0"
+
+libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.4" % "test"
 

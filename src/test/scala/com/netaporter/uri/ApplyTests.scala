@@ -3,10 +3,6 @@ package com.netaporter.uri
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
-/**
- * Date: 13/04/2013
- * Time: 15:58
- */
 class ApplyTests extends FlatSpec with Matchers {
 
   "Uri apply method" should "accept String scheme, String host and path" in {

@@ -1,0 +1,16 @@
+package com.netaporter.uri.inet
+
+import spray.json.DefaultJsonProtocol._
+import spray.json.{JsonFormat, _}
+
+import scala.io.Source
+
+object PublicSuffixes {
+  lazy val trie = {
+    implicit lazy val trieFmt: JsonFormat[Trie] = lazyFormat(jsonFormat(Trie, "c", "e"))
+    val trieJson = Source.fromFile("src/main/resources/public_suffix_trie.json", "UTF-8")
+    val trie = trieJson.mkString.parseJson.convertTo[Trie]
+    trieJson.close()
+    trie
+  }
+}

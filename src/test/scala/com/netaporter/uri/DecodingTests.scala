@@ -4,10 +4,6 @@ import org.scalatest.{Matchers, FlatSpec}
 import com.netaporter.uri.decoding.{UriDecodeException, NoopDecoder}
 import com.netaporter.uri.config.UriConfig
 
-/**
- * Date: 29/06/2013
- * Time: 17:41
- */
 class DecodingTests extends FlatSpec with Matchers {
 
   "Reserved characters" should "be percent decoded during parsing" in {

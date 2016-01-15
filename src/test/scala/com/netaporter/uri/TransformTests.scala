@@ -3,10 +3,6 @@ package com.netaporter.uri
 import org.scalatest.{Matchers, WordSpec}
 import Uri._
 
-/**
- * Date: 13/10/2013
- * Time: 22:30
- */
 class TransformTests extends WordSpec with Matchers {
 
   "mapQuery" should {

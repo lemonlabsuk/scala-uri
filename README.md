@@ -19,7 +19,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.11"
+"com.netaporter" %% "scala-uri" % "0.4.12"
 ```
 
 There is also a [demo project](https://github.com/NET-A-PORTER/scala-uri-demo) to help you get up and running quickly, from scratch.
@@ -345,18 +345,18 @@ uri.toString //This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F8
 
 ## Public Suffixes
 
-`scala-uri` used the list of public suffixes from [publicsuffix.org](https://publicsuffix.org) to allow you to identify 
+`scala-uri` used the list of public suffixes from [publicsuffix.org](https://publicsuffix.org) to allow you to identify
 the TLD of your absolute URIs.
 
 The `publicSuffix` method returns the longest public suffix from your URI
- 
+
 ```
 val uri = Uri.parse("http://www.google.co.uk/blah")
 uri.publicSuffix == Some("co.uk")
 ```
 
 The `publicSuffixes` method returns all the public suffixes from your URI
- 
+
 ```
 val uri = Uri.parse("http://www.google.co.uk/blah")
 uri.publicSuffixes == Seq("co.uk", "uk")
@@ -373,7 +373,7 @@ For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/net-a-porter/sc
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.11"
+"com.netaporter" %% "scala-uri" % "0.4.12"
 ```
 
 For maven users you should use (for 2.11.x):
@@ -382,7 +382,7 @@ For maven users you should use (for 2.11.x):
 <dependency>
     <groupId>com.netaporter</groupId>
     <artifactId>scala-uri_2.11</artifactId>
-    <version>0.4.11</version>
+    <version>0.4.12</version>
 </dependency>
 ```
 
@@ -397,7 +397,7 @@ resolvers += "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/sn
 Add the following dependency:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.12-SNAPSHOT"
+"com.netaporter" %% "scala-uri" % "0.4.13-SNAPSHOT"
 ```
 
 # Contributions

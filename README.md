@@ -24,7 +24,7 @@ To include it in your SBT project from maven central:
 
 There is also a [demo project](https://github.com/NET-A-PORTER/scala-uri-demo) to help you get up and running quickly, from scratch.
 
-*Note:* This library works best when using Scala `2.11.2+`. Due a bug in older versions of Scala, this library  can result in `StackOverflowException`s for very large URLs when using versions of Scala olders than `2.11.2`. [More details](https://github.com/NET-A-PORTER/scala-uri/issues/51#issuecomment-45759462)
+*Note:* This library works best when using Scala `2.11.2+`. Due a bug in older versions of Scala, this library  can result in `StackOverflowException`s for very large URLs when using versions of Scala older than `2.11.2`. [More details](https://github.com/NET-A-PORTER/scala-uri/issues/51#issuecomment-45759462)
 
 ## Building URIs with the DSL
 
@@ -345,7 +345,7 @@ uri.toString //This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F8
 
 ## Public Suffixes
 
-`scala-uri` used the list of public suffixes from [publicsuffix.org](https://publicsuffix.org) to allow you to identify
+`scala-uri` uses the list of public suffixes from [publicsuffix.org](https://publicsuffix.org) to allow you to identify
 the TLD of your absolute URIs.
 
 The `publicSuffix` method returns the longest public suffix from your URI

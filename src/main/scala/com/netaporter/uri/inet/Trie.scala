@@ -17,7 +17,8 @@ case class Trie(children: Map[Char, Trie], wordEnd: Boolean = false) {
             matches
           case Some(next) =>
             val newPrevious = previous + x
-            val newMatches = if(next.wordEnd && xs.headOption.contains('.')) newPrevious +: matches else matches
+            //TODO: When Scala 2.10 support is dropped, change headOption == Some to headOption.contains
+            val newMatches = if(next.wordEnd && xs.headOption == Some('.')) newPrevious +: matches else matches
             collectMatches(newPrevious, xs, next, newMatches)
         }
     }

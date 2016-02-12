@@ -350,14 +350,14 @@ the TLD of your absolute URIs.
 
 The `publicSuffix` method returns the longest public suffix from your URI
 
-```
+```scala
 val uri = Uri.parse("http://www.google.co.uk/blah")
 uri.publicSuffix == Some("co.uk")
 ```
 
 The `publicSuffixes` method returns all the public suffixes from your URI
 
-```
+```scala
 val uri = Uri.parse("http://www.google.co.uk/blah")
 uri.publicSuffixes == Seq("co.uk", "uk")
 ```

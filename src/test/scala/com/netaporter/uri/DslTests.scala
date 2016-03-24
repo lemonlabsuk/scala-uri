@@ -207,4 +207,24 @@ class DslTests extends FlatSpec with Matchers {
     val uri = "http://host" / "path" / "to" `#` "weird" / "resource" ? ("a" -> "1" ) & ("b" -> "2") `#` "wow"
     uri.toString should equal("http://host/path/to/resource?a=1&b=2#wow")
   }
+
+  "/? operator" should "add a slash to the path and a query param" in {
+    val uri = "http://host" /? ("a" -> "1" )
+    uri.toString should equal("http://host/?a=1")
+  }
+
+  it should "work alongside the / operator" in {
+    val uri = "http://host" / "path" /? ("a" -> "1" )
+    uri.toString should equal("http://host/path/?a=1")
+  }
+
+  it should "work alongside the & operator" in {
+    val uri = "http://host" /? ("a" -> "1" ) & ("b" -> "2" )
+    uri.toString should equal("http://host/?a=1&b=2")
+  }
+
+  it should "work alongside the / and & operators together" in {
+    val uri = "http://host" / "path" /? ("a" -> "1" ) & ("b" -> "2" )
+    uri.toString should equal("http://host/path/?a=1&b=2")
+  }
 }

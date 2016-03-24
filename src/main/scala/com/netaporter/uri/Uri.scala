@@ -302,6 +302,10 @@ object Uri {
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Uri =
     UriParser.parse(s.toString, config)
 
+
+  def parseQuery(s: CharSequence)(implicit config: UriConfig = UriConfig.default): QueryString =
+    UriParser.parseQuery(s.toString, config)
+
   def apply(scheme: String = null,
             user: String = null,
             password: String = null,

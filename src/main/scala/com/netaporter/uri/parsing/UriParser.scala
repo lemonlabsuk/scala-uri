@@ -70,4 +70,20 @@ object UriParser {
         throw e
     }
   }
+
+  def parseQuery(s: String, config: UriConfig) = {
+    val withQuestionMark = if(s.head == '?') s else "?" + s
+    val parser = new DefaultUriParser(withQuestionMark, config)
+
+    parser._queryString.run() match {
+      case Success(queryString) =>
+        queryString
+
+      case Failure(pe@ParseError(position, _, formatTraces)) =>
+        throw new java.net.URISyntaxException(s, "Invalid URI could not be parsed. " + formatTraces, position.index)
+
+      case Failure(e) =>
+        throw e
+    }
+  }
 }

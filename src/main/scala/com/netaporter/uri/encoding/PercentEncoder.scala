@@ -21,12 +21,17 @@ case class PercentEncoder(charsToEncode: Set[Char] = DEFAULT_CHARS_TO_ENCODE) ex
 }
 
 object PercentEncoder {
+
+  val USER_INFO_CHARS_TO_ENCODE = Set (
+    ' ', '%', '<', '>', '[', ']', '#', '%', '{', '}', '^', '`', '|', '?', '@', ':', '/'
+  )
+
   val PATH_CHARS_TO_ENCODE = Set (
-    ' ', '%', '?', '<', '>', '[', ']', '#', '%', '{', '}', '^', '`', '|'
+    ' ', '%', '<', '>', '[', ']', '#', '%', '{', '}', '^', '`', '|', '?'
   )
 
   val QUERY_CHARS_TO_ENCODE = Set (
-    '&', ' ', '%', '<', '>', '[', ']', '#', '%', '{', '}', '^', '`', '|', '\\', '+', '='
+    ' ', '%', '<', '>', '[', ']', '#', '%', '{', '}', '^', '`', '|', '&', '\\', '+', '='
   )
 
   val FRAGMENT_CHARS_TO_ENCODE = Set('#')

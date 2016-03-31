@@ -8,9 +8,11 @@ import PercentEncoder._
  * Date: 28/08/2013
  * Time: 21:31
  */
-case class UriConfig(pathEncoder: UriEncoder,
+case class UriConfig(userInfoEncoder: UriEncoder,
+                     pathEncoder: UriEncoder,
                      queryEncoder: UriEncoder,
                      fragmentEncoder: UriEncoder,
+                     userInfoDecoder: UriDecoder,
                      pathDecoder: UriDecoder,
                      queryDecoder: UriDecoder,
                      fragmentDecoder: UriDecoder,
@@ -23,9 +25,11 @@ case class UriConfig(pathEncoder: UriEncoder,
 
 object UriConfig {
 
-  val default = UriConfig(pathEncoder = PercentEncoder(PATH_CHARS_TO_ENCODE),
+  val default = UriConfig(userInfoEncoder = PercentEncoder(USER_INFO_CHARS_TO_ENCODE),
+                          pathEncoder = PercentEncoder(PATH_CHARS_TO_ENCODE),
                           queryEncoder = PercentEncoder(QUERY_CHARS_TO_ENCODE),
                           fragmentEncoder = PercentEncoder(FRAGMENT_CHARS_TO_ENCODE),
+                          userInfoDecoder = PercentDecoder,
                           pathDecoder = PercentDecoder,
                           queryDecoder = PercentDecoder,
                           fragmentDecoder = PercentDecoder,
@@ -43,5 +47,5 @@ object UriConfig {
             decoder: UriDecoder = PercentDecoder,
             matrixParams: Boolean = false,
             charset: String = "UTF-8"): UriConfig =
-    UriConfig(encoder, encoder, encoder, decoder, decoder, decoder, matrixParams, charset)
+    UriConfig(encoder, encoder, encoder, encoder, decoder, decoder, decoder, decoder, matrixParams, charset)
 }

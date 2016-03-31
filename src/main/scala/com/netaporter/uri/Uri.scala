@@ -272,9 +272,19 @@ case class Uri (
 
   def toString(implicit c: UriConfig = UriConfig.default): String = {
     //If there is no scheme, we use scheme relative
-    val schemeStr = scheme.map(_ + "://").getOrElse("//")
-    val userInfo = user.map(_ + password.map(":" + _).getOrElse("") + "@").getOrElse("")
-    host.map(schemeStr + userInfo + _).getOrElse("") +
+    def userInfo = for {
+      userStr <- user
+      userStrEncoded = c.userInfoEncoder.encode(userStr, c.charset)
+      passwordStrEncoded = password.map(p => ":" + c.userInfoEncoder.encode(p, c.charset)).getOrElse("")
+    } yield userStrEncoded + passwordStrEncoded + "@"
+
+    val hostStr = for {
+      hostStr <- host
+      schemeStr = scheme.map(_ + "://").getOrElse("//")
+      userInfoStr = userInfo.getOrElse("")
+    } yield schemeStr + userInfoStr + hostStr
+
+    hostStr.getOrElse("") +
       port.map(":" + _).getOrElse("") +
       path(c) +
       queryString(c) +

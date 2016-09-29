@@ -37,7 +37,7 @@ resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/reposi
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
-libraryDependencies += "org.parboiled" %% "parboiled" % "2.1.0"
+libraryDependencies += "org.parboiled" %% "parboiled" % "2.1.2"
 
 libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
 

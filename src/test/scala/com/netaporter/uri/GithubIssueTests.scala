@@ -107,7 +107,7 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
   }
 
   "Github Issue #56" should "now be fixed" in {
-    val ex = the [java.net.URISyntaxException] thrownBy Uri.parse("http://test.net/##")
+    val ex = the [java.net.URISyntaxException] thrownBy Uri.parse("http://test.net:8o8o")
     ex.getMessage should startWith("Invalid URI could not be parsed.")
   }
 
@@ -177,5 +177,11 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
 
     val withPathAndQuery = p / "some/path/segments" ? ("returnUrl" -> "http://localhost:1234/some/path/segments")
     withPathAndQuery.toString should equal("http://localhost:1234/some/path/segments?returnUrl=http://localhost:1234/some/path/segments")
+  }
+
+  "Github Issue #114" should "now be fixed" in {
+    val uri = Uri.parse("https://krownlab.com/products/hardware-systems/baldur/#baldur-top-mount#1")
+    uri.fragment should equal(Some("baldur-top-mount#1"))
+    uri.toString should equal("https://krownlab.com/products/hardware-systems/baldur/#baldur-top-mount%231")
   }
 }

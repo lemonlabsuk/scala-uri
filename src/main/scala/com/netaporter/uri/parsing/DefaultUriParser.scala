@@ -59,7 +59,7 @@ class DefaultUriParser(val input: ParserInput, conf: UriConfig) extends Parser w
   }
 
   def _fragment: Rule1[String] = rule {
-    "#" ~ capture(zeroOrMore(!anyOf("#") ~ ANY)) ~> extractFragment
+    "#" ~ capture(zeroOrMore(ANY)) ~> extractFragment
   }
 
   def _abs_uri: Rule1[Uri] = rule {

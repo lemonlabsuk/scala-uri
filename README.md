@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/NET-A-PORTER/scala-uri.svg?branch=master)](https://travis-ci.org/NET-A-PORTER/scala-uri)
 [![codecov.io](http://codecov.io/github/NET-A-PORTER/scala-uri/coverage.svg?branch=master)](http://codecov.io/github/NET-A-PORTER/scala-uri?branch=master)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/NET-A-PORTER/scala-uri?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.netaporter/scala-uri_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.netaporter/scala-uri_2.11)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.netaporter/scala-uri_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.netaporter/scala-uri_2.12)
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
@@ -369,7 +369,7 @@ These methods return `None` and `Seq.empty`, respectively for relative URIs
 
 ## Including scala-uri your project
 
-`scala-uri` `0.4.x` is currently built with support for scala `2.10.x` and `2.11.x`
+`scala-uri` `0.4.x` is currently built with support for scala `2.12.x`, `2.11.x` and `2.10.x`
 
 For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/net-a-porter/scala-uri/tree/0.3.x)
 
@@ -379,12 +379,12 @@ Release builds are available in maven central. For SBT users just add the follow
 "com.netaporter" %% "scala-uri" % "0.4.16"
 ```
 
-For maven users you should use (for 2.11.x):
+For maven users you should use (for 2.12.x):
 
 ```xml
 <dependency>
     <groupId>com.netaporter</groupId>
-    <artifactId>scala-uri_2.11</artifactId>
+    <artifactId>scala-uri_2.12</artifactId>
     <version>0.4.16</version>
 </dependency>
 ```

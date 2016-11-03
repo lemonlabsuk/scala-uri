@@ -1,4 +1,4 @@
-import scoverage.ScoverageSbtPlugin.ScoverageKeys._
+//import scoverage.ScoverageSbtPlugin.ScoverageKeys._
 
 name := "scala-uri"
 
@@ -6,12 +6,13 @@ organization  := "com.netaporter"
 
 version       := "0.4.16"
 
-scalaVersion  := "2.11.7"
+scalaVersion  := "2.12.0"
 
-crossScalaVersions := Seq("2.10.5", "2.11.7")
+crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0")
 
 def coverageEnabled(scalaVersion: String) = scalaVersion match {
   case v if v startsWith "2.10" => false
+  case v if v startsWith "2.12" => false
   case _ => true
 }
 
@@ -19,11 +20,11 @@ lazy val updatePublicSuffixes = taskKey[Unit]("Updates the public suffix Trie at
 
 updatePublicSuffixes := UpdatePublicSuffixTrie.generate()
 
-coverageOutputXML := coverageEnabled(scalaVersion.value)
-
-coverageOutputCobertua := coverageEnabled(scalaVersion.value)
-
-coverageHighlighting := coverageEnabled(scalaVersion.value)
+//coverageOutputXML := coverageEnabled(scalaVersion.value)
+//
+//coverageOutputCobertua := coverageEnabled(scalaVersion.value)
+//
+//coverageHighlighting := coverageEnabled(scalaVersion.value)
 
 publishMavenStyle := true
 
@@ -37,11 +38,11 @@ resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/reposi
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature")
 
-libraryDependencies += "org.parboiled" %% "parboiled" % "2.1.2"
+libraryDependencies += "org.parboiled" %% "parboiled" % "2.1.3"
 
 libraryDependencies += "io.spray" %%  "spray-json" % "1.3.2"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.4" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 
 parallelExecution in Test := false
 

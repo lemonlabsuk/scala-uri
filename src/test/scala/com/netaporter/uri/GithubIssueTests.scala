@@ -185,7 +185,7 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
     uri.toString should equal("https://krownlab.com/products/hardware-systems/baldur/#baldur-top-mount%231")
   }
 
-  "Github Issue 124" should "not be fixed" in {
+  "Github Issue #124" should "now be fixed" in {
     val uri = Uri.parse("https://github.com")
     uri.matrixParams should equal(Seq.empty)
   }

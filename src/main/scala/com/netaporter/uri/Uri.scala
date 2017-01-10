@@ -33,9 +33,13 @@ case class Uri (
     pathPartOption(name).head
 
   def matrixParams =
-    pathParts.last match {
-      case MatrixParams(_, p) => p
-      case _ => Seq.empty
+    pathParts.lastOption match {
+      case Some(pathPart) =>
+        pathPart match {
+          case MatrixParams(_, p) => p
+          case _ => Seq.empty
+        }
+      case None => Seq.empty
     }
 
   def addMatrixParam(pp: String, k: String, v: String) = copy (

@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/NET-A-PORTER/scala-uri.svg?branch=master)](https://travis-ci.org/NET-A-PORTER/scala-uri)
 [![codecov.io](http://codecov.io/github/NET-A-PORTER/scala-uri/coverage.svg?branch=master)](http://codecov.io/github/NET-A-PORTER/scala-uri?branch=master)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/NET-A-PORTER/scala-uri?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.netaporter/scala-uri_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.netaporter/scala-uri_2.12)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
@@ -20,7 +20,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.16"
+"io.lemonlabs" %% "scala-uri" % "0.4.16"
 ```
 
 There is also a [demo project](https://github.com/NET-A-PORTER/scala-uri-demo) to help you get up and running quickly, from scratch.
@@ -376,14 +376,14 @@ For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/net-a-porter/sc
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.16"
+"io.lemonlabs" %% "scala-uri" % "0.4.16"
 ```
 
 For maven users you should use (for 2.12.x):
 
 ```xml
 <dependency>
-    <groupId>com.netaporter</groupId>
+    <groupId>io.lemonlabs</groupId>
     <artifactId>scala-uri_2.12</artifactId>
     <version>0.4.16</version>
 </dependency>
@@ -400,7 +400,7 @@ resolvers += "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/sn
 Add the following dependency:
 
 ```scala
-"com.netaporter" %% "scala-uri" % "0.4.17-SNAPSHOT"
+"io.lemonlabs" %% "scala-uri" % "0.4.17-SNAPSHOT"
 ```
 
 # Contributions
@@ -444,5 +444,3 @@ For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https:/
 # License
 
 `scala-uri` is open source software released under the [Apache 2 License](http://www.apache.org/licenses/LICENSE-2.0).
-
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/6379a8269f03e9dc2cc994c9493eecc0 "githalytics.com")](http://githalytics.com/net-a-porter/scala-uri)

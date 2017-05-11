@@ -2,7 +2,7 @@
 
 name := "scala-uri"
 
-organization  := "com.netaporter"
+organization  := "io.lemonlabs"
 
 version       := "0.4.16"
 

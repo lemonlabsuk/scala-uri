@@ -1,7 +1,7 @@
 # scala-uri
 
 [![Build Status](https://travis-ci.org/lemonlabsuk/scala-uri.svg?branch=master)](https://travis-ci.org/NET-A-PORTER/scala-uri)
-[![codecov.io](http://codecov.io/github/NET-A-PORTER/scala-uri/coverage.svg?branch=master)](http://codecov.io/github/NET-A-PORTER/scala-uri?branch=master)
+[![codecov.io](http://codecov.io/github/lemonlabsuk/scala-uri/coverage.svg?branch=master)](https://codecov.io/gh/lemonlabsuk/scala-uri/branch/master)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/lemonlabsuk/Lobby#)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)
 

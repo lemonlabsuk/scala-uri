@@ -1,7 +1,6 @@
 --- 
 language: scala
-#script: "sbt ++$TRAVIS_SCALA_VERSION coverage test"
-script: "sbt ++$TRAVIS_SCALA_VERSION test"
+script: "sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport"
 
 jdk:
   - oraclejdk8
@@ -13,8 +12,8 @@ scala:
 
 sudo: false # Enable new travis container-based infrastructure
 
-#after_success:
-#  - bash <(curl -s https://codecov.io/bash)
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 
 notifications:
   webhooks:

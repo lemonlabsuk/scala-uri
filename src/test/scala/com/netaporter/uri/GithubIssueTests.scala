@@ -56,7 +56,6 @@ class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
     uri.host.value should equal ("localhost")
     uri.port.value should equal (8080)
     uri.path should equal ("/ping")
-    println(uri.query.params)
     uri.query.params("oi") should equal (Vector(Some("TscV16GUGtlU")))
     uri.query.params("ppc") should equal (Vector(Some("")))
     uri.query.params("bpc") should equal (Vector(Some("")))

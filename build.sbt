@@ -1,5 +1,3 @@
-//import scoverage.ScoverageSbtPlugin.ScoverageKeys._
-
 name := "scala-uri"
 
 organization  := "io.lemonlabs"
@@ -10,21 +8,11 @@ scalaVersion  := "2.12.0"
 
 crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0")
 
-def coverageEnabled(scalaVersion: String) = scalaVersion match {
-  case v if v startsWith "2.10" => false
-  case v if v startsWith "2.12" => false
-  case _ => true
-}
+coverageEnabled := scalaVersion.value startsWith "2.12"
 
 lazy val updatePublicSuffixes = taskKey[Unit]("Updates the public suffix Trie at com.netaporter.uri.internet.PublicSuffixes")
 
 updatePublicSuffixes := UpdatePublicSuffixTrie.generate()
-
-//coverageOutputXML := coverageEnabled(scalaVersion.value)
-//
-//coverageOutputCobertua := coverageEnabled(scalaVersion.value)
-//
-//coverageHighlighting := coverageEnabled(scalaVersion.value)
 
 publishMavenStyle := true
 
@@ -46,16 +34,16 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 
 parallelExecution in Test := false
 
-publishTo <<= version { (v: String) =>
+publishTo := {
   val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT"))
+  if (version.value.trim.endsWith("SNAPSHOT"))
     Some("snapshots" at nexus + "content/repositories/snapshots")
   else
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
 
-pomExtra := (
-  <url>https://github.com/net-a-porter/scala-uri</url>
+pomExtra :=
+  <url>https://github.com/lemonlabsuk/scala-uri</url>
   <licenses>
     <license>
       <name>Apache 2</name>
@@ -64,8 +52,8 @@ pomExtra := (
     </license>
   </licenses>
   <scm>
-    <url>git@github.com:net-a-porter/scala-uri.git</url>
-    <connection>scm:git@github.com:net-a-porter/scala-uri.git</connection>
+    <url>git@github.com:lemonlabsuk/scala-uri.git</url>
+    <connection>scm:git@github.com:lemonlabsuk/scala-uri.git</connection>
   </scm>
   <developers>
     <developer>
@@ -73,4 +61,4 @@ pomExtra := (
       <name>Ian Forsey</name>
       <url>http://theon.github.io</url>
     </developer>
-  </developers>)
+  </developers>

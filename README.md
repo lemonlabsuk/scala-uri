@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/lemonlabsuk/scala-uri.svg?branch=master)](https://travis-ci.org/NET-A-PORTER/scala-uri)
 [![codecov.io](http://codecov.io/github/lemonlabsuk/scala-uri/coverage.svg?branch=master)](https://codecov.io/gh/lemonlabsuk/scala-uri/branch/master)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/lemonlabsuk/Lobby#)
+[![Slack](https://lemonlabs.io/slack/badge.svg)](https://lemonlabs.io/slack)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:

@@ -226,9 +226,28 @@ import com.netaporter.uri.dsl._
 implicit val c = UriConfig(decoder = NoopDecoder)
 val uri: Uri = "http://example.com/i-havent-%been%-percent-encoded"
 
-uri.toString //This is: http://example.com/i-havent-%25been%25-percent-encoded
+uri.toString // This is: http://example.com/i-havent-%25been%25-percent-encoded
 
-uri.toStringRaw //This is: http://example.com/i-havent-%been%-percent-encoded
+uri.toStringRaw // This is: http://example.com/i-havent-%been%-percent-encoded
+```
+
+#### Invalid Percent Encoding
+
+If your Uri contains invalid percent encoding, by default scala-uri will throw a `UriDecodeException`:
+
+```scala
+Uri.parse("/?x=%3") // This throws a UriDecodeException
+```
+
+You can configure scala-uri to instead ignore invalid percent encoding and *only* percent decode correctly percent encoded values like so:
+
+```scala
+implicit val c = UriConfig(
+  decoder = PercentDecoder(ignoreInvalidPercentEncoding = true)
+)
+val uri = Uri.parse("/?x=%3")
+uri.toString // This is /?x=%253
+uri.toStringRaw // This is /?x=%3
 ```
 
 ## Replacing Query String Parameters

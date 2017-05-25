@@ -10,8 +10,10 @@ import org.parboiled2.ParseError
 
 /**
  * Test Suite to ensure that bugs raised by awesome github peeps NEVER come back
+  *
+  * These bugs were raised at the old github page https://github.com/net-a-porter/scala-uri
  */
-class GithubIssueTests extends FlatSpec with Matchers with OptionValues {
+class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
 
   import uri.dsl._
 

@@ -1,11 +1,5 @@
 package com.netaporter.uri.encoding
 
-import scala.Array
-
-/**
- * Date: 28/08/2013
- * Time: 21:07
- */
 trait UriEncoder {
   def shouldEncode(ch: Char): Boolean
   def encodeChar(ch: Char): String
@@ -23,4 +17,6 @@ trait UriEncoder {
 
     new String(encChars, charset)
   }
+
+  def +(other: UriEncoder) = ChainedUriEncoder(other :: this :: Nil)
 }

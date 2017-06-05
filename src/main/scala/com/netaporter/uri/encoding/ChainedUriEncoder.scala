@@ -12,5 +12,5 @@ case class ChainedUriEncoder(encoders: Seq[UriEncoder]) extends UriEncoder {
     encoders.find(_.shouldEncode(ch))
   }
 
-  def +(encoder: UriEncoder) = copy(encoders = encoder +: encoders)
+  override def +(encoder: UriEncoder) = copy(encoders = encoder +: encoders)
 }

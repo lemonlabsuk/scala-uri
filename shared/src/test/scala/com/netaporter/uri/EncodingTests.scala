@@ -29,8 +29,8 @@ class EncodingTests extends FlatSpec with Matchers {
   }
 
   "URI path double quotes" should "be percent encoded when using conservative encoder" in {
-    val uri: Uri = "http://theon.github.com" / "what-she-said" / """"that""""
-    uri.toString(UriConfig.conservative) should equal ("http://theon.github.com/what-she-said/%22that%22")
+    val uri: Uri = "http://theon.github.com" / "blah" / """"quoted""""
+    uri.toString(UriConfig.conservative) should equal ("http://theon.github.com/blah/%22quoted%22")
   }
 
   "URI path spaces" should "be plus encoded if configured" in {
@@ -51,8 +51,8 @@ class EncodingTests extends FlatSpec with Matchers {
   }
 
   "Querystring double quotes" should "be percent encoded when using conservative encoder" in {
-    val uri: Uri = "http://theon.github.com" ? ("what-she-said" -> """"that"""")
-    uri.toString(UriConfig.conservative) should equal ("http://theon.github.com?what-she-said=%22that%22")
+    val uri: Uri = "http://theon.github.com" ? ("blah" -> """"quoted"""")
+    uri.toString(UriConfig.conservative) should equal ("http://theon.github.com?blah=%22quoted%22")
   }
 
   "Reserved characters" should "be percent encoded when using conservative encoder" in {
@@ -63,12 +63,6 @@ class EncodingTests extends FlatSpec with Matchers {
   "Chinese characters" should "be percent encoded" in {
     val uri = "http://theon.github.com/uris-in-scala.html" ? ("chinese" -> "网址")
     uri.toString should equal ("http://theon.github.com/uris-in-scala.html?chinese=%E7%BD%91%E5%9D%80")
-  }
-  
-  "Chinese characters with non-UTF8 encoding" should "be percent encoded" in {
-    val uri = "http://theon.github.com/uris-in-scala.html" ? ("chinese" -> "网址")
-    val conf = UriConfig(charset = "GB2312")
-    uri.toString(conf) should equal ("http://theon.github.com/uris-in-scala.html?chinese=%CD%F8%D6%B7")
   }
 
   "Russian characters" should "be percent encoded" in {

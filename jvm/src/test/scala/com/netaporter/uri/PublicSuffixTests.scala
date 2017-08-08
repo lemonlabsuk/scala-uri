@@ -1,7 +1,6 @@
 package com.netaporter.uri
 
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers
+import org.scalatest.{FlatSpec, Matchers}
 
 class PublicSuffixTests extends FlatSpec with Matchers {
 

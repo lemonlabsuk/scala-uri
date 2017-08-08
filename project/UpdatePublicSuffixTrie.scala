@@ -60,7 +60,7 @@ object UpdatePublicSuffixTrie {
     // Reduce JSON file size by using short names "c" and "e" for children and wordEnd
     implicit lazy val trieFmt: JsonFormat[Trie] = lazyFormat(jsonFormat(Trie.apply, "c", "e"))
 
-    val p = new PrintWriter(new File("src/main/resources/public_suffix_trie.json"))
+    val p = new PrintWriter(new File("jvm/src/main/resources/public_suffix_trie.json"))
     p.println(trie.toJson.compactPrint)
     p.close()
   }

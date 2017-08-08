@@ -15,6 +15,7 @@
  * Support for [protocol relative urls](#protocol-relative-urls)
  * Support for [user information](#user-information) e.g. `ftp://user:password@mysite.com`
  * Support for extracting TLDs and [public suffixes](#public-suffixes) such as `.com` and `.co.uk` from hosts
+ * [scala-js support])(#scala-js-support)
 
 To include it in your SBT project from maven central:
 
@@ -359,6 +360,10 @@ uri.publicSuffixes == Seq("co.uk", "uk")
 ```
 
 These methods return `None` and `Seq.empty`, respectively for relative URIs
+
+## scala-js support
+
+See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs-example) for usage
 
 ## Including scala-uri your project
 

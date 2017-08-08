@@ -32,27 +32,6 @@ case class Uri (
   def pathPart(name: String) =
     pathPartOption(name).head
 
-  def matrixParams =
-    pathParts.lastOption match {
-      case Some(pathPart) =>
-        pathPart match {
-          case MatrixParams(_, p) => p
-          case _ => Seq.empty
-        }
-      case None => Seq.empty
-    }
-
-  def addMatrixParam(pp: String, k: String, v: String) = copy (
-    pathParts = pathParts.map {
-      case p: PathPart if p.part == pp => p.addParam(k -> Some(v))
-      case x => x
-    }
-  )
-
-  def addMatrixParam(k: String, v: String) = copy (
-    pathParts = pathParts.dropRight(1) :+ pathParts.last.addParam(k -> Some(v))
-  )
-
   /**
    * Adds a new Query String parameter key-value pair. If the value for the Query String parmeter is None, then this
    * Query String parameter will not be rendered in calls to toString or toStringRaw

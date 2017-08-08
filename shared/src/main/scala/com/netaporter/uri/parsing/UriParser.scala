@@ -58,9 +58,7 @@ trait UriParser {
 
 object UriParser {
   def parse(s: String, config: UriConfig) = {
-    val parser =
-      if(config.matrixParams) new DefaultUriParser(s, config) with MatrixParamSupport
-      else                    new DefaultUriParser(s, config)
+    val parser = new DefaultUriParser(s, config)
 
     parser._uri.run() match {
       case Success(uri) =>

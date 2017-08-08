@@ -7,7 +7,7 @@ import scala.collection.GenTraversableOnce
 import scala.collection.Seq
 
 /**
- * Trait use to represent a list of key value parameters, such as query string parameters and matrix parameters
+ * Trait use to represent a list of key value parameters, such as query string parameters
  */
 trait Parameters {
   type Self <: Parameters

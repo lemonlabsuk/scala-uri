@@ -14,7 +14,6 @@
  * Support for [custom encoding](#custom-encoding) such as encoding [spaces as pluses](#encoding-spaces-as-pluses)
  * Support for [protocol relative urls](#protocol-relative-urls)
  * Support for [user information](#user-information) e.g. `ftp://user:password@mysite.com`
- * Support for [matrix parameters](#matrix-parameters)
  * Support for extracting TLDs and [public suffixes](#public-suffixes) such as `.com` and `.co.uk` from hosts
 
 To include it in your SBT project from maven central:
@@ -321,31 +320,6 @@ import com.netaporter.uri.dsl._
 val uri: Uri = "//example.com/path"
 uri.scheme //This is: None
 uri.host //This is: Some("example.com")
-```
-
-## Matrix Parameters
-
-[Matrix Parameters](http://www.w3.org/DesignIssues/MatrixURIs.html) are supported in `scala-uri`. Support is enabled
-using a`UriConfig` with `matrixParams = true` like so:
-
-```scala
-import com.netaporter.uri.dsl._
-
-implicit val config = UriConfig(matrixParams = true)
-val uri = "http://example.com/path;paramOne=value;paramTwo=value2/pathTwo;paramThree=value3"
-
-//Get parameters at the end of the path
-uri.matrixParams //This is Vector("paramThree" -> "value3")
-
-//Add parameters to end of path
-val uri2 = uri.addMatrixParam("paramFour", "value4")
-uri2.toString //This is http://example.com/path;paramOne=value;paramTwo=value2/pathTwo;paramThree=value3;paramFour=value4
-
-//Get parameters for mid path segment
-uri.pathPart("pathTwo").params //This is Vector("paramOne" -> "value", "paramTwo" -> "value2")
-
-//Add parameters for mid path segment
-val uri3 = uri.addMatrixParam("pathTwo", "paramFour", "value4")
 ```
 
 ## Character Sets

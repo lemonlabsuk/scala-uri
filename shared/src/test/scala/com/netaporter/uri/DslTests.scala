@@ -156,23 +156,6 @@ class DslTests extends FlatSpec with Matchers {
     uri.withPassword("not-so-secret").toString should equal ("http://user:not-so-secret@moonpig.com/#hi")
   }
 
-  "Matrix params" should "be added mid path" in {
-    val uri = "http://stackoverflow.com/pathOne/pathTwo"
-    val uriTwo = uri.addMatrixParam("pathOne", "name", "val")
-
-    uriTwo.pathPart("pathOne").params should equal(Vector("name" -> Some("val")))
-    uriTwo.toString should equal("http://stackoverflow.com/pathOne;name=val/pathTwo")
-  }
-
-  "Matrix params" should "be added to the end of the path" in {
-    val uri = "http://stackoverflow.com/pathOne/pathTwo"
-    val uriTwo = uri.addMatrixParam("name", "val")
-
-    uriTwo.matrixParams should equal(Vector("name" -> Some("val")))
-    uriTwo.pathPart("pathTwo").params should equal(Vector("name" -> Some("val")))
-    uriTwo.toString should equal("http://stackoverflow.com/pathOne/pathTwo;name=val")
-  }
-
   "A list of query params" should "get added successsfully" in {
     val p = ("name", true) :: ("key2", false) :: Nil
     val uri = "http://example.com".addParams(p)

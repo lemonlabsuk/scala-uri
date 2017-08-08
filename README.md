@@ -19,7 +19,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "0.4.17"
+"io.lemonlabs" %% "scala-uri" % "0.5.0"
 ```
 
 There is also a [demo project](https://github.com/NET-A-PORTER/scala-uri-demo) to help you get up and running quickly, from scratch.
@@ -362,14 +362,15 @@ These methods return `None` and `Seq.empty`, respectively for relative URIs
 
 ## Including scala-uri your project
 
-`scala-uri` `0.4.x` is currently built with support for scala `2.12.x`, `2.11.x` and `2.10.x`
+`scala-uri` `0.5.x` is currently built with support for scala `2.12.x`, `2.11.x`
 
-For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/net-a-porter/scala-uri/tree/0.3.x)
+ * For `2.10.x` support use `scala-uri` `0.4.x`
+ * For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/net-a-porter/scala-uri/tree/0.3.x)
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "0.4.17"
+"io.lemonlabs" %% "scala-uri" % "0.5.0"
 ```
 
 For maven users you should use (for 2.12.x):
@@ -378,7 +379,7 @@ For maven users you should use (for 2.12.x):
 <dependency>
     <groupId>io.lemonlabs</groupId>
     <artifactId>scala-uri_2.12</artifactId>
-    <version>0.4.17</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
@@ -393,7 +394,7 @@ resolvers += "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/sn
 Add the following dependency:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "0.4.18-SNAPSHOT"
+"io.lemonlabs" %% "scala-uri" % "0.5.1-SNAPSHOT"
 ```
 
 # Contributions
@@ -415,6 +416,12 @@ Generate code coverage reports from the sbt console by running the `scct:test` c
 ## Performance Tests
 
 For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https://github.com/net-a-porter/scala-uri-benchmarks) github project
+
+# Migration guide from 0.4.x
+
+ * Matrix parameters have been removed. If you still need this, raise an issue
+ * scala 2.10 support dropped, please upgrade to 2.11 or 2.12 to use scala-uri 0.5.x
+ * scala-js support added
 
 # Migration guide from 0.3.x
 

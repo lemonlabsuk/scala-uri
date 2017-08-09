@@ -2,8 +2,8 @@ import sbt.Keys.libraryDependencies
 import org.scalajs.sbtplugin.cross.CrossType
 
 name                            := "scala-uri root"
-scalaVersion in ThisBuild       := "2.12.0"
-crossScalaVersions in ThisBuild := Seq("2.11.8", "2.12.0")
+scalaVersion in ThisBuild       := "2.12.3"
+crossScalaVersions in ThisBuild := Seq("2.11.8", "2.12.3")
 
 val sharedSettings = Seq(
   name          := "scala-uri",

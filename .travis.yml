@@ -1,6 +1,12 @@
 --- 
 language: scala
-script: "sbt $COVERAGE ++$TRAVIS_SCALA_VERSION coverage test coverageReport"
+script: >
+ sbt -Dscala.uri.ver=999-SNAPSHOT $COVERAGE ++$TRAVIS_SCALA_VERSION coverage test coverageReport publishLocal &&
+ cd target &&
+ git clone https://github.com/lemonlabsuk/scala-uri-demo.git &&
+ cd scala-uri-demo &&
+ sbt -Dscala.uri.ver=999-SNAPSHOT test &&
+ sbt -Dscala.uri.ver=0.5.0 test
 
 jdk:
   - oraclejdk8

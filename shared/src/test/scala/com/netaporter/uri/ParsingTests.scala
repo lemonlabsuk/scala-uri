@@ -1,11 +1,8 @@
 package com.netaporter.uri
 
-import org.scalatest.{Matchers, FlatSpec}
-import Uri._
-import scala._
-import scala.Some
+import com.netaporter.uri.Uri._
 import com.netaporter.uri.parsing._
-import com.netaporter.uri.config.UriConfig
+import org.scalatest.{FlatSpec, Matchers}
 
 class ParsingTests extends FlatSpec with Matchers {
 

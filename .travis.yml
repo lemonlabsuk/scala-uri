@@ -1,13 +1,16 @@
 --- 
 language: scala
-script: "sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport"
+script: "sbt $COVERAGE ++$TRAVIS_SCALA_VERSION coverage test coverageReport"
 
 jdk:
   - oraclejdk8
 
-scala:
-  - 2.11.8
-  - 2.12.3
+matrix:
+  include:
+    - scala: 2.12.3
+      env: COVERAGE=coverageOn
+    - scala: 2.11.8
+      env: COVERAGE=coverageOff
 
 sudo: false # Enable new travis container-based infrastructure
 

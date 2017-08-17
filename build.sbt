@@ -21,8 +21,7 @@ val sharedSettings = Seq(
 val jvmSettings = Seq(
   libraryDependencies ++= Seq(
     "io.spray" %%  "spray-json" % "1.3.2"
-  ),
-  coverageEnabled := scalaVersion.value startsWith "2.12"
+  )
 )
 
 val publishingSettings = Seq(

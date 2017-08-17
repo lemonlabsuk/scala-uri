@@ -388,20 +388,6 @@ For maven users you should use (for 2.12.x):
 </dependency>
 ```
 
-### Latest snapshot builds
-
-For the latest snapshot builds, add the Sonatype OSS repo to your SBT build configuration:
-
-```scala
-resolvers += "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/snapshots"
-```
-
-Add the following dependency:
-
-```scala
-"io.lemonlabs" %% "scala-uri" % "0.5.1-SNAPSHOT"
-```
-
 # Contributions
 
 Contributions to `scala-uri` are always welcome. Good ways to contribute include:

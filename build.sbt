@@ -8,7 +8,6 @@ crossScalaVersions in ThisBuild := Seq("2.11.8", "2.12.3")
 val sharedSettings = Seq(
   name          := "scala-uri",
   organization  := "io.lemonlabs",
-  version       := sys.props.getOrElse("scala.uri.ver", "0.5.0"),
   scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature"),
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled" % "2.1.4",
@@ -25,6 +24,24 @@ val jvmSettings = Seq(
 )
 
 val publishingSettings = Seq(
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+  pgpSecretRing := file("secring.gpg"),
+  pgpPublicRing := file("pubring.gpg"),
+  pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray),
+  releaseProcess += releaseStepCommand("sonatypeRelease"),
+  releaseCrossBuild := true,
+  releaseTagComment := version.value,
+  releaseCommitMessage := s"Bump version to ${version.value}",
+  (for {
+    username <- sys.env.get("SONATYPE_USERNAME")
+    password <- sys.env.get("SONATYPE_PASSWORD")
+  } yield
+    credentials += Credentials(
+      "Sonatype Nexus Repository Manager",
+      "oss.sonatype.org",
+      username,
+      password)
+  ).getOrElse(credentials ++= Seq()),
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },

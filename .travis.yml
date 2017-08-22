@@ -1,11 +1,11 @@
 --- 
 language: scala
 script: >
- sbt -Dscala.uri.ver=999-SNAPSHOT $COVERAGE ++$TRAVIS_SCALA_VERSION coverage test coverageReport publishLocal &&
+ sbt $COVERAGE ++$TRAVIS_SCALA_VERSION coverage test coverageReport &&
+ (sbt "project scalaUriJVM" release "project scalaUriJS" release  || echo "Already published this version?") &&
  cd target &&
  git clone https://github.com/lemonlabsuk/scala-uri-demo.git &&
  cd scala-uri-demo &&
- sbt -Dscala.ver=$TRAVIS_SCALA_VERSION -Dscala.uri.ver=999-SNAPSHOT test &&
  sbt -Dscala.ver=$TRAVIS_SCALA_VERSION -Dscala.uri.ver=0.5.0 test
 
 jdk:
@@ -22,3 +22,8 @@ sudo: false # Enable new travis container-based infrastructure
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+env:
+  global:
+  - secure: obCXw9ON8rsCKinqKaRP14cbALCyPwCtHL7ehW69TFwC+iAAzzBRIJsKjYBSJEWl9/jMVi52g/X1WbN1xsNf6jzIZxUndrVLGLjgp0IPr2wDzA43x3hWM5AVrCYH+0hlCQjNTU7oRDhb3Pyd8sy985ul04hkOl0h9YnSYn0JM+n2VlYIpIBXqQdR00rOvpIBMoxx1eq250TWTEX4iat+dB1ZL8Uh3lYFAGnH0HosEvKvRurLn7Eql+kheF/YM1OGH0vO8FDzj3CUUTFkbnLknpl77T0re6IN8QPJENg1shXGFyWL4swIrTdWn4paTL6C7yRy5UrdtLjRK8PdJ3aMBcnMYt4mvnbu2rOKzwSGyjJW9E+/hWbrfzVCFj/nWgi3vCeNY3HdYtEswviJhno0OpWBJ9ZG3+aKOPtuAW7J48zJ5oBHTqmZyB/8Z8KD13UxXOD5b8pdZHd5OqBInbK/tUil9Eiv1ACYFI8rEaeg8OLH8WpgmQmCUQNHOOGG+sEPjowWSZY1ze3KILgn6NaMN3Y7DX0KsN27ae9mXOULiYJUa7rG6MSN2/cGGODdy8xed2GLGkxJhcJ0ATTxUh0umDt3W2g25a9wBAg6Hg3Zpe04DfA+htkjF3hbLUc2y2Ar5PgeXVE0uvf2D3fu83M1XjqOBq9gW9C3p81h02Be91c=
+  - secure: d0nAZxjZFMbH64FKyJj0I4BJ9mH957wwVFvx86h7jApo4PdZ/Eeg1RkafaLMj3Sfzm9Y0EEo44VdS6L6EZJK62Xt/AB6xF3uUswgVkXPu/X/R90mi1fSXOgOMqEUhZnbq32RPKoIz7HkAAWop5CPvp+OrFXAqq4KvD/ch+1KaZQOQdF8RiR3Y1/foaKVZddbmrocmNCnW+2cKPrHh0OKHO9t0LeaSfZOpWa03ybMaI+gzCUW4VkjejT5fPqYO6AOQ9GsrCBZ9cB2JOj7TqoYXsP7OAI2QCSCpn823KC00thLqCccnNYUzA46ZaVqc6noz55+HwuXMpnOq/dWb5SvrdQGqommbjwL+QE12Qi4mvhFpXjzBYCgr0Wz5u7wku7Xukhk1bOeenEYyxP7aMC3tX5CYxk11XMdX1NPzvBbb1boAv6ovxkWzeVDsl/w38SvkwtlCMWeUYbABTeH4dA+sgotNQxHg2gLUBQds/zotgiOXgZ1a57ypG34+tWgXgQhpNyV3nKNCaMVDmxK++tWWSdvM5n+WWTr36HK1PLZsCF2DCi2GFZkLnp2B9pQL93DgLsd9ns8CdbkcaZsZ+PX39umkkW+PYWcBuexXdR2ygWMXDA5WUmBFvU6y2TmK3e8HPcv/eQuJt6XKtQ6gKoTbf+DRYnmsU6cy+JvnGYVGfg=

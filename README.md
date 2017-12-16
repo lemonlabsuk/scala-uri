@@ -39,9 +39,15 @@ uri.toString //This is: http://theon.github.com/scala-uri?p1=one&p2=2&p3=true
 
 val uri2 = "http://theon.github.com/scala-uri" ? ("param1" -> Some("1")) & ("param2" -> None)
 uri2.toString //This is: http://theon.github.com/scala-uri?param1=1
+
+val uri3 = "http://theon.github.com/scala-uri" ? "param1=1"
+uri3.toString //This is: http://theon.github.com/scala-uri?param1=1
 ```
 
-To add query string parameters, use either the `?` or `&` method and pass a `Tuple2` as an argument. The first value in the Tuple is a name of the query string parameter, the second is the value. If a parameter value is an `Option`, it will only be rendered provided it is not `None`.
+To add query string parameters, use either the `?` or `&` method and pass as an argument either:
+
+ - a `Tuple2`. The first value in the Tuple is a name of the query string parameter, the second is the value. If a parameter value is an `Option`, it will only be rendered provided it is not `None`.
+ - a `String`. It will be parsed as a query param. E.g. `"query=param"`
 
 #### Adding multiple query parameters
 

@@ -1,6 +1,8 @@
 package com.netaporter.uri.dsl
 
-import com.netaporter.uri.{Uri, StringPathPart}
+import com.netaporter.uri.config.UriConfig
+import com.netaporter.uri.parsing.UriParser
+import com.netaporter.uri.{StringPathPart, Uri}
 
 /**
  * Value class to add DSL functionality to Uris
@@ -16,6 +18,13 @@ class UriDsl(val uri: Uri) extends AnyVal {
    * @return A new Uri with the new Query String parameter
    */
   def ?(kv: (String, Any)) = uri.addParam(kv._1, kv._2)
+
+  /**
+    * Adds a new Query String. The specified String is parsed as a Query String param.
+    * @return A new Uri with the new Query String parameter
+    */
+  def ?(kv: String)(implicit config: UriConfig = UriConfig.default) =
+    uri.addParam(UriParser.parseQueryParam(kv, config))
 
   /**
    * Adds a trailing forward slash to the path and a new Query String parameter key-value pair.
@@ -34,6 +43,12 @@ class UriDsl(val uri: Uri) extends AnyVal {
    */
   def &(kv: (String, Any)) = uri.addParam(kv._1, kv._2)
 
+  /**
+    * Adds a new Query String. The specified String is parsed as a Query String param.
+    * @return A new Uri with the new Query String parameter
+    */
+  def &(kv: String)(implicit config: UriConfig = UriConfig.default) =
+    uri.addParam(UriParser.parseQueryParam(kv, config))
 
   /**
    * Adds a fragment to the end of the uri

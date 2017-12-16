@@ -1,6 +1,6 @@
 package com.netaporter.uri
 
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{FlatSpec, Matchers}
 
 class DslTests extends FlatSpec with Matchers {
 
@@ -209,5 +209,46 @@ class DslTests extends FlatSpec with Matchers {
   it should "work alongside the / and & operators together" in {
     val uri = "http://host" / "path" /? ("a" -> "1" ) & ("b" -> "2" )
     uri.toString should equal("http://host/path/?a=1&b=2")
+  }
+
+  "Adding a Query Param as a String" should "parse a key+value" in {
+    val uri = "http://a/b" ? "c=d"
+    uri.host should equal (Some("a"))
+    uri.path should equal ("/b")
+    uri.query should equal (QueryString(Seq("c" -> Some("d"))))
+  }
+
+  it should "parse multiple key+value" in {
+    val uri = "http://a/b" ? "c=d" & "e=f"
+    uri.host should equal (Some("a"))
+    uri.path should equal ("/b")
+    uri.query should equal (QueryString(Seq(
+      "c" -> Some("d"),
+      "e" -> Some("f")
+    )))
+  }
+
+  it should "parse a key with no value" in {
+    val uri = "http://a/b" ? "c"
+    uri.host should equal (Some("a"))
+    uri.path should equal ("/b")
+    uri.query should equal (QueryString(Seq("c" -> None)))
+  }
+
+  it should "parse a key with empty value" in {
+    val uri = "http://a/b" ? "c="
+    uri.host should equal (Some("a"))
+    uri.path should equal ("/b")
+    uri.query should equal (QueryString(Seq("c" -> Some(""))))
+  }
+
+  it should "mix with a Tuple query param" in {
+    val uri = "http://a/b" ? "c=d" & ("e" -> "f")
+    uri.host should equal (Some("a"))
+    uri.path should equal ("/b")
+    uri.query should equal (QueryString(Seq(
+      "c" -> Some("d"),
+      "e" -> Some("f")
+    )))
   }
 }

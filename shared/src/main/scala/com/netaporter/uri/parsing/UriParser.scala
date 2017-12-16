@@ -87,4 +87,19 @@ object UriParser {
         throw e
     }
   }
+
+  def parseQueryParam(s: String, config: UriConfig): Param = {
+    val parser = new DefaultUriParser(s, config)
+
+    parser._queryParamOrTok.run() match {
+      case Success(queryParam) =>
+        queryParam
+
+      case Failure(pe @ ParseError(position, _, formatTraces)) =>
+        throw new java.net.URISyntaxException(s, "Invalid URI could not be parsed. " + formatTraces, position.index)
+
+      case Failure(e) =>
+        throw e
+    }
+  }
 }

@@ -53,6 +53,8 @@ case class Uri (
     copy(query = query.addParams(cleanKvs))
   }
 
+  def addParam(kv: Param) = copy(query = query.addParam(kv))
+
   def protocol = scheme
 
   /**

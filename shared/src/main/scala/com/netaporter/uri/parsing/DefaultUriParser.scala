@@ -55,8 +55,12 @@ class DefaultUriParser(val input: ParserInput, conf: UriConfig) extends Parser w
     capture(zeroOrMore(!anyOf("=&#") ~ ANY)) ~> extractTok
   }
 
+  def _queryParamOrTok: Rule1[Param] = rule {
+    _queryParam | _queryTok
+  }
+
   def _queryString: Rule1[QueryString] = rule {
-    "?" ~ zeroOrMore(_queryParam | _queryTok).separatedBy("&") ~> extractQueryString
+    "?" ~ zeroOrMore(_queryParamOrTok).separatedBy("&") ~> extractQueryString
   }
 
   def _fragment: Rule1[String] = rule {

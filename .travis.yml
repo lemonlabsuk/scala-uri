@@ -2,7 +2,6 @@
 language: scala
 script: >
  sbt $COVERAGE ++$TRAVIS_SCALA_VERSION coverage test coverageReport &&
- (sbt "project scalaUriJVM" release "project scalaUriJS" release  || echo "Already published this version?") &&
  cd target &&
  git clone https://github.com/lemonlabsuk/scala-uri-demo.git &&
  cd scala-uri-demo &&

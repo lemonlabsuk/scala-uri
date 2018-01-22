@@ -58,6 +58,13 @@ val uri = "http://example.com".addParams(p)
 uri.toString //This is: http://example.com/?key=true&key2=false
 ```
 
+```scala
+import com.netaporter.uri.dsl._
+val p = Map("key" -> true, "key2" -> false)
+val uri = "http://example.com".addParams(p)
+uri.toString //This is: http://example.com/?key=true&key2=false
+```
+
 ### Paths
 
 ```scala

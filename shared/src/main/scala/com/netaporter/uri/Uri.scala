@@ -45,13 +45,16 @@ case class Uri (
     case (n, v) => copy(query = query.addParam(n, Some(v.toString)))
   }
 
-  def addParams(kvs: Seq[(String, Any)]) = {
+  def addParams(kvs: Seq[(String, Any)]): Uri = {
     val cleanKvs = kvs.filterNot(_._2 == None).map {
       case (k, Some(v)) => (k, Some(v.toString))
       case (k, v) => (k, Some(v.toString))
     }
     copy(query = query.addParams(cleanKvs))
   }
+
+  def addParams(kvs: Map[String, Any]): Uri =
+    addParams(kvs.toSeq)
 
   def addParam(kv: Param) = copy(query = query.addParam(kv))
 

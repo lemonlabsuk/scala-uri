@@ -164,8 +164,23 @@ class DslTests extends FlatSpec with Matchers {
     uri.toString should equal("http://example.com?name=true&key2=false")
   }
 
+  "A map of query params" should "get added successsfully" in {
+    val p = Map("name" -> true, "key2" -> false)
+    val uri = "http://example.com".addParams(p)
+    uri.query.params("name") should equal(Some("true") :: Nil)
+    uri.query.params("key2") should equal(Some("false") :: Nil)
+    uri.toString should equal("http://example.com?name=true&key2=false")
+  }
+
   "A list of query params" should "get added to a URL already with query params successsfully" in {
     val p = ("name", true) :: ("key2", false) :: Nil
+    val uri = ("http://example.com" ? ("name" -> Some("param1"))).addParams(p)
+    uri.query.params("name") should equal(Vector(Some("param1"), Some("true")))
+    uri.query.params("key2") should equal(Some("false") :: Nil)
+  }
+
+  "A map of query params" should "get added to a URL already with query params successsfully" in {
+    val p = Map("name" -> true, "key2" -> false)
     val uri = ("http://example.com" ? ("name" -> Some("param1"))).addParams(p)
     uri.query.params("name") should equal(Vector(Some("param1"), Some("true")))
     uri.query.params("key2") should equal(Some("false") :: Nil)

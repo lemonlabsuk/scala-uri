@@ -12,3 +12,7 @@ Thumbs.db
 .DS_Store
 
 .history
+
+pubring.gpg
+secring.gpg
+

@@ -19,12 +19,10 @@ case class Uri (
   pathParts: Seq[PathPart],
   query: QueryString,
   fragment: Option[String]
-) {
+) extends SubdomainSupport {
 
   lazy val hostParts: Seq[String] =
     host.map(h => h.split('.').toVector).getOrElse(Vector.empty)
-
-  def subdomain = hostParts.headOption
 
   def pathPartOption(name: String) =
     pathParts.find(_.part == name)
@@ -242,6 +240,13 @@ case class Uri (
     copy(query = query.removeAll())
   }
 
+  /**
+    * Returns the longest public suffix for the host in this URI. Examples include:
+    *  `com`   for `www.example.com`
+    *  `co.uk` for `www.example.co.uk`
+    *
+    * @return the longest public suffix for the host in this URI
+    */
   def publicSuffix: Option[String] = {
     for {
       h <- host
@@ -249,6 +254,13 @@ case class Uri (
     } yield longestMatch.reverse
   }
 
+  /**
+    * Returns all longest public suffixes for the host in this URI. Examples include:
+    *  `com` for `www.example.com`
+    *  `co.uk` and `uk` for `www.example.co.uk`
+    *
+    * @return all public suffixes for the host in this URI
+    */
   def publicSuffixes: Seq[String] = {
     for {
       h <- host.toSeq

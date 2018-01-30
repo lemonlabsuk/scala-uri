@@ -353,7 +353,35 @@ val uri = "http://theon.github.com/uris-in-scala.html" ? ("chinese" -> "网址")
 uri.toString //This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F8%D6%B7
 ```
 
+## Subdomains
+
+**Note:** *Currently not supported for scala-js*
+
+```scala
+import com.netaporter.uri.Uri
+
+// This returns Some("www")
+Uri.parse("http://www.example.com/blah").subdomain
+
+// This returns Some("a.b.c")
+Uri.parse("http://a.b.c.example.com/blah").subdomain
+
+// This returns None
+Uri.parse("http://example.com/blah").subdomain
+
+// This returns Vector("a", "a.b", "a.b.c", "a.b.c.example")
+Uri.parse("http://a.b.c.example.com/blah").subdomains
+
+// This returns Some("a")
+Uri.parse("http://a.b.c.example.com/blah").shortestSubdomain
+
+// This returns Some("a.b.c.example")
+Uri.parse("http://a.b.c.example.com/blah").longestSubdomain
+```
+
 ## Public Suffixes
+
+**Note:** *Currently not supported for scala-js*
 
 `scala-uri` uses the list of public suffixes from [publicsuffix.org](https://publicsuffix.org) to allow you to identify
 the TLD of your absolute URIs.

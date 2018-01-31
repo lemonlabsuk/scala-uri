@@ -68,7 +68,7 @@ class ParsingTests extends FlatSpec with Matchers {
   }
 
   "Parsing a url with a fragment" should "result in a Uri with Some for fragment" in {
-    val uri = parse("//theon.github.com/uris-in-scala.html#fragged")
+    val uri = parse("//theon.github.com#fragged")
     uri.fragment should equal (Some("fragged"))
   }
 

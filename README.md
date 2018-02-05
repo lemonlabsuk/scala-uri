@@ -17,7 +17,7 @@
  * Support for extracting TLDs and [public suffixes](#public-suffixes) such as `.com` and `.co.uk` from hosts
  * Support for [URNs](#urns)
  * Support for [mailto](#mailto)
- * [scala-js support])(#scala-js-support)
+ * [scala-js support](#scala-js-support)
 
 To include it in your SBT project from maven central:
 

@@ -18,7 +18,8 @@ case class Uri (
   port: Option[Int],
   pathParts: Seq[PathPart],
   query: QueryString,
-  fragment: Option[String]
+  fragment: Option[String],
+  pathStartsWithSlash: Boolean
 ) extends SubdomainSupport {
 
   lazy val hostParts: Seq[String] =
@@ -119,7 +120,7 @@ case class Uri (
    */
   def path(implicit c: UriConfig = UriConfig.default) =
     if(pathParts.isEmpty) ""
-    else "/" + pathParts.map(_.partToString(c)).mkString("/")
+    else (if(pathStartsWithSlash) "/" else "") + pathParts.map(_.partToString(c)).mkString("/")
 
   def queryStringRaw(implicit c: UriConfig = UriConfig.default) =
     queryString(c.withNoEncoding)
@@ -278,13 +279,19 @@ case class Uri (
       passwordStrEncoded = password.map(p => ":" + c.userInfoEncoder.encode(p, c.charset)).getOrElse("")
     } yield userStrEncoded + passwordStrEncoded + "@"
 
+    val hasAuthority = user.nonEmpty || password.nonEmpty || host.nonEmpty || port.nonEmpty
+    val isAbsoluteWithAuthority = scheme.nonEmpty && hasAuthority
+    val isProtocolRelative = scheme.isEmpty && host.nonEmpty
+    val schemeStr = scheme.map(_ + ":")
+
     val hostStr = for {
       hostStr <- host
-      schemeStr = scheme.map(_ + "://").getOrElse("//")
       userInfoStr = userInfo.getOrElse("")
-    } yield schemeStr + userInfoStr + hostStr
+    } yield userInfoStr + hostStr
 
-    hostStr.getOrElse("") +
+    schemeStr.getOrElse("") +
+      (if(isAbsoluteWithAuthority || isProtocolRelative) "//" else "") +
+      hostStr.getOrElse("") +
       port.map(":" + _).getOrElse("") +
       path(c) +
       queryString(c) +
@@ -323,7 +330,8 @@ object Uri {
             port: Int = 0,
             pathParts: Seq[PathPart] = Seq.empty,
             query: QueryString = EmptyQueryString,
-            fragment: String = null) = {
+            fragment: String = null,
+            pathStartsWithSlash: Boolean = true) = {
     new Uri(Option(scheme),
       Option(user),
       Option(password),
@@ -331,7 +339,8 @@ object Uri {
       if(port > 0) Some(port) else None,
       pathParts,
       query,
-      Option(fragment)
+      Option(fragment),
+      pathStartsWithSlash
     )
   }
 

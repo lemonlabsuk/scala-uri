@@ -48,7 +48,7 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
 
     uri.scheme should equal (None)
     uri.host should equal (None)
-    uri.path should equal ("/abc")
+    uri.path should equal ("abc")
   }
 
   "Github Issue #15" should "now be fixed. Empty Query String values are parsed" in {
@@ -64,15 +64,11 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
   }
 
   "Github Issue #12" should "now be fixed. Parsing URIs parse percent escapes" in {
-    val source = new Uri(
-      Some("http"),
-      None,
-      None,
-      Some("xn--ls8h.example.net"),
-      None,
-      List(PathPart(""), PathPart("path with spaces")),
-      QueryString(Vector("a b" -> Some("c d"))),
-      None
+    val source = Uri(
+      scheme = "http",
+      host = "xn--ls8h.example.net",
+      pathParts = PathPart("path with spaces") :: Nil,
+      query = QueryString(Vector("a b" -> Some("c d")))
     )
     val parsed = parse(source.toString)
     parsed should equal(source)

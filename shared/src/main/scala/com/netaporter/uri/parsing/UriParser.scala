@@ -41,8 +41,11 @@ trait UriParser {
     StringPathPart(decodedPathPart)
   }
 
-  val extractPathParts = (pp: Seq[PathPart]) =>
-    pp.toVector
+  val extractAbsPath = (pp: Seq[PathPart]) =>
+    Path(startsWithSlash = true, pp.toVector)
+
+  val extractRelPath = (maybeSlash: String, pp: Seq[PathPart]) =>
+    Path(maybeSlash.nonEmpty, pp.toVector)
 
   val extractTuple = (k: String, v: String) =>
     k -> Some(v)
@@ -54,6 +57,7 @@ trait UriParser {
    */
   case class Authority(user: Option[String], password: Option[String], host: String, port: Option[Int])
   case class UserInfo(user: String, pass: Option[String])
+  case class Path(startsWithSlash: Boolean, pathParts: Vector[PathPart])
 }
 
 object UriParser {

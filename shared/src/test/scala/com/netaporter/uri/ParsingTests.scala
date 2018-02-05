@@ -208,4 +208,23 @@ class ParsingTests extends FlatSpec with Matchers {
     val parsed = Uri.parseQuery("a=b&c=d")
     parsed should equal(QueryString.create("a" -> Some("b"), "c" -> Some("d")))
   }
+
+  "mailto scheme" should "parse email address as the path" in {
+    val mailto = Uri.parse("mailto:java-net@java.sun.com")
+    mailto.scheme should equal(Some("mailto"))
+    mailto.path should equal("java-net@java.sun.com")
+  }
+
+  "mailto scheme with query" should "parse email address as the path" in {
+    val mailto = Uri.parse("mailto:someone@example.com?subject=Hello")
+    mailto.scheme should equal(Some("mailto"))
+    mailto.path should equal("someone@example.com")
+    mailto.query.param("subject") should equal(Some("Hello"))
+  }
+
+  "URNs" should "parse everything after the scheme as the path" in {
+    val urn = Uri.parse("urn:example:animal:ferret:nose")
+    urn.scheme should equal(Some("urn"))
+    urn.path should equal("example:animal:ferret:nose")
+  }
 }

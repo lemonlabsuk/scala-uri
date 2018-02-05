@@ -1,5 +1,7 @@
 package com.netaporter.uri.parsing
 
+import java.net.URISyntaxException
+
 import org.parboiled2._
 import com.netaporter.uri._
 import com.netaporter.uri.config.UriConfig
@@ -26,7 +28,11 @@ class DefaultUriParser(val input: ParserInput, conf: UriConfig) extends Parser w
   }
 
   def _authority: Rule1[Authority] = rule {
-    ((optional(_userInfo) ~ _host_name ~ optional(_port)) | (push[Option[UserInfo]](None) ~ _host_name ~ optional(_port))) ~> extractAuthority
+    "//" ~ ((optional(_userInfo) ~ _host_name ~ optional(_port)) | (push[Option[UserInfo]](None) ~ _host_name ~ optional(_port))) ~> extractAuthority
+  }
+
+  def _authorityAsOpt: Rule1[Option[Authority]] = rule {
+    _authority ~> ((a: Authority) => Some(a))
   }
 
   def _pathSegment: Rule1[PathPart] = rule {
@@ -34,17 +40,28 @@ class DefaultUriParser(val input: ParserInput, conf: UriConfig) extends Parser w
   }
 
   /**
-   * A sequence of path parts that MUST start with a slash
-   */
-  def _abs_path: Rule1[Vector[PathPart]] = rule {
-    zeroOrMore("/" ~ _pathSegment) ~> extractPathParts
+    * A sequence of path parts that MUST start with a slash
+    *
+    * If a URI contains an authority component, then the path component must either be empty
+    * or begin with a slash ("/") character.
+    */
+  def _pathForAuthority: Rule1[Path] = rule {
+    zeroOrMore("/" ~ _pathSegment) ~> extractAbsPath
+  }
+
+  def _authorityWithPath: Rule2[Option[Authority], Path] = rule {
+    _authorityAsOpt ~ _pathForAuthority
+  }
+
+  def _noAuthorityWithPath: Rule2[Option[Authority], Path] = rule {
+    push[Option[Authority]](None) ~ _relPath
   }
 
   /**
    * A sequence of path parts optionally starting with a slash
    */
-  def _rel_path: Rule1[Vector[PathPart]] = rule {
-    optional("/") ~ zeroOrMore(_pathSegment).separatedBy("/") ~> extractPathParts
+  def _relPath: Rule1[Path] = rule {
+    capture(optional("/")) ~ zeroOrMore(_pathSegment).separatedBy("/") ~> extractRelPath
   }
 
   def _queryParam: Rule1[Param] = rule {
@@ -68,48 +85,48 @@ class DefaultUriParser(val input: ParserInput, conf: UriConfig) extends Parser w
   }
 
   def _abs_uri: Rule1[Uri] = rule {
-    _scheme ~ "://" ~ optional(_authority) ~ _abs_path ~ optional(_queryString) ~ optional(_fragment) ~> extractAbsUri
+    _scheme ~ ":" ~ (_authorityWithPath | _noAuthorityWithPath) ~ optional(_queryString) ~ optional(_fragment) ~> extractAbsUri
   }
 
   def _protocol_rel_uri: Rule1[Uri] = rule {
-    "//" ~ optional(_authority) ~ _abs_path ~ optional(_queryString) ~ optional(_fragment) ~> extractProtocolRelUri
+    _authority ~ _pathForAuthority ~ optional(_queryString) ~ optional(_fragment) ~> extractProtocolRelUri
   }
 
   def _rel_uri: Rule1[Uri] = rule {
-    _rel_path ~ optional(_queryString) ~ optional(_fragment) ~> extractRelUri
+    _relPath ~ optional(_queryString) ~ optional(_fragment) ~> extractRelUri
   }
 
   def _uri: Rule1[Uri] = rule {
     (_abs_uri | _protocol_rel_uri | _rel_uri) ~ EOI
   }
 
-  val extractAbsUri = (scheme: String, authority: Option[Authority], pp: Seq[PathPart], qs: Option[QueryString], f: Option[String]) =>
+  val extractAbsUri = (scheme: String, authority: Option[Authority], path: Path, qs: Option[QueryString], f: Option[String]) =>
     extractUri (
       scheme = Some(scheme),
       authority = authority,
-      pathParts = pp,
+      path = path,
       query = qs,
       fragment = f
     )
 
-  val extractProtocolRelUri = (authority: Option[Authority], pp: Seq[PathPart], qs: Option[QueryString], f: Option[String]) =>
+  val extractProtocolRelUri = (authority: Authority, path: Path, qs: Option[QueryString], f: Option[String]) =>
     extractUri (
-      authority = authority,
-      pathParts = pp,
+      authority = Some(authority),
+      path = path,
       query = qs,
       fragment = f
     )
 
-  val extractRelUri = (pp: Seq[PathPart], qs: Option[QueryString], f: Option[String]) =>
+  val extractRelUri = (path: Path, qs: Option[QueryString], f: Option[String]) =>
     extractUri (
-      pathParts = pp,
+      path = path,
       query = qs,
       fragment = f
     )
 
   def extractUri(scheme: Option[String] = None,
                  authority: Option[Authority] = None,
-                 pathParts: Seq[PathPart],
+                 path: Path,
                  query: Option[QueryString],
                  fragment: Option[String]) =
     new Uri(
@@ -118,7 +135,8 @@ class DefaultUriParser(val input: ParserInput, conf: UriConfig) extends Parser w
       password = authority.flatMap(_.password),
       host = authority.map(_.host),
       port = authority.flatMap(_.port),
-      pathParts = pathParts,
+      pathParts = path.pathParts,
+      pathStartsWithSlash = path.startsWithSlash,
       query = query.getOrElse(EmptyQueryString),
       fragment = fragment
     )

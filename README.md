@@ -15,6 +15,8 @@
  * Support for [protocol relative urls](#protocol-relative-urls)
  * Support for [user information](#user-information) e.g. `ftp://user:password@mysite.com`
  * Support for extracting TLDs and [public suffixes](#public-suffixes) such as `.com` and `.co.uk` from hosts
+ * Support for [URNs](#urns)
+ * Support for [mailto](#mailto)
  * [scala-js support])(#scala-js-support)
 
 To include it in your SBT project from maven central:
@@ -401,6 +403,23 @@ uri.publicSuffixes == Seq("co.uk", "uk")
 ```
 
 These methods return `None` and `Seq.empty`, respectively for relative URIs
+
+## URNs
+
+```scala
+val urn = Uri.parse("urn:example:animal:ferret:nose")
+urn.scheme // This is Some("urn")
+urn.path // This is "example:animal:ferret:nose"
+```
+
+## mailto
+
+```scala
+val mailto = Uri.parse("mailto:someone@example.com?subject=Hello")
+mailto.scheme // This is Some(mailto")
+mailto.path // This is "someone@example.com"
+mailto.query.param("subject") // This is Some("Hello")
+```
 
 ## scala-js support
 

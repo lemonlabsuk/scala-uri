@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class DslTests extends FlatSpec with Matchers {
 
-  import dsl._
+  import dsl.url._
 
   "A simple absolute URI" should "render correctly" in {
     val uri: Uri = "http://theon.github.com/uris-in-scala.html"
@@ -61,9 +61,9 @@ class DslTests extends FlatSpec with Matchers {
     newUri.toString should equal ("/uris-in-scala.html")
   }
 
-  "Replace all params method" should "replace all query params" in {
+  "withQueryString" should "replace all query params" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
-    val newUri = uri.replaceAllParams("testThree" -> Some("3"), "testFour" -> Some("4"))
+    val newUri = uri.withQueryStringOptionValues("testThree" -> Some("3"), "testFour" -> Some("4"))
     newUri.toString should equal ("/uris-in-scala.html?testThree=3&testFour=4")
   }
 
@@ -97,9 +97,9 @@ class DslTests extends FlatSpec with Matchers {
     newUri.toString should equal ("/uris-in-scala.html?testTwo=2")
   }
 
-  "Remove all params method" should "remove all query params" in {
+  "with empty QueryString" should "remove all query params" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
-    val newUri = uri.removeAllParams
+    val newUri = uri.withQueryString(QueryString.empty)
     newUri.toString should equal ("/uris-in-scala.html")
   }
 
@@ -129,16 +129,6 @@ class DslTests extends FlatSpec with Matchers {
   "Path with query string and fragment" should "render correctly" in {
     val uri = "http://google.com/test" ? ("q" -> "scala-uri") `#` "fragment"
     uri.toString should equal ("http://google.com/test?q=scala-uri#fragment")
-  }
-
-  "hostParts" should "return the dot separated host" in {
-    val uri = "http://theon.github.com/test" ? ("q" -> "scala-uri")
-    uri.hostParts should equal (Vector("theon", "github", "com"))
-  }
-
-  "subdomain" should "return the first dot separated part of the host" in {
-    val uri = "http://theon.github.com/test" ? ("q" -> "scala-uri")
-    uri.subdomain should equal (Some("theon"))
   }
 
   "Uri with user info" should "render correctly" in {
@@ -228,42 +218,36 @@ class DslTests extends FlatSpec with Matchers {
 
   "Adding a Query Param as a String" should "parse a key+value" in {
     val uri = "http://a/b" ? "c=d"
-    uri.host should equal (Some("a"))
-    uri.path should equal ("/b")
-    uri.query should equal (QueryString(Seq("c" -> Some("d"))))
+    uri.hostOption should equal (Some("a"))
+    uri.path.toString() should equal ("/b")
+    uri.query should equal (QueryString.fromPairs("c" -> "d"))
   }
 
   it should "parse multiple key+value" in {
     val uri = "http://a/b" ? "c=d" & "e=f"
-    uri.host should equal (Some("a"))
-    uri.path should equal ("/b")
-    uri.query should equal (QueryString(Seq(
-      "c" -> Some("d"),
-      "e" -> Some("f")
-    )))
+    uri.hostOption should equal (Some("a"))
+    uri.path.toString() should equal ("/b")
+    uri.query should equal (QueryString.fromPairs("c" -> "d", "e" -> "f"))
   }
 
   it should "parse a key with no value" in {
     val uri = "http://a/b" ? "c"
-    uri.host should equal (Some("a"))
-    uri.path should equal ("/b")
-    uri.query should equal (QueryString(Seq("c" -> None)))
+    uri.hostOption should equal (Some("a"))
+    uri.path.toString() should equal ("/b")
+    uri.query should equal (QueryString.fromPairOptions("c" -> None))
   }
 
   it should "parse a key with empty value" in {
     val uri = "http://a/b" ? "c="
-    uri.host should equal (Some("a"))
-    uri.path should equal ("/b")
-    uri.query should equal (QueryString(Seq("c" -> Some(""))))
+    uri.hostOption should equal (Some("a"))
+    uri.path.toString() should equal ("/b")
+    uri.query should equal (QueryString.fromPairs("c" -> ""))
   }
 
   it should "mix with a Tuple query param" in {
     val uri = "http://a/b" ? "c=d" & ("e" -> "f")
-    uri.host should equal (Some("a"))
-    uri.path should equal ("/b")
-    uri.query should equal (QueryString(Seq(
-      "c" -> Some("d"),
-      "e" -> Some("f")
-    )))
+    uri.hostOption should equal (Some("a"))
+    uri.path.toString() should equal ("/b")
+    uri.query should equal (QueryString.fromPairs("c" -> "d", "e" -> "f"))
   }
 }

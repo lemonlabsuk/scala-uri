@@ -5,12 +5,12 @@ import org.scalatest.{FlatSpec, Matchers}
 class PublicSuffixTests extends FlatSpec with Matchers {
 
   "Uri publicSuffix method" should "match the longest public suffix" in {
-    val uri = Uri.parse("http://www.google.co.uk/blah")
+    val uri = Url.parse("http://www.google.co.uk/blah")
     uri.publicSuffix should equal(Some("co.uk"))
   }
 
   it should "only return public suffixes that match full dot separated host parts" in {
-    val uri = Uri.parse("http://www.bar.com")
+    val uri = Url.parse("http://www.bar.com")
 
     // Should not match ar.com
     // Github issue #110
@@ -18,12 +18,12 @@ class PublicSuffixTests extends FlatSpec with Matchers {
   }
 
   "Uri publicSuffixes method" should "match the all public suffixes" in {
-    val uri = Uri.parse("http://www.google.co.uk/blah")
-    uri.publicSuffixes should equal(Seq("co.uk", "uk"))
+    val uri = Url.parse("http://www.google.co.uk/blah")
+    uri.publicSuffixes should equal(Vector("co.uk", "uk"))
   }
 
   it should "return None for relative URLs" in {
-    val uri = Uri.parse("/blah")
+    val uri = Url.parse("/blah")
     uri.publicSuffix should equal(None)
   }
 }

@@ -1,14 +1,13 @@
 package com.netaporter.uri
 
 import org.scalatest.{Matchers, WordSpec}
-import Uri._
 
 class TransformTests extends WordSpec with Matchers {
 
   "mapQuery" should {
 
     "transform query params" in {
-      val uri = parse("/test?param_1=hello&param_2=goodbye&param_3=false")
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye&param_3=false")
       val uri2 = uri.mapQuery {
         case (k, v) => (k, v map (_+ "TEST"))
       }
@@ -16,19 +15,19 @@ class TransformTests extends WordSpec with Matchers {
     }
 
     "transform query param names" in {
-      val uri = parse("/test?param_1=hello&param_2=goodbye&param_3=false")
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye&param_3=false")
       val uri2 = uri.mapQueryNames(_.split("_")(1))
       uri2.toString should equal("/test?1=hello&2=goodbye&3=false")
     }
 
     "flip query params" in {
-      val uri = parse("/test?param_1=hello&param_2=goodbye&param_3=false")
-      val uri2 = uri.mapQuery(_ match { case (k,Some(v)) => v->Some(k) case o => o})
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye&param_3=false")
+      val uri2 = uri.mapQuery { case (k, Some(v)) => v -> Some(k) case o => o }
       uri2.toString should equal("/test?hello=param_1&goodbye=param_2&false=param_3")
     }
 
     "transform query param values" in {
-      val uri = parse("/test?param_1=hello&param_2=goodbye&param_3=false")
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye&param_3=false")
       val uri2 = uri.mapQueryValues(_.charAt(0).toString)
       uri2.toString should equal("/test?param_1=h&param_2=g&param_3=f")
     }
@@ -37,7 +36,7 @@ class TransformTests extends WordSpec with Matchers {
   "filterQuery" should {
 
     "filter query params" in {
-      val uri = parse("/test?param_1=hello&param_2=goodbye&param_3=false")
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye&param_3=false")
       val uri2 = uri.filterQuery {
         case (k, Some(v)) => (k + v).length > 13
         case (k, None) => k.length > 13
@@ -46,19 +45,19 @@ class TransformTests extends WordSpec with Matchers {
     }
 
     "filter out all query params" in {
-      val uri = parse("/test?param_1=hello&param_2=goodbye&param_3=false")
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye&param_3=false")
       val uri2 = uri.filterQuery(p => false)
       uri2.toString should equal("/test")
     }
 
     "filter query param names" in {
-      val uri = parse("/test?param_1=hello&param_2=goodbye&param_3=false")
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye&param_3=false")
       val uri2 = uri.filterQueryNames(_ == "param_1")
       uri2.toString should equal("/test?param_1=hello")
     }
 
     "filter query param values" in {
-      val uri = parse("/test?param_1=hello&param_2=goodbye&param_3=false")
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye&param_3=false")
       val uri2 = uri.filterQueryValues(_ == "false")
       uri2.toString should equal("/test?param_3=false")
     }

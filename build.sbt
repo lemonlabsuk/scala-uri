@@ -2,8 +2,8 @@ import sbt.Keys.libraryDependencies
 import org.scalajs.sbtplugin.cross.CrossType
 
 name                            := "scala-uri root"
-scalaVersion in ThisBuild       := "2.12.3"
-crossScalaVersions in ThisBuild := Seq("2.11.8", "2.12.3")
+scalaVersion in ThisBuild       := "2.12.4"
+crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.4")
 
 val sharedSettings = Seq(
   name          := "scala-uri",
@@ -11,8 +11,8 @@ val sharedSettings = Seq(
   scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature"),
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled" % "2.1.4",
-    "com.chuusai"   %%% "shapeless" % "2.3.2",
-    "org.scalatest" %%% "scalatest" % "3.0.0" % "test"
+    "com.chuusai"   %%% "shapeless" % "2.3.3",
+    "org.scalatest" %%% "scalatest" % "3.0.4" % "test"
   ),
   parallelExecution in Test := false
 )

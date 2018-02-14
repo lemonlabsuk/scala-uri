@@ -13,8 +13,8 @@ import org.scalatest.{FlatSpec, Matchers, OptionValues}
 class GithubIssuesTests extends FlatSpec with Matchers with OptionValues {
 
   "Github Issue #1" should "throw UriDecodeException when url contains invalid percent encoding" in {
-    Seq("/?x=%3", "/%3", "/?a=%3&b=whatever", "/?%3=okay").foreach { part =>
-      an[UriDecodeException] should be thrownBy Uri.parse(part)
+    Vector("/?x=%3", "/%3", "/?a=%3&b=whatever", "/?%3=okay").foreach { part =>
+      an[UriDecodeException] should be thrownBy Url.parse(part)
     }
   }
 
@@ -23,8 +23,8 @@ class GithubIssuesTests extends FlatSpec with Matchers with OptionValues {
       encoder = NoopEncoder,
       decoder = PercentDecoder(ignoreInvalidPercentEncoding = true)
     )
-    Seq("/?x=%3", "/%3", "/?a=%3&b=whatever", "/?%3=okay").foreach { part =>
-      Uri.parse(part).toString shouldBe part
+    Vector("/?x=%3", "/%3", "/?a=%3&b=whatever", "/?%3=okay").foreach { part =>
+      Url.parse(part).toString shouldBe part
     }
   }
 }

@@ -2,9 +2,9 @@ package com.netaporter.uri
 
 import org.scalatest.{Matchers, FlatSpec}
 
-class TypeTests extends FlatSpec with Matchers {
+class DslTypeTests extends FlatSpec with Matchers {
 
-  import dsl._
+  import dsl.url._
 
   "String" should "render correctly" in {
     val uri = "/uris-in-scala.html" ? ("param" -> "hey")
@@ -28,6 +28,6 @@ class TypeTests extends FlatSpec with Matchers {
 
   "Options" should "render correctly" in {
     val uri = "/uris-in-scala.html" ? ("param" -> Some("some")) & ("param2" -> None)
-    uri.toString should equal ("/uris-in-scala.html?param=some")
+    uri.toString should equal ("/uris-in-scala.html?param=some&param2")
   }
 }

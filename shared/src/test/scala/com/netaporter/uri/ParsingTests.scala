@@ -51,6 +51,20 @@ class ParsingTests extends FlatSpec with Matchers {
     )
   }
 
+  "Parsing a url with IPv4address" should "result in the correct host" in {
+    val uri = parse("http://127.0.0.1:9000/uris-in-scala.html")
+    uri.host should equal(Some("127.0.0.1"))
+    uri.port should equal(Some(9000))
+    uri.toString should equal ("http://127.0.0.1:9000/uris-in-scala.html")
+  }
+
+  "Parsing a url with IPv6address" should "result in the correct host" in {
+    val uri = parse("http://[2001:db8::7]:9000/uris-in-scala.html")
+    uri.host should equal(Some("[2001:db8::7]"))
+    uri.port should equal(Some(9000))
+    uri.toString should equal ("http://[2001:db8::7]:9000/uris-in-scala.html")
+  }
+
   "Parsing a url with relative scheme" should "result in a Uri with None for scheme" in {
     val uri = parse("//theon.github.com/uris-in-scala.html")
     uri.scheme should equal (None)

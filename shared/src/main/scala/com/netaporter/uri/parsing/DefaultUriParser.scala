@@ -15,7 +15,7 @@ class DefaultUriParser(val input: ParserInput, conf: UriConfig) extends Parser w
   }
 
   def _host_name: Rule1[String] = rule {
-    capture(oneOrMore(!anyOf(":/?#") ~ ANY))
+    capture("[" ~ oneOrMore(!anyOf("[]/?#") ~ ANY) ~ "]") | capture(oneOrMore(!anyOf(":/?#") ~ ANY))
   }
 
   def _userInfo: Rule1[UserInfo] = rule {

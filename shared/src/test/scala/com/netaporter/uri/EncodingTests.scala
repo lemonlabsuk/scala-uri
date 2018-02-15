@@ -71,8 +71,8 @@ class EncodingTests extends FlatSpec with Matchers {
   }
 
   "Fragments" should "be percent encoded" in {
-    val uri = "http://theon.github.com/uris-in-scala.html" ? ("chinese" -> "网址")
-    uri.toString should equal ("http://theon.github.com/uris-in-scala.html?chinese=%E7%BD%91%E5%9D%80")
+    val uri = "http://theon.github.com/uris-in-scala.html" `#` "chinese# 网址"
+    uri.toString should equal ("http://theon.github.com/uris-in-scala.html#chinese%23%20%E7%BD%91%E5%9D%80")
   }
 
   "Percent encoding with custom reserved characters" should "be easy" in {

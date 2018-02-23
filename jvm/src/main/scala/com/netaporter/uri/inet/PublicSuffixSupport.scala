@@ -25,7 +25,7 @@ trait PublicSuffixSupport { this: Authority =>
     * @return the longest public suffix for the host in this URI
     */
   def publicSuffix: Option[String] =
-    PublicSuffixSupport.trie.longestMatch(host.reverse).map(_.reverse)
+    PublicSuffixSupport.trie.longestMatch(host.toString.reverse).map(_.reverse)
 
   /**
     * Returns all longest public suffixes for the host in this URI. Examples include:
@@ -35,5 +35,5 @@ trait PublicSuffixSupport { this: Authority =>
     * @return all public suffixes for the host in this URI
     */
   def publicSuffixes: Vector[String] =
-    PublicSuffixSupport.trie.matches(host.reverse).map(_.reverse)
+    PublicSuffixSupport.trie.matches(host.toString.reverse).map(_.reverse)
 }

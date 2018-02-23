@@ -2,31 +2,65 @@ package com.netaporter.uri.parsing
 
 import com.netaporter.uri._
 import com.netaporter.uri.config.UriConfig
+import org.parboiled2.CharPredicate._
 import org.parboiled2._
 
 import scala.collection.immutable
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser {
 
-  def _scheme: Rule1[String] = rule {
-    capture(CharPredicate.Alpha ~ zeroOrMore(CharPredicate.AlphaNum | anyOf("+-.")))
+  def _int: Rule1[Int] = rule {
+    capture(oneOrMore(Digit)) ~> extractInt
   }
 
-  def _host_name: Rule1[String] = rule {
-    capture("[" ~ oneOrMore(!anyOf("[]/?#") ~ ANY) ~ "]") | capture(oneOrMore(!anyOf(":/?#") ~ ANY))
+  def _scheme: Rule1[String] = rule {
+    capture(Alpha ~ zeroOrMore(AlphaNum | anyOf("+-.")))
+  }
+
+  def _ip_v4: Rule1[IpV4] = rule {
+    _int ~ '.' ~ _int ~ '.' ~ _int ~ '.' ~ _int ~> extractIpv4
+  }
+
+  def _ip_v6_hex_piece: Rule1[String] = rule {
+    capture(oneOrMore(HexDigit))
+  }
+
+  def _full_ip_v6: Rule1[IpV6] = rule {
+    '[' ~ 8.times(_ip_v6_hex_piece).separatedBy(':') ~ ']' ~> extractFullIpv6
+  }
+
+  def _ip_v6_hex_pieces: Rule1[immutable.Seq[String]] = rule {
+    zeroOrMore(_ip_v6_hex_piece).separatedBy(':')
+  }
+
+  def _ip_v6_with_eluded: Rule1[IpV6] = rule {
+    '[' ~ _ip_v6_hex_pieces ~ "::" ~ _ip_v6_hex_pieces ~ ']' ~> extractIpv6WithEluded
+  }
+
+  def _ip_v6: Rule1[IpV6] = rule {
+    _full_ip_v6 | _ip_v6_with_eluded
+  }
+
+  def _domain_name: Rule1[DomainName] = rule {
+    capture(oneOrMore(noneOf(":/?#"))) ~> extractDomainName
+  }
+
+  def _host: Rule1[Host] = rule {
+    _ip_v4 | _ip_v6 | _domain_name
   }
 
   def _userInfo: Rule1[UserInfo] = rule {
-    capture(oneOrMore(!anyOf(":/?@") ~ ANY)) ~ optional(":" ~ capture(zeroOrMore(!anyOf("@") ~ ANY))) ~ "@" ~> extractUserInfo
+    capture(oneOrMore(noneOf(":/?[]@"))) ~ optional(":" ~ capture(zeroOrMore(noneOf("@")))) ~ "@" ~> extractUserInfo
   }
 
   def _port: Rule1[Int] = rule {
-    ":" ~ capture(oneOrMore(CharPredicate.Digit)) ~> extractInt
+    ":" ~ _int
   }
 
   def _authority: Rule1[Authority] = rule {
-    "//" ~ ((optional(_userInfo) ~ _host_name ~ optional(_port)) | (push[Option[UserInfo]](None) ~ _host_name ~ optional(_port))) ~> extractAuthority
+    //"//" ~ ((optional(_userInfo) ~ _host ~ optional(_port)) | (push[Option[UserInfo]](None) ~ _host ~ optional(_port))) ~> extractAuthority
+    "//" ~ (optional(_userInfo) ~ _host ~ optional(_port)) ~> extractAuthority
   }
 
   def _authorityAsOpt: Rule1[Option[Authority]] = rule {
@@ -125,10 +159,48 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   val extractInt = (num: String) =>
     num.toInt
 
+  val extractHexToInt = (num: String) =>
+    Integer.parseInt(num, 16)
+
+  val extractIpv4 = (a: Int, b: Int, c: Int, d: Int) =>
+    IpV4(a, b, c, d)
+
+//  val extractIpv6HexPiece = (hex: String) =>
+//    HexPiece(hex)
+
+  val extractFullIpv6 = (pieces: immutable.Seq[String]) =>
+    IpV6.fromHexPieces(pieces)
+
+  val extractIpv6WithEluded = (beforeEluded: immutable.Seq[String], afterEluded: immutable.Seq[String]) => {
+    val eladedPieces = 8 - beforeEluded.size - afterEluded.size
+    if(eladedPieces < 2) {
+      throw new UriParsingException("IPv6 has too many pieces. Must be either exactly eight hex pieces or fewer than six hex pieces with a '::'")
+    }
+    IpV6.fromHexPieces(
+      beforeEluded ++ Vector.fill(eladedPieces)("0") ++ afterEluded
+    )
+  }
+
+//  val extractIpv6 = (pieces: immutable.Seq[IpV6Piece]) => {
+//    val eladedPieces = pieces.count(_.isElided)
+//    if(eladedPieces > 1) {
+//      throw new UriParsingException("IPv6 address cannot have multiple '::' pieces")
+//    }
+//    val expandEladedTo = 8 - pieces.length - eladedPieces
+//    val expandedPieces = pieces.flatMap {
+//      case Elided => Vector.fill(expandEladedTo)("0")
+//      case HexPiece(hex) => Vector(hex)
+//    }
+//    IpV6.fromHexPieces(expandedPieces)
+//  }
+
+  val extractDomainName = (domainName: String) =>
+    DomainName(domainName)
+
   val extractUserInfo = (user: String, pass: Option[String]) =>
     UserInfo(Some(pathDecoder.decode(user)), pass.map(pathDecoder.decode))
 
-  val extractAuthority = (userInfo: Option[UserInfo], host: String, port: Option[Int]) =>
+  val extractAuthority = (userInfo: Option[UserInfo], host: Host, port: Option[Int]) =>
     Authority(userInfo.getOrElse(UserInfo.empty), host, port)
 
   val extractFragment = (x: String) =>
@@ -181,76 +253,126 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   def pathDecoder = conf.pathDecoder
   def queryDecoder = conf.queryDecoder
   def fragmentDecoder = conf.fragmentDecoder
+
+  def parseIpV6(): IpV6 =
+    extractResult(_ip_v6.run(), "IPv6")
+
+  def parseIpV4(): IpV4 =
+    extractResult(_ip_v4.run(), "IPv4")
+
+  def parseDomainName(): DomainName =
+    extractResult(_domain_name.run(), "Domain Name")
+
+  def parseHost(): Host =
+    extractResult(_host.run(), "Host")
+
+  def parseUserInfo(): UserInfo =
+    extractResult(_userInfo.run(), "User Info")
+
+  def parseUrn(): Urn = ???
+
+  def parseUrnPath(): UrnPath = ???
+
+  def parseUrlWithoutAuthority(): UrlWithoutAuthority = ???
+
+  def parseAbsoluteUrl(): AbsoluteUrl = ???
+
+  def parseProtocolRelativeUrl(): ProtocolRelativeUrl = ???
+
+  def parseUrlWithAuthority(): UrlWithAuthority = ???
+
+  def parseRelativeUrl(): RelativeUrl = ???
+
+  def parseUri(): Uri = ???
+
+  def parsePath(): UrlPath =
+    extractResult(_relPath.run(), "Path")
+
+  def parseAuthority(): Authority =
+    extractResult(_authority.run(), "Authority")
+
+  def parseUrl(): Url =
+    extractResult(_url.run(), "URL")
+
+  def parseQuery(): QueryString =
+    extractResult(_queryString.run(), "Query String")
+
+  def parseQueryParam(): (String, Option[String]) =
+    extractResult(_queryParamOrTok.run(), "Query Parameter")
+  
+  private def extractResult[T](res: Try[T], name: => String): T = {
+    res match {
+      case Success(thing) =>
+        thing
+
+      case Failure(pe @ ParseError(_, _, _)) =>
+        val detail = pe.format(input)
+        throw new UriParsingException(s"Invalid $name could not be parsed. $detail")
+
+      case Failure(e) =>
+        throw e
+    }
+  }
 }
 
 object UrlParser {
-  def parseUserInfo(s: String)(implicit config: UriConfig = UriConfig.default): UserInfo = ???
 
-  def parseUrn(s: String)(implicit config: UriConfig = UriConfig.default): Urn = ???
+  def apply(s: CharSequence): UrlParser =
+    new UrlParser(s.toString)
 
-  def parseUrnPath(s: String)(implicit config: UriConfig = UriConfig.default): UrnPath = ???
+  def parseIpV6(s: String)(implicit config: UriConfig = UriConfig.default): IpV6 =
+    UrlParser(s).parseIpV6()
 
-  def parseUrlPath(s: String)(implicit config: UriConfig = UriConfig.default): UrlPath = ???
+  def parseIpV4(s: String)(implicit config: UriConfig = UriConfig.default): IpV4 =
+    UrlParser(s).parseIpV4()
 
-  def parseUrlWithoutAuthority(s: String)(implicit config: UriConfig = UriConfig.default): UrlWithoutAuthority = ???
+  def parseDomainName(s: String)(implicit config: UriConfig = UriConfig.default): DomainName =
+    UrlParser(s).parseDomainName()
 
-  def parseAbsoluteUrl(s: String)(implicit config: UriConfig = UriConfig.default): AbsoluteUrl = ???
+  def parseHost(s: String)(implicit config: UriConfig = UriConfig.default): Host =
+    UrlParser(s).parseHost()
 
-  def parseProtocolRelativeUrl(s: String)(implicit config: UriConfig = UriConfig.default): ProtocolRelativeUrl = ???
+  def parseUserInfo(s: String)(implicit config: UriConfig = UriConfig.default): UserInfo =
+    UrlParser(s).parseUserInfo()
 
-  def parseUrlWithAuthority(s: String)(implicit config: UriConfig = UriConfig.default): UrlWithAuthority = ???
+  def parseUrn(s: String)(implicit config: UriConfig = UriConfig.default): Urn =
+    UrlParser(s).parseUrn()
 
-  def parseRelativeUrl(s: String)(implicit config: UriConfig = UriConfig.default): RelativeUrl = ???
+  def parseUrnPath(s: String)(implicit config: UriConfig = UriConfig.default): UrnPath =
+    UrlParser(s).parseUrnPath()
 
-  def parseUri(s: String)(implicit config: UriConfig = UriConfig.default): Uri = ???
+  def parseUrlWithoutAuthority(s: String)(implicit config: UriConfig = UriConfig.default): UrlWithoutAuthority =
+    UrlParser(s).parseUrlWithoutAuthority()
 
-  def parsePath(s: String)(implicit config: UriConfig = UriConfig.default): UrlPath = ???
+  def parseAbsoluteUrl(s: String)(implicit config: UriConfig = UriConfig.default): AbsoluteUrl =
+    UrlParser(s).parseAbsoluteUrl()
 
-  def parseAuthority(s: String)(implicit config: UriConfig = UriConfig.default): Authority = ???
+  def parseProtocolRelativeUrl(s: String)(implicit config: UriConfig = UriConfig.default): ProtocolRelativeUrl =
+    UrlParser(s).parseProtocolRelativeUrl()
 
-  def parseUrl(s: String)(implicit config: UriConfig): Url = {
-    val parser = new UrlParser(s)
+  def parseUrlWithAuthority(s: String)(implicit config: UriConfig = UriConfig.default): UrlWithAuthority =
+    UrlParser(s).parseUrlWithAuthority()
 
-    parser._url.run() match {
-      case Success(uri) =>
-        uri
+  def parseRelativeUrl(s: String)(implicit config: UriConfig = UriConfig.default): RelativeUrl =
+    UrlParser(s).parseRelativeUrl()
 
-      case Failure(pe @ ParseError(position, _, formatTraces)) =>
-        throw new java.net.URISyntaxException(s, "Invalid URI could not be parsed. " + formatTraces, position.index)
+  def parsePath(s: String)(implicit config: UriConfig = UriConfig.default): UrlPath =
+    UrlParser(s).parsePath()
 
-      case Failure(e) =>
-        throw e
-    }
-  }
+  def parseAuthority(s: String)(implicit config: UriConfig = UriConfig.default): Authority =
+    UrlParser(s).parseAuthority()
+
+  def parseUri(toString: String): Uri =
+    ???
+
+  def parseUrl(s: String)(implicit config: UriConfig): Url =
+    UrlParser(s).parseUrl()
 
   def parseQuery(s: String)(implicit config: UriConfig) = {
     val withQuestionMark = if(s.head == '?') s else "?" + s
-    val parser = new UrlParser(withQuestionMark)
-
-    parser._queryString.run() match {
-      case Success(queryString) =>
-        queryString
-
-      case Failure(pe @ ParseError(position, _, formatTraces)) =>
-        throw new java.net.URISyntaxException(s, "Invalid URI could not be parsed. " + formatTraces, position.index)
-
-      case Failure(e) =>
-        throw e
-    }
+    UrlParser(withQuestionMark).parseQuery()
   }
 
-  def parseQueryParam(s: String)(implicit config: UriConfig): (String, Option[String]) = {
-    val parser = new UrlParser(s)
-
-    parser._queryParamOrTok.run() match {
-      case Success(queryParam) =>
-        queryParam
-
-      case Failure(pe @ ParseError(position, _, formatTraces)) =>
-        throw new java.net.URISyntaxException(s, "Invalid URI could not be parsed. " + formatTraces, position.index)
-
-      case Failure(e) =>
-        throw e
-    }
-  }
+  def parseQueryParam(s: String)(implicit config: UriConfig): (String, Option[String]) =
+    UrlParser(s).parseQueryParam()
 }

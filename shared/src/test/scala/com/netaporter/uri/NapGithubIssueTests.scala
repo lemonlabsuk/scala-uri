@@ -50,7 +50,7 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
     val uri = Url.parse("http://localhost:8080/ping?oi=TscV16GUGtlU&ppc=&bpc=")
 
     uri.schemeOption should equal (Some("http"))
-    uri.hostOption should equal (Some("localhost"))
+    uri.hostOption should equal (Some(DomainName("localhost")))
     uri.port.value should equal (8080)
     uri.path.toString() should equal ("/ping")
     uri.query.params("oi") should equal (Vector(Some("TscV16GUGtlU")))
@@ -93,7 +93,7 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
   }
 
   "Github Issue #56" should "now be fixed" in {
-    val ex = the [java.net.URISyntaxException] thrownBy Uri.parse("http://test.net:8o8o")
+    val ex = the [java.net.URISyntaxException] thrownBy Url.parse("http://test.net:8o8o")
     ex.getMessage should startWith("Invalid URI could not be parsed.")
   }
 
@@ -129,13 +129,13 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
   }
 
   "Github Issue #68" should "now be fixed" in {
-    val uri = Uri.parse("http://example.com/path?param=something==")
+    val uri = Url.parse("http://example.com/path?param=something==")
     uri.toString should equal("http://example.com/path?param=something%3D%3D")
   }
 
   "Github Issue #72" should "now be fixed" in {
     val uri = Url.parse("http://hello.world?email=abc@xyz")
-    uri.hostOption should equal(Some("hello.world"))
+    uri.hostOption should equal(Some(DomainName("hello.world")))
     uri.query.param("email") should equal(Some("abc@xyz"))
   }
 
@@ -152,7 +152,7 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
   "Github Issue #104" should "now be fixed" in {
     val uri = Url.parse("a1+-.://localhost")
     uri.schemeOption should equal(Some("a1+-."))
-    uri.hostOption should equal(Some("localhost"))
+    uri.hostOption should equal(Some(DomainName("localhost")))
   }
 
   "Github Issue #106" should "now be fixed" in {

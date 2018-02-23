@@ -218,35 +218,35 @@ class DslTests extends FlatSpec with Matchers {
 
   "Adding a Query Param as a String" should "parse a key+value" in {
     val uri = "http://a/b" ? "c=d"
-    uri.hostOption should equal (Some("a"))
+    uri.hostOption should equal (Some(DomainName("a")))
     uri.path.toString() should equal ("/b")
     uri.query should equal (QueryString.fromPairs("c" -> "d"))
   }
 
   it should "parse multiple key+value" in {
     val uri = "http://a/b" ? "c=d" & "e=f"
-    uri.hostOption should equal (Some("a"))
+    uri.hostOption should equal (Some(DomainName("a")))
     uri.path.toString() should equal ("/b")
     uri.query should equal (QueryString.fromPairs("c" -> "d", "e" -> "f"))
   }
 
   it should "parse a key with no value" in {
     val uri = "http://a/b" ? "c"
-    uri.hostOption should equal (Some("a"))
+    uri.hostOption should equal (Some(DomainName("a")))
     uri.path.toString() should equal ("/b")
     uri.query should equal (QueryString.fromPairOptions("c" -> None))
   }
 
   it should "parse a key with empty value" in {
     val uri = "http://a/b" ? "c="
-    uri.hostOption should equal (Some("a"))
+    uri.hostOption should equal (Some(DomainName("a")))
     uri.path.toString() should equal ("/b")
     uri.query should equal (QueryString.fromPairs("c" -> ""))
   }
 
   it should "mix with a Tuple query param" in {
     val uri = "http://a/b" ? "c=d" & ("e" -> "f")
-    uri.hostOption should equal (Some("a"))
+    uri.hostOption should equal (Some(DomainName("a")))
     uri.path.toString() should equal ("/b")
     uri.query should equal (QueryString.fromPairs("c" -> "d", "e" -> "f"))
   }

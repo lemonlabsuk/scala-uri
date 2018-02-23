@@ -6,7 +6,7 @@ import com.netaporter.uri.parsing.UrlParser
 
 
 case class Authority(userInfo: UserInfo,
-                     host: String,
+                     host: Host,
                      port: Option[Int])
                     (implicit config: UriConfig) extends PublicSuffixSupport {
 
@@ -67,7 +67,7 @@ case class Authority(userInfo: UserInfo,
     */
   def longestSubdomain: Option[String] = {
     val publicSuffixLength: Int = publicSuffix.map(_.length + 1).getOrElse(0)
-    host.dropRight(publicSuffixLength) match {
+    host.toString.dropRight(publicSuffixLength) match {
       case "" => None
       case other => Some(other)
     }
@@ -93,13 +93,19 @@ case class Authority(userInfo: UserInfo,
 object Authority {
 
   def apply(host: String)(implicit config: UriConfig): Authority =
+    new Authority(UserInfo.empty, Host.parse(host), port = None)
+
+  def apply(host: Host)(implicit config: UriConfig): Authority =
     new Authority(UserInfo.empty, host, port = None)
 
   def apply(host: String, port: Int)(implicit config: UriConfig): Authority =
+    new Authority(UserInfo.empty, Host.parse(host), Some(port))
+
+  def apply(host: Host, port: Int)(implicit config: UriConfig): Authority =
     new Authority(UserInfo.empty, host, Some(port))
 
   def empty(implicit uriConfig: UriConfig): Authority =
-    Authority(UserInfo.empty, "", None)
+    Authority(UserInfo.empty, Host.empty, port = None)
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Authority =
     UrlParser.parseAuthority(s.toString)

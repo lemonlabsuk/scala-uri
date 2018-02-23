@@ -21,7 +21,7 @@ trait Url extends Uri {
   type SelfWithScheme <: Url
   type SelfWithAuthority <: UrlWithAuthority
 
-  def hostOption: Option[String]
+  def hostOption: Option[Host]
   def port: Option[Int]
 
   def user: Option[String]
@@ -96,7 +96,16 @@ trait Url extends Uri {
     * @param host the new host to set
     * @return a new Url with the specified host
     */
-  def withHost(host: String): SelfWithAuthority
+  def withHost(host: Host): SelfWithAuthority
+
+  /**
+    * Copies this Url but with the host set as the given value.
+    *
+    * @param host the new host to set
+    * @return a new Url with the specified host
+    */
+  def withHost(host: String): SelfWithAuthority =
+    withHost(Host.parse(host))
 
   /**
     * Copies this Url but with the user set as the given value.
@@ -401,7 +410,7 @@ object Url {
               "A Url with an authority must either have an empty path or a path that begins with " +
               "a slash ('/') character. RFC 3986 section 3.2.")
       val portOpt = if(port > 0) Some(port) else None
-      Authority(UserInfo(Option(user), Option(password)), host, portOpt)
+      Authority(UserInfo(Option(user), Option(password)), Host.parse(host), portOpt)
     }
 
     (scheme, host) match {
@@ -431,13 +440,13 @@ case class RelativeUrl(path: UrlPath,
 
   type Self = RelativeUrl
   type SelfWithAuthority = ProtocolRelativeUrl
-  type SelfWithScheme = AbsoluteUrl
+  type SelfWithScheme = UrlWithoutAuthority
 
   def self: RelativeUrl = this
 
   def schemeOption: Option[String] = None
 
-  def hostOption: Option[String] = None
+  def hostOption: Option[Host] = None
   def port: Option[Int] = None
 
   def user: Option[String] = None
@@ -450,20 +459,20 @@ case class RelativeUrl(path: UrlPath,
   def shortestSubdomain: Option[String] = None
   def longestSubdomain: Option[String] = None
 
-  def withScheme(scheme: String): AbsoluteUrl =
-    AbsoluteUrl(scheme, Authority.empty, path, query, fragment)
+  def withScheme(scheme: String): UrlWithoutAuthority =
+    UrlWithoutAuthority(scheme, path, query, fragment)
 
   def withAuthority(authority: Authority): ProtocolRelativeUrl =
     ProtocolRelativeUrl(authority, path, query, fragment)
 
-  def withHost(host: String): ProtocolRelativeUrl =
+  def withHost(host: Host): ProtocolRelativeUrl =
     withAuthority(Authority(host))
 
   def withUser(user: String): ProtocolRelativeUrl =
-    withAuthority(Authority(UserInfo(user), host = "", port = None))
+    withAuthority(Authority(UserInfo(user), host = Host.empty, port = None))
 
   def withPassword(password: String): ProtocolRelativeUrl =
-    withAuthority(Authority(UserInfo(user = None, Some(password)), host = "", port = None))
+    withAuthority(Authority(UserInfo(user = None, Some(password)), host = Host.empty, port = None))
 
   def withPort(port: Int): ProtocolRelativeUrl =
     withAuthority(Authority(host = "", port))
@@ -511,15 +520,15 @@ trait UrlWithAuthority extends Url {
 
   def authority: Authority
 
-  def host: String = authority.host
-  def hostOption: Option[String] = Some(host)
+  def host: Host = authority.host
+  def hostOption: Option[Host] = Some(host)
 
   def port: Option[Int] = authority.port
   def userInfo: UserInfo = authority.userInfo
   def user: Option[String] = authority.user
   def password: Option[String] = authority.password
 
-  def withHost(host: String): Self =
+  def withHost(host: Host): Self =
     withAuthority(authority.copy(host = host))
 
   def withUser(user: String): Self = {
@@ -707,7 +716,7 @@ case class UrlWithoutAuthority(scheme: String,
   def self: UrlWithoutAuthority = this
 
   def schemeOption: Option[String] = Some(scheme)
-  def hostOption: Option[String] = None
+  def hostOption: Option[Host] = None
   def port: Option[Int] = None
   def user: Option[String] = None
   def password: Option[String] = None
@@ -728,7 +737,7 @@ case class UrlWithoutAuthority(scheme: String,
     * @param host the new host to set
     * @return a new Url with the specified host
     */
-  def withHost(host: String): AbsoluteUrl =
+  def withHost(host: Host): AbsoluteUrl =
     AbsoluteUrl(scheme, Authority(host), path, query, fragment)
 
   /**
@@ -756,7 +765,7 @@ case class UrlWithoutAuthority(scheme: String,
     * @return a new Url with the specified user
     */
   def withUser(user: String): AbsoluteUrl =
-    AbsoluteUrl(scheme, Authority(UserInfo(user), host = "", port = None), path, query, fragment)
+    AbsoluteUrl(scheme, Authority(UserInfo(user), host = Host.empty, port = None), path, query, fragment)
 
   /**
     * Copies this Url but with the password set as the given value.
@@ -765,7 +774,7 @@ case class UrlWithoutAuthority(scheme: String,
     * @return a new Url with the specified password
     */
   def withPassword(password: String): AbsoluteUrl =
-    AbsoluteUrl(scheme, Authority(UserInfo(user = None, password = Some(password)), host = "", port = None), path, query, fragment)
+    AbsoluteUrl(scheme, Authority(UserInfo(user = None, password = Some(password)), host = Host.empty, port = None), path, query, fragment)
 
   def withAuthority(authority: Authority): AbsoluteUrl =
     AbsoluteUrl(scheme, authority, path, query, fragment)
@@ -824,5 +833,5 @@ object UrlPath {
   val slash = UrlPath(Vector.empty, leadingSlash = true)
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlPath =
-    UrlParser.parseUrlPath(s.toString)
+    UrlParser.parsePath(s.toString)
 }

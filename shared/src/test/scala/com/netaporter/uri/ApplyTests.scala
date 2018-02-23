@@ -9,7 +9,7 @@ class ApplyTests extends FlatSpec with Matchers {
     val url = Url(scheme = "http", host = "theon.github.com", path = "/blah")
     url shouldBe an [AbsoluteUrl]
     url.schemeOption should equal(Some("http"))
-    url.hostOption should equal(Some("theon.github.com"))
+    url.hostOption should equal(Some(DomainName("theon.github.com")))
     url.path.toString() should equal("/blah")
     url.query should equal(QueryString.empty)
   }
@@ -18,7 +18,7 @@ class ApplyTests extends FlatSpec with Matchers {
     val url = Url(scheme = "http", host = "example.com")
     url shouldBe an [AbsoluteUrl]
     url.schemeOption should equal(Some("http"))
-    url.hostOption should equal(Some("example.com"))
+    url.hostOption should equal(Some(DomainName("example.com")))
     url.path.toString() should equal("")
     url.query should equal(QueryString.empty)
   }
@@ -27,7 +27,7 @@ class ApplyTests extends FlatSpec with Matchers {
     val url = Url(host = "example.com", path = "/example")
     url shouldBe an [ProtocolRelativeUrl]
     url.schemeOption should equal(None)
-    url.hostOption should equal(Some("example.com"))
+    url.hostOption should equal(Some(DomainName("example.com")))
     url.path.toString() should equal("/example")
     url.query should equal(QueryString.empty)
   }
@@ -55,7 +55,7 @@ class ApplyTests extends FlatSpec with Matchers {
     val url = Url(scheme = "http", host = "theon.github.com", query = qs)
     url shouldBe an [AbsoluteUrl]
     url.schemeOption should equal(Some("http"))
-    url.hostOption should equal(Some("theon.github.com"))
+    url.hostOption should equal(Some(DomainName("theon.github.com")))
     url.query should equal(qs)
   }
 

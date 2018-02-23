@@ -39,7 +39,7 @@ class DecodingTests extends FlatSpec with Matchers {
 
   "Parsing an non percent encoded URL containing percents" should "throw UriDecodeException" in {
     intercept[UriDecodeException] {
-      Uri.parse("http://lesswrong.com/index.php?query=abc%yum&john=hello")
+      Url.parse("http://lesswrong.com/index.php?query=abc%yum&john=hello")
     }
   }
 }

@@ -65,10 +65,10 @@ class ToUriTests extends WordSpec with Matchers {
       val javaUri: URI = new URI("http://user:password@www.example.com/test?weird%3D%26key=strange%25value&arrow=%E2%87%94")
       val url = Uri(javaUri).toUrl
       url.schemeOption should equal(Some("http"))
-      url.hostOption should equal(Some("www.example.com"))
+      url.hostOption should equal(Some(DomainName("www.example.com")))
       url.user should equal(Some("user"))
       url.password should equal(Some("password"))
-      url.path.toString should equal("/test")
+      url.path.toString() should equal("/test")
       url.query.params should equal(Vector(("weird=&key", Some("strange%value")), ("arrow", Some("⇔"))))
       url.toString(UriConfig.conservative) should equal(javaUri.toASCIIString)
     }

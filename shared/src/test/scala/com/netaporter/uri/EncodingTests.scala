@@ -86,8 +86,11 @@ class EncodingTests extends FlatSpec with Matchers {
 
   "Percent encoding with a few less reserved characters that the defaults" should "be easy" in {
     implicit val config: UriConfig = UriConfig(encoder = percentEncode -- '+')
-    val url = Url.parse("http://theon.github.com/uris-in-scala.html?reserved=:/?#[]@!$&'()*+,;={}\\\n\r")
-    url.toString should equal ("http://theon.github.com/uris-in-scala.html?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A+%2C%3B%3D%7B%7D%5C%0A%0D")
+    val url = Url(
+      path = "/uris-in-scala.html",
+      query = QueryString.fromPairs("reserved" -> ":/?#[]@!$&'()*+,;={}\\\n\r")
+    )
+    url.toString should equal ("/uris-in-scala.html?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A+%2C%3B%3D%7B%7D%5C%0A%0D")
   }
 
   "Percent encoding with a few extra reserved characters on top of the defaults" should "be easy" in {

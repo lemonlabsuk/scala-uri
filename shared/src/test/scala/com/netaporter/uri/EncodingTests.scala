@@ -58,7 +58,7 @@ class EncodingTests extends FlatSpec with Matchers {
     val url = Url(
       query = QueryString.fromPairs("reserved" -> ":/?#[]@!$&'()*+,;={}\\\n\r")
     )
-    url.toString(UriConfig.conservative) should equal ("http://theon.github.com/uris-in-scala.html?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D")
+    url.toString(UriConfig.conservative) should equal ("?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D")
   }
 
   "Chinese characters" should "be percent encoded" in {

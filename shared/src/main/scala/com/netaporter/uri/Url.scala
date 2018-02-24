@@ -635,11 +635,14 @@ case class ProtocolRelativeUrl(authority: Authority,
   /**
     * Copies this Url but with the path set as the given value.
     *
+    * If the specified path is non empty *and* doesn't have a leading slash, one will be added, as per RFC 3986:
+    * When authority is present, the path must either be empty or begin with a slash ("/") character.
+    *
     * @param path the new path to set
     * @return a new Url with the specified path
     */
   def withPath(path: UrlPath): ProtocolRelativeUrl =
-    copy(path = path)
+    copy(path = path.withLeadingSlashOrEmpty)
 
   def withQueryString(query: QueryString): ProtocolRelativeUrl =
     copy(query = query)
@@ -682,11 +685,14 @@ case class AbsoluteUrl(scheme: String,
   /**
     * Copies this Url but with the path set as the given value.
     *
+    * If the specified path is non empty *and* doesn't have a leading slash, one will be added, as per RFC 3986:
+    * When authority is present, the path must either be empty or begin with a slash ("/") character.
+    *
     * @param path the new path to set
     * @return a new Url with the specified path
     */
   def withPath(path: UrlPath): AbsoluteUrl =
-    copy(path = path)
+    copy(path = path.withLeadingSlashOrEmpty)
 
   def withQueryString(query: QueryString): AbsoluteUrl =
     copy(query = query)
@@ -808,6 +814,10 @@ case class UrlPath(parts: Vector[String], leadingSlash: Boolean = true)(implicit
       copy(parts = parts :+ part)
   }
 
+  private[uri] def withLeadingSlashOrEmpty: UrlPath =
+    if(leadingSlash || isEmpty) this
+    else copy(leadingSlash = true)
+
   def addParts(otherParts: String*): UrlPath = {
     addParts(otherParts)
   }
@@ -820,12 +830,10 @@ case class UrlPath(parts: Vector[String], leadingSlash: Boolean = true)(implicit
     * Returns the encoded path. By default non ASCII characters in the path are percent encoded.
     * @return String containing the path for this Uri
     */
-  private[uri] def toString(c: UriConfig): String =
-    if(parts.isEmpty) ""
-    else {
-      val encodedParts = parts.map(p => c.pathEncoder.encode(p, c.charset))
-      (if(leadingSlash) "/" else "") + encodedParts.mkString("/")
-    }
+  private[uri] def toString(c: UriConfig): String = {
+    val encodedParts = parts.map(p => c.pathEncoder.encode(p, c.charset))
+    (if (leadingSlash) "/" else "") + encodedParts.mkString("/")
+  }
 }
 
 object UrlPath {

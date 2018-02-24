@@ -46,7 +46,7 @@ class ToUriTests extends WordSpec with Matchers {
         scheme = "http",
         host = "www.example.com",
         path = "/test",
-        query = QueryString.fromPairOptions("weird" -> None, "key" -> Some("strange%value"), "arrow" -> Some("⇔"))
+        query = QueryString.fromPairOptions("weird=&key" -> Some("strange%value"), "arrow" -> Some("⇔"))
       )
       val javaUri: URI = url.toJavaURI
       javaUri.getScheme should equal("http")

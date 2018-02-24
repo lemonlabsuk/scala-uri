@@ -2,6 +2,7 @@ package com.netaporter.uri
 
 import com.netaporter.uri.config.UriConfig
 import com.netaporter.uri.decoding.PermissivePercentDecoder
+import com.netaporter.uri.parsing.UriParsingException
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
 /**
@@ -62,7 +63,7 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
     val source = Url(
       scheme = "http",
       host = "xn--ls8h.example.net",
-      path = "path with spaces",
+      path = "/path with spaces",
       query = QueryString.fromPairs("a b" -> "c d")
     )
     val parsed = Url.parse(source.toString)
@@ -93,8 +94,8 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
   }
 
   "Github Issue #56" should "now be fixed" in {
-    val ex = the [java.net.URISyntaxException] thrownBy Url.parse("http://test.net:8o8o")
-    ex.getMessage should startWith("Invalid URI could not be parsed.")
+    val ex = the [UriParsingException] thrownBy Url.parse("http://test.net:8o8o")
+    ex.getMessage should startWith("Invalid URL could not be parsed")
   }
 
   "Github Issue #65 example 1" should "now be fixed" in {

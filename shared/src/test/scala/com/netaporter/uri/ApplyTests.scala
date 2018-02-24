@@ -63,7 +63,7 @@ class ApplyTests extends FlatSpec with Matchers {
     val thrown = the [IllegalArgumentException] thrownBy
       Url(host = "example.com", path = "example")
 
-    thrown.getMessage should equal("A Url with an authority must either have an empty path or a " +
+    thrown.getMessage should equal("requirement failed: A Url with an authority must either have an empty path or a " +
                                    "path that begins with a slash ('/') character. RFC 3986 section 3.2.")
   }
 }

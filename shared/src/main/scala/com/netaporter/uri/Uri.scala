@@ -1,9 +1,7 @@
 package com.netaporter.uri
 
 import com.netaporter.uri.config.UriConfig
-import com.netaporter.uri.parsing.UrlParser
-
-import scala.collection.Seq
+import com.netaporter.uri.parsing.UriParser
 
 /**
   * Represents a URI. See [[https://www.ietf.org/rfc/rfc3986 RFC 3986]]
@@ -75,5 +73,5 @@ object Uri {
     parse(javaUri.toASCIIString)
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Uri =
-    UrlParser.parseUri(s.toString)
+    UriParser.parseUri(s.toString)
 }

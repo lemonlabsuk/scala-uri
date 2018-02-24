@@ -1,6 +1,6 @@
 package com.netaporter.uri
 import com.netaporter.uri.config.UriConfig
-import com.netaporter.uri.parsing.UrlParser
+import com.netaporter.uri.parsing.UrnParser
 
 /**
   * Represents a URN. See [[https://www.ietf.org/rfc/rfc2141 RFC 2141]]
@@ -36,7 +36,7 @@ case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.default
 
 object Urn {
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Urn =
-    UrlParser.parseUrn(s.toString)
+    UrnParser.parseUrn(s.toString)
 }
 
 case class UrnPath(nid: String, nss: String)(implicit val config: UriConfig = UriConfig.default) extends Path {
@@ -48,10 +48,10 @@ case class UrnPath(nid: String, nss: String)(implicit val config: UriConfig = Ur
     UrlPath(parts, leadingSlash = false)
 
   private[uri] def toString(c: UriConfig): String =
-    c.pathEncoder.encode(nid, c.charset) + ":" + c.pathEncoder.encode(nss, c.charset)
+    nid + ":" + c.pathEncoder.encode(nss, c.charset)
 }
 
 object UrnPath {
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrnPath =
-    UrlParser.parseUrnPath(s.toString)
+    UrnParser.parseUrnPath(s.toString)
 }

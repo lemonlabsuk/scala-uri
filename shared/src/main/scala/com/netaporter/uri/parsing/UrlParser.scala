@@ -8,7 +8,9 @@ import org.parboiled2._
 import scala.collection.immutable
 import scala.util.{Failure, Success, Try}
 
-class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser {
+class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
+
+  val _host_end = ":/?#"
 
   def _int: Rule1[Int] = rule {
     capture(oneOrMore(Digit)) ~> extractInt
@@ -43,14 +45,24 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _domain_name: Rule1[DomainName] = rule {
-    capture(oneOrMore(noneOf(":/?#"))) ~> extractDomainName
+    capture(oneOrMore(noneOf(_host_end))) ~> extractDomainName
   }
 
   def _host: Rule1[Host] = rule {
     _ip_v4 | _ip_v6 | _domain_name
   }
 
-  def _userInfo: Rule1[UserInfo] = rule {
+  /**
+    * To ensure that hosts that begin with an IP but have further leading characters are not matched as IPs,
+    * we need to anchor the tail end to a character that signals the end of the host. E.g.
+    *
+    * The host in the URL `http://1.2.3.4.blah/` should be DomainName(1.2.3.4.blah), not IPv4(1.2.3.4)
+    */
+  def _host_in_authority: Rule1[Host] = rule {
+    (_ip_v4 ~ &(anyOf(_host_end))) | (_ip_v6 ~ &(anyOf(_host_end))) | _domain_name
+  }
+
+  def _user_info: Rule1[UserInfo] = rule {
     capture(oneOrMore(noneOf(":/?[]@"))) ~ optional(":" ~ capture(zeroOrMore(noneOf("@")))) ~ "@" ~> extractUserInfo
   }
 
@@ -59,15 +71,10 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _authority: Rule1[Authority] = rule {
-    //"//" ~ ((optional(_userInfo) ~ _host ~ optional(_port)) | (push[Option[UserInfo]](None) ~ _host ~ optional(_port))) ~> extractAuthority
-    "//" ~ (optional(_userInfo) ~ _host ~ optional(_port)) ~> extractAuthority
+    "//" ~ (optional(_user_info) ~ _host_in_authority ~ optional(_port)) ~> extractAuthority
   }
 
-  def _authorityAsOpt: Rule1[Option[Authority]] = rule {
-    _authority ~> ((a: Authority) => Some(a))
-  }
-
-  def _pathSegment: Rule1[String] = rule {
+  def _path_segment: Rule1[String] = rule {
     capture(zeroOrMore(!anyOf("/?#") ~ ANY)) ~> extractPathPart
   }
 
@@ -77,84 +84,76 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
     * If a URI contains an authority component, then the path component must either be empty
     * or begin with a slash ("/") character.
     */
-  def _pathForAuthority: Rule1[UrlPath] = rule {
-    zeroOrMore("/" ~ _pathSegment) ~> extractAbsPath
-  }
-
-  def _authorityWithPath: Rule2[Option[Authority], UrlPath] = rule {
-    _authorityAsOpt ~ _pathForAuthority
-  }
-
-  def _noAuthorityWithPath: Rule2[Option[Authority], UrlPath] = rule {
-    push[Option[Authority]](None) ~ _relPath
+  def _path_for_authority: Rule1[UrlPath] = rule {
+    zeroOrMore("/" ~ _path_segment) ~> extractAbsPath
   }
 
   /**
    * A sequence of path parts optionally starting with a slash
    */
-  def _relPath: Rule1[UrlPath] = rule {
-    capture(optional("/")) ~ zeroOrMore(_pathSegment).separatedBy("/") ~> extractRelPath
+  def _path: Rule1[UrlPath] = rule {
+    capture(optional("/")) ~ zeroOrMore(_path_segment).separatedBy("/") ~> extractRelPath
   }
 
-  def _queryParam: Rule1[(String, Some[String])] = rule {
+  def _query_param: Rule1[(String, Some[String])] = rule {
     capture(zeroOrMore(!anyOf("=&#") ~ ANY)) ~ "=" ~ capture(zeroOrMore(!anyOf("&#") ~ ANY)) ~> extractTuple
   }
 
-  def _queryTok: Rule1[(String, None.type)] = rule {
+  def _query_tok: Rule1[(String, None.type)] = rule {
     capture(zeroOrMore(!anyOf("=&#") ~ ANY)) ~> extractTok
   }
 
-  def _queryParamOrTok: Rule1[(String, Option[String])] = rule {
-    _queryParam | _queryTok
+  def _query_param_or_tok: Rule1[(String, Option[String])] = rule {
+    _query_param | _query_tok
   }
 
-  def _queryString: Rule1[QueryString] = rule {
-    "?" ~ zeroOrMore(_queryParamOrTok).separatedBy("&") ~> extractQueryString
+  def _query_string: Rule1[QueryString] = rule {
+    "?" ~ zeroOrMore(_query_param_or_tok).separatedBy("&") ~> extractQueryString
+  }
+  
+  def _maybe_query_string: Rule1[QueryString] = rule {
+    _query_string | push(QueryString.empty)
   }
 
   def _fragment: Rule1[String] = rule {
     "#" ~ capture(zeroOrMore(ANY)) ~> extractFragment
   }
 
-  def _abs_url: Rule1[Url] = rule {
-    _scheme ~ ":" ~ (_authorityWithPath | _noAuthorityWithPath) ~ optional(_queryString) ~ optional(_fragment) ~> extractAbsUri
+  def _abs_url: Rule1[AbsoluteUrl] = rule {
+    _scheme ~ ":" ~ _authority ~ _path_for_authority ~ _maybe_query_string ~ optional(_fragment) ~> extractAbsoluteUrl
   }
 
-  def _protocol_rel_url: Rule1[Url] = rule {
-    _authority ~ _pathForAuthority ~ optional(_queryString) ~ optional(_fragment) ~> extractProtocolRelUri
+  def _url_without_authority: Rule1[UrlWithoutAuthority] = rule {
+    _scheme ~ ":" ~ _path ~ _maybe_query_string ~ optional(_fragment) ~> extractUrlWithoutAuthority
   }
 
-  def _rel_url: Rule1[Url] = rule {
-    _relPath ~ optional(_queryString) ~ optional(_fragment) ~> extractRelUri
+  def _protocol_rel_url: Rule1[ProtocolRelativeUrl] = rule {
+    _authority ~ _path_for_authority ~ _maybe_query_string ~ optional(_fragment) ~> extractProtocolRelativeUrl
+  }
+
+  def _rel_url: Rule1[RelativeUrl] = rule {
+    _path ~ _maybe_query_string ~ optional(_fragment) ~> extractRelativeUrl
+  }
+
+  def _url_with_authority: Rule1[UrlWithAuthority] = rule {
+    _abs_url | _protocol_rel_url
   }
 
   def _url: Rule1[Url] = rule {
-    (_abs_url | _protocol_rel_url | _rel_url) ~ EOI
+    _abs_url | _protocol_rel_url | _url_without_authority | _rel_url
   }
 
-  val extractAbsUri = (scheme: String, authority: Option[Authority], path: UrlPath, qs: Option[QueryString], f: Option[String]) =>
-    extractUrl (
-      scheme = Some(scheme),
-      authority = authority,
-      path = path,
-      maybeQuery = qs,
-      fragment = f
-    )
+  val extractAbsoluteUrl = (scheme: String, authority: Authority, path: UrlPath, qs: QueryString, f: Option[String]) =>
+    AbsoluteUrl(scheme, authority, path, qs, f)
 
-  val extractProtocolRelUri = (authority: Authority, path: UrlPath, qs: Option[QueryString], f: Option[String]) =>
-    extractUrl (
-      authority = Some(authority),
-      path = path,
-      maybeQuery = qs,
-      fragment = f
-    )
+  val extractProtocolRelativeUrl = (authority: Authority, path: UrlPath, qs: QueryString, f: Option[String]) =>
+    ProtocolRelativeUrl(authority, path, qs, f)
 
-  val extractRelUri = (path: UrlPath, qs: Option[QueryString], f: Option[String]) =>
-    extractUrl (
-      path = path,
-      maybeQuery = qs,
-      fragment = f
-    )
+  val extractRelativeUrl = (path: UrlPath, qs: QueryString, f: Option[String]) =>
+    RelativeUrl(path, qs, f)
+
+  val extractUrlWithoutAuthority = (scheme: String, path: UrlPath, qs: QueryString, f: Option[String]) =>
+    UrlWithoutAuthority(scheme, path, qs, f)
 
   val extractInt = (num: String) =>
     num.toInt
@@ -164,9 +163,6 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
 
   val extractIpv4 = (a: Int, b: Int, c: Int, d: Int) =>
     IpV4(a, b, c, d)
-
-//  val extractIpv6HexPiece = (hex: String) =>
-//    HexPiece(hex)
 
   val extractFullIpv6 = (pieces: immutable.Seq[String]) =>
     IpV6.fromHexPieces(pieces)
@@ -180,19 +176,6 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
       beforeEluded ++ Vector.fill(eladedPieces)("0") ++ afterEluded
     )
   }
-
-//  val extractIpv6 = (pieces: immutable.Seq[IpV6Piece]) => {
-//    val eladedPieces = pieces.count(_.isElided)
-//    if(eladedPieces > 1) {
-//      throw new UriParsingException("IPv6 address cannot have multiple '::' pieces")
-//    }
-//    val expandEladedTo = 8 - pieces.length - eladedPieces
-//    val expandedPieces = pieces.flatMap {
-//      case Elided => Vector.fill(expandEladedTo)("0")
-//      case HexPiece(hex) => Vector(hex)
-//    }
-//    IpV6.fromHexPieces(expandedPieces)
-//  }
 
   val extractDomainName = (domainName: String) =>
     DomainName(domainName)
@@ -213,99 +196,29 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
     pathDecoder.decode(pathPart)
 
   val extractAbsPath = (pp: Seq[String]) =>
-    UrlPath(pp.toVector)
+    if(pp.isEmpty) UrlPath.empty
+    else UrlPath(pp.toVector, leadingSlash = true)
 
-  val extractRelPath = (maybeSlash: String, pp: immutable.Seq[String]) =>
-    UrlPath(pp.toVector, maybeSlash.nonEmpty)
+  val extractRelPath = (maybeSlash: String, pp: immutable.Seq[String]) => pp match {
+    case Seq("") => UrlPath(Vector.empty, maybeSlash.nonEmpty)
+    case _ => UrlPath (pp.toVector, maybeSlash.nonEmpty)
+  }
 
   val extractTuple = (k: String, v: String) =>
     k -> Some(v)
 
   val extractTok = (k: String) => k -> None
 
-  def extractUrl(scheme: Option[String] = None,
-                 authority: Option[Authority] = None,
-                 path: UrlPath,
-                 maybeQuery: Option[QueryString],
-                 fragment: Option[String]): Url = {
-    // TODO: Break out into separate rules
-    val query = maybeQuery.getOrElse(QueryString.empty)
-
-    (scheme, authority, path, query, fragment) match {
-
-//      case (Some("urn"), _, _, _, _) =>
-//        Urn(UrnPath(path.toString().takeWhile(_ != ':'), path.toString().dropWhile(_ != ':').tail))
-
-      case (Some(scheme), Some(authority), _, _, _) =>
-        AbsoluteUrl(scheme, authority, path, query, fragment)
-
-      case (None, Some(authority), _, _, _) =>
-        ProtocolRelativeUrl(authority, path, query, fragment)
-
-      case (Some(scheme), None, _, _, _) =>
-        UrlWithoutAuthority(scheme, path, query, fragment)
-
-      case (None, None, _, _, _) =>
-        RelativeUrl(path, query, fragment)
-    }
-  }
-
   def pathDecoder = conf.pathDecoder
   def queryDecoder = conf.queryDecoder
   def fragmentDecoder = conf.fragmentDecoder
-
-  def parseIpV6(): IpV6 =
-    extractResult(_ip_v6.run(), "IPv6")
-
-  def parseIpV4(): IpV4 =
-    extractResult(_ip_v4.run(), "IPv4")
-
-  def parseDomainName(): DomainName =
-    extractResult(_domain_name.run(), "Domain Name")
-
-  def parseHost(): Host =
-    extractResult(_host.run(), "Host")
-
-  def parseUserInfo(): UserInfo =
-    extractResult(_userInfo.run(), "User Info")
-
-  def parseUrn(): Urn = ???
-
-  def parseUrnPath(): UrnPath = ???
-
-  def parseUrlWithoutAuthority(): UrlWithoutAuthority = ???
-
-  def parseAbsoluteUrl(): AbsoluteUrl = ???
-
-  def parseProtocolRelativeUrl(): ProtocolRelativeUrl = ???
-
-  def parseUrlWithAuthority(): UrlWithAuthority = ???
-
-  def parseRelativeUrl(): RelativeUrl = ???
-
-  def parseUri(): Uri = ???
-
-  def parsePath(): UrlPath =
-    extractResult(_relPath.run(), "Path")
-
-  def parseAuthority(): Authority =
-    extractResult(_authority.run(), "Authority")
-
-  def parseUrl(): Url =
-    extractResult(_url.run(), "URL")
-
-  def parseQuery(): QueryString =
-    extractResult(_queryString.run(), "Query String")
-
-  def parseQueryParam(): (String, Option[String]) =
-    extractResult(_queryParamOrTok.run(), "Query Parameter")
   
-  private def extractResult[T](res: Try[T], name: => String): T = {
-    res match {
+  private[uri] def getOrThrow[T](t: Try[T], name: => String): T = {
+    t match {
       case Success(thing) =>
         thing
 
-      case Failure(pe @ ParseError(_, _, _)) =>
+      case Failure(pe@ParseError(_, _, _)) =>
         val detail = pe.format(input)
         throw new UriParsingException(s"Invalid $name could not be parsed. $detail")
 
@@ -313,11 +226,56 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
         throw e
     }
   }
+
+  def parseIpV6(): IpV6 =
+    getOrThrow(rule(_ip_v6 ~ EOI).run(), "IPv6")
+
+  def parseIpV4(): IpV4 =
+    getOrThrow(rule(_ip_v4 ~ EOI).run(), "IPv4")
+
+  def parseDomainName(): DomainName =
+    getOrThrow(rule(_domain_name ~ EOI).run(), "Domain Name")
+
+  def parseHost(): Host =
+    getOrThrow(rule(_host ~ EOI).run(), "Host")
+
+  def parseUserInfo(): UserInfo =
+    getOrThrow(rule(_user_info ~ EOI).run(), "User Info")
+
+  def parseUrlWithoutAuthority(): UrlWithoutAuthority =
+    getOrThrow(rule(_url_without_authority ~ EOI).run(), "Url")
+
+  def parseAbsoluteUrl(): AbsoluteUrl =
+    getOrThrow(rule(_abs_url ~ EOI).run(), "Url")
+
+  def parseProtocolRelativeUrl(): ProtocolRelativeUrl =
+    getOrThrow(rule(_protocol_rel_url ~ EOI).run(), "Url")
+
+  def parseUrlWithAuthority(): UrlWithAuthority =
+    getOrThrow(rule(_url_with_authority ~ EOI).run(), "Url")
+
+  def parseRelativeUrl(): RelativeUrl =
+    getOrThrow(rule(_rel_url ~ EOI).run(), "Url")
+
+  def parsePath(): UrlPath =
+    getOrThrow(rule(_path ~ EOI).run(), "Path")
+
+  def parseAuthority(): Authority =
+    getOrThrow(rule(_authority ~ EOI).run(), "Authority")
+
+  def parseUrl(): Url =
+    getOrThrow(rule(_url ~ EOI).run(), "URL")
+
+  def parseQuery(): QueryString =
+    getOrThrow(rule(_query_string ~ EOI).run(), "Query String")
+
+  def parseQueryParam(): (String, Option[String]) =
+    getOrThrow(rule(_query_param_or_tok ~ EOI).run(), "Query Parameter")
 }
 
 object UrlParser {
 
-  def apply(s: CharSequence): UrlParser =
+  def apply(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlParser =
     new UrlParser(s.toString)
 
   def parseIpV6(s: String)(implicit config: UriConfig = UriConfig.default): IpV6 =
@@ -334,12 +292,6 @@ object UrlParser {
 
   def parseUserInfo(s: String)(implicit config: UriConfig = UriConfig.default): UserInfo =
     UrlParser(s).parseUserInfo()
-
-  def parseUrn(s: String)(implicit config: UriConfig = UriConfig.default): Urn =
-    UrlParser(s).parseUrn()
-
-  def parseUrnPath(s: String)(implicit config: UriConfig = UriConfig.default): UrnPath =
-    UrlParser(s).parseUrnPath()
 
   def parseUrlWithoutAuthority(s: String)(implicit config: UriConfig = UriConfig.default): UrlWithoutAuthority =
     UrlParser(s).parseUrlWithoutAuthority()
@@ -362,17 +314,14 @@ object UrlParser {
   def parseAuthority(s: String)(implicit config: UriConfig = UriConfig.default): Authority =
     UrlParser(s).parseAuthority()
 
-  def parseUri(toString: String): Uri =
-    ???
-
-  def parseUrl(s: String)(implicit config: UriConfig): Url =
+  def parseUrl(s: String)(implicit config: UriConfig = UriConfig.default): Url =
     UrlParser(s).parseUrl()
 
-  def parseQuery(s: String)(implicit config: UriConfig) = {
+  def parseQuery(s: String)(implicit config: UriConfig = UriConfig.default) = {
     val withQuestionMark = if(s.head == '?') s else "?" + s
     UrlParser(withQuestionMark).parseQuery()
   }
 
-  def parseQueryParam(s: String)(implicit config: UriConfig): (String, Option[String]) =
+  def parseQueryParam(s: String)(implicit config: UriConfig = UriConfig.default): (String, Option[String]) =
     UrlParser(s).parseQueryParam()
 }

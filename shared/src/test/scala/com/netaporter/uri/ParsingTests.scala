@@ -171,7 +171,6 @@ class ParsingTests extends FlatSpec with Matchers {
     url.schemeOption should equal(None)
     url.user should equal(Some("user"))
     url.password should equal(Some("pass"))
-    url.subdomain should equal(Some("www"))
     url.hostOption should equal(Some(DomainName("www.mywebsite.com")))
     url.path.parts should equal(Vector("index.html"))
   }

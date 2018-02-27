@@ -84,8 +84,8 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
     * If a URI contains an authority component, then the path component must either be empty
     * or begin with a slash ("/") character.
     */
-  def _path_for_authority: Rule1[UrlPath] = rule {
-    zeroOrMore("/" ~ _path_segment) ~> extractAbsPath
+  def _path_for_authority: Rule1[AbsoluteOrEmptyPath] = rule {
+    zeroOrMore("/" ~ _path_segment) ~> extractAbsOrEmptyPath
   }
 
   /**
@@ -110,7 +110,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   def _query_string: Rule1[QueryString] = rule {
     "?" ~ zeroOrMore(_query_param_or_tok).separatedBy("&") ~> extractQueryString
   }
-  
+
   def _maybe_query_string: Rule1[QueryString] = rule {
     _query_string | push(QueryString.empty)
   }
@@ -143,10 +143,10 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
     _abs_url | _protocol_rel_url | _url_without_authority | _rel_url
   }
 
-  val extractAbsoluteUrl = (scheme: String, authority: Authority, path: UrlPath, qs: QueryString, f: Option[String]) =>
+  val extractAbsoluteUrl = (scheme: String, authority: Authority, path: AbsoluteOrEmptyPath, qs: QueryString, f: Option[String]) =>
     AbsoluteUrl(scheme, authority, path, qs, f)
 
-  val extractProtocolRelativeUrl = (authority: Authority, path: UrlPath, qs: QueryString, f: Option[String]) =>
+  val extractProtocolRelativeUrl = (authority: Authority, path: AbsoluteOrEmptyPath, qs: QueryString, f: Option[String]) =>
     ProtocolRelativeUrl(authority, path, qs, f)
 
   val extractRelativeUrl = (path: UrlPath, qs: QueryString, f: Option[String]) =>
@@ -195,14 +195,17 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   val extractPathPart = (pathPart: String) =>
     pathDecoder.decode(pathPart)
 
-  val extractAbsPath = (pp: Seq[String]) =>
-    if(pp.isEmpty) UrlPath.empty
-    else UrlPath(pp.toVector, leadingSlash = true)
+  val extractAbsOrEmptyPath = (pp: Seq[String]) =>
+    if(pp.isEmpty) EmptyPath
+    else AbsolutePath(pp.toVector)
 
-  val extractRelPath = (maybeSlash: String, pp: immutable.Seq[String]) => pp match {
-    case Seq("") => UrlPath(Vector.empty, maybeSlash.nonEmpty)
-    case _ => UrlPath (pp.toVector, maybeSlash.nonEmpty)
-  }
+  val extractRelPath = (maybeSlash: String, pp: immutable.Seq[String]) =>
+    if(maybeSlash.nonEmpty)
+      AbsolutePath(pp.toVector)
+    else if(pp == Seq(""))
+      UrlPath.empty
+    else
+      RootlessPath(pp.toVector)
 
   val extractTuple = (k: String, v: String) =>
     k -> Some(v)

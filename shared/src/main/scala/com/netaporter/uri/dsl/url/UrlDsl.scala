@@ -107,7 +107,7 @@ class UrlDsl(val url: Url) extends AnyVal {
   private def merge(other: Url): Url =
     url.withFragment(other.fragment.orElse(url.fragment))
        .withQueryString(url.query.addParams(other.query))
-       .withPath(url.path.copy(parts = url.path.parts ++ other.path.parts))
+       .withPath(url.path.addParts(other.path.parts))
 
   def /(other: Url): Url = merge(other)
   def ?(other: Url): Url = merge(other)

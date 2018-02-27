@@ -95,13 +95,29 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   }
 
   /**
-    * Transforms each parameter by applying the specified Function
+    * Transforms the Query String by applying the specified PartialFunction to each Query String Parameter
     *
-    * @param f Function to transform each parameter
+    * Parameters not defined in the PartialFunction will be left as-is.
+    *
+    * @param f A function that returns a new Parameter when applied to each Parameter
     * @return
     */
-  def map(f: ((String, Option[String])) => (String, Option[String])): QueryString =
-    QueryString(params.map(f))
+  def map(f: PartialFunction[(String, Option[String]), (String, Option[String])]): QueryString = {
+    QueryString(params.map { kv =>
+      if(f.isDefinedAt(kv)) f(kv) else kv
+    })
+  }
+
+  /**
+    * Transforms the Query String by applying the specified PartialFunction to each Query String Parameter
+    *
+    * Parameters not defined in the PartialFunction will be removed.
+    *
+    * @param f A function that returns a new Parameter when applied to each Parameter
+    * @return
+    */
+  def collect(f: PartialFunction[(String, Option[String]), (String, Option[String])]): QueryString =
+    QueryString(params.collect(f))
 
   /**
     * Transforms each parameter by applying the specified Function

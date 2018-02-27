@@ -59,11 +59,8 @@ class ApplyTests extends FlatSpec with Matchers {
     url.query should equal(qs)
   }
 
-  it should "accept NOT allow host with path staring with non-slash" in {
-    val thrown = the [IllegalArgumentException] thrownBy
-      Url(host = "example.com", path = "example")
-
-    thrown.getMessage should equal("requirement failed: A Url with an authority must either have an empty path or a " +
-                                   "path that begins with a slash ('/') character. RFC 3986 section 3.2.")
+  it should "automatically add a slash when missing if authority is specified" in {
+    val url = Url(host = "example.com", path = "example")
+    url.path.toString() should equal("/example")
   }
 }

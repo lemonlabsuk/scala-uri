@@ -74,6 +74,9 @@ object Uri {
   def apply(javaUri: java.net.URI): Uri =
     parse(javaUri.toASCIIString)
 
+  def unapply(uri: Uri): Option[Path] =
+    Some(uri.path)
+
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Uri =
     UriParser.parseUri(s.toString)
 }
@@ -500,6 +503,10 @@ object Url {
     }
   }
 
+  def unapply(url: Url): Option[(UrlPath, QueryString, Option[String])] =
+    Some((url.path, url.query, url.fragment))
+
+
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Url =
     UrlParser.parseUrl(s.toString)
 }
@@ -682,6 +689,10 @@ sealed trait UrlWithAuthority extends Url {
 }
 
 object UrlWithAuthority {
+
+  def unapply(url: UrlWithAuthority): Option[(Authority, UrlPath, QueryString, Option[String])] =
+    Some((url.authority, url.path, url.query, url.fragment))
+
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlWithAuthority =
     UrlParser.parseUrlWithAuthority(s.toString)
 }
@@ -915,9 +926,6 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
 object Urn {
   def apply(nid: String, nss: String): Urn =
     new Urn(UrnPath(nid, nss))
-
-  def unapply(urn: Urn): Option[(String, String)] =
-    Some((urn.path.nid, urn.path.nss))
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Urn =
     UrnParser.parseUrn(s.toString)

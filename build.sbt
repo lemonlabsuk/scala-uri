@@ -8,7 +8,7 @@ crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.4")
 val sharedSettings = Seq(
   name          := "scala-uri",
   organization  := "io.lemonlabs",
-  scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature"),
+  scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature", "-Xfatal-warnings"),
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled" % "2.1.4",
     "com.chuusai"   %%% "shapeless" % "2.3.3",

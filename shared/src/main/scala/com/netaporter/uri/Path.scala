@@ -72,7 +72,7 @@ object UrlPath {
   *
   *   When authority is present, the path must either be empty or begin with a slash ("/") character.
   */
-trait AbsoluteOrEmptyPath extends UrlPath {
+sealed trait AbsoluteOrEmptyPath extends UrlPath {
 
   def toAbsoluteOrEmpty: AbsoluteOrEmptyPath =
     this
@@ -81,7 +81,7 @@ trait AbsoluteOrEmptyPath extends UrlPath {
     RootlessPath(parts)
 }
 
-object EmptyPath extends AbsoluteOrEmptyPath {
+case object EmptyPath extends AbsoluteOrEmptyPath {
 
   def isEmpty: Boolean =
     true
@@ -97,6 +97,8 @@ object EmptyPath extends AbsoluteOrEmptyPath {
 
   def parts: Vector[String] =
     Vector.empty
+
+  override private[uri] def toString(c: UriConfig): String = ""
 }
 
 final case class RootlessPath(parts: Vector[String])(implicit val config: UriConfig = UriConfig.default) extends UrlPath {
@@ -122,10 +124,13 @@ final case class RootlessPath(parts: Vector[String])(implicit val config: UriCon
     parts.isEmpty
 }
 
+object RootlessPath {
+  def fromParts(parts: String*)(implicit config: UriConfig = UriConfig.default): RootlessPath =
+    new RootlessPath(parts.toVector)
+}
+
 /**
   * An AbsolutePath is a path that starts with a slash
-  *
-  * @param parts
   */
 final case class AbsolutePath(parts: Vector[String])(implicit val config: UriConfig = UriConfig.default) extends AbsoluteOrEmptyPath {
 
@@ -145,6 +150,10 @@ final case class AbsolutePath(parts: Vector[String])(implicit val config: UriCon
     "/" + super.toString(c)
 }
 
+object AbsolutePath {
+  def fromParts(parts: String*)(implicit config: UriConfig = UriConfig.default): AbsolutePath =
+    new AbsolutePath(parts.toVector)
+}
 
 final case class UrnPath(nid: String, nss: String)(implicit val config: UriConfig = UriConfig.default) extends Path {
 

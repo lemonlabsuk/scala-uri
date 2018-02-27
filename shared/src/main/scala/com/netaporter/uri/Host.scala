@@ -6,20 +6,21 @@ import com.netaporter.uri.parsing.UrlParser
 import scala.annotation.tailrec
 import scala.collection.{GenSeq, GenTraversable, GenTraversableOnce}
 
-trait Host
+sealed trait Host
 
 object Host {
-  def empty = EmptyHost
+  def empty: Host =
+    EmptyHost
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Host =
     UrlParser.parseHost(s.toString)
 }
 
-object EmptyHost extends Host {
+case object EmptyHost extends Host {
   override def toString: String = ""
 }
 
-case class DomainName(value: String) extends Host {
+final case class DomainName(value: String) extends Host {
   override def toString: String = value
 }
 
@@ -28,7 +29,7 @@ object DomainName {
     UrlParser.parseDomainName(s.toString)
 }
 
-case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte) extends Host {
+final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte) extends Host {
 
   private def uByteToInt(b: Byte): Int = b & 0xff
 
@@ -55,7 +56,7 @@ object IpV4 {
     UrlParser.parseIpV4(s.toString)
 }
 
-case class IpV6(piece1: Char, piece2: Char, piece3: Char, piece4: Char,
+final case class IpV6(piece1: Char, piece2: Char, piece3: Char, piece4: Char,
                 piece5: Char, piece6: Char, piece7: Char, piece8: Char) extends Host {
 
   def piece1Int: Int = piece1.toInt

@@ -7,17 +7,19 @@
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
- * A [DSL](#building-uris-with-the-dsl) for building URIs
- * A [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt) compliant [parser](#parsing-uris) to parse URIs from Strings
- * No dependencies on existing web frameworks
+ * A [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt) compliant [parser](#parsing-urls) to parse URLs and URNs from Strings
+ * URL [Builders](#building-urls) to create URLs from scratch
+ * Ability to transform query strings with methods such as [filterQuery](#filterquery) and [mapQuery](#mapquery)
  * Ability to [replace](#replacing-query-string-parameters) and [remove](#removing-query-string-parameters) query string parameters
+ * Ability to extract TLDs and [public suffixes](#public-suffixes) such as `.com` and `.co.uk` from hosts
+ * Ability to [parse](#parsing-ips) IPv6 and IPv4 addresses
  * Support for [custom encoding](#custom-encoding) such as encoding [spaces as pluses](#encoding-spaces-as-pluses)
  * Support for [protocol relative urls](#protocol-relative-urls)
  * Support for [user information](#user-information) e.g. `ftp://user:password@mysite.com`
- * Support for extracting TLDs and [public suffixes](#public-suffixes) such as `.com` and `.co.uk` from hosts
  * Support for [URNs](#urns)
- * Support for [mailto](#mailto)
- * [scala-js support](#scala-js-support)
+ * Support for [mailto](#mailto) URLs
+ * Support for [scala-js](#scala-js-support)
+ * No dependencies on existing web frameworks
 
 To include it in your SBT project from maven central:
 
@@ -31,46 +33,33 @@ There is also a [demo project](https://github.com/NET-A-PORTER/scala-uri-demo) t
 
 ## Parsing
 
-### Parse an Absolute URL
-
-```scala
-val url = AbsoluteUrl.parse("https://www.scala-lang.org")
-```
-
-### Parse a Relative URL
-
-```scala
-val url = RelativeUrl.parse("/index.html")
-```
-
-### Parse a URL with no authority
-
-```scala
-val url = UrlWithoutAuthority.parse("mailto:test@example.com")
-```
-
-### Parse a Protocol Relative URL
-
-```scala
-val url = ProtocolRelativeUrl.parse("//www.scala-lang.org")
-```
-
-### Parse any type of URL
-
-If your URL could be any of the above, you can using `Url.parse`. The returned value has type `Url` with an
-underlying implementation of `AbsoluteUrl`, `RelativeUrl`, `UrlWithoutAuthority` or `ProtocolRelativeUrl`
+### Parse a URL
 
 ```scala
 val url = Url.parse("https://www.scala-lang.org")
 ```
 
-### Parse a URN
+The returned value has type `Url` with an underlying implementation of `AbsoluteUrl`, `RelativeUrl`,
+`UrlWithoutAuthority` or `ProtocolRelativeUrl`. If you know your URL will always be one of these types, you can
+use the following `parse` methods to get a more specific return type
 
 ```scala
-val url = Url.parse("urn:isbn:0981531687")
+val absoluteUrl = AbsoluteUrl.parse("https://www.scala-lang.org")
+val relativeUrl = RelativeUrl.parse("/index.html")
+val mailtoUrl = UrlWithoutAuthority.parse("mailto:test@example.com")
+val protocolRelativeUrl = ProtocolRelativeUrl.parse("//www.scala-lang.org")
 ```
 
-## Building URIs
+## Parse a URN
+
+```scala
+val urn = Urn.parse("urn:isbn:0981531687")
+urn.scheme // This is Some("urn")
+urn.nid // This is "isbn"
+urn.nss // This is "0981531687"
+```
+
+## Building URLs
 
 `Url` provides an apply method with a bunch of optional parameters that can be used to build URLs
 
@@ -82,7 +71,7 @@ val url2 = Url(path = "/opensource", query = QueryString.fromPairs("param1" -> "
 
 ## Transforming URLs
 
-### map
+### mapQuery
 
 The `mapQuery` method will transform the Query String of a URI by applying the specified `PartialFunction` to each
 Query String Parameter. Any parameters not matched in the `PartialFunction` will be left as-is.
@@ -99,19 +88,19 @@ uri.mapQuery {
 The `mapQueryNames` and `mapQueryValues` provide a more convenient way to transform just Query Parameter names or values
 
 ```scala
-val uri = "/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
+val uri = Url.parse("/scala-uri?p1=one&p2=2&p3=true")
 
 uri.mapQueryNames(_.toUpperCase) //Results in /scala-uri?P1_map=one&P2=2&P3=true
 
 uri.mapQueryValues(_.replace("true", "false")) //Results in /scala-uri?p1=one&p2=2&p3=false
 ```
 
-### filter
+### filterQuery
 
 The `filterQuery` method will remove any Query String Parameters for which the provided Function returns false
 
 ```scala
-val uri = "/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
+val uri = Url.parse("/scala-uri?p1=one&p2=2&p3=true")
 
 //Results in /scala-uri?p2=2
 uri.filterQuery {
@@ -124,14 +113,14 @@ uri.filterQuery(_._2 == "one") //Results in /scala-uri?p1=one
 The `filterQueryNames` and `filterQueryValues` provide a more convenient way to filter just by Query Parameter name or value
 
 ```scala
-val uri = "/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
+val uri = Url.parse("/scala-uri?p1=one&p2=2&p3=true")
 
 uri.filterQueryNames(_ > "p1") //Results in /scala-uri?p2=2&p3=true
 
 uri.filterQueryValues(_.length == 1) //Results in /scala-uri?p2=2
 ```
 
-### collect
+### collectQuery
 
 The `collectQuery` method will transform the Query String of a URI by applying the specified `PartialFunction` to each
 Query String Parameter. Any parameters not matched in the `PartialFunction` will be removed.
@@ -145,9 +134,7 @@ uri.mapQuery {
 }
 ```
 
-## Pattern Matching
-
-### Matching Uris
+## Pattern Matching URIs
 
 ```scala
 val uri: Uri = Uri.parse(...)
@@ -163,6 +150,24 @@ uri match {
 }
 ```
 
+## Hosts
+
+### Parsing Hosts
+
+You can parse a String representing the host part of a URI with `Host.parse`. The return type is `Host` with an
+underling implementation of `DomainName`, `IpV4` or `IpV6`.
+
+```scala
+val host = Host.parse("lemonlabs.io")
+```
+
+#### Parsing IPs
+
+```scala
+val ipv4 = IpV4.parse("13.32.214.142")
+val ipv6 = IpV6.parse("[1:2:3:4:5:6:7:8]")
+```
+
 ### Matching Hosts
 
 ```scala
@@ -174,6 +179,8 @@ host match {
     case ip: IpV6 => // Matches IpV6s
 }
 ```
+
+## Paths
 
 ### Matching Paths
 
@@ -218,8 +225,9 @@ In this instance, using `Url.parse` instead of `Uri.parse` would fix this warnin
 By Default, `scala-uri` will URL percent encode paths and query string parameters. To prevent this, you can call the `uri.toStringRaw` method:
 
 ```scala
-import com.netaporter.uri.dsl._
-val uri = "http://example.com/path with space" ? ("param" -> "üri")
+import com.netaporter.uri.Url
+
+val uri = Url.parse("http://example.com/path with space?param=üri")
 
 uri.toString //This is: http://example.com/path%20with%20space?param=%C3%BCri
 
@@ -271,7 +279,7 @@ import com.netaporter.uri.dsl._
 import com.netaporter.uri.encoding._
 implicit val config = UriConfig(encoder = percentEncode + encodeCharAs(' ', "_"))
 
-val uri: Uri = "http://theon.github.com/uri with space"
+val uri = Uri.parse("http://theon.github.com/uri with space")
 uri.toString //This is http://theon.github.com/uri_with_space
 ```
 
@@ -281,7 +289,7 @@ By Default, `scala-uri` will URL percent decode paths and query string parameter
 
 ```scala
 import com.netaporter.uri.dsl._
-val uri: Uri = "http://example.com/i-have-%25been%25-percent-encoded"
+val uri = Uri.parse("http://example.com/i-have-%25been%25-percent-encoded")
 
 uri.toString //This is: http://example.com/i-have-%25been%25-percent-encoded
 
@@ -293,7 +301,7 @@ To prevent this, you can bring the following implicit into scope:
 ```scala
 import com.netaporter.uri.dsl._
 implicit val c = UriConfig(decoder = NoopDecoder)
-val uri: Uri = "http://example.com/i-havent-%been%-percent-encoded"
+val uri = Uri.parse("http://example.com/i-havent-%been%-percent-encoded")
 
 uri.toString // This is: http://example.com/i-havent-%25been%25-percent-encoded
 
@@ -321,11 +329,11 @@ uri.toStringRaw // This is /?x=%3
 
 ## Replacing Query String Parameters
 
-If you wish to replace all existing query string parameters with a given name, you can use the `uri.replaceParams()` method:
+If you wish to replace all existing query string parameters with a given name, you can use the `Url.replaceParams()` method:
 
 ```scala
-import com.netaporter.uri.dsl._
-val uri = "http://example.com/path" ? ("param" -> "1")
+import com.netaporter.uri.Url
+val uri = Url.parse("http://example.com/path?param=1")
 val newUri = uri.replaceParams("param", "2")
 
 newUri.toString //This is: http://example.com/path?param=2
@@ -336,8 +344,8 @@ newUri.toString //This is: http://example.com/path?param=2
 If you wish to remove all existing query string parameters with a given name, you can use the `uri.removeParams()` method:
 
 ```scala
-import com.netaporter.uri.dsl._
-val uri = "http://example.com/path" ? ("param" -> "1") & ("param2" -> "2")
+import com.netaporter.uri.Url
+val uri = Url.parse("http://example.com/path?param=1&param2=2")
 val newUri = uri.removeParams("param")
 
 newUri.toString //This is: http://example.com/path?param2=2
@@ -384,10 +392,10 @@ uri.withPassword("secret") // URL is now http://user:secret@host.com
 [Protocol Relative URLs](http://paulirish.com/2010/the-protocol-relative-url/) are supported in `scala-uri`. A `Uri` object with a protocol of `None`, but a host of `Some(x)` will be considered a protocol relative URL.
 
 ```scala
-import com.netaporter.uri.dsl._
-val uri: Uri = "//example.com/path"
-uri.scheme //This is: None
-uri.host //This is: Some("example.com")
+import com.netaporter.uri.Url
+val uri = Uri.parse("//example.com/path")
+uri.scheme // This is: None
+uri.host // This is: Some("example.com")
 ```
 
 ## Character Sets
@@ -395,7 +403,7 @@ uri.host //This is: Some("example.com")
 By default `scala-uri` uses `UTF-8` charset encoding:
 
 ```scala
-val uri = "http://theon.github.com/uris-in-scala.html" ? ("chinese" -> "网址")
+val uri = Url.parse("http://theon.github.com/uris-in-scala.html?chinese=网址")
 uri.toString //This is http://theon.github.com/uris-in-scala.html?chinese=%E7%BD%91%E5%9D%80
 ```
 
@@ -403,7 +411,7 @@ This can be changed like so:
 
 ```scala
 implicit val conf = UriConfig(charset = "GB2312")
-val uri = "http://theon.github.com/uris-in-scala.html" ? ("chinese" -> "网址")
+val uri = Url.parse("http://theon.github.com/uris-in-scala.html?chinese=网址")
 uri.toString //This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F8%D6%B7
 ```
 
@@ -415,22 +423,22 @@ uri.toString //This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F8
 import com.netaporter.uri.Uri
 
 // This returns Some("www")
-Uri.parse("http://www.example.com/blah").subdomain
+Url.parse("http://www.example.com/blah").subdomain
 
 // This returns Some("a.b.c")
-Uri.parse("http://a.b.c.example.com/blah").subdomain
+Url.parse("http://a.b.c.example.com/blah").subdomain
 
 // This returns None
-Uri.parse("http://example.com/blah").subdomain
+Url.parse("http://example.com/blah").subdomain
 
 // This returns Vector("a", "a.b", "a.b.c", "a.b.c.example")
-Uri.parse("http://a.b.c.example.com/blah").subdomains
+Url.parse("http://a.b.c.example.com/blah").subdomains
 
 // This returns Some("a")
-Uri.parse("http://a.b.c.example.com/blah").shortestSubdomain
+Url.parse("http://a.b.c.example.com/blah").shortestSubdomain
 
 // This returns Some("a.b.c.example")
-Uri.parse("http://a.b.c.example.com/blah").longestSubdomain
+Url.parse("http://a.b.c.example.com/blah").longestSubdomain
 ```
 
 ## Public Suffixes
@@ -443,26 +451,18 @@ the TLD of your absolute URIs.
 The `publicSuffix` method returns the longest public suffix from your URI
 
 ```scala
-val uri = Uri.parse("http://www.google.co.uk/blah")
+val uri = Url.parse("http://www.google.co.uk/blah")
 uri.publicSuffix == Some("co.uk")
 ```
 
 The `publicSuffixes` method returns all the public suffixes from your URI
 
 ```scala
-val uri = Uri.parse("http://www.google.co.uk/blah")
+val uri = Url.parse("http://www.google.co.uk/blah")
 uri.publicSuffixes == Seq("co.uk", "uk")
 ```
 
 These methods return `None` and `Seq.empty`, respectively for relative URIs
-
-## URNs
-
-```scala
-val urn = Uri.parse("urn:example:animal:ferret:nose")
-urn.scheme // This is Some("urn")
-urn.path // This is "example:animal:ferret:nose"
-```
 
 ## mailto
 
@@ -475,7 +475,7 @@ mailto.query.param("subject") // This is Some("Hello")
 
 ## URL builder DSL
 
-By importing `com.netaporter.uri.url.dsl._`, you may use a DSL to construct URLs
+By importing `com.netaporter.uri.dsl._`, you may use a DSL to construct URLs
 
 ```scala
 import com.netaporter.uri.url.dsl._

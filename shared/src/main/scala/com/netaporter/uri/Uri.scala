@@ -184,30 +184,6 @@ sealed trait Url extends Uri {
     withHost(Host.parse(host))
 
   /**
-    * Copies this Url but with the user set as the given value.
-    *
-    * @param user the new user to set
-    * @return a new Url with the specified user
-    */
-  def withUser(user: String): SelfWithAuthority
-
-  /**
-    * Copies this Url but with the password set as the given value.
-    *
-    * @param password the new password to set
-    * @return a new Url with the specified password
-    */
-  def withPassword(password: String): SelfWithAuthority
-
-  /**
-    * Copies this Url but with the port set as the given value.
-    *
-    * @param port the new port to set
-    * @return a new Url with the specified port
-    */
-  def withPort(port: Int): SelfWithAuthority
-
-  /**
     * Copies this Url but with the fragment set as the given value.
     *
     * @param fragment the new fragment to set
@@ -617,16 +593,34 @@ sealed trait UrlWithAuthority extends Url {
   def withHost(host: Host): Self =
     withAuthority(authority.copy(host = host))
 
+  /**
+    * Copies this Url but with the user set as the given value.
+    *
+    * @param user the new user to set
+    * @return a new Url with the specified user
+    */
   def withUser(user: String): Self = {
     val newUserInfo = userInfo.copy(user = Some(user))
     withAuthority(authority.copy(userInfo = newUserInfo))
   }
 
+  /**
+    * Copies this Url but with the password set as the given value.
+    *
+    * @param password the new password to set
+    * @return a new Url with the specified password
+    */
   def withPassword(password: String): Self = {
     val newUserInfo = userInfo.copy(password = Some(password))
     withAuthority(authority.copy(userInfo = newUserInfo))
   }
 
+  /**
+    * Copies this Url but with the port set as the given value.
+    *
+    * @param port the new port to set
+    * @return a new Url with the specified port
+    */
   def withPort(port: Int): Self =
     withAuthority(authority.copy(port = Some(port)))
 

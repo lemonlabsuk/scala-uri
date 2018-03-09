@@ -29,99 +29,71 @@ There is also a [demo project](https://github.com/NET-A-PORTER/scala-uri-demo) t
 
 *Note:* This library works best when using Scala `2.11.2+`. Due a bug in older versions of Scala, this library  can result in `StackOverflowException`s for very large URLs when using versions of Scala older than `2.11.2`. [More details](https://github.com/NET-A-PORTER/scala-uri/issues/51#issuecomment-45759462)
 
-## Building URIs with the DSL
+## Parsing
 
-### Query Strings
-
-```scala
-import com.netaporter.uri.dsl._
-
-val uri = "http://theon.github.com/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
-uri.toString //This is: http://theon.github.com/scala-uri?p1=one&p2=2&p3=true
-
-val uri2 = "http://theon.github.com/scala-uri" ? ("param1" -> Some("1")) & ("param2" -> None)
-uri2.toString //This is: http://theon.github.com/scala-uri?param1=1
-
-val uri3 = "http://theon.github.com/scala-uri" ? "param1=1"
-uri3.toString //This is: http://theon.github.com/scala-uri?param1=1
-```
-
-To add query string parameters, use either the `?` or `&` method and pass as an argument either:
-
- - a `Tuple2`. The first value in the Tuple is a name of the query string parameter, the second is the value. If a parameter value is an `Option`, it will only be rendered provided it is not `None`.
- - a `String`. It will be parsed as a query param. E.g. `"query=param"`
-
-#### Adding multiple query parameters
+### Parse an Absolute URL
 
 ```scala
-import com.netaporter.uri.dsl._
-val p = ("key", true) :: ("key2", false) :: Nil
-val uri = "http://example.com".addParams(p)
-uri.toString //This is: http://example.com/?key=true&key2=false
+val url = AbsoluteUrl.parse("https://www.scala-lang.org")
 ```
+
+### Parse a Relative URL
 
 ```scala
-import com.netaporter.uri.dsl._
-val p = Map("key" -> true, "key2" -> false)
-val uri = "http://example.com".addParams(p)
-uri.toString //This is: http://example.com/?key=true&key2=false
+val url = RelativeUrl.parse("/index.html")
 ```
 
-### Paths
+### Parse a URL with no authority
 
 ```scala
-import com.netaporter.uri.dsl._
-
-val uri = "http://theon.github.com" / "scala-uri"
-uri.toString //This is: http://theon.github.com/scala-uri
+val url = UrlWithoutAuthority.parse("mailto:test@example.com")
 ```
 
-To add path segments, use the `/` method
-
-### Fragments
-
-To set the fragment, use the `` `#` `` method:
+### Parse a Protocol Relative URL
 
 ```scala
-import com.netaporter.uri.dsl._
-val uri = "http://theon.github.com/scala-uri" `#` "fragments"
-
-uri.toString //This is: http://theon.github.com/scala-uri#fragments
+val url = ProtocolRelativeUrl.parse("//www.scala-lang.org")
 ```
 
-## Parsing URIs
+### Parse any type of URL
 
-Provided you have the import `com.netaporter.uri.dsl._`, Strings will be implicitly parsed into `Uri` instances:
+If your URL could be any of the above, you can using `Url.parse`. The returned value has type `Url` with an
+underlying implementation of `AbsoluteUrl`, `RelativeUrl`, `UrlWithoutAuthority` or `ProtocolRelativeUrl`
 
 ```scala
-import com.netaporter.uri.dsl._
-val uri: Uri = "http://theon.github.com/scala-uri?param1=1&param2=2"
+val url = Url.parse("https://www.scala-lang.org")
 ```
 
-However, if you prefer, you can call `Uri.parse()` explicitly:
+### Parse a URN
 
 ```scala
-import com.netaporter.uri.Uri.parse
-val uri = parse("http://theon.github.com/scala-uri?param1=1&param2=2")
+val url = Url.parse("urn:isbn:0981531687")
 ```
 
-There also exists a `import com.netaporter.uri.Uri.parseQuery` for instances when you wish to parse a query string, not a full URI.
+## Building URIs
 
-## Transforming URIs
+`Url` provides an apply method with a bunch of optional parameters that can be used to build URLs
+
+```
+val url = Url(scheme = "http", host = "lemonlabs.io", path = "/opensource")
+
+val url2 = Url(path = "/opensource", query = QueryString.fromPairs("param1" -> "a", "param2" -> "b"))
+```
+
+## Transforming URLs
 
 ### map
 
-The `mapQuery` method will transform the Query String of a URI by applying the specified Function to each Query String Parameter
+The `mapQuery` method will transform the Query String of a URI by applying the specified `PartialFunction` to each
+Query String Parameter. Any parameters not matched in the `PartialFunction` will be left as-is.
 
 ```scala
-val uri = "/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
+val uri = Url.parse("/scala-uri?p1=one&p2=2&p3=true")
 
-//Results in /scala-uri?p1_map=one_map&p2_map=2_map&p3_map=true_map
+// Results in /scala-uri?p1_map=one_map&p2_map=2_map&p3_map=true_map
 uri.mapQuery {
-  case (n, v) => (n + "_map", v + "_map")
+  case (n, Some(v)) => (n + "_map", Some(v + "_map"))
 }
-
-uri.mapQuery(_.swap) //Results in /scala-uri?one=p1&2=p2&true=p3
 ```
 
 The `mapQueryNames` and `mapQueryValues` provide a more convenient way to transform just Query Parameter names or values
@@ -158,6 +130,88 @@ uri.filterQueryNames(_ > "p1") //Results in /scala-uri?p2=2&p3=true
 
 uri.filterQueryValues(_.length == 1) //Results in /scala-uri?p2=2
 ```
+
+### collect
+
+The `collectQuery` method will transform the Query String of a URI by applying the specified `PartialFunction` to each
+Query String Parameter. Any parameters not matched in the `PartialFunction` will be removed.
+
+```scala
+val uri = Url.parse("/scala-uri?p1=one&p2=2&p3=true")
+
+// Results in /scala-uri?p1_map=one_map
+uri.mapQuery {
+  case ("p1", Some(v)) => (p1_map", Some(v + "_map"))
+}
+```
+
+## Pattern Matching
+
+### Matching Uris
+
+```scala
+val uri: Uri = Uri.parse(...)
+uri match {
+    case Uri(path) => // Matches Urns and Urls
+    case Urn(path) => // Matches Urns
+    case Url(path, query, fragment) => // Matches Urls
+    case RelativeUrl(path, query, fragment) => // Matches RelativeUrls
+    case UrlWithAuthority(authority, path, query, fragment) => // Matches AbsoluteUrls and ProtocolRelativeUrls
+    case AbsoluteUrls(scheme, authority, path, query, fragment) => // Matches AbsoluteUrls
+    case ProtocolRelativeUrls(authority, path, query, fragment) => // Matches ProtocolRelativeUrls
+    case UrlWithoutAuthority(scheme, path, query, fragment) => // Matches UrlWithoutAuthoritys
+}
+```
+
+### Matching Hosts
+
+```scala
+val host: Host = Host.parse(...)
+host match {
+    case Host(host) => // Matches DomainNames, IpV4s and IpV6s
+    case DomainName(host) => // Matches DomainNames
+    case ip: IpV4 => // Matches IpV4s
+    case ip: IpV6 => // Matches IpV6s
+}
+```
+
+### Matching Paths
+
+```scala
+val path: Path = Path.parse(...)
+path match {
+    case Path(parts) => // Matches any path
+    case AbsolutePath(parts) => // Matches any path starting with a slash
+    case Rootless(parts) => // Matches any path that *doesn't* start with a slash
+
+    case PathParts("a", "b", "c") => // Matches "/a/b/c" and "a/b/c"
+    case PathParts("a", "b", _*) => // Matches any path starting with "/a/b" or "a/b"
+
+    case EmptyPath() => // Matches ""
+    case PathParts() => // Matches "" and "/"
+
+    case UrnPath("nid", "nss") => // Matches a URN Path "nid:nss"
+}
+```
+
+### Exhaustive matching
+
+In some cases `scalac` will be able to detect instances where not all cases are being matched. For example:
+
+```scala
+Uri.parse("/test") match {
+  case u: Url => println(u.toString)
+}
+```
+
+results in the following compiler warning, because Uri.parse can return `Urn`s as well as `Url`s:
+
+```
+<console>:15: warning: match may not be exhaustive.
+It would fail on the following input: Urn(_)
+```
+
+In this instance, using `Url.parse` instead of `Uri.parse` would fix this warning
 
 ## URL Percent Encoding
 
@@ -306,23 +360,21 @@ uri.query.paramMap //This is: Map("a" -> Seq("b", "c"), "d" -> Seq("e"))
 Parsing URLs with user information:
 
 ```scala
-val uri = "http://user:pass@host.com"
-uri.user //This is Some("user")
-uri.password //This is Some("pass")
+val url = Url.parse("http://user:pass@host.com")
+url.user // This is Some("user")
+url.password // This is Some("pass")
 ```
 
 Modifying user information:
 
 ```scala
-import com.netaporter.uri.dsl._
-val mailto = "mailto://user@host.com"
-mailto.withUser("jack") //URL is now jack@host.com
+val url = Url.parse("http://host.com")
+mailto.withUser("jack") // URL is now http://jack@host.com
 ```
 
 ```scala
-import com.netaporter.uri.dsl._
-val uri = "http://user:pass@host.com"
-uri.withPassword("secret") //URL is now http://user:secret@host.com
+val url = Url.parse("http://user:pass@host.com")
+uri.withPassword("secret") // URL is now http://user:secret@host.com
 ```
 
 **Note:** that using clear text passwords in URLs is [ill advised](http://tools.ietf.org/html/rfc3986#section-3.2.1)
@@ -415,10 +467,39 @@ urn.path // This is "example:animal:ferret:nose"
 ## mailto
 
 ```scala
-val mailto = Uri.parse("mailto:someone@example.com?subject=Hello")
+val mailto = Url.parse("mailto:someone@example.com?subject=Hello")
 mailto.scheme // This is Some(mailto")
 mailto.path // This is "someone@example.com"
 mailto.query.param("subject") // This is Some("Hello")
+```
+
+## URL builder DSL
+
+By importing `com.netaporter.uri.url.dsl._`, you may use a DSL to construct URLs
+
+```scala
+import com.netaporter.uri.url.dsl._
+
+// Query Strings
+
+val uri = "http://theon.github.com/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
+uri.toString //This is: http://theon.github.com/scala-uri?p1=one&p2=2&p3=true
+
+val uri2 = "http://theon.github.com/scala-uri" ? ("param1" -> Some("1")) & ("param2" -> None)
+uri2.toString //This is: http://theon.github.com/scala-uri?param1=1&param2
+
+val uri3 = "http://theon.github.com/scala-uri" ? "param1=1"
+uri3.toString //This is: http://theon.github.com/scala-uri?param1=1
+
+// Paths
+
+val uri4 = "http://theon.github.com" / "scala-uri"
+uri4.toString //This is: http://theon.github.com/scala-uri
+
+// Fragments
+
+val uri5 = "http://theon.github.com/scala-uri" `#` "fragments"
+uri5.toString //This is: http://theon.github.com/scala-uri#fragments
 ```
 
 ## scala-js support
@@ -468,13 +549,19 @@ Generate code coverage reports from the sbt console by running the `scct:test` c
 
 For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https://github.com/net-a-porter/scala-uri-benchmarks) github project
 
-# Migration guide from 0.4.x
+# Migration guides
+
+## 0.5.x to 1.x.x
+
+ * Package change from `com.netaporter.uri` to `io.lemonlabs.uri`
+
+## 0.4.x to 0.5.x
 
  * Matrix parameters have been removed. If you still need this, raise an issue
  * scala 2.10 support dropped, please upgrade to 2.11 or 2.12 to use scala-uri 0.5.x
  * scala-js support added
 
-# Migration guide from 0.3.x
+## 0.3.x to 0.4.x
 
  * Package changes / import changes
   * All code moved from `com.github.theon` package to `com.netaporter` package

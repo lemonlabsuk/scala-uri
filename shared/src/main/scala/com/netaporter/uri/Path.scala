@@ -24,6 +24,14 @@ sealed trait Path {
 object Path {
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Path =
     UrlParser.parsePath(s.toString)
+
+  def unapply(path: Path): Option[Vector[String]] =
+    Some(path.parts)
+}
+
+object PathParts {
+  def unapplySeq(path: Path): Option[Seq[String]] =
+    Some(path.parts)
 }
 
 sealed trait UrlPath extends Path {
@@ -98,6 +106,9 @@ case object EmptyPath extends AbsoluteOrEmptyPath {
   def parts: Vector[String] =
     Vector.empty
 
+  def unapply(path: UrlPath): Boolean =
+    path.isEmpty
+
   override private[uri] def toString(c: UriConfig): String = ""
 }
 
@@ -114,11 +125,10 @@ final case class RootlessPath(parts: Vector[String])(implicit val config: UriCon
     else AbsolutePath(parts)
 
   def withParts(otherParts: GenTraversableOnce[String]): UrlPath =
-    copy(parts = otherParts.toVector)
+    RootlessPath(otherParts.toVector)
 
   /**
     * Returns true if this path is empty (i.e. calling `toString` will return an empty String)
-    * An empty RootlessPath is the same as EmptyPath. Use EmptyPath instead wherever possible.
     */
   def isEmpty: Boolean =
     parts.isEmpty

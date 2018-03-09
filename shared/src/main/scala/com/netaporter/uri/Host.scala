@@ -10,14 +10,13 @@ sealed trait Host
 
 object Host {
   def empty: Host =
-    EmptyHost
+    DomainName("")
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Host =
     UrlParser.parseHost(s.toString)
-}
 
-case object EmptyHost extends Host {
-  override def toString: String = ""
+  def unapply(host: Host): Option[String] =
+    Some(host.toString)
 }
 
 final case class DomainName(value: String) extends Host {

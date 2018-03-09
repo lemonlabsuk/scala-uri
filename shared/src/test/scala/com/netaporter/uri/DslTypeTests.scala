@@ -4,7 +4,7 @@ import org.scalatest.{Matchers, FlatSpec}
 
 class DslTypeTests extends FlatSpec with Matchers {
 
-  import dsl.url._
+  import dsl._
 
   "String" should "render correctly" in {
     val uri = "/uris-in-scala.html" ? ("param" -> "hey")

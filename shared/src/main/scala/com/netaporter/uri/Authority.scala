@@ -104,9 +104,6 @@ object Authority {
   def apply(host: Host, port: Int)(implicit config: UriConfig): Authority =
     new Authority(UserInfo.empty, host, Some(port))
 
-  def empty(implicit uriConfig: UriConfig): Authority =
-    Authority(UserInfo.empty, Host.empty, port = None)
-
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Authority =
     UrlParser.parseAuthority(s.toString)
 }

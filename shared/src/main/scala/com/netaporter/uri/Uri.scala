@@ -448,8 +448,28 @@ sealed trait Url extends Uri {
   private[uri] def fragmentToString(c: UriConfig): String =
     fragment.map(f => "#" + c.fragmentEncoder.encode(f, c.charset)).getOrElse("")
 
+  def toAbsoluteUrl: AbsoluteUrl = this match {
+    case a: AbsoluteUrl => a
+    case _ => throw new ClassCastException(getClass.getSimpleName + " cannot be cast to AbsoluteUrl")
+  }
+
+  def toRelativeUrl: RelativeUrl = this match {
+    case r: RelativeUrl => r
+    case _ => throw new ClassCastException(getClass.getSimpleName + " cannot be cast to RelativeUrl")
+  }
+
+  def toProtocolRelativeUrl: ProtocolRelativeUrl = this match {
+    case p: ProtocolRelativeUrl => p
+    case _ => throw new ClassCastException(getClass.getSimpleName + " cannot be cast to ProtocolRelativeUrl")
+  }
+
+  def toUrlWithoutAuthority: UrlWithoutAuthority = this match {
+    case u: UrlWithoutAuthority => u
+    case _ => throw new ClassCastException(getClass.getSimpleName + " cannot be cast to UrlWithoutAuthority")
+  }
+
   def toUrl: Url = this
-  def toUrn: Urn = throw new IllegalStateException(getClass.getSimpleName + " cannot be cast to Urn")
+  def toUrn: Urn = throw new ClassCastException(getClass.getSimpleName + " cannot be cast to Urn")
 }
 
 object Url {
@@ -529,15 +549,6 @@ final case class RelativeUrl(path: UrlPath,
 
   def withHost(host: Host): ProtocolRelativeUrl =
     withAuthority(Authority(host))
-
-  def withUser(user: String): ProtocolRelativeUrl =
-    withAuthority(Authority(UserInfo(user), host = Host.empty, port = None))
-
-  def withPassword(password: String): ProtocolRelativeUrl =
-    withAuthority(Authority(UserInfo(user = None, Some(password)), host = Host.empty, port = None))
-
-  def withPort(port: Int): ProtocolRelativeUrl =
-    withAuthority(Authority(host = "", port))
 
   /**
     * Copies this Url but with the path set as the given value.
@@ -848,24 +859,6 @@ final case class UrlWithoutAuthority(scheme: String,
   def withPort(port: Int): AbsoluteUrl =
     AbsoluteUrl(scheme, Authority(host = "", port), path.toAbsoluteOrEmpty, query, fragment)
 
-  /**
-    * Copies this Url but with the user set as the given value.
-    *
-    * @param user the new user to set
-    * @return a new Url with the specified user
-    */
-  def withUser(user: String): AbsoluteUrl =
-    AbsoluteUrl(scheme, Authority(UserInfo(user), host = Host.empty, port = None), path.toAbsoluteOrEmpty, query, fragment)
-
-  /**
-    * Copies this Url but with the password set as the given value.
-    *
-    * @param password the new password to set
-    * @return a new Url with the specified password
-    */
-  def withPassword(password: String): AbsoluteUrl =
-    AbsoluteUrl(scheme, Authority(UserInfo(user = None, password = Some(password)), host = Host.empty, port = None), path.toAbsoluteOrEmpty, query, fragment)
-
   def withAuthority(authority: Authority): AbsoluteUrl =
     AbsoluteUrl(scheme, authority, path.toAbsoluteOrEmpty, query, fragment)
 
@@ -900,6 +893,9 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
 
   def schemeOption = Some("urn")
 
+  def nss: String = path.nss
+  def nid: String = path.nid
+
   /**
     * Converts this URN into a URL with the given scheme.
     * The NID and NSS will be made path segments of the URL.
@@ -910,7 +906,7 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
   def withScheme(scheme: String): UrlWithoutAuthority =
     UrlWithoutAuthority(scheme, path.toUrlPath, QueryString.empty, fragment = None)
 
-  def toUrl: Url = throw new IllegalStateException("Urn cannot be cast to Url")
+  def toUrl: Url = throw new ClassCastException("Urn cannot be cast to Url")
   def toUrn: Urn = this
 
   private[uri] def toString(c: UriConfig): String =

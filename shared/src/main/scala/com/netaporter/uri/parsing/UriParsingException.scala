@@ -1,3 +1,5 @@
 package com.netaporter.uri.parsing
 
-class UriParsingException(msg: String) extends Exception(msg)
+import com.netaporter.uri.UriException
+
+class UriParsingException(msg: String) extends UriException(msg)

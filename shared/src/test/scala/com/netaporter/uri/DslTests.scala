@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class DslTests extends FlatSpec with Matchers {
 
-  import dsl.url._
+  import dsl._
 
   "A simple absolute URI" should "render correctly" in {
     val uri: Uri = "http://theon.github.com/uris-in-scala.html"
@@ -112,13 +112,13 @@ class DslTests extends FlatSpec with Matchers {
   "Host setter method" should "copy the URI with the new host" in {
     val uri = "http://coldplay.com/chris-martin.html" ? ("testOne" -> "1")
     val newUri = uri.withHost("jethrotull.com")
-    newUri.toString should equal ("http://jethrotull.com/chris-martin.html?testOne=1")
+    newUri.toString() should equal ("http://jethrotull.com/chris-martin.html?testOne=1")
   }
 
   "Port setter method" should "copy the URI with the new port" in {
     val uri = "http://coldplay.com/chris-martin.html" ? ("testOne" -> "1")
-    val newUri = uri.withPort(8080)
-    newUri.toString should equal ("http://coldplay.com:8080/chris-martin.html?testOne=1")
+    val newUri = uri.toAbsoluteUrl.withPort(8080)
+    newUri.toString() should equal ("http://coldplay.com:8080/chris-martin.html?testOne=1")
   }
 
   "Path with fragment" should "render correctly" in {
@@ -138,12 +138,12 @@ class DslTests extends FlatSpec with Matchers {
 
   "Uri with a changed user" should "render correctly" in {
     val uri = "http://user:password@moonpig.com/" `#` "hi"
-    uri.withUser("ian").toString should equal ("http://ian:password@moonpig.com/#hi")
+    uri.toAbsoluteUrl.withUser("ian").toString() should equal ("http://ian:password@moonpig.com/#hi")
   }
 
   "Uri with a changed password" should "render correctly" in {
     val uri = "http://user:password@moonpig.com/" `#` "hi"
-    uri.withPassword("not-so-secret").toString should equal ("http://user:not-so-secret@moonpig.com/#hi")
+    uri.toAbsoluteUrl.withPassword("not-so-secret").toString() should equal ("http://user:not-so-secret@moonpig.com/#hi")
   }
 
   "A list of query params" should "get added successsfully" in {

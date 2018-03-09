@@ -4,14 +4,11 @@ import com.netaporter.uri.config.UriConfig
 import com.netaporter.uri.parsing.UrlParser
 
 import scala.annotation.tailrec
-import scala.collection.{GenSeq, GenTraversable, GenTraversableOnce}
+import scala.collection.GenSeq
 
 sealed trait Host
 
 object Host {
-  def empty: Host =
-    DomainName("")
-
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Host =
     UrlParser.parseHost(s.toString)
 

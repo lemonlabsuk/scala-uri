@@ -1,9 +1,8 @@
-package com.netaporter.uri.dsl
+package com.netaporter.uri
 
-import com.netaporter.uri.{RelativeUrl, Uri, Url}
 import com.netaporter.uri.config.UriConfig
 
-package object url {
+package object dsl {
 
   import scala.language.implicitConversions
 

@@ -1,4 +1,4 @@
-package com.netaporter.uri.dsl.url
+package com.netaporter.uri.dsl
 
 import com.netaporter.uri.Url
 import com.netaporter.uri.parsing.UrlParser

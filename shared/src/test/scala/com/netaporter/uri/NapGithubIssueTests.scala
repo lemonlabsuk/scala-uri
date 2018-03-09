@@ -28,7 +28,7 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
   }
 
   "Github Issue #6" should "now be fixed. No implicit Encoder val required for implicit Uri -> String conversion " in {
-    import dsl.url._
+    import dsl._
     val uri = Url.parse("/blah?blah=blah")
     val uriString: String = uri
     uriString should equal ("/blah?blah=blah")
@@ -141,8 +141,8 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
   }
 
   "Github Issue #73" should "now be fixed" in {
-    val uri = Url.parse("http://somewhere.something").withUser("user:1@domain").withPassword("abc xyz")
-    uri.toString should equal("http://user%3A1%40domain:abc%20xyz@somewhere.something")
+    val uri = AbsoluteUrl.parse("http://somewhere.something").withUser("user:1@domain").withPassword("abc xyz")
+    uri.toString() should equal("http://user%3A1%40domain:abc%20xyz@somewhere.something")
   }
 
   "Github Issue #99" should "now be fixed" in {

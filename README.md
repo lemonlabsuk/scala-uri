@@ -624,7 +624,7 @@ Contributions to `scala-uri` are always welcome. Good ways to contribute include
 
 The unit tests can be run from the sbt console by running the `test` command! Checking the unit tests all pass before sending pull requests will be much appreciated.
 
-Generate code coverage reports from the sbt console by running the `scct:test` command. The HTML reports should be generated at `target/scala-2.10/coverage-report/index.html`. Ideally pull requests shouldn't significantly decrease code coverage, but it's not the end of the world if they do. Contributions with no tests are better than no contributions :)
+Generate code coverage reports from the sbt console by running `sbt coverage test coverageReport`. Ideally pull requests shouldn't significantly decrease code coverage, but it's not the end of the world if they do. Contributions with no tests are better than no contributions :)
 
 ## Performance Tests
 
@@ -635,6 +635,36 @@ For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https:/
 ## 0.5.x to 1.x.x
 
  * Package change from `com.netaporter.uri` to `io.lemonlabs.uri`
+ * The single `Uri` case class has now been replaced with a class hierarchy. Use the most specific class in this
+   hierarchy that fits your use case
+ * `Uri` used to be a case class, but the replacements `Uri` and `Url` are now traits. This means they no longer
+   have a `copy` method. Use the `with` methods instead (e.g. `withHost`, `withPath` etc)
+ * Changed parameter value type from `Any` to `String` in methods `addParam`, `addParams`, `replaceParams`.
+   Please now call `.toString` before passing non String types to these methods
+ * Changed parameter value type from `Option[Any]` to `Option[String]` in method `replaceAll`.
+   Please now call `.toString` before passing non String types to this method
+ * Query string parameters with a value of `None` will now always be rendered with no equals sign (e.g. `?param`).
+   Previously some methods (such as `?`, `&`, `\?`, `addParam` and `addParams`) would not render parameters with a value of `None` at all.
+ * In most cases `Url.parse` should be used instead of `Uri.parse`. See all parse methods [here](#parsing-urls)
+ * `scheme` is now called `schemeOption` on `Uri`. If you have an instance of `AbsoluteUrl` or `ProtocolRelativeUrl`
+   there is still `scheme` method but it returns `String` rather than `Option[String]`
+ * `protocol` method has been removed from `Uri`. Use `schemeOption` instead
+ * Type changed from `Seq` to `Vector` for:
+   * `subdomains`, `publicSuffixes`, `params` return type
+   * `removeAll` and `removeParams` argument types
+   * `params` field in `QueryString`
+   * `paramMap` and `pathParts` fields in `Uri`, now `Url`
+ * Methods `addParam` and `addParams`  that took Option arguments are now called `addParamOptionValue` and `addParamsOptionValues`
+ * Method `replaceAllParams` has been replaced with `withQueryString` or `withQueryStringOptionValues`
+ * Method `removeAllParams` has been replaced with `withQueryString(QueryString.empty)`
+ * Method `subdomain` has been removed from the scala-js version. The implementation was incorrect and did not
+   match the JVM version of `subdomain`. Once public suffixes are supported for the scala-js version, a correct
+   implementation of `subdomain` can be added
+ * Implicit `UriConfig`s now need to be where your `Uri`s are parsed/constructed, rather than where they are rendered
+ * Method `hostParts` has been removed from `Uri`. This method predated `publicSuffix` and `subdomain` which are more
+   useful methods for pulling apart a host
+ * Field `pathStartsWithSlash` removed from `Uri`. This was only intended to be used internally. You can now instead
+   check if `Uri.path` is an instance of `AbsolutePath` to determine if the path will start with slash
 
 ## 0.4.x to 0.5.x
 

@@ -1,5 +1,5 @@
-package com.netaporter.uri.parsing
+package io.lemonlabs.uri.parsing
 
-import com.netaporter.uri.UriException
+import io.lemonlabs.uri.UriException
 
 class UriParsingException(msg: String) extends UriException(msg)

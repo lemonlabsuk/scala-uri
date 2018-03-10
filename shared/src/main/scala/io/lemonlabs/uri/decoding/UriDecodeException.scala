@@ -1,5 +1,5 @@
-package com.netaporter.uri.decoding
+package io.lemonlabs.uri.decoding
 
-import com.netaporter.uri.UriException
+import io.lemonlabs.uri.UriException
 
 class UriDecodeException(message: String) extends UriException(message)

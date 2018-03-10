@@ -92,6 +92,6 @@ lazy val scalaUri =
 lazy val scalaUriJs     = scalaUri.js
 lazy val scalaUriJvm    = scalaUri.jvm
 
-lazy val updatePublicSuffixes = taskKey[Unit]("Updates the public suffix Trie at com.netaporter.uri.internet.PublicSuffixes")
+lazy val updatePublicSuffixes = taskKey[Unit]("Updates the public suffix Trie at io.lemonlabs.uri.internet.PublicSuffixes")
 
 updatePublicSuffixes := UpdatePublicSuffixTrie.generate()

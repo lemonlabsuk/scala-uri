@@ -27,7 +27,7 @@ To include it in your SBT project from maven central:
 "io.lemonlabs" %% "scala-uri" % "0.5.7"
 ```
 
-There is also a [demo project](https://github.com/NET-A-PORTER/scala-uri-demo) to help you get up and running quickly, from scratch.
+There are also demo projects for both [scala](https://github.com/NET-A-PORTER/scala-uri-demo) and [scala-js](https://github.com/lemonlabsuk/scala-uri-scalajs-example) to help you get up and running quickly.
 
 *Note:* This library works best when using Scala `2.11.2+`. Due a bug in older versions of Scala, this library  can result in `StackOverflowException`s for very large URLs when using versions of Scala older than `2.11.2`. [More details](https://github.com/NET-A-PORTER/scala-uri/issues/51#issuecomment-45759462)
 
@@ -36,7 +36,7 @@ There is also a [demo project](https://github.com/NET-A-PORTER/scala-uri-demo) t
 ### Parse a URL
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val url = Url.parse("https://www.scala-lang.org")
 ```
@@ -46,7 +46,7 @@ The returned value has type `Url` with an underlying implementation of `Absolute
 use the following `parse` methods to get a more specific return type
 
 ```scala
-import com.netaporter.uri._
+import io.lemonlabs.uri._
 
 val absoluteUrl = AbsoluteUrl.parse("https://www.scala-lang.org")
 val relativeUrl = RelativeUrl.parse("/index.html")
@@ -57,7 +57,7 @@ val protocolRelativeUrl = ProtocolRelativeUrl.parse("//www.scala-lang.org")
 ## Parse a URN
 
 ```scala
-import com.netaporter.uri.Urn
+import io.lemonlabs.uri.Urn
 
 val urn = Urn.parse("urn:isbn:0981531687")
 urn.schemeOption // This is Some("urn")
@@ -70,7 +70,7 @@ urn.nss // This is "0981531687"
 `Url` provides an apply method with a bunch of optional parameters that can be used to build URLs
 
 ```
-import com.netaporter.uri.{Url, QueryString}
+import io.lemonlabs.uri.{Url, QueryString}
 
 val url = Url(scheme = "http", host = "lemonlabs.io", path = "/opensource")
 val url2 = Url(path = "/opensource", query = QueryString.fromPairs("param1" -> "a", "param2" -> "b"))
@@ -84,7 +84,7 @@ The `mapQuery` method will transform the Query String of a URI by applying the s
 Query String Parameter. Any parameters not matched in the `PartialFunction` will be left as-is.
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("/scala-uri?p1=one&p2=2&p3=true")
 
@@ -97,7 +97,7 @@ uri.mapQuery {
 The `mapQueryNames` and `mapQueryValues` provide a more convenient way to transform just Query Parameter names or values
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("/scala-uri?p1=one&p2=2&p3=true")
 
@@ -110,7 +110,7 @@ uri.mapQueryValues(_.replace("true", "false")) // Results in /scala-uri?p1=one&p
 The `filterQuery` method will remove any Query String Parameters for which the provided Function returns false
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("/scala-uri?p1=one&p2=2&p3=true")
 
@@ -125,7 +125,7 @@ uri.filterQuery(_._1 == "p1") // Results in /scala-uri?p1=one
 The `filterQueryNames` and `filterQueryValues` provide a more convenient way to filter just by Query Parameter name or value
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("/scala-uri?p1=one&p2=2&p3=true")
 
@@ -139,7 +139,7 @@ The `collectQuery` method will transform the Query String of a URI by applying t
 Query String Parameter. Any parameters not matched in the `PartialFunction` will be removed.
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("/scala-uri?p1=one&p2=2&p3=true")
 
@@ -152,7 +152,7 @@ uri.collectQuery {
 ## Pattern Matching URIs
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri: Uri = Uri.parse(...)
 uri match {
@@ -172,7 +172,7 @@ uri match {
 In some cases `scalac` will be able to detect instances where not all cases are being matched. For example:
 
 ```scala
-import com.netaporter.uri.Uri
+import io.lemonlabs.uri.Uri
 
 Uri.parse("/test") match {
   case u: Url => println(u.toString)
@@ -197,7 +197,7 @@ You can parse a String representing the host part of a URI with `Host.parse`. Th
 underling implementation of `DomainName`, `IpV4` or `IpV6`.
 
 ```scala
-import com.netaporter.uri.Host
+import io.lemonlabs.uri.Host
 
 val host = Host.parse("lemonlabs.io")
 ```
@@ -205,7 +205,7 @@ val host = Host.parse("lemonlabs.io")
 #### Parsing IPs
 
 ```scala
-import com.netaporter.uri.{IpV4, IpV6}
+import io.lemonlabs.uri.{IpV4, IpV6}
 
 val ipv4 = IpV4.parse("13.32.214.142")
 val ipv6 = IpV6.parse("[1:2:3:4:5:6:7:8]")
@@ -214,7 +214,7 @@ val ipv6 = IpV6.parse("[1:2:3:4:5:6:7:8]")
 ### Matching Hosts
 
 ```scala
-import com.netaporter.uri.Host
+import io.lemonlabs.uri.Host
 
 val host: Host = Host.parse(...)
 host match {
@@ -230,7 +230,7 @@ host match {
 ### Matching Paths
 
 ```scala
-import com.netaporter.uri.Path
+import io.lemonlabs.uri.Path
 
 val path: Path = Path.parse(...)
 path match {
@@ -253,7 +253,7 @@ path match {
 By Default, `scala-uri` will URL percent encode paths and query string parameters. To prevent this, you can call the `uri.toStringRaw` method:
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("http://example.com/path with space?param=üri")
 
@@ -262,13 +262,13 @@ uri.toString // This is: http://example.com/path%20with%20space?param=%C3%BCri
 uri.toStringRaw // This is: http://example.com/path with space?param=üri
 ```
 
-The characters that `scala-uri` will percent encode by default can be found [here](https://github.com/NET-A-PORTER/scala-uri/blob/master/src/main/scala/com/netaporter/uri/encoding/PercentEncoder.scala#L21). You can modify which characters are percent encoded like so:
+The characters that `scala-uri` will percent encode by default can be found [here](https://github.com/lemonlabsuk/scala-uri/blob/master/shared/src/main/scala/io/lemonlabs/uri/encoding/PercentEncoder.scala#L51). You can modify which characters are percent encoded like so:
 
 Only percent encode the hash character:
 
 ```scala
-import com.netaporter.uri.config.UriConfig
-import com.netaporter.uri.encoding._
+import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.encoding._
 
 implicit val config = UriConfig(encoder = percentEncode('#'))
 ```
@@ -276,8 +276,8 @@ implicit val config = UriConfig(encoder = percentEncode('#'))
 Percent encode all the default chars, except the plus character:
 
 ```scala
-import com.netaporter.uri.config.UriConfig
-import com.netaporter.uri.encoding._
+import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.encoding._
 
 implicit val config = UriConfig(encoder = percentEncode -- '+')
 ```
@@ -285,8 +285,8 @@ implicit val config = UriConfig(encoder = percentEncode -- '+')
 Encode all the default chars, and also encode the letters a and b:
 
 ```scala
-import com.netaporter.uri.config.UriConfig
-import com.netaporter.uri.encoding._
+import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.encoding._
 
 implicit val config = UriConfig(encoder = percentEncode ++ ('a', 'b'))
 ```
@@ -296,9 +296,9 @@ implicit val config = UriConfig(encoder = percentEncode ++ ('a', 'b'))
 The default behaviour with scala uri, is to encode spaces as `%20`, however if you instead wish them to be encoded as the `+` symbol, then simply add the following `implicit val` to your code:
 
 ```scala
-import com.netaporter.uri.Url
-import com.netaporter.uri.config.UriConfig
-import com.netaporter.uri.encoding._
+import io.lemonlabs.uri.Url
+import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.encoding._
 
 implicit val config = UriConfig(encoder = percentEncode + spaceAsPlus)
 
@@ -311,9 +311,9 @@ uri.toString // This is http://theon.github.com/uri+with+space
 If you would like to do some custom encoding for specific characters, you can use the `encodeCharAs` encoder.
 
 ```scala
-import com.netaporter.uri.Url
-import com.netaporter.uri.config.UriConfig
-import com.netaporter.uri.encoding._
+import io.lemonlabs.uri.Url
+import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.encoding._
 
 implicit val config = UriConfig(encoder = percentEncode + encodeCharAs(' ', "_"))
 
@@ -326,7 +326,7 @@ uri.toString // This is http://theon.github.com/uri_with_space
 By Default, `scala-uri` will URL percent decode paths and query string parameters during parsing:
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("http://example.com/i-have-%25been%25-percent-encoded")
 
@@ -337,9 +337,9 @@ uri.toStringRaw // This is: http://example.com/i-have-%been%-percent-encoded
 To prevent this, you can bring the following implicit into scope:
 
 ```scala
-import com.netaporter.uri.Url
-import com.netaporter.uri.config.UriConfig
-import com.netaporter.uri.decoding.NoopDecoder
+import io.lemonlabs.uri.Url
+import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.decoding.NoopDecoder
 
 implicit val c = UriConfig(decoder = NoopDecoder)
 
@@ -354,7 +354,7 @@ uri.toStringRaw // This is: http://example.com/i-havent-%been%-percent-encoded
 If your Uri contains invalid percent encoding, by default scala-uri will throw a `UriDecodeException`:
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 Url.parse("/?x=%3") // This throws a UriDecodeException
 ```
@@ -362,9 +362,9 @@ Url.parse("/?x=%3") // This throws a UriDecodeException
 You can configure scala-uri to instead ignore invalid percent encoding and *only* percent decode correctly percent encoded values like so:
 
 ```scala
-import com.netaporter.uri.Url
-import com.netaporter.uri.config.UriConfig
-import com.netaporter.uri.decoding.PercentDecoder
+import io.lemonlabs.uri.Url
+import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.decoding.PercentDecoder
 
 implicit val c = UriConfig(
   decoder = PercentDecoder(ignoreInvalidPercentEncoding = true)
@@ -379,7 +379,7 @@ uri.toStringRaw // This is /?x=%3
 If you wish to replace all existing query string parameters with a given name, you can use the `Url.replaceParams()` method:
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("http://example.com/path?param=1")
 val newUri = uri.replaceParams("param", "2")
@@ -392,7 +392,7 @@ newUri.toString // This is: http://example.com/path?param=2
 If you wish to remove all existing query string parameters with a given name, you can use the `uri.removeParams()` method:
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("http://example.com/path?param=1&param2=2")
 val newUri = uri.removeParams("param")
@@ -405,7 +405,7 @@ newUri.toString //This is: http://example.com/path?param2=2
 To get the query string parameters as a `Map[String,Seq[String]]` you can do the following:
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("http://example.com/path?a=b&a=c&d=e")
 uri.query.paramMap // This is: Map("a" -> Vector("b", "c"), "d" -> Vector("e"))
@@ -418,7 +418,7 @@ uri.query.paramMap // This is: Map("a" -> Vector("b", "c"), "d" -> Vector("e"))
 Parsing URLs with user information:
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val url = Url.parse("http://user:pass@host.com")
 url.user // This is Some("user")
@@ -428,14 +428,14 @@ url.password // This is Some("pass")
 Modifying user information:
 
 ```scala
-import com.netaporter.uri.AbsoluteUrl
+import io.lemonlabs.uri.AbsoluteUrl
 
 val url = AbsoluteUrl.parse("http://host.com")
 url.withUser("jack") // URL is now http://jack@host.com
 ```
 
 ```scala
-import com.netaporter.uri.AbsoluteUrl
+import io.lemonlabs.uri.AbsoluteUrl
 
 val url = AbsoluteUrl.parse("http://user:pass@host.com")
 url.withPassword("secret") // URL is now http://user:secret@host.com
@@ -448,7 +448,7 @@ url.withPassword("secret") // URL is now http://user:secret@host.com
 [Protocol Relative URLs](http://paulirish.com/2010/the-protocol-relative-url/) are supported in `scala-uri`. A `Uri` object with a protocol of `None`, but a host of `Some(x)` will be considered a protocol relative URL.
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("//example.com/path") // Return type is Url
 uri.schemeOption // This is: None
@@ -458,7 +458,7 @@ uri.hostOption // This is: Some("example.com")
 Use `ProtocolRelativeUrl.parse` if you know your URL will always be Protocol Relative:
 
 ```scala
-import com.netaporter.uri.ProtocolRelativeUrl
+import io.lemonlabs.uri.ProtocolRelativeUrl
 
 val uri = ProtocolRelativeUrl.parse("//example.com/path") // Return type is ProtocolRelativeUrl
 uri.schemeOption // This is: None
@@ -470,7 +470,7 @@ uri.host // This is: "example.com"
 By default `scala-uri` uses `UTF-8` charset encoding:
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("http://theon.github.com/uris-in-scala.html?chinese=网址")
 uri.toString // This is http://theon.github.com/uris-in-scala.html?chinese=%E7%BD%91%E5%9D%80
@@ -479,8 +479,8 @@ uri.toString // This is http://theon.github.com/uris-in-scala.html?chinese=%E7%B
 This can be changed like so:
 
 ```scala
-import com.netaporter.uri.config.UriConfig
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.Url
 
 implicit val conf = UriConfig(charset = "GB2312")
 
@@ -493,7 +493,7 @@ uri.toString // This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F
 **Note:** *Currently not supported for scala-js*
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 // This returns Some("www")
 Url.parse("http://www.example.com/blah").subdomain
@@ -526,7 +526,7 @@ the TLD of your absolute URIs.
 The `publicSuffix` method returns the longest public suffix from your URI
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("http://www.google.co.uk/blah")
 uri.publicSuffix // This returns Some("co.uk")
@@ -535,7 +535,7 @@ uri.publicSuffix // This returns Some("co.uk")
 The `publicSuffixes` method returns all the public suffixes from your URI
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val uri = Url.parse("http://www.google.co.uk/blah")
 uri.publicSuffixes // This returns Vector("co.uk", "uk")
@@ -546,7 +546,7 @@ These methods return `None` and `Vector.empty`, respectively for URLs without a 
 ## mailto
 
 ```scala
-import com.netaporter.uri.Url
+import io.lemonlabs.uri.Url
 
 val mailto = Url.parse("mailto:someone@example.com?subject=Hello")
 mailto.scheme // This is Some(mailto")
@@ -556,10 +556,10 @@ mailto.query.param("subject") // This is Some("Hello")
 
 ## URL builder DSL
 
-By importing `com.netaporter.uri.dsl._`, you may use a DSL to construct URLs
+By importing `io.lemonlabs.uri.dsl._`, you may use a DSL to construct URLs
 
 ```scala
-import com.netaporter.uri.dsl._
+import io.lemonlabs.uri.dsl._
 
 // Query Strings
 
@@ -592,7 +592,7 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 `scala-uri` `0.5.x` is currently built with support for scala `2.12.x`, `2.11.x`
 
  * For `2.10.x` support use `scala-uri` `0.4.x`
- * For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/net-a-porter/scala-uri/tree/0.3.x)
+ * For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.3.x)
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 

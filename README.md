@@ -639,6 +639,8 @@ For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https:/
    hierarchy that fits your use case
  * `Uri` used to be a case class, but the replacements `Uri` and `Url` are now traits. This means they no longer
    have a `copy` method. Use the `with` methods instead (e.g. `withHost`, `withPath` etc)
+ * `host` method on `Url` now has return type `Host` rather than `String`. You may have to change `url.host` to `url.host.toString`
+ * `path` method on `Url` now has return type `Path` rather than `String`. You may have to change `url.path` to `url.path.toString`
  * Changed parameter value type from `Any` to `String` in methods `addParam`, `addParams`, `replaceParams`.
    Please now call `.toString` before passing non String types to these methods
  * Changed parameter value type from `Option[Any]` to `Option[String]` in method `replaceAll`.

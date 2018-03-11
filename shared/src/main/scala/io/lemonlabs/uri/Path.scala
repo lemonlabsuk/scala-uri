@@ -10,6 +10,9 @@ sealed trait Path {
   def parts: Vector[String]
   private[uri] def toString(config: UriConfig): String
 
+  def isEmpty: Boolean
+  def nonEmpty: Boolean = !isEmpty
+
   /**
     * Returns the path with no encoders taking place (e.g. non ASCII characters will not be percent encoded)
     * @return String containing the raw path for this Uri
@@ -40,8 +43,6 @@ sealed trait UrlPath extends Path {
   def toRootless: RootlessPath
   def toAbsolute: AbsolutePath
   def toAbsoluteOrEmpty: AbsoluteOrEmptyPath
-
-  def isEmpty: Boolean
 
   def addPart(part: String): UrlPath =
     withParts(parts :+ part)
@@ -172,6 +173,9 @@ final case class UrnPath(nid: String, nss: String)(implicit val config: UriConfi
 
   def toUrlPath: UrlPath =
     UrlPath(parts)
+
+  def isEmpty: Boolean =
+    false
 
   private[uri] def toString(c: UriConfig): String =
     nid + ":" + c.pathEncoder.encode(nss, c.charset)

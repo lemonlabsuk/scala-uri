@@ -5,7 +5,7 @@ script: >
  cd target &&
  git clone https://github.com/lemonlabsuk/scala-uri-demo.git &&
  cd scala-uri-demo &&
- sbt -Dscala.ver=$TRAVIS_SCALA_VERSION -Dscala.uri.ver=0.5.7 test
+ sbt -Dscala.ver=$TRAVIS_SCALA_VERSION -Dscala.uri.ver=1.0.0-rc1 test
 
 jdk:
   - oraclejdk8

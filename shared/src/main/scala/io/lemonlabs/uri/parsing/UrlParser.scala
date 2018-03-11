@@ -58,8 +58,12 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
     *
     * The host in the URL `http://1.2.3.4.blah/` should be DomainName(1.2.3.4.blah), not IPv4(1.2.3.4)
     */
+  def _ip_in_url_end: Rule0 = rule {
+    &(anyOf(_host_end) | EOI)
+  }
+
   def _host_in_authority: Rule1[Host] = rule {
-    (_ip_v4 ~ &(anyOf(_host_end))) | (_ip_v6 ~ &(anyOf(_host_end))) | _domain_name
+    (_ip_v4 ~ _ip_in_url_end) | _ip_v6 | _domain_name
   }
 
   def _user_info: Rule1[UserInfo] = rule {

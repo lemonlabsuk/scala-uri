@@ -67,6 +67,12 @@ class ParsingTests extends FlatSpec with Matchers {
     url.hostOption should equal(Some(DomainName("1.2.3")))
   }
 
+  it should "parse with no path" in {
+    val url = Url.parse("http://1.2.3.4")
+    url.hostOption should equal(Some(IpV4(1, 2, 3, 4)))
+    url.path should equal(EmptyPath)
+  }
+
   "Parsing a url with IPv6address" should "parse address with a ::" in {
     val url = Url.parse("http://[2001:db8::7]:9000/uris-in-scala.html")
     url.hostOption should equal(Some(IpV6("2001", "db8", "0", "0", "0", "0", "0", "7")))

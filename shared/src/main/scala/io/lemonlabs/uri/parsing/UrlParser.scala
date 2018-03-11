@@ -195,7 +195,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   val extractPathPart = (pathPart: String) =>
     pathDecoder.decode(pathPart)
 
-  val extractAbsOrEmptyPath = (pp: Seq[String]) =>
+  val extractAbsOrEmptyPath = (pp: immutable.Seq[String]) =>
     if(pp.isEmpty) EmptyPath
     else AbsolutePath(pp.toVector)
 

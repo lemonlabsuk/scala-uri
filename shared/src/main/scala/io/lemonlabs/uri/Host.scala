@@ -1,12 +1,52 @@
 package io.lemonlabs.uri
 
 import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.inet._
 import io.lemonlabs.uri.parsing.UrlParser
 
 import scala.annotation.tailrec
 import scala.collection.GenSeq
 
-sealed trait Host
+sealed trait Host extends PublicSuffixSupport {
+  def value: String
+  override def toString: String = value
+
+  /**
+    * Returns the second largest subdomain for this URL's host.
+    *
+    * E.g. for http://a.b.c.example.com returns a.b.c
+    *
+    * Note: In the event there is only one subdomain (i.e. the host is the root domain), this method returns `None`.
+    * E.g. This method will return `None` for `http://example.com`.
+    *
+    * @return the second largest subdomain for this URL's host
+    */
+  def subdomain: Option[String]
+
+  /**
+    * Returns all subdomains for this URL's host.
+    * E.g. for http://a.b.c.example.com returns a, a.b, a.b.c and a.b.c.example
+    *
+    * @return all subdomains for this URL's host
+    */
+  def subdomains: Vector[String]
+
+  /**
+    * Returns the shortest subdomain for this URL's host.
+    * E.g. for http://a.b.c.example.com returns a
+    *
+    * @return the shortest subdomain for this URL's host
+    */
+  def shortestSubdomain: Option[String]
+
+  /**
+    * Returns the longest subdomain for this URL's host.
+    * E.g. for http://a.b.c.example.com returns a.b.c.example
+    *
+    * @return the longest subdomain for this URL's host
+    */
+  def longestSubdomain: Option[String]
+}
 
 object Host {
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Host =
@@ -16,8 +56,68 @@ object Host {
     Some(host.toString)
 }
 
-final case class DomainName(value: String) extends Host {
+final case class DomainName(value: String) extends Host with PublicSuffixSupportImpl {
   override def toString: String = value
+
+  /**
+    * Returns the second largest subdomain for this URL's host.
+    *
+    * E.g. for http://a.b.c.example.com returns a.b.c
+    *
+    * Note: In the event there is only one subdomain (i.e. the host is the root domain), this method returns `None`.
+    * E.g. This method will return `None` for `http://example.com`.
+    *
+    * @return the second largest subdomain for this URL's host
+    */
+  def subdomain: Option[String] = longestSubdomain flatMap { ls =>
+    ls.lastIndexOf('.') match {
+      case -1 => None
+      case i => Some(ls.substring(0, i))
+    }
+  }
+
+  /**
+    * Returns all subdomains for this URL's host.
+    * E.g. for http://a.b.c.example.com returns a, a.b, a.b.c and a.b.c.example
+    *
+    * @return all subdomains for this URL's host
+    */
+  def subdomains: Vector[String] = {
+    def concatHostParts(longestSubdomainStr: String) = {
+      val parts = longestSubdomainStr.split('.').toVector
+      if (parts.size == 1) parts
+      else {
+        parts.tail.foldLeft(Vector(parts.head)) { (subdomainList, part) =>
+          subdomainList :+ (subdomainList.last + '.' + part)
+        }
+      }
+    }
+
+    longestSubdomain.map(concatHostParts).getOrElse(Vector.empty)
+  }
+
+  /**
+    * Returns the shortest subdomain for this URL's host.
+    * E.g. for http://a.b.c.example.com returns a
+    *
+    * @return the shortest subdomain for this URL's host
+    */
+  def shortestSubdomain: Option[String] =
+    longestSubdomain.map(_.takeWhile(_ != '.'))
+
+  /**
+    * Returns the longest subdomain for this URL's host.
+    * E.g. for http://a.b.c.example.com returns a.b.c.example
+    *
+    * @return the longest subdomain for this URL's host
+    */
+  def longestSubdomain: Option[String] = {
+    val publicSuffixLength: Int = publicSuffix.map(_.length + 1).getOrElse(0)
+    value.dropRight(publicSuffixLength) match {
+      case "" => None
+      case other => Some(other)
+    }
+  }
 }
 
 object DomainName {
@@ -37,7 +137,14 @@ final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte) ex
   def octets: Vector[Byte] = Vector(octet1, octet2, octet3, octet4)
   def octetsInt: Vector[Int] = Vector(octet1Int, octet2Int, octet3Int, octet4Int)
 
-  override def toString: String = s"$octet1Int.$octet2Int.$octet3Int.$octet4Int"
+  def value: String = s"$octet1Int.$octet2Int.$octet3Int.$octet4Int"
+
+  def publicSuffix: Option[String] = None
+  def publicSuffixes: Vector[String] = Vector.empty
+  def subdomain: Option[String] = None
+  def subdomains: Vector[String] = Vector.empty
+  def shortestSubdomain: Option[String] = None
+  def longestSubdomain: Option[String] = None
 }
 
 object IpV4 {
@@ -92,7 +199,14 @@ final case class IpV6(piece1: Char, piece2: Char, piece3: Char, piece4: Char,
     longestRun(0, (-1, -1), 0)
   }
 
-  override def toString: String = elidedStartAndEnd() match {
+  def publicSuffix: Option[String] = None
+  def publicSuffixes: Vector[String] = Vector.empty
+  def subdomain: Option[String] = None
+  def subdomains: Vector[String] = Vector.empty
+  def shortestSubdomain: Option[String] = None
+  def longestSubdomain: Option[String] = None
+
+  def value: String = elidedStartAndEnd() match {
     case (-1, -1) => toStringNonNormalised
     case (start, end) =>
       "[" + hexPieces.take(start).mkString(":") + "::" + hexPieces.drop(end).mkString(":") + "]"

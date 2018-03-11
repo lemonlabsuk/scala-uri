@@ -1,9 +1,7 @@
 package io.lemonlabs.uri.inet
 
-import io.lemonlabs.uri.Authority
-import io.lemonlabs.uri.NotImplementedForScalaJsError
+trait PublicSuffixSupport {
 
-trait PublicSuffixSupport { this: Authority =>
   /**
     * Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`
@@ -11,8 +9,7 @@ trait PublicSuffixSupport { this: Authority =>
     *
     * @return the longest public suffix for the host in this URI
     */
-  def publicSuffix: Option[String] =
-    throw NotImplementedForScalaJsError
+  def publicSuffix: Option[String]
 
   /**
     * Returns all longest public suffixes for the host in this URI. Examples include:
@@ -21,6 +18,6 @@ trait PublicSuffixSupport { this: Authority =>
     *
     * @return all public suffixes for the host in this URI
     */
-  def publicSuffixes: Vector[String] =
-    throw NotImplementedForScalaJsError
+  def publicSuffixes: Vector[String]
+
 }

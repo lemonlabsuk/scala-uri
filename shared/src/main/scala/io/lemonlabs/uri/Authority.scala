@@ -1,6 +1,5 @@
 package io.lemonlabs.uri
 
-import io.lemonlabs.uri.inet.PublicSuffixSupport
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.UrlParser
 
@@ -8,10 +7,30 @@ import io.lemonlabs.uri.parsing.UrlParser
 case class Authority(userInfo: UserInfo,
                      host: Host,
                      port: Option[Int])
-                    (implicit config: UriConfig) extends PublicSuffixSupport {
+                    (implicit config: UriConfig) {
 
   def user: Option[String] = userInfo.user
   def password: Option[String] = userInfo.password
+
+  /**
+    * Returns the longest public suffix for the host in this URI. Examples include:
+    *  `com`   for `www.example.com`
+    *  `co.uk` for `www.example.co.uk`
+    *
+    * @return the longest public suffix for the host in this URI
+    */
+  def publicSuffix: Option[String] =
+    host.publicSuffix
+
+  /**
+    * Returns all longest public suffixes for the host in this URI. Examples include:
+    *  `com` for `www.example.com`
+    *  `co.uk` and `uk` for `www.example.co.uk`
+    *
+    * @return all public suffixes for the host in this URI
+    */
+  def publicSuffixes: Vector[String] =
+    host.publicSuffixes
 
   /**
     * Returns the second largest subdomain for this URL's host.
@@ -23,12 +42,8 @@ case class Authority(userInfo: UserInfo,
     *
     * @return the second largest subdomain for this URL's host
     */
-  def subdomain: Option[String] = longestSubdomain flatMap { ls =>
-    ls.lastIndexOf('.') match {
-      case -1 => None
-      case i => Some(ls.substring(0, i))
-    }
-  }
+  def subdomain: Option[String] =
+    host.subdomain
 
   /**
     * Returns all subdomains for this URL's host.
@@ -36,19 +51,8 @@ case class Authority(userInfo: UserInfo,
     *
     * @return all subdomains for this URL's host
     */
-  def subdomains: Vector[String] = {
-    def concatHostParts(longestSubdomainStr: String) = {
-      val parts = longestSubdomainStr.split('.').toVector
-      if (parts.size == 1) parts
-      else {
-        parts.tail.foldLeft(Vector(parts.head)) { (subdomainList, part) =>
-          subdomainList :+ (subdomainList.last + '.' + part)
-        }
-      }
-    }
-
-    longestSubdomain.map(concatHostParts).getOrElse(Vector.empty)
-  }
+  def subdomains: Vector[String] =
+    host.subdomains
 
   /**
     * Returns the shortest subdomain for this URL's host.
@@ -57,7 +61,7 @@ case class Authority(userInfo: UserInfo,
     * @return the shortest subdomain for this URL's host
     */
   def shortestSubdomain: Option[String] =
-    longestSubdomain.map(_.takeWhile(_ != '.'))
+    host.shortestSubdomain
 
   /**
     * Returns the longest subdomain for this URL's host.
@@ -65,13 +69,8 @@ case class Authority(userInfo: UserInfo,
     *
     * @return the longest subdomain for this URL's host
     */
-  def longestSubdomain: Option[String] = {
-    val publicSuffixLength: Int = publicSuffix.map(_.length + 1).getOrElse(0)
-    host.toString.dropRight(publicSuffixLength) match {
-      case "" => None
-      case other => Some(other)
-    }
-  }
+  def longestSubdomain: Option[String] =
+    host.longestSubdomain
 
   private[uri] def toString(c: UriConfig): String = {
     val userInfo = for {

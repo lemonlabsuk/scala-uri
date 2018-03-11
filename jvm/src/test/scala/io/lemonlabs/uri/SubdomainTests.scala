@@ -34,6 +34,21 @@ class SubdomainTests extends FlatSpec with Matchers {
     subdomain should equal(Some("a.b"))
   }
 
+  "subdomain" should "return for URL with no public suffix" in {
+    val subdomain = Url.parse("http://1.2.3/").subdomain
+    subdomain should equal(Some("1.2"))
+  }
+
+  "subdomain" should "NOT return for URL with IPv4" in {
+    val subdomain = Url.parse("http://1.2.3.4/").subdomain
+    subdomain should equal(None)
+  }
+
+  "subdomain" should "NOT return for URL with IPv6" in {
+    val subdomain = Url.parse("http://[1:2:3:4:5:6:7:8]/").subdomain
+    subdomain should equal(None)
+  }
+
   "subdomain" should "return None for root domain http://a.com/" in {
     val subdomain = Url.parse("http://a.com/").subdomain
     subdomain should equal(None)

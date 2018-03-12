@@ -7,7 +7,7 @@
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
- * A [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt) compliant [parser](#parsing-urls) to parse URLs and URNs from Strings
+ * A [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt) compliant [parser](#parsing) to parse URLs and URNs from Strings
  * URL [Builders](#building-urls) to create URLs from scratch
  * Ability to transform query strings with methods such as [filterQuery](#filterquery) and [mapQuery](#mapquery)
  * Ability to [replace](#replacing-query-string-parameters) and [remove](#removing-query-string-parameters) query string parameters
@@ -16,7 +16,7 @@
  * Support for [custom encoding](#custom-encoding) such as encoding [spaces as pluses](#encoding-spaces-as-pluses)
  * Support for [protocol relative urls](#protocol-relative-urls)
  * Support for [user information](#user-information) e.g. `ftp://user:password@mysite.com`
- * Support for [URNs](#urns)
+ * Support for [URNs](#parse-a-urn)
  * Support for [mailto](#mailto) URLs
  * Support for [scala-js](#scala-js-support)
  * No dependencies on existing web frameworks
@@ -27,7 +27,9 @@ To include it in your SBT project from maven central:
 "io.lemonlabs" %% "scala-uri" % "1.0.0-rc1"
 ```
 
-There are also demo projects for both [scala](https://github.com/NET-A-PORTER/scala-uri-demo) and [scala-js](https://github.com/lemonlabsuk/scala-uri-scalajs-example) to help you get up and running quickly.
+[Migration Guide](#0.5.x-to-1.x.x) from 0.5.x
+
+There are also demo projects for both [scala](https://github.com/lemonlabsuk/scala-uri-demo) and [scala-js](https://github.com/lemonlabsuk/scala-uri-scalajs-example) to help you get up and running quickly.
 
 *Note:* This library works best when using Scala `2.11.2+`. Due a bug in older versions of Scala, this library  can result in `StackOverflowException`s for very large URLs when using versions of Scala older than `2.11.2`. [More details](https://github.com/NET-A-PORTER/scala-uri/issues/51#issuecomment-45759462)
 
@@ -65,11 +67,16 @@ urn.nid // This is "isbn"
 urn.nss // This is "0981531687"
 ```
 
+## Parse a URIs
+
+You can use `Uri.parse` to parse URNs as well as URLs. `Url.parse` and `Urn.parse` are preferable as they return
+a more specific return type
+
 ## Building URLs
 
 `Url` provides an apply method with a bunch of optional parameters that can be used to build URLs
 
-```
+```scala
 import io.lemonlabs.uri.{Url, QueryString}
 
 val url = Url(scheme = "http", host = "lemonlabs.io", path = "/opensource")
@@ -302,7 +309,7 @@ import io.lemonlabs.uri.encoding._
 
 implicit val config = UriConfig(encoder = percentEncode + spaceAsPlus)
 
-val uri = Uri.parse("http://theon.github.com/uri with space")
+val uri = Url.parse("http://theon.github.com/uri with space")
 uri.toString // This is http://theon.github.com/uri+with+space
 ```
 
@@ -317,7 +324,7 @@ import io.lemonlabs.uri.encoding._
 
 implicit val config = UriConfig(encoder = percentEncode + encodeCharAs(' ', "_"))
 
-val uri = Uri.parse("http://theon.github.com/uri with space")
+val uri = Url.parse("http://theon.github.com/uri with space")
 uri.toString // This is http://theon.github.com/uri_with_space
 ```
 
@@ -545,10 +552,12 @@ These methods return `None` and `Vector.empty`, respectively for URLs without a 
 
 ## mailto
 
-```scala
-import io.lemonlabs.uri.Url
+Mailto URLs are best parsed with `UrlWithoutAuthority.parse`, but can also be parsed with `Url.parse`
 
-val mailto = Url.parse("mailto:someone@example.com?subject=Hello")
+```scala
+import io.lemonlabs.uri.UrlWithoutAuthority
+
+val mailto = UrlWithoutAuthority.parse("mailto:someone@example.com?subject=Hello")
 mailto.scheme // This is Some(mailto")
 mailto.path // This is "someone@example.com"
 mailto.query.param("subject") // This is Some("Hello")
@@ -616,7 +625,7 @@ Contributions to `scala-uri` are always welcome. Good ways to contribute include
 
  * Raising bugs and feature requests
  * Fixing bugs and developing new features (I will attempt to merge in pull requests ASAP)
- * Improving the performance of `scala-uri`. See the [Performance Tests](https://github.com/net-a-porter/scala-uri-benchmarks) project for details of how to run the `scala-uri` performance benchmarks.
+ * Improving the performance of `scala-uri`. See the [Performance Tests](https://github.com/lemonlabsuk/scala-uri-benchmarks) project for details of how to run the `scala-uri` performance benchmarks.
 
 # Building scala-uri
 
@@ -628,11 +637,14 @@ Generate code coverage reports from the sbt console by running `sbt coverage tes
 
 ## Performance Tests
 
-For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https://github.com/net-a-porter/scala-uri-benchmarks) github project
+For the `scala-uri` performance tests head to the [scala-uri-benchmarks](https://github.com/lemonlabsuk/scala-uri-benchmarks) github project
 
 # Migration guides
 
 ## 0.5.x to 1.x.x
+
+Thanks to @evanbennett. `1.x.x` is inspired by his fork [here](https://github.com/evanbennett/scala-uri)
+and discussion [here](https://github.com/NET-A-PORTER/scala-uri/pull/113).
 
  * Package change from `com.netaporter.uri` to `io.lemonlabs.uri`
  * The single `Uri` case class has now been replaced with a class hierarchy. Use the most specific class in this

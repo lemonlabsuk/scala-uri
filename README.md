@@ -598,10 +598,10 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 
 ## Including scala-uri your project
 
-`scala-uri` `0.5.x` is currently built with support for scala `2.12.x`, `2.11.x`
+`scala-uri` `1.x.x` is currently built with support for scala `2.12.x`, `2.11.x`
 
- * For `2.10.x` support use `scala-uri` `0.4.x`
- * For `2.9.x` support use `scala-uri` [`0.3.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.3.x)
+ * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
+ * For `2.9.x` support use `scala-uri` `0.3.6` from branch [`0.3.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.3.x)
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 

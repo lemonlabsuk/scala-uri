@@ -1,4 +1,4 @@
-# scala-uri
+# scala-uri 0.4.x
 
 [![Build Status](https://travis-ci.org/lemonlabsuk/scala-uri.svg?branch=master)](https://travis-ci.org/NET-A-PORTER/scala-uri)
 [![codecov.io](http://codecov.io/github/lemonlabsuk/scala-uri/coverage.svg?branch=master)](https://codecov.io/gh/lemonlabsuk/scala-uri/branch/master)

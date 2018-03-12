@@ -24,7 +24,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "1.0.0-rc1"
+"io.lemonlabs" %% "scala-uri" % "1.0.0"
 ```
 
 [Migration Guide](#0.5.x-to-1.x.x) from 0.5.x
@@ -606,7 +606,7 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "1.0.0-rc1"
+"io.lemonlabs" %% "scala-uri" % "1.0.0"
 ```
 
 For maven users you should use (for 2.12.x):
@@ -615,7 +615,7 @@ For maven users you should use (for 2.12.x):
 <dependency>
     <groupId>io.lemonlabs</groupId>
     <artifactId>scala-uri_2.12</artifactId>
-    <version>1.0.0-rc1</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 

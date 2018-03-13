@@ -19,29 +19,11 @@ val sharedSettings = Seq(
 
 val jvmSettings = Seq(
   libraryDependencies ++= Seq(
-    "io.spray" %%  "spray-json" % "1.3.2"
+    "io.spray" %%  "spray-json" % "1.3.3"
   )
 )
 
 val publishingSettings = Seq(
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-  pgpSecretRing := file("secring.gpg"),
-  pgpPublicRing := file("pubring.gpg"),
-  pgpPassphrase := sys.env.get("PGP_PASSPHRASE").map(_.toCharArray),
-  releaseProcess += releaseStepCommand("sonatypeRelease"),
-  releaseCrossBuild := true,
-  releaseTagComment := version.value,
-  releaseCommitMessage := s"Bump version to ${version.value}",
-  (for {
-    username <- sys.env.get("SONATYPE_USERNAME")
-    password <- sys.env.get("SONATYPE_PASSWORD")
-  } yield
-    credentials += Credentials(
-      "Sonatype Nexus Repository Manager",
-      "oss.sonatype.org",
-      username,
-      password)
-  ).getOrElse(credentials ++= Seq()),
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
@@ -71,7 +53,7 @@ val publishingSettings = Seq(
         <developer>
           <id>theon</id>
           <name>Ian Forsey</name>
-          <url>http://theon.github.io</url>
+          <url>https://lemonlabs.io</url>
         </developer>
       </developers>
 )

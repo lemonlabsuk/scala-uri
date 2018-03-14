@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-VER=$(git tag | tail -n1)
+VER=$(git tag --sort=committerdate | tail -n1)
 
 echo "Current version is $VER, what is the next version?"
 read -r NEW_VER

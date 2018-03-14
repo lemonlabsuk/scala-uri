@@ -264,26 +264,25 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
 
   type ParamToString = PartialFunction[(String, Option[String]), String]
 
-  private[uri] def toString(c: UriConfig): String =
-    if(params.isEmpty) ""
-    else {
-      val enc = c.queryEncoder
-      val charset = c.charset
+  private[uri] def toString(c: UriConfig): String = {
+    val enc = c.queryEncoder
+    val charset = c.charset
 
-      val someToString: ParamToString = {
-        case (k, Some(v)) => enc.encode(k, charset) + "=" + enc.encode(v, charset)
-      }
-      val paramToString: ParamToString = someToString orElse {
-        case (k, None) => enc.encode(k, charset)
-      }
-
-      val paramsAsString = c.renderQuery match {
-        case All =>          params.map(paramToString)
-        case ExcludeNones => params.collect(someToString)
-      }
-
-      "?" + paramsAsString.mkString("&")
+    val someToString: ParamToString = {
+      case (k, Some(v)) => enc.encode(k, charset) + "=" + enc.encode(v, charset)
     }
+    val paramToString: ParamToString = someToString orElse {
+      case (k, None) => enc.encode(k, charset)
+    }
+
+    val paramsAsString = c.renderQuery match {
+      case All =>          params.map(paramToString)
+      case ExcludeNones => params.collect(someToString)
+    }
+
+    if(paramsAsString.isEmpty) ""
+    else "?" + paramsAsString.mkString("&")
+  }
 
   /**
     * Returns the query string with no encoding taking place (e.g. non ASCII characters will not be percent encoded)

@@ -44,6 +44,18 @@ class UrlDsl(val url: Url) extends AnyVal {
     /("").addParam(kv._1, anyToQueryValue(kv._2))
 
   /**
+    * Maybe adds a new Query String parameter key-value pair.
+    * If the value for the Query String parameter is None, then this Query String parameter will not be added,
+    * otherwise it will be added
+    * @param kv Tuple2 representing the query string parameter
+    * @return A new Uri with the new Query String parameter
+    */
+  def &&(kv: (String, Any)): Url = kv match {
+    case (k, None) => url
+    case (k, v)    => &(k, v)
+  }
+
+  /**
    * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
    * Query String parameter will be rendered without a value e.g. `?param` as opposed to `?param=value`
    * @param kv Tuple2 representing the query string parameter

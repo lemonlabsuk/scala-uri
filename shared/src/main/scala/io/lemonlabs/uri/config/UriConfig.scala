@@ -4,10 +4,6 @@ import io.lemonlabs.uri.encoding.{NoopEncoder, UriEncoder, PercentEncoder}
 import io.lemonlabs.uri.decoding.{PercentDecoder, UriDecoder}
 import PercentEncoder._
 
-/**
- * Date: 28/08/2013
- * Time: 21:31
- */
 case class UriConfig(userInfoEncoder: UriEncoder,
                      pathEncoder: UriEncoder,
                      queryEncoder: UriEncoder,
@@ -16,7 +12,8 @@ case class UriConfig(userInfoEncoder: UriEncoder,
                      pathDecoder: UriDecoder,
                      queryDecoder: UriDecoder,
                      fragmentDecoder: UriDecoder,
-                     charset: String) {
+                     charset: String,
+                     renderQuery: RenderQuery) {
 
   def withNoEncoding = copy(pathEncoder = NoopEncoder, queryEncoder = NoopEncoder, fragmentEncoder = NoopEncoder)
 
@@ -32,7 +29,8 @@ object UriConfig {
                           pathDecoder = PercentDecoder,
                           queryDecoder = PercentDecoder,
                           fragmentDecoder = PercentDecoder,
-                          charset = "UTF-8")
+                          charset = "UTF-8",
+                          renderQuery = RenderQuery.default)
 
 
   /**
@@ -43,6 +41,7 @@ object UriConfig {
 
   def apply(encoder: UriEncoder = PercentEncoder(),
             decoder: UriDecoder = PercentDecoder,
-            charset: String = "UTF-8"): UriConfig =
-    UriConfig(encoder, encoder, encoder, encoder, decoder, decoder, decoder, decoder, charset)
+            charset: String = "UTF-8",
+            renderQuery: RenderQuery = RenderQuery.default): UriConfig =
+    UriConfig(encoder, encoder, encoder, encoder, decoder, decoder, decoder, decoder, charset, renderQuery)
 }

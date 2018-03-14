@@ -1,6 +1,6 @@
 package io.lemonlabs.uri
 
-import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.config.{All, ExcludeNones, UriConfig}
 import io.lemonlabs.uri.parsing.UrlParser
 
 import scala.collection.{GenTraversable, GenTraversableOnce}
@@ -29,11 +29,13 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
 
   /**
     * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    * Pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    *
+    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     *
     * @return A new instance with the new parameter added
     */
-  def addParam(k: String, v: Option[String]) =
+  def addParam(k: String, v: Option[String]): QueryString =
     QueryString(params :+ (k -> v))
 
   /**
@@ -54,7 +56,9 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * Adds a new Query String parameter key-value pair.
     *
     * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    * Pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
+    *
+    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
     */
   def addParamOptionValue(kv: (String, Option[String])): QueryString =
     QueryString(params :+ kv)
@@ -81,10 +85,23 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * Adds all the specified key-value pairs as parameters to the query
     *
     * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    * Pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    *
+    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     */
   def addParamsOptionValues(kvs: GenTraversable[(String, Option[String])]): QueryString =
     QueryString(params ++ kvs)
+
+  /**
+    * Adds all the specified key-value pairs as parameters to the query
+    *
+    * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
+    *
+    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
+    */
+  def addParamsOptionValues(kvs: (String, Option[String])*): QueryString =
+    addParamsOptionValues(kvs)
 
   def params(key: String): Vector[Option[String]] = params.collect {
     case (k, v) if k == key => v
@@ -245,16 +262,27 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def isEmpty: Boolean = params.isEmpty
   def nonEmpty: Boolean = params.nonEmpty
 
+  type ParamToString = PartialFunction[(String, Option[String]), String]
+
   private[uri] def toString(c: UriConfig): String =
     if(params.isEmpty) ""
     else {
       val enc = c.queryEncoder
       val charset = c.charset
-      val paramsToString = params.map {
+
+      val someToString: ParamToString = {
         case (k, Some(v)) => enc.encode(k, charset) + "=" + enc.encode(v, charset)
-        case (k, None   ) => enc.encode(k, charset)
       }
-      "?" + paramsToString.mkString("&")
+      val paramToString: ParamToString = someToString orElse {
+        case (k, None) => enc.encode(k, charset)
+      }
+
+      val paramsAsString = c.renderQuery match {
+        case All =>          params.map(paramToString)
+        case ExcludeNones => params.collect(someToString)
+      }
+
+      "?" + paramsAsString.mkString("&")
     }
 
   /**

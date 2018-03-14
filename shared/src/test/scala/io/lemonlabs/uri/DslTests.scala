@@ -1,5 +1,6 @@
 package io.lemonlabs.uri
 
+import io.lemonlabs.uri.config.{All, ExcludeNones, UriConfig}
 import org.scalatest.{FlatSpec, Matchers}
 
 class DslTests extends FlatSpec with Matchers {
@@ -16,19 +17,31 @@ class DslTests extends FlatSpec with Matchers {
     uri.toString should equal ("/uris-in-scala.html")
   }
 
-  "An absolute URI with querystring parameters" should "render correctly" in {
+  "An absolute URI with query string parameters" should "render correctly" in {
     val uri = "http://theon.github.com/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
     uri.toString should equal ("http://theon.github.com/uris-in-scala.html?testOne=1&testTwo=2")
   }
 
-  "A relative URI with querystring parameters" should "render correctly" in {
+  "A relative URI with query string parameters" should "render correctly" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
     uri.toString should equal ("/uris-in-scala.html?testOne=1&testTwo=2")
   }
 
-  "Multiple querystring parameters with the same name" should "render correctly" in {
+  "Multiple query string parameters with the same name" should "render correctly" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testOne" -> "2")
     uri.toString should equal ("/uris-in-scala.html?testOne=1&testOne=2")
+  }
+
+  "Query string parameters with value None" should "not be rendered with renderQuery=ExcludeNones" in {
+    implicit val config: UriConfig = UriConfig(renderQuery = ExcludeNones)
+    val uri = "/uris-in-scala.html" ? ("testOne" -> None) & ("testTwo" -> "2") & ("testThree" -> None)
+    uri.toString should equal ("/uris-in-scala.html?testTwo=2")
+  }
+
+  "Query string parameters with value None" should "be rendered with renderQuery=All" in {
+    implicit val config: UriConfig = UriConfig(renderQuery = All)
+    val uri = "/uris-in-scala.html" ? ("testOne" -> None) & ("testTwo" -> "2") & ("testThree" -> None)
+    uri.toString should equal ("/uris-in-scala.html?testOne&testTwo=2&testThree")
   }
 
   "Replace param method" should "replace single parameters with a String argument" in {

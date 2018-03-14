@@ -404,7 +404,22 @@ import io.lemonlabs.uri.Url
 val uri = Url.parse("http://example.com/path?param=1&param2=2")
 val newUri = uri.removeParams("param")
 
-newUri.toString //This is: http://example.com/path?param2=2
+newUri.toString // This is: http://example.com/path?param2=2
+```
+
+## Omitting Query Parameters with value `None`
+
+scala-uri has support for not rendering query parameters that have a value of `None`. Set `renderQuery = ExcludeNones`
+in your `UriConfig` and make it visible in the scope where you parse/create your `Url`
+
+```scala
+import io.lemonlabs.uri.Url
+import io.lemonlabs.uri.config._
+
+implicit val config: UriConfig = UriConfig(renderQuery = ExcludeNones)
+
+val url = Url.parse("http://github.com/lemonlabsuk").addParamsOptionValues("a" -> Some("some"), "b" -> None)
+url.toString // This is http://github.com/lemonlabsuk?a=some
 ```
 
 ## Get query string parameters

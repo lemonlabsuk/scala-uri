@@ -239,11 +239,14 @@ sealed trait Url extends Uri {
 
   def addPathParts(parts: String*): Self =
     withPath(path.addParts(parts))
+
   /**
     * Adds a new Query String parameter key-value pair.
     *
     * Pairs with values, such as `Some("value")`, represent query params with values, i.e `?param=value`
-    * Pairs without values, i.e `None`, represent query params without values, i.e `?param`
+    *
+    * By default, pairs without values, i.e `None`, represent query params without values, i.e `?param`
+    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     *
     * @param name name of the parameter
     * @param value value for the parameter
@@ -275,7 +278,9 @@ sealed trait Url extends Uri {
     * Adds a new Query String parameter key-value pair.
     *
     * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    * Pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    *
+    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     *
     * @param kv name-value pair for the query parameter to be added
     * @return A new Url with the new Query String parameter
@@ -305,7 +310,9 @@ sealed trait Url extends Uri {
     * Adds all the specified key-value pairs as parameters to the query
     *
     * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    * Pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    *
+    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     *
     * @param kvs A list of key-value pairs to add as query parameters
     * @return A new Url with the new Query String parameters
@@ -314,11 +321,27 @@ sealed trait Url extends Uri {
     withQueryString(query.addParamsOptionValues(kvs))
 
   /**
+    * Adds all the specified key-value pairs as parameters to the query
+    *
+    * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
+    *
+    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
+    *
+    * @param kvs A list of key-value pairs to add as query parameters
+    * @return A new Url with the new Query String parameters
+    */
+  def addParamsOptionValues(kvs: (String, Option[String])*): Self =
+    withQueryString(query.addParamsOptionValues(kvs: _*))
+
+  /**
     * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
     * with the specified value.
     *
     * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    * Pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    *
+    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     *
     * @param k Key for the Query String parameter(s) to replace
     * @param v value to replace with

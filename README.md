@@ -656,8 +656,9 @@ and discussion [here](https://github.com/NET-A-PORTER/scala-uri/pull/113).
    Please now call `.toString` before passing non String types to these methods
  * Changed parameter value type from `Option[Any]` to `Option[String]` in method `replaceAll`.
    Please now call `.toString` before passing non String types to this method
- * Query string parameters with a value of `None` will now always be rendered with no equals sign (e.g. `?param`).
+ * Query string parameters with a value of `None` will now be rendered with no equals sign by default (e.g. `?param`).
    Previously some methods (such as `?`, `&`, `\?`, `addParam` and `addParams`) would not render parameters with a value of `None` at all.
+   In 1.x.x, this behaviour can be achieved by using the [`renderQuery`](#omitting-query-parameters-with-value-none) config option.
  * In most cases `Url.parse` should be used instead of `Uri.parse`. See all parse methods [here](#parsing-urls)
  * `scheme` is now called `schemeOption` on `Uri`. If you have an instance of `AbsoluteUrl` or `ProtocolRelativeUrl`
    there is still `scheme` method but it returns `String` rather than `Option[String]`

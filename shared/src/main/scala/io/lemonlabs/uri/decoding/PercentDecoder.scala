@@ -16,7 +16,7 @@ object PercentDecoder extends PercentDecoder(ignoreInvalidPercentEncoding = fals
 case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDecoder {
 
   def decode(s: String) = {
-    def charAt(str: String, index: Int) = Try(str.charAt(index)).toOption
+    def charAt(str: String, index: Int) = Try(str.substring(index, index + 1)).toOption
 
     def substring(str: String,  beginIndex: Int, endIndex: Int) =
       Try(str.substring(beginIndex, endIndex)).toOption
@@ -24,7 +24,7 @@ case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDeco
     @scala.annotation.tailrec
     def go(index: Int, result: ArrayBuffer[Byte]): Array[Byte] = (charAt(s, index), substring(s, index + 1, index + 3)) match {
       case (None, _) => result.toArray
-      case (Some('%'), Some(hex)) =>
+      case (Some("%"), Some(hex)) =>
         val (increment, percentByte) = Try(Integer.parseInt(hex, 16).toByte)
           .map { percentByte =>
             (3, percentByte)
@@ -32,11 +32,11 @@ case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDeco
             (1, '%'.toByte)
           }.getOrElse(throw new UriDecodeException(s"Encountered '%' followed by a non hex number. $errorMessage"))
         go(index + increment, result :+ percentByte)
-      case (Some('%'), None) if !ignoreInvalidPercentEncoding =>
+      case (Some("%"), None) if !ignoreInvalidPercentEncoding =>
         val c = charAt(s, index + 1).getOrElse("")
         throw new UriDecodeException(s"Encountered '%' followed by '$c'. $errorMessage")
       case (Some(c), _) =>
-        go(index + 1, result :+ c.toByte)
+        go(index + 1, result ++ c.getBytes)
     }
     new String(go(0, ArrayBuffer.empty), cs)
   }

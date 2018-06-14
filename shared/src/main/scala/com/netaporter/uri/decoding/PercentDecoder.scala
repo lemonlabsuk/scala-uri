@@ -1,9 +1,12 @@
 package com.netaporter.uri.decoding
 import PercentDecoder._
 
+import scala.collection.mutable.ArrayBuffer
+import scala.util.Try
+
 
 object PercentDecoder extends PercentDecoder(ignoreInvalidPercentEncoding = false) {
-  protected  val errorMessage =
+  protected val errorMessage =
     "It looks like this URL isn't Percent Encoded. If so, you can use either" +
     "PercentDecoder(ignoreInvalidPercentEncoding=true) or NoopDecoder to suppress this Exception"
 
@@ -11,21 +14,30 @@ object PercentDecoder extends PercentDecoder(ignoreInvalidPercentEncoding = fals
 }
 
 case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDecoder {
-  def decode(s: String) = try {
-    val segments = s.split('%')
-    val decodedSegments = segments.tail.flatMap {
-      case seg if seg.length > 1 =>
-        val percentByte = Integer.parseInt(seg.substring(0, 2), 16).toByte
-        percentByte +: seg.substring(2).getBytes(cs)
 
-      case seg if ignoreInvalidPercentEncoding =>
-        '%'.toByte +: seg.getBytes(cs)
+  def decode(s: String) = {
+    def charAt(str: String, index: Int) = Try(str.charAt(index)).toOption
 
-      case seg =>
-        throw new UriDecodeException(s"Encountered '%' followed by '$seg'. $errorMessage")
+    def substring(str: String,  beginIndex: Int, endIndex: Int) =
+      Try(str.substring(beginIndex, endIndex)).toOption
+
+    @scala.annotation.tailrec
+    def go(index: Int, result: ArrayBuffer[Byte]): Array[Byte] = (charAt(s, index), substring(s, index + 1, index + 3)) match {
+      case (None, _) => result.toArray
+      case (Some('%'), Some(hex)) =>
+        val (increment, percentByte) = Try(Integer.parseInt(hex, 16).toByte)
+          .map { percentByte =>
+            (3, percentByte)
+          }.recover { case _ if ignoreInvalidPercentEncoding =>
+            (1, '%'.toByte)
+          }.getOrElse(throw new UriDecodeException(s"Encountered '%' followed by a non hex number. $errorMessage"))
+        go(index + increment, result :+ percentByte)
+      case (Some('%'), None) if !ignoreInvalidPercentEncoding =>
+        val c = charAt(s, index + 1).getOrElse("")
+        throw new UriDecodeException(s"Encountered '%' followed by '$c'. $errorMessage")
+      case (Some(c), _) =>
+        go(index + 1, result :+ c.toByte)
     }
-    segments.head + new String(decodedSegments, cs)
-  } catch {
-    case e: NumberFormatException => throw new UriDecodeException(s"Encountered '%' followed by a non hex number. $errorMessage")
+    new String(go(0, ArrayBuffer.empty), cs)
   }
 }

@@ -41,5 +41,11 @@ class DecodingTests extends FlatSpec with Matchers {
     intercept[UriDecodeException] {
       Url.parse("http://lesswrong.com/index.php?query=abc%yum&john=hello")
     }
+    intercept[UriDecodeException] {
+      Uri.parse("http://lesswrong.com/index.php?query=abc%%")
+    }
+    intercept[UriDecodeException] {
+      Uri.parse("%")
+    }
   }
 }

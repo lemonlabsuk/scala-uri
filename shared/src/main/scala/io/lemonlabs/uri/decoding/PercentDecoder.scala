@@ -1,8 +1,7 @@
 package io.lemonlabs.uri.decoding
-import PercentDecoder._
+import io.lemonlabs.uri.decoding.PercentDecoder._
 
-import scala.collection.mutable.ArrayBuffer
-import scala.util.Try
+import scala.annotation.tailrec
 
 
 object PercentDecoder extends PercentDecoder(ignoreInvalidPercentEncoding = false) {
@@ -16,28 +15,28 @@ object PercentDecoder extends PercentDecoder(ignoreInvalidPercentEncoding = fals
 case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDecoder {
 
   def decode(s: String) = {
-    def charAt(str: String, index: Int) = Try(str.substring(index, index + 1)).toOption
 
-    def substring(str: String,  beginIndex: Int, endIndex: Int) =
-      Try(str.substring(beginIndex, endIndex)).toOption
-
-    @scala.annotation.tailrec
-    def go(index: Int, result: ArrayBuffer[Byte]): Array[Byte] = (charAt(s, index), substring(s, index + 1, index + 3)) match {
-      case (None, _) => result.toArray
-      case (Some("%"), Some(hex)) =>
-        val (increment, percentByte) = Try(Integer.parseInt(hex, 16).toByte)
-          .map { percentByte =>
-            (3, percentByte)
-          }.recover { case _ if ignoreInvalidPercentEncoding =>
-            (1, '%'.toByte)
-          }.getOrElse(throw new UriDecodeException(s"Encountered '%' followed by a non hex number. $errorMessage"))
-        go(index + increment, result :+ percentByte)
-      case (Some("%"), None) if !ignoreInvalidPercentEncoding =>
-        val c = charAt(s, index + 1).getOrElse("")
-        throw new UriDecodeException(s"Encountered '%' followed by '$c'. $errorMessage")
-      case (Some(c), _) =>
-        go(index + 1, result ++ c.getBytes)
+    def toHexByte(hex: String) = try {
+      if (hex.length != 2) {
+        throw new UriDecodeException(s"Encountered '%' followed by a non hex number '$hex'. $errorMessage")
+      }
+      Integer.parseInt(hex, 16).toByte
+    } catch {
+      case e: NumberFormatException => throw new UriDecodeException(s"Encountered '%' followed by a non hex number '$hex'. $errorMessage")
     }
-    new String(go(0, ArrayBuffer.empty), cs)
+
+    @tailrec
+    def go(remaining: List[Char], result: Array[Byte]): Array[Byte] =
+      remaining match {
+        case Nil =>
+          result
+        case '%' :: xs if !ignoreInvalidPercentEncoding =>
+          val hex = xs.take(2)
+          go(xs.drop(2), result :+ toHexByte(hex.mkString))
+        case ch :: xs =>
+          go(xs, result ++ ch.toString.getBytes(cs))
+      }
+
+    new String(go(s.toCharArray.toList, Array.empty), cs)
   }
 }

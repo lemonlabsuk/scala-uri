@@ -1,9 +1,11 @@
 package io.lemonlabs.uri.decoding
-import PercentDecoder._
+import io.lemonlabs.uri.decoding.PercentDecoder._
+
+import scala.annotation.tailrec
 
 
 object PercentDecoder extends PercentDecoder(ignoreInvalidPercentEncoding = false) {
-  protected  val errorMessage =
+  protected val errorMessage =
     "It looks like this URL isn't Percent Encoded. If so, you can use either" +
     "PercentDecoder(ignoreInvalidPercentEncoding=true) or NoopDecoder to suppress this Exception"
 
@@ -11,21 +13,30 @@ object PercentDecoder extends PercentDecoder(ignoreInvalidPercentEncoding = fals
 }
 
 case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDecoder {
-  def decode(s: String) = try {
-    val segments = s.split('%')
-    val decodedSegments = segments.tail.flatMap {
-      case seg if seg.length > 1 =>
-        val percentByte = Integer.parseInt(seg.substring(0, 2), 16).toByte
-        percentByte +: seg.substring(2).getBytes(cs)
 
-      case seg if ignoreInvalidPercentEncoding =>
-        '%'.toByte +: seg.getBytes(cs)
+  def decode(s: String) = {
 
-      case seg =>
-        throw new UriDecodeException(s"Encountered '%' followed by '$seg'. $errorMessage")
+    def toHexByte(hex: String) = try {
+      if (hex.length != 2) {
+        throw new UriDecodeException(s"Encountered '%' followed by a non hex number '$hex'. $errorMessage")
+      }
+      Integer.parseInt(hex, 16).toByte
+    } catch {
+      case e: NumberFormatException => throw new UriDecodeException(s"Encountered '%' followed by a non hex number '$hex'. $errorMessage")
     }
-    segments.head + new String(decodedSegments, cs)
-  } catch {
-    case e: NumberFormatException => throw new UriDecodeException(s"Encountered '%' followed by a non hex number. $errorMessage")
+
+    @tailrec
+    def go(remaining: List[Char], result: Array[Byte]): Array[Byte] =
+      remaining match {
+        case Nil =>
+          result
+        case '%' :: xs if !ignoreInvalidPercentEncoding =>
+          val hex = xs.take(2)
+          go(xs.drop(2), result :+ toHexByte(hex.mkString))
+        case ch :: xs =>
+          go(xs, result ++ ch.toString.getBytes(cs))
+      }
+
+    new String(go(s.toCharArray.toList, Array.empty), cs)
   }
 }

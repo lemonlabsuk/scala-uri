@@ -538,6 +538,20 @@ Url.parse("http://a.b.c.example.com/blah").longestSubdomain
 
 These methods return `None` or `Vector.empty` for URLs without a Host (e.g. Relative URLs)
 
+## Apex Domains
+
+**Note:** *Currently not supported for scala-js*
+
+The method `apexDomain` returns the [apex domain](https://help.github.com/articles/about-supported-custom-domains/#apex-domains)
+for the URL (e.g. `example.com` for `http://www.example.com/path`)
+
+```scala
+import io.lemonlabs.uri.Url
+
+val uri = Url.parse("http://www.google.co.uk/blah")
+uri.apexDomain // This returns Some("google.co.uk")
+```
+
 ## Public Suffixes
 
 **Note:** *Currently not supported for scala-js*

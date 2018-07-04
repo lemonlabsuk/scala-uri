@@ -14,7 +14,7 @@ class SubdomainTests extends FlatSpec with Matchers {
     subdomain should equal(Some("a.b.c"))
   }
 
-  "longestSubdomain" should "return a for root domain http://a.com/" in {
+  "longestSubdomain" should "return a for apex domain http://a.com/" in {
     val subdomain = Url.parse("http://a.com/").longestSubdomain
     subdomain should equal(Some("a"))
   }
@@ -49,7 +49,7 @@ class SubdomainTests extends FlatSpec with Matchers {
     subdomain should equal(None)
   }
 
-  "subdomain" should "return None for root domain http://a.com/" in {
+  "subdomain" should "return None for apex domain http://a.com/" in {
     val subdomain = Url.parse("http://a.com/").subdomain
     subdomain should equal(None)
   }
@@ -64,7 +64,7 @@ class SubdomainTests extends FlatSpec with Matchers {
     subdomains should equal(Vector("a", "a.b", "a.b.c"))
   }
 
-  "subdomains" should "return for root domain http://a.com/" in {
+  "subdomains" should "return for apex domain http://a.com/" in {
     val subdomains = Url.parse("http://a.com/").subdomains
     subdomains should equal(Vector("a"))
   }
@@ -79,7 +79,7 @@ class SubdomainTests extends FlatSpec with Matchers {
     subdomain should equal(Some("a"))
   }
 
-  "shortestSubdomain" should "return a for root domain http://a.com/" in {
+  "shortestSubdomain" should "return a for apex domain http://a.com/" in {
     val subdomain = Url.parse("http://a.com/").shortestSubdomain
     subdomain should equal(Some("a"))
   }

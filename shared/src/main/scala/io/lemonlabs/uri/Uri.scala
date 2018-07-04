@@ -130,7 +130,7 @@ sealed trait Url extends Uri {
     *
     * E.g. for http://a.b.c.example.com returns a.b.c
     *
-    * Note: In the event there is only one subdomain (i.e. the host is the root domain), this method returns `None`.
+    * Note: In the event there is only one subdomain (i.e. the host is the apex domain), this method returns `None`.
     * E.g. This method will return `None` for `http://example.com`.
     *
     * @return the second largest subdomain for this URL's host
@@ -460,6 +460,21 @@ sealed trait Url extends Uri {
     withQueryString(query.filterNames(f))
 
   /**
+    * Returns the apex domain for this URL.
+    *
+    * The apex domain is constructed from the public suffix for this URL's host prepended with the
+    * immediately preceding dot segment.
+    *
+    * Examples include:
+    *  `example.com`   for `www.example.com`
+    *  `example.co.uk` for `www.example.co.uk`
+    *
+    * @return the apex domain for this URL
+    */
+  def apexDomain: Option[String] =
+    hostOption.flatMap(_.apexDomain)
+
+  /**
     * Removes any Query String Parameters that return false when their value is applied to the given Function
     *
     * @param f
@@ -683,7 +698,7 @@ sealed trait UrlWithAuthority extends Url {
     *
     * E.g. for http://a.b.c.example.com returns a.b.c
     *
-    * Note: In the event there is only one subdomain (i.e. the host is the root domain), this method returns `None`.
+    * Note: In the event there is only one subdomain (i.e. the host is the apex domain), this method returns `None`.
     * E.g. This method will return `None` for `http://example.com`.
     *
     * @return the second largest subdomain for this URL's host

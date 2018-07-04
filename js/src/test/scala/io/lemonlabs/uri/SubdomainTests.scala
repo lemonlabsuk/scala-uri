@@ -15,7 +15,7 @@ class SubdomainTests extends FlatSpec with Matchers {
     a[NotImplementedError] should be thrownBy Url.parse("http://a.b.c/").longestSubdomain
   }
 
-  "longestSubdomain" should "return a for root domain http://a.com/" in {
+  "longestSubdomain" should "return a for apex domain http://a.com/" in {
     a[NotImplementedError] should be thrownBy Url.parse("http://a.com/").longestSubdomain
   }
 
@@ -31,7 +31,7 @@ class SubdomainTests extends FlatSpec with Matchers {
     a[NotImplementedError] should be thrownBy Url.parse("http://a.b.c/").subdomain
   }
 
-  "subdomain" should "return None for root domain http://a.com/" in {
+  "subdomain" should "return None for apex domain http://a.com/" in {
     a[NotImplementedError] should be thrownBy Url.parse("http://a.com/").subdomain
   }
 
@@ -43,7 +43,7 @@ class SubdomainTests extends FlatSpec with Matchers {
     a[NotImplementedError] should be thrownBy Url.parse("http://a.b.c/").subdomains
   }
 
-  "subdomains" should "return for root domain http://a.com/" in {
+  "subdomains" should "return for apex domain http://a.com/" in {
     a[NotImplementedError] should be thrownBy Url.parse("http://a.com/").subdomains
   }
 
@@ -55,7 +55,7 @@ class SubdomainTests extends FlatSpec with Matchers {
     a[NotImplementedError] should be thrownBy Url.parse("http://a.b.c/").shortestSubdomain
   }
 
-  "shortestSubdomain" should "return a for root domain http://a.com/" in {
+  "shortestSubdomain" should "return a for apex domain http://a.com/" in {
     a[NotImplementedError] should be thrownBy Url.parse("http://a.com/").shortestSubdomain
   }
 }

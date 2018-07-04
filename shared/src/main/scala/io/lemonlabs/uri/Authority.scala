@@ -37,7 +37,7 @@ case class Authority(userInfo: UserInfo,
     *
     * E.g. for http://a.b.c.example.com returns a.b.c
     *
-    * Note: In the event there is only one subdomain (i.e. the host is the root domain), this method returns `None`.
+    * Note: In the event there is only one subdomain (i.e. the host is the apex domain), this method returns `None`.
     * E.g. This method will return `None` for `http://example.com`.
     *
     * @return the second largest subdomain for this URL's host

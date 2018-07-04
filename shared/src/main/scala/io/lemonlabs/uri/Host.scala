@@ -12,11 +12,25 @@ sealed trait Host extends PublicSuffixSupport {
   override def toString: String = value
 
   /**
+    * Returns the apex domain for this Host.
+    *
+    * The apex domain is constructed from the public suffix prepended with the immediately preceding
+    * dot segment.
+    *
+    * Examples include:
+    *  `example.com`   for `www.example.com`
+    *  `example.co.uk` for `www.example.co.uk`
+    *
+    * @return the apex domain for this domain
+    */
+  def apexDomain: Option[String]
+
+  /**
     * Returns the second largest subdomain for this URL's host.
     *
     * E.g. for http://a.b.c.example.com returns a.b.c
     *
-    * Note: In the event there is only one subdomain (i.e. the host is the root domain), this method returns `None`.
+    * Note: In the event there is only one subdomain (i.e. the host is the apex domain), this method returns `None`.
     * E.g. This method will return `None` for `http://example.com`.
     *
     * @return the second largest subdomain for this URL's host
@@ -60,14 +74,34 @@ final case class DomainName(value: String) extends Host with PublicSuffixSupport
   override def toString: String = value
 
   /**
-    * Returns the second largest subdomain for this URL's host.
+    * Returns the apex domain for this Host.
+    *
+    * The apex domain is constructed from the public suffix prepended with the immediately preceding
+    * dot segment.
+    *
+    * Examples include:
+    *  `example.com`   for `www.example.com`
+    *  `example.co.uk` for `www.example.co.uk`
+    *
+    * @return the apex domain for this domain
+    */
+  def apexDomain: Option[String] =
+    publicSuffix map { ps =>
+      val apexDomainStart = value.dropRight(ps.length + 1).lastIndexOf('.')
+
+      if(apexDomainStart == -1) value
+      else value.substring(apexDomainStart + 1)
+    }
+
+  /**
+    * Returns the second largest subdomain in this host.
     *
     * E.g. for http://a.b.c.example.com returns a.b.c
     *
-    * Note: In the event there is only one subdomain (i.e. the host is the root domain), this method returns `None`.
+    * Note: In the event there is only one subdomain (i.e. the host is the apex domain), this method returns `None`.
     * E.g. This method will return `None` for `http://example.com`.
     *
-    * @return the second largest subdomain for this URL's host
+    * @return the second largest subdomain for this host
     */
   def subdomain: Option[String] = longestSubdomain flatMap { ls =>
     ls.lastIndexOf('.') match {
@@ -77,10 +111,10 @@ final case class DomainName(value: String) extends Host with PublicSuffixSupport
   }
 
   /**
-    * Returns all subdomains for this URL's host.
+    * Returns all subdomains for this host.
     * E.g. for http://a.b.c.example.com returns a, a.b, a.b.c and a.b.c.example
     *
-    * @return all subdomains for this URL's host
+    * @return all subdomains for this host
     */
   def subdomains: Vector[String] = {
     def concatHostParts(longestSubdomainStr: String) = {
@@ -97,19 +131,19 @@ final case class DomainName(value: String) extends Host with PublicSuffixSupport
   }
 
   /**
-    * Returns the shortest subdomain for this URL's host.
+    * Returns the shortest subdomain for this host.
     * E.g. for http://a.b.c.example.com returns a
     *
-    * @return the shortest subdomain for this URL's host
+    * @return the shortest subdomain for this host
     */
   def shortestSubdomain: Option[String] =
     longestSubdomain.map(_.takeWhile(_ != '.'))
 
   /**
-    * Returns the longest subdomain for this URL's host.
+    * Returns the longest subdomain for this host.
     * E.g. for http://a.b.c.example.com returns a.b.c.example
     *
-    * @return the longest subdomain for this URL's host
+    * @return the longest subdomain for this host
     */
   def longestSubdomain: Option[String] = {
     val publicSuffixLength: Int = publicSuffix.map(_.length + 1).getOrElse(0)
@@ -139,6 +173,7 @@ final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte) ex
 
   def value: String = s"$octet1Int.$octet2Int.$octet3Int.$octet4Int"
 
+  def apexDomain: Option[String] = None
   def publicSuffix: Option[String] = None
   def publicSuffixes: Vector[String] = Vector.empty
   def subdomain: Option[String] = None
@@ -199,6 +234,7 @@ final case class IpV6(piece1: Char, piece2: Char, piece3: Char, piece4: Char,
     longestRun(0, (-1, -1), 0)
   }
 
+  def apexDomain: Option[String] = None
   def publicSuffix: Option[String] = None
   def publicSuffixes: Vector[String] = Vector.empty
   def subdomain: Option[String] = None

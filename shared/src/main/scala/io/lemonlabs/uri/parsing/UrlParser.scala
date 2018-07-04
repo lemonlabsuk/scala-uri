@@ -12,8 +12,8 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
 
   val _host_end = ":/?#"
 
-  def _int: Rule1[Int] = rule {
-    capture(oneOrMore(Digit)) ~> extractInt
+  def _int(maxLength: Int): Rule1[Int] = rule {
+    capture((1 to maxLength).times(Digit)) ~> extractInt
   }
 
   def _scheme: Rule1[String] = rule {
@@ -21,11 +21,11 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _ip_v4: Rule1[IpV4] = rule {
-    _int ~ '.' ~ _int ~ '.' ~ _int ~ '.' ~ _int ~> extractIpv4
+    _int(3) ~ '.' ~ _int(3) ~ '.' ~ _int(3) ~ '.' ~ _int(3) ~> extractIpv4
   }
 
   def _ip_v6_hex_piece: Rule1[String] = rule {
-    capture(oneOrMore(HexDigit))
+    capture((1 to 4).times(HexDigit))
   }
 
   def _full_ip_v6: Rule1[IpV6] = rule {
@@ -71,7 +71,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _port: Rule1[Int] = rule {
-    ":" ~ _int
+    ":" ~ _int(5)
   }
 
   def _authority: Rule1[Authority] = rule {

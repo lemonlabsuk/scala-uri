@@ -11,7 +11,7 @@ import org.scalatest.{FlatSpec, Matchers, OptionValues}
   * These bugs were raised on thr github issues page https://github.com/lemonlabsuk/scala-uri/issues
   */
 class GithubIssuesTests extends FlatSpec with Matchers with OptionValues {
-  "Github Issue #1 wowowow" should "throw UriDecodeException when url contains invalid percent encoding" in {
+  "Github Issue #1" should "throw UriDecodeException when url contains invalid percent encoding" in {
     Vector("/?x=%3", "/%3", "/?a=%3&b=whatever", "/?%3=okay").foreach { part =>
       withClue(part) {
         an[UriDecodeException] should be thrownBy Url.parse(part)
@@ -27,5 +27,10 @@ class GithubIssuesTests extends FlatSpec with Matchers with OptionValues {
     Vector("/?x=%3", "/%3", "/?a=%3&b=whatever", "/?%3=okay").foreach { part =>
       Url.parse(part).toString shouldBe part
     }
+  }
+
+  "Github Issue #20" should "support URLs with long numbers" in {
+    val url = Url.parse("https://12345678987654321.example.com/")
+    url.hostOption should equal(Some(DomainName("12345678987654321.example.com")))
   }
 }

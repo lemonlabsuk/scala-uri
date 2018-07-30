@@ -71,7 +71,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _port: Rule1[Int] = rule {
-    ":" ~ _int(5)
+    ":" ~ _int(10)
   }
 
   def _authority: Rule1[Authority] = rule {

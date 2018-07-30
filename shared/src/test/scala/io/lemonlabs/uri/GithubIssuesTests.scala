@@ -33,4 +33,9 @@ class GithubIssuesTests extends FlatSpec with Matchers with OptionValues {
     val url = Url.parse("https://12345678987654321.example.com/")
     url.hostOption should equal(Some(DomainName("12345678987654321.example.com")))
   }
+
+  "Github Issue #21" should "support really long port numbers" in {
+    val url = Url.parse("soundcloud://sounds:78237871")
+    url.port should equal(Some(78237871))
+  }
 }

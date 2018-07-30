@@ -27,7 +27,7 @@ To include it in your SBT project from maven central:
 "io.lemonlabs" %% "scala-uri" % "1.1.5"
 ```
 
-[Migration Guide](#0.5.x-to-1.x.x) from 0.5.x
+[Migration Guide](#05x-to-1xx) from 0.5.x
 
 There are also demo projects for both [scala](https://github.com/lemonlabsuk/scala-uri-demo) and [scala-js](https://github.com/lemonlabsuk/scala-uri-scalajs-example) to help you get up and running quickly.
 

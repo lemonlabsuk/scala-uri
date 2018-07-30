@@ -656,7 +656,7 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
 
 ## 0.5.x to 1.x.x
 
-Thanks to @evanbennett. `1.x.x` is inspired by his fork [here](https://github.com/evanbennett/scala-uri)
+Thanks to [@evanbennett](https://github.com/evanbennett). `1.x.x` is inspired by his fork [here](https://github.com/evanbennett/scala-uri)
 and discussion [here](https://github.com/NET-A-PORTER/scala-uri/pull/113).
 
  * Package change from `com.netaporter.uri` to `io.lemonlabs.uri`

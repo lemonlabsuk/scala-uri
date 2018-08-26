@@ -488,26 +488,22 @@ sealed trait Url extends Uri {
 
   def toAbsoluteUrl: AbsoluteUrl = this match {
     case a: AbsoluteUrl => a
-    case _ => throw new ClassCastException(getClass.getSimpleName + " cannot be cast to AbsoluteUrl")
+    case _ => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to AbsoluteUrl")
   }
 
   def toRelativeUrl: RelativeUrl = this match {
     case r: RelativeUrl => r
-    case _ => throw new ClassCastException(getClass.getSimpleName + " cannot be cast to RelativeUrl")
+    case _ => RelativeUrl(path, query, fragment)
   }
 
   def toProtocolRelativeUrl: ProtocolRelativeUrl = this match {
     case p: ProtocolRelativeUrl => p
-    case _ => throw new ClassCastException(getClass.getSimpleName + " cannot be cast to ProtocolRelativeUrl")
-  }
-
-  def toUrlWithoutAuthority: UrlWithoutAuthority = this match {
-    case u: UrlWithoutAuthority => u
-    case _ => throw new ClassCastException(getClass.getSimpleName + " cannot be cast to UrlWithoutAuthority")
+    case a: AbsoluteUrl => ProtocolRelativeUrl(a.authority, a.path, a.query, a.fragment)
+    case _ => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to ProtocolRelativeUrl")
   }
 
   def toUrl: Url = this
-  def toUrn: Urn = throw new ClassCastException(getClass.getSimpleName + " cannot be cast to Urn")
+  def toUrn: Urn = throw new UriConversionException(getClass.getSimpleName + " cannot be converted to Urn")
 }
 
 object Url {
@@ -944,7 +940,7 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
   def withScheme(scheme: String): UrlWithoutAuthority =
     UrlWithoutAuthority(scheme, path.toUrlPath, QueryString.empty, fragment = None)
 
-  def toUrl: Url = throw new ClassCastException("Urn cannot be cast to Url")
+  def toUrl: Url = throw new UriConversionException("Urn cannot be converted to Url")
   def toUrn: Urn = this
 
   private[uri] def toString(c: UriConfig): String =

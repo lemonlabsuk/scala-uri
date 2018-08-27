@@ -165,7 +165,7 @@ val absoluteUrl = Url.parse("http://www.example.com/example?a=b")
 absoluteUrl.toRelativeUrl // This is /example?a=b
 ```
 
-### Convert an Relative URL to a Absolute URL
+### Convert a Relative URL to an Absolute URL
 
 ```scala
 import io.lemonlabs.uri.Url

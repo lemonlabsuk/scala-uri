@@ -156,6 +156,24 @@ uri.collectQuery {
 }
 ```
 
+### Convert an Absolute URL to a Relative URL
+
+```scala
+import io.lemonlabs.uri.Url
+
+val absoluteUrl = Url.parse("http://www.example.com/example?a=b")
+absoluteUrl.toRelativeUrl // This is /example?a=b
+```
+
+### Convert an Relative URL to a Absolute URL
+
+```scala
+import io.lemonlabs.uri.Url
+
+val relativeUrl = Url.parse("/example?a=b")
+relativeUrl.withScheme("http").withHost("www.example.com") // This is http://www.example.com/example?a=b
+```
+
 ## Pattern Matching URIs
 
 ```scala

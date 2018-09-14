@@ -1,5 +1,5 @@
 import sbt.Keys.libraryDependencies
-import org.scalajs.sbtplugin.cross.CrossType
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 name                            := "scala-uri root"
 scalaVersion in ThisBuild       := "2.12.6"
@@ -66,7 +66,7 @@ lazy val root = project.in(file("."))
   )
 
 lazy val scalaUri =
-  crossProject.in(file("."))
+  crossProject(JSPlatform, JVMPlatform)
     .settings(sharedSettings)
     .settings(publishingSettings)
     .jvmSettings(jvmSettings)

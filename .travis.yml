@@ -1,8 +1,6 @@
 --- 
 language: scala
 script: >
- # Disable coverage until scoverage is available for scala 2.13.0-M4
- # sbt $COVERAGE ++$TRAVIS_SCALA_VERSION coverage test coverageReport &&
  sbt ++$TRAVIS_SCALA_VERSION test &&
  cd target &&
  git clone https://github.com/lemonlabsuk/scala-uri-demo.git &&
@@ -23,10 +21,6 @@ matrix:
       env: COVERAGE=coverageOff
 
 sudo: false # Enable new travis container-based infrastructure
-
-# Disable coverage until scoverage is available for scala 2.13.0-M4
-# after_success:
-#  - bash <(curl -s https://codecov.io/bash)
 
 env:
   global:

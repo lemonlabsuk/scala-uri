@@ -16,7 +16,7 @@ case class PercentEncoder(charsToEncode: Set[Char] = DEFAULT_CHARS_TO_ENCODE) ex
    */
   def ascii(ch: Char) = ch > 31 && ch < 127
 
-  def --(chars: Char*) = new PercentEncoder(charsToEncode -- chars)
+  def --(chars: Char*) = new PercentEncoder(charsToEncode.diff(chars.toSet))
   def ++(chars: Char*) = new PercentEncoder(charsToEncode ++ chars)
 }
 

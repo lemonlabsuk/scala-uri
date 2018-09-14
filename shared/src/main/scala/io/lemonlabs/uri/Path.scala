@@ -3,8 +3,6 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UrlParser, UrnParser}
 
-import scala.collection.GenTraversableOnce
-
 sealed trait Path {
   def config: UriConfig
   def parts: Vector[String]
@@ -38,7 +36,7 @@ object PathParts {
 }
 
 sealed trait UrlPath extends Path {
-  def withParts(parts: GenTraversableOnce[String]): UrlPath
+  def withParts(parts: Iterable[String]): UrlPath
 
   def toRootless: RootlessPath
   def toAbsolute: AbsolutePath
@@ -50,7 +48,7 @@ sealed trait UrlPath extends Path {
   def addParts(otherParts: String*): UrlPath =
     addParts(otherParts)
 
-  def addParts(otherParts: GenTraversableOnce[String]): UrlPath =
+  def addParts(otherParts: Iterable[String]): UrlPath =
     withParts(parts = parts ++ otherParts)
 
   /**
@@ -67,7 +65,7 @@ object UrlPath {
   def empty: UrlPath = EmptyPath
   val slash: UrlPath = AbsolutePath(Vector.empty)
 
-  def apply(parts: GenTraversableOnce[String]): UrlPath =
+  def apply(parts: Iterable[String]): UrlPath =
     if(parts.isEmpty) EmptyPath
     else AbsolutePath(parts.toVector)
 
@@ -98,7 +96,7 @@ case object EmptyPath extends AbsoluteOrEmptyPath {
   def toAbsolute: AbsolutePath =
     AbsolutePath(Vector.empty)
 
-  def withParts(parts: GenTraversableOnce[String]): UrlPath =
+  def withParts(parts: Iterable[String]): UrlPath =
     UrlPath(parts.toVector)
 
   def config: UriConfig =
@@ -125,7 +123,7 @@ final case class RootlessPath(parts: Vector[String])(implicit val config: UriCon
     if(parts.isEmpty) EmptyPath
     else AbsolutePath(parts)
 
-  def withParts(otherParts: GenTraversableOnce[String]): UrlPath =
+  def withParts(otherParts: Iterable[String]): UrlPath =
     RootlessPath(otherParts.toVector)
 
   /**
@@ -148,7 +146,7 @@ final case class AbsolutePath(parts: Vector[String])(implicit val config: UriCon
   def toAbsolute: AbsolutePath =
     this
 
-  def withParts(otherParts: GenTraversableOnce[String]): UrlPath =
+  def withParts(otherParts: Iterable[String]): UrlPath =
     copy(parts = otherParts.toVector)
 
   /**

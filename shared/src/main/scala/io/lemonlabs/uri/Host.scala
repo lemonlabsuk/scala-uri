@@ -5,7 +5,7 @@ import io.lemonlabs.uri.inet._
 import io.lemonlabs.uri.parsing.UrlParser
 
 import scala.annotation.tailrec
-import scala.collection.GenSeq
+import scala.collection.{GenSeq, immutable}
 
 sealed trait Host extends PublicSuffixSupport {
   def value: String
@@ -270,12 +270,12 @@ object IpV6 {
          hexToInt(piece5), hexToInt(piece6), hexToInt(piece7), hexToInt(piece8))
   }
 
-  def fromIntPieces(pieces: GenSeq[Int]): IpV6 = {
+  def fromIntPieces(pieces: immutable.Seq[Int]): IpV6 = {
     require(pieces.length == 8, "IPv6 must be made up of eight pieces")
     IpV6(pieces(0), pieces(1), pieces(2), pieces(3), pieces(4), pieces(5), pieces(6), pieces(7))
   }
 
-  def fromHexPieces(pieces: GenSeq[String]): IpV6 = {
+  def fromHexPieces(pieces: immutable.Seq[String]): IpV6 = {
     require(pieces.length == 8, "IPv6 must be made up of eight pieces")
     IpV6(pieces(0), pieces(1), pieces(2), pieces(3), pieces(4), pieces(5), pieces(6), pieces(7))
   }

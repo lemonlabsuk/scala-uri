@@ -2,24 +2,24 @@ import sbt.Keys.libraryDependencies
 import org.scalajs.sbtplugin.cross.CrossType
 
 name                            := "scala-uri root"
-scalaVersion in ThisBuild       := "2.12.4"
-crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.4")
+scalaVersion in ThisBuild       := "2.12.6"
+crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.6", "2.13.0-M4")
 
 val sharedSettings = Seq(
   name          := "scala-uri",
   organization  := "io.lemonlabs",
   scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature", "-Xfatal-warnings"),
   libraryDependencies ++= Seq(
-    "org.parboiled" %%% "parboiled" % "2.1.4",
+    "org.parboiled" %%% "parboiled" % "2.1.5",
     "com.chuusai"   %%% "shapeless" % "2.3.3",
-    "org.scalatest" %%% "scalatest" % "3.0.4" % "test"
+    "org.scalatest" %%% "scalatest" % "3.0.6-SNAP2" % "test"
   ),
   parallelExecution in Test := false
 )
 
 val jvmSettings = Seq(
   libraryDependencies ++= Seq(
-    "io.spray" %%  "spray-json" % "1.3.3"
+    "io.spray" %%  "spray-json" % "1.3.4"
   )
 )
 

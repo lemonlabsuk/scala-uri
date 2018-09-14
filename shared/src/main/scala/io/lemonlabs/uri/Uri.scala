@@ -3,8 +3,6 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UriParser, UrlParser, UrnParser}
 
-import scala.collection.{GenTraversable, GenTraversableOnce}
-
 /**
   * Represents a URI. See [[https://www.ietf.org/rfc/rfc3986 RFC 3986]]
   *
@@ -234,7 +232,7 @@ sealed trait Url extends Uri {
   def addPathPart(part: String): Self =
     withPath(path.addPart(part))
 
-  def addPathParts(parts: GenTraversableOnce[String]): Self =
+  def addPathParts(parts: Iterable[String]): Self =
     withPath(path.addParts(parts))
 
   def addPathParts(parts: String*): Self =
@@ -303,7 +301,7 @@ sealed trait Url extends Uri {
     * @param kvs A list of key-value pairs to add as query parameters
     * @return A new Url with the new Query String parameters
     */
-  def addParams(kvs: GenTraversable[(String, String)]): Self =
+  def addParams(kvs: Iterable[(String, String)]): Self =
     withQueryString(query.addParams(kvs))
 
   /**
@@ -317,7 +315,7 @@ sealed trait Url extends Uri {
     * @param kvs A list of key-value pairs to add as query parameters
     * @return A new Url with the new Query String parameters
     */
-  def addParamsOptionValues(kvs: GenTraversable[(String, Option[String])]): Self =
+  def addParamsOptionValues(kvs: Iterable[(String, Option[String])]): Self =
     withQueryString(query.addParamsOptionValues(kvs))
 
   /**
@@ -382,7 +380,7 @@ sealed trait Url extends Uri {
     * @param k Names of Query String parameter(s) to remove
     * @return
     */
-  def removeParams(k: GenTraversableOnce[String]): Self =
+  def removeParams(k: Iterable[String]): Self =
     withQueryString(query.removeAll(k))
 
   /**
@@ -420,7 +418,7 @@ sealed trait Url extends Uri {
     * @param f A function that returns a collection of Parameters when applied to each parameter
     * @return
     */
-  def flatMapQuery(f: ((String, Option[String])) => GenTraversableOnce[(String, Option[String])]): Self =
+  def flatMapQuery(f: ((String, Option[String])) => Iterable[(String, Option[String])]): Self =
     withQueryString(query.flatMap(f))
 
   /**

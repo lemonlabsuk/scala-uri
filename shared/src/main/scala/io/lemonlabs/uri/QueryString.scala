@@ -3,8 +3,6 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.config.{All, ExcludeNones, UriConfig}
 import io.lemonlabs.uri.parsing.UrlParser
 
-import scala.collection.{GenTraversable, GenTraversableOnce}
-
 case class QueryString(params: Vector[(String, Option[String])])(implicit config: UriConfig = UriConfig.default) {
 
   lazy val paramMap: Map[String, Vector[String]] = params.foldLeft(Map.empty[String, Vector[String]]) {
@@ -78,7 +76,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   /**
     * Adds all the specified key-value pairs as parameters to the query
     */
-  def addParams(kvs: GenTraversable[(String, String)]): QueryString =
+  def addParams(kvs: Iterable[(String, String)]): QueryString =
     addParamsOptionValues(kvs.map { case (k,v) => (k, Some(v)) })
 
   /**
@@ -89,7 +87,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
     * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     */
-  def addParamsOptionValues(kvs: GenTraversable[(String, Option[String])]): QueryString =
+  def addParamsOptionValues(kvs: Iterable[(String, Option[String])]): QueryString =
     QueryString(params ++ kvs)
 
   /**
@@ -142,7 +140,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @param f A function that returns a collection of Parameters when applied to each parameter
     * @return
     */
-  def flatMap(f: ((String, Option[String])) => GenTraversableOnce[(String, Option[String])]): QueryString =
+  def flatMap(f: ((String, Option[String])) => Iterable[(String, Option[String])]): QueryString =
     QueryString(params.flatMap(f))
 
   /**
@@ -256,7 +254,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @param k Names of Query String parameter(s) to remove
     * @return
     */
-  def removeAll(k: GenTraversableOnce[String]): QueryString =
+  def removeAll(k: Iterable[String]): QueryString =
     filterNames(name => !k.exists(_ == name))
 
   def isEmpty: Boolean = params.isEmpty
@@ -302,7 +300,7 @@ object QueryString {
   def fromPairs(params: (String, String)*)(implicit config: UriConfig = UriConfig.default): QueryString =
     fromTraversable(params)
 
-  def fromTraversable(params: GenTraversableOnce[(String, String)])(implicit config: UriConfig = UriConfig.default): QueryString =
+  def fromTraversable(params: Iterable[(String, String)])(implicit config: UriConfig = UriConfig.default): QueryString =
     new QueryString(params.toVector.map {
       case (k, v) => (k, Some(v))
     })

@@ -3,8 +3,6 @@ package io.lemonlabs.uri.dsl
 import io.lemonlabs.uri.Url
 import io.lemonlabs.uri.parsing.UrlParser
 
-import scala.collection.GenTraversable
-
 /**
  * Value class to add DSL functionality to Urls
  */
@@ -77,7 +75,7 @@ class UrlDsl(val url: Url) extends AnyVal {
     * @param kvs A list of key-value pairs to add as query parameters
     * @return A new Url with the new Query String parameters
     */
-  def addParams(kvs: GenTraversable[(String, Any)]): Url =
+  def addParams(kvs: Iterable[(String, Any)]): Url =
     url.addParamsOptionValues(kvs.map { case (k, v) => (k, anyToQueryValue(v)) })
 
   /**

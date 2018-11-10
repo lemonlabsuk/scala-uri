@@ -5,6 +5,8 @@ import io.lemonlabs.uri.decoding.{PercentDecoder, UriDecodeException}
 import io.lemonlabs.uri.encoding.NoopEncoder
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
+import scala.util.Failure
+
 /**
   * Test Suite to ensure that bugs raised by awesome github peeps NEVER come back
   *
@@ -15,6 +17,8 @@ class GithubIssuesTests extends FlatSpec with Matchers with OptionValues {
     Vector("/?x=%3", "/%3", "/?a=%3&b=whatever", "/?%3=okay").foreach { part =>
       withClue(part) {
         an[UriDecodeException] should be thrownBy Url.parse(part)
+        Url.parseOption(part) should equal(None)
+        Url.parseTry(part).isSuccess should equal(false)
       }
     }
   }

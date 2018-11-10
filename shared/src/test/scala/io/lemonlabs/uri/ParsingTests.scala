@@ -3,6 +3,8 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.parsing.UriParsingException
 import org.scalatest.{FlatSpec, Matchers}
 
+import scala.util.Failure
+
 class ParsingTests extends FlatSpec with Matchers {
 
   "Parsing an absolute URI" should "result in a valid Uri object" in {
@@ -10,6 +12,16 @@ class ParsingTests extends FlatSpec with Matchers {
     url.schemeOption should equal (Some("http"))
     url.hostOption should equal (Some(DomainName("theon.github.com")))
     url.path.toString() should equal ("/uris-in-scala.html")
+  }
+
+  it should "result in a Success Try" in {
+    val url = Url.parseTry("http://theon.github.com/uris-in-scala.html")
+    url.isSuccess should equal(true)
+  }
+
+  it should "result in a Some Option" in {
+    val url = Url.parseOption("http://theon.github.com/uris-in-scala.html")
+    url.isDefined should equal(true)
   }
 
   "Parsing a relative URI" should "result in a valid Uri object" in {
@@ -111,12 +123,24 @@ class ParsingTests extends FlatSpec with Matchers {
   }
 
   it should "NOT parse full IPv6 with more than 8 segments" in {
-    a[UriParsingException] should be thrownBy Url.parse("http://[1:2:3:4:5:6:7:8:9]:9000")
+    val nineSegIp = "http://[1:2:3:4:5:6:7:8:9]:9000"
+    val e = the[UriParsingException] thrownBy Url.parse(nineSegIp)
+
+    e.getMessage should equal("""Invalid URL could not be parsed. Invalid input ']', expected HexDigit or ':' (line 1, column 26):
+                                |http://[1:2:3:4:5:6:7:8:9]:9000
+                                |                         ^""".stripMargin)
+
+    Url.parseTry(nineSegIp).isFailure should equal(true)
+    Url.parseOption(nineSegIp) should equal(None)
   }
 
   it should "NOT parse IPv6 with more than 6 segments and a ::" in {
-    val e = the[UriParsingException] thrownBy Url.parse("http://[1:2:3::4:5:6:7]:9000")
+    val tooManySegs = "http://[1:2:3::4:5:6:7]:9000"
+    val e = the[UriParsingException] thrownBy Url.parse(tooManySegs)
     e.getMessage should equal("IPv6 has too many pieces. Must be either exactly eight hex pieces or fewer than six hex pieces with a '::'")
+
+    Url.parseTry(tooManySegs).isFailure should equal(true)
+    Url.parseOption(tooManySegs) should equal(None)
   }
 
   "Parsing a url with relative scheme" should "result in a Uri with None for scheme" in {

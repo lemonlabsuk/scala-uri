@@ -40,34 +40,26 @@ class UrnParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   val extractUrn = (urnPath: UrnPath) =>
     Urn(urnPath)
 
-  private[uri] def getOrThrow[T](t: Try[T], name: => String): T = {
-    t match {
-      case Success(thing) =>
-        thing
-
-      case Failure(pe@ParseError(_, _, _)) =>
+  private[uri] def mapParseError[T](t: Try[T], name: => String): Try[T] =
+    t.recoverWith {
+      case pe @ ParseError(_, _, _) =>
         val detail = pe.format(input)
-        throw new UriParsingException(s"Invalid $name could not be parsed. $detail")
-
-      case Failure(e) =>
-        throw e
+        Failure(new UriParsingException(s"Invalid $name could not be parsed. $detail"))
     }
-  }
 
-  def parseUrnPath(): UrnPath =
-    getOrThrow(rule(_urn_path ~ EOI).run(), "URN Path")
+  def parseUrnPath(): Try[UrnPath] =
+    mapParseError(rule(_urn_path ~ EOI).run(), "URN Path")
 
-  def parseUrn(): Urn =
-    getOrThrow(rule(_urn ~ EOI).run(), "URN")
+  def parseUrn(): Try[Urn] =
+    mapParseError(rule(_urn ~ EOI).run(), "URN")
 }
 object UrnParser {
   def apply(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrnParser =
     new UrnParser(s.toString)
 
-  def parseUrn(s: String)(implicit config: UriConfig = UriConfig.default): Urn =
+  def parseUrn(s: String)(implicit config: UriConfig = UriConfig.default): Try[Urn] =
     UrnParser(s).parseUrn()
 
-  def parseUrnPath(s: String)(implicit config: UriConfig = UriConfig.default): UrnPath =
+  def parseUrnPath(s: String)(implicit config: UriConfig = UriConfig.default): Try[UrnPath] =
     UrnParser(s).parseUrnPath()
-
 }

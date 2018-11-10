@@ -3,6 +3,8 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UriParser, UrlParser, UrnParser}
 
+import scala.util.Try
+
 /**
   * Represents a URI. See [[https://www.ietf.org/rfc/rfc3986 RFC 3986]]
   *
@@ -75,8 +77,14 @@ object Uri {
   def unapply(uri: Uri): Option[Path] =
     Some(uri.path)
 
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Uri =
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Uri] =
     UriParser.parseUri(s.toString)
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[Uri] =
+    parseTry(s).toOption
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Uri =
+    parseTry(s).get
 }
 
 /**
@@ -534,8 +542,13 @@ object Url {
   def unapply(url: Url): Option[(UrlPath, QueryString, Option[String])] =
     Some((url.path, url.query, url.fragment))
 
-
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Url =
+    parseTry(s).get
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[Url] =
+    parseTry(s).toOption
+
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Url] =
     UrlParser.parseUrl(s.toString)
 }
 
@@ -608,6 +621,12 @@ object RelativeUrl {
     RelativeUrl(UrlPath.empty, QueryString.empty, None)
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): RelativeUrl =
+    parseTry(s).get
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[RelativeUrl] =
+    parseTry(s).toOption
+
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[RelativeUrl] =
     UrlParser.parseRelativeUrl(s.toString)
 }
 
@@ -731,6 +750,12 @@ object UrlWithAuthority {
     Some((url.authority, url.path, url.query, url.fragment))
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlWithAuthority =
+    parseTry(s).get
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[UrlWithAuthority] =
+    parseTry(s).toOption
+
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrlWithAuthority] =
     UrlParser.parseUrlWithAuthority(s.toString)
 }
 
@@ -780,6 +805,12 @@ final case class ProtocolRelativeUrl(authority: Authority,
 
 object ProtocolRelativeUrl {
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): ProtocolRelativeUrl =
+    parseTry(s).get
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[ProtocolRelativeUrl] =
+    parseTry(s).toOption
+
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[ProtocolRelativeUrl] =
     UrlParser.parseProtocolRelativeUrl(s.toString)
 }
 
@@ -830,6 +861,12 @@ final case class AbsoluteUrl(scheme: String,
 
 object AbsoluteUrl {
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): AbsoluteUrl =
+    parseTry(s).get
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[AbsoluteUrl] =
+    parseTry(s).toOption
+
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[AbsoluteUrl] =
     UrlParser.parseAbsoluteUrl(s.toString)
 }
 
@@ -906,6 +943,12 @@ final case class UrlWithoutAuthority(scheme: String,
 
 object UrlWithoutAuthority {
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlWithoutAuthority =
+    parseTry(s).get
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[UrlWithoutAuthority] =
+    parseTry(s).toOption
+
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrlWithoutAuthority] =
     UrlParser.parseUrlWithoutAuthority(s.toString)
 }
 
@@ -950,5 +993,11 @@ object Urn {
     new Urn(UrnPath(nid, nss))
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Urn =
+    parseTry(s).get
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[Urn] =
+    parseTry(s).toOption
+
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Urn] =
     UrnParser.parseUrn(s.toString)
 }

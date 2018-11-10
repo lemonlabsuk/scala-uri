@@ -3,6 +3,8 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.config.{All, ExcludeNones, UriConfig}
 import io.lemonlabs.uri.parsing.UrlParser
 
+import scala.util.Try
+
 case class QueryString(params: Vector[(String, Option[String])])(implicit config: UriConfig = UriConfig.default) {
 
   lazy val paramMap: Map[String, Vector[String]] = params.foldLeft(Map.empty[String, Vector[String]]) {
@@ -308,6 +310,12 @@ object QueryString {
   def empty(implicit config: UriConfig = UriConfig.default): QueryString =
     new QueryString(Vector.empty)
 
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): QueryString =
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[QueryString] =
     UrlParser.parseQuery(s.toString)
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[QueryString] =
+    parseTry(s).toOption
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): QueryString =
+    parseTry(s).get
 }

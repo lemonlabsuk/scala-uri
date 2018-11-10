@@ -3,6 +3,8 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UrlParser, UrnParser}
 
+import scala.util.Try
+
 sealed trait Path {
   def config: UriConfig
   def parts: Vector[String]
@@ -23,8 +25,14 @@ sealed trait Path {
 }
 
 object Path {
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Path =
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Path] =
     UrlParser.parsePath(s.toString)
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[Path] =
+    parseTry(s).toOption
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Path =
+    parseTry(s).get
 
   def unapply(path: Path): Option[Vector[String]] =
     Some(path.parts)
@@ -69,8 +77,14 @@ object UrlPath {
     if(parts.isEmpty) EmptyPath
     else AbsolutePath(parts.toVector)
 
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlPath =
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrlPath] =
     UrlParser.parsePath(s.toString)
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[UrlPath] =
+    parseTry(s).toOption
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlPath =
+    parseTry(s).get
 }
 
 /**
@@ -180,6 +194,12 @@ final case class UrnPath(nid: String, nss: String)(implicit val config: UriConfi
 }
 
 object UrnPath {
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrnPath =
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrnPath] =
     UrnParser.parseUrnPath(s.toString)
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[UrnPath] =
+    parseTry(s).toOption
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrnPath =
+    parseTry(s).get
 }

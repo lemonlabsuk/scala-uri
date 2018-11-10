@@ -3,6 +3,8 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.UrlParser
 
+import scala.util.Try
+
 
 case class Authority(userInfo: UserInfo,
                      host: Host,
@@ -103,8 +105,14 @@ object Authority {
   def apply(host: Host, port: Int)(implicit config: UriConfig): Authority =
     new Authority(UserInfo.empty, host, Some(port))
 
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Authority =
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Authority] =
     UrlParser.parseAuthority(s.toString)
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[Authority] =
+    parseTry(s).toOption
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Authority =
+    parseTry(s).get
 }
 
 case class UserInfo(user: Option[String], password: Option[String])
@@ -117,6 +125,12 @@ object UserInfo {
 
   def empty = UserInfo(None, None)
 
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UserInfo =
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UserInfo] =
     UrlParser.parseUserInfo(s.toString)
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[UserInfo] =
+    parseTry(s).toOption
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UserInfo =
+    parseTry(s).get
 }

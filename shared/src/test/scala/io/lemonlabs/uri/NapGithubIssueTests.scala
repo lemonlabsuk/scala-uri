@@ -94,8 +94,13 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
   }
 
   "Github Issue #56" should "now be fixed" in {
-    val ex = the [UriParsingException] thrownBy Url.parse("http://test.net:8o8o")
+    val badPort = "http://test.net:8o8o"
+
+    val ex = the [UriParsingException] thrownBy Url.parse(badPort)
     ex.getMessage should startWith("Invalid URL could not be parsed")
+
+    Url.parseTry(badPort).isSuccess should equal(false)
+    Url.parseOption(badPort) should equal(None)
   }
 
   "Github Issue #65 example 1" should "now be fixed" in {

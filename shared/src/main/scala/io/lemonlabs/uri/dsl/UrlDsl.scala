@@ -29,7 +29,7 @@ class UrlDsl(val url: Url) extends AnyVal {
     * @return A new Uri with the new Query String parameter
     */
   def ?(kv: String): Url =
-    url.addParamOptionValue(UrlParser.parseQueryParam(kv))
+    url.addParamOptionValue(UrlParser.parseQueryParam(kv).get)
 
   /**
    * Adds a trailing forward slash to the path and a new Query String parameter key-value pair.
@@ -67,7 +67,7 @@ class UrlDsl(val url: Url) extends AnyVal {
     * @return A new Uri with the new Query String parameter
     */
   def &(kv: String): Url =
-    url.addParamOptionValue(UrlParser.parseQueryParam(kv))
+    ?(kv)
 
   /**
     * Adds all the specified key-value pairs as parameters to the query

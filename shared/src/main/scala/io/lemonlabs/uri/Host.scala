@@ -6,6 +6,7 @@ import io.lemonlabs.uri.parsing.UrlParser
 
 import scala.annotation.tailrec
 import scala.collection.{GenSeq, immutable}
+import scala.util.Try
 
 sealed trait Host extends PublicSuffixSupport {
   def value: String
@@ -63,8 +64,14 @@ sealed trait Host extends PublicSuffixSupport {
 }
 
 object Host {
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Host =
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Host] =
     UrlParser.parseHost(s.toString)
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[Host] =
+    parseTry(s).toOption
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Host =
+    parseTry(s).get
 
   def unapply(host: Host): Option[String] =
     Some(host.toString)
@@ -155,8 +162,14 @@ final case class DomainName(value: String) extends Host with PublicSuffixSupport
 }
 
 object DomainName {
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): DomainName =
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[DomainName] =
     UrlParser.parseDomainName(s.toString)
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[DomainName] =
+    parseTry(s).toOption
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): DomainName =
+    parseTry(s).get
 }
 
 final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte) extends Host {
@@ -190,8 +203,14 @@ object IpV4 {
     new IpV4(octet1.toByte, octet2.toByte, octet3.toByte, octet4.toByte)
   }
 
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): IpV4 =
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[IpV4] =
     UrlParser.parseIpV4(s.toString)
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[IpV4] =
+    parseTry(s).toOption
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): IpV4 =
+    parseTry(s).get
 }
 
 final case class IpV6(piece1: Char, piece2: Char, piece3: Char, piece4: Char,
@@ -280,6 +299,12 @@ object IpV6 {
     IpV6(pieces(0), pieces(1), pieces(2), pieces(3), pieces(4), pieces(5), pieces(6), pieces(7))
   }
 
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): IpV6 =
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[IpV6] =
     UrlParser.parseIpV6(s.toString)
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[IpV6] =
+    parseTry(s).toOption
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): IpV6 =
+    parseTry(s).get
 }

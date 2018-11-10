@@ -23,7 +23,6 @@ trait UriParser {
 }
 
 object UriParser {
-  def parseUri(s: String)(implicit config: UriConfig = UriConfig.default): Uri =
-    Try(UrnParser.parseUrn(s))
-      .getOrElse(UrlParser.parseUrl(s))
+  def parseUri(s: String)(implicit config: UriConfig = UriConfig.default): Try[Uri] =
+    UrnParser.parseUrn(s) orElse UrlParser.parseUrl(s)
 }

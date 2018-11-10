@@ -227,8 +227,6 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
         Failure(new UriParsingException(s"Invalid $name could not be parsed. $detail"))
     }
 
-  // Try
-
   def parseIpV6(): Try[IpV6] = 
     mapParseError(rule(_ip_v6 ~ EOI).run(), "IPv6")
 

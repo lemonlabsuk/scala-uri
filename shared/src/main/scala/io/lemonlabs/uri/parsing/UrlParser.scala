@@ -6,7 +6,7 @@ import org.parboiled2.CharPredicate._
 import org.parboiled2._
 
 import scala.collection.immutable
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Try}
 
 class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
 

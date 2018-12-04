@@ -1,6 +1,5 @@
 package io.lemonlabs.uri
 
-import io.lemonlabs.uri.config.UriConfig
 
 /**
  * Date: 28/08/2013

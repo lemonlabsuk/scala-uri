@@ -1,6 +1,5 @@
 package io.lemonlabs.uri.decoding
 
-import io.lemonlabs.uri.Uri
 
 class PermissiveDecoder(child: UriDecoder) extends UriDecoder {
   def decode(s: String) = {

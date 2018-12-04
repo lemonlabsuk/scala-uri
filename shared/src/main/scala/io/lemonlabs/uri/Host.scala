@@ -5,7 +5,7 @@ import io.lemonlabs.uri.inet._
 import io.lemonlabs.uri.parsing.UrlParser
 
 import scala.annotation.tailrec
-import scala.collection.{GenSeq, immutable}
+import scala.collection.immutable
 import scala.util.Try
 
 sealed trait Host extends PublicSuffixSupport {

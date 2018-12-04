@@ -1,6 +1,6 @@
 package io.lemonlabs.uri.inet
 
-import io.lemonlabs.uri.{Authority, Host}
+import io.lemonlabs.uri.Host
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 

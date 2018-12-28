@@ -3,7 +3,6 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.parsing.UriParsingException
 import org.scalatest.{FlatSpec, Matchers}
 
-import scala.util.Failure
 
 class ParsingTests extends FlatSpec with Matchers {
 

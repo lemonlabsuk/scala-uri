@@ -5,7 +5,7 @@ import io.lemonlabs.uri.{Urn, UrnPath}
 import org.parboiled2.CharPredicate._
 import org.parboiled2._
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Try}
 
 class UrnParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
 

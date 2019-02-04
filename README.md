@@ -12,6 +12,7 @@
  * Ability to transform query strings with methods such as [filterQuery](#filterquery) and [mapQuery](#mapquery)
  * Ability to [replace](#replacing-query-string-parameters) and [remove](#removing-query-string-parameters) query string parameters
  * Ability to extract TLDs and [public suffixes](#public-suffixes) such as `.com` and `.co.uk` from hosts
+ * Ability to render URLs in [punycode](#punycode)
  * Ability to [parse](#parsing-ips) IPv6 and IPv4 addresses
  * Support for [custom encoding](#custom-encoding) such as encoding [spaces as pluses](#encoding-spaces-as-pluses)
  * Support for [protocol relative urls](#protocol-relative-urls)
@@ -596,6 +597,19 @@ uri.publicSuffixes // This returns Vector("co.uk", "uk")
 ```
 
 These methods return `None` and `Vector.empty`, respectively for URLs without a Host (e.g. Relative URLs)
+
+## Punycode
+
+**Note:** *Currently not supported for scala-js*
+
+See [RFC 3490](http://www.ietf.org/rfc/rfc3490.txt)
+
+```scala
+import io.lemonlabs.uri.Url
+
+val url = Url.parse("https://はじめよう.みんな/howto.html")
+url.toStringPunycode // This returns "https://xn--p8j9a0d9c9a.xn--q9jyb4c/howto.html"
+```
 
 ## mailto
 

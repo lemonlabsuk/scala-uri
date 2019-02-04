@@ -13,6 +13,12 @@ sealed trait Host extends PublicSuffixSupport {
   override def toString: String = value
 
   /**
+    * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
+    *         operation of <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
+    */
+  def toStringPunycode: String = value
+
+  /**
     * Returns the apex domain for this Host.
     *
     * The apex domain is constructed from the public suffix prepended with the immediately preceding
@@ -77,8 +83,14 @@ object Host {
     Some(host.toString)
 }
 
-final case class DomainName(value: String) extends Host with PublicSuffixSupportImpl {
-  override def toString: String = value
+final case class DomainName(value: String) extends Host with PublicSuffixSupportImpl with PunycodeSupport {
+
+  /**
+    * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
+    *         operation of <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
+    */
+  override def toStringPunycode: String =
+    toPunycode(value)
 
   /**
     * Returns the apex domain for this Host.

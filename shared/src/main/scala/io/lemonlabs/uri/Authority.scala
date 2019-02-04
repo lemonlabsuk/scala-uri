@@ -74,21 +74,28 @@ case class Authority(userInfo: UserInfo,
   def longestSubdomain: Option[String] =
     host.longestSubdomain
 
-  private[uri] def toString(c: UriConfig): String = {
+  private[uri] def toString(c: UriConfig, hostToString: Host => String): String = {
     val userInfo = for {
       userStr <- user
       userStrEncoded = c.userInfoEncoder.encode(userStr, c.charset)
       passwordStrEncoded = password.map(p => ":" + c.userInfoEncoder.encode(p, c.charset)).getOrElse("")
     } yield userStrEncoded + passwordStrEncoded + "@"
 
-    userInfo.getOrElse("") + host + port.map(":" + _).getOrElse("")
+    userInfo.getOrElse("") + hostToString(host) + port.map(":" + _).getOrElse("")
   }
 
+  /**
+    * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
+    *         operation of <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
+    */
+  def toStringPunycode: String =
+    toString(config, _.toStringPunycode)
+
   override def toString: String =
-    toString(config)
+    toString(config, _.toString)
 
   def toStringRaw: String =
-    toString(config.withNoEncoding)
+    toString(config.withNoEncoding, _.toString)
 }
 
 object Authority {

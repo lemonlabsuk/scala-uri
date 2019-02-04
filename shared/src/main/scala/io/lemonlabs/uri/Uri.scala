@@ -42,8 +42,6 @@ sealed trait Uri {
     */
   def withScheme(scheme: String): SelfWithScheme
 
-  private[uri] def toString(config: UriConfig): String
-
   def toUrl: Url
   def toUrn: Urn
 
@@ -67,6 +65,8 @@ sealed trait Uri {
 
   override def toString: String =
     toString(config)
+
+  private[uri] def toString(config: UriConfig): String
 }
 
 object Uri {
@@ -510,6 +510,14 @@ sealed trait Url extends Uri {
 
   def toUrl: Url = this
   def toUrn: Urn = throw new UriConversionException(getClass.getSimpleName + " cannot be converted to Urn")
+
+  /**
+    * @return the URL as a String. If the URI has a domain name for a host, any unicode characters will be
+    *         returned in ASCII Compatible Encoding (ACE), as defined by the ToASCII operation of
+    *         <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
+    */
+  def toStringPunycode: String =
+    toString(config)
 }
 
 object Url {
@@ -742,6 +750,19 @@ sealed trait UrlWithAuthority extends Url {
     */
   def longestSubdomain: Option[String] =
     authority.longestSubdomain
+
+  /**
+    * @return the URL as a String. If the URI has a domain name for a host, any unicode characters will be
+    *         returned in ASCII Compatible Encoding (ACE), as defined by the ToASCII operation of
+    *         <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
+    */
+  override def toStringPunycode: String =
+    toString(config, _.toStringPunycode)
+
+  private[uri] def toString(c: UriConfig): String =
+    toString(c, _.toString)
+
+  private[uri] def toString(c: UriConfig, hostToString: Host => String): String
 }
 
 object UrlWithAuthority {
@@ -799,8 +820,8 @@ final case class ProtocolRelativeUrl(authority: Authority,
   def withQueryString(query: QueryString): ProtocolRelativeUrl =
     copy(query = query)
 
-  private[uri] def toString(c: UriConfig): String =
-    "//" + authority.toString(c) + path.toString(c) + query.toString(c) + fragmentToString(c)
+  private[uri] def toString(c: UriConfig, hostToString: Host => String): String =
+    "//" + authority.toString(c, hostToString) + path.toString(c) + query.toString(c) + fragmentToString(c)
 }
 
 object ProtocolRelativeUrl {
@@ -855,8 +876,8 @@ final case class AbsoluteUrl(scheme: String,
   def withQueryString(query: QueryString): AbsoluteUrl =
     copy(query = query)
 
-  private[uri] def toString(c: UriConfig): String =
-    scheme + "://" + authority.toString(c) + path.toString(c) + query.toString(c) + fragmentToString(c)
+  private[uri] def toString(c: UriConfig, hostToString: Host => String): String =
+    scheme + "://" + authority.toString(c, hostToString) + path.toString(c) + query.toString(c) + fragmentToString(c)
 }
 
 object AbsoluteUrl {

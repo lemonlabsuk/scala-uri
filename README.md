@@ -186,9 +186,9 @@ uri match {
     case Urn(path) => // Matches Urns
     case Url(path, query, fragment) => // Matches Urls
     case RelativeUrl(path, query, fragment) => // Matches RelativeUrls
-    case UrlWithAuthority(authority, path, query, fragment) => // Matches AbsoluteUrls and ProtocolRelativeUrls
-    case AbsoluteUrls(scheme, authority, path, query, fragment) => // Matches AbsoluteUrls
-    case ProtocolRelativeUrls(authority, path, query, fragment) => // Matches ProtocolRelativeUrls
+    case UrlWithAuthority(authority, path, query, fragment) => // Matches AbsoluteUrl and ProtocolRelativeUrl
+    case AbsoluteUrl(scheme, authority, path, query, fragment) => // Matches AbsoluteUrl
+    case ProtocolRelativeUrl(authority, path, query, fragment) => // Matches ProtocolRelativeUrl
     case UrlWithoutAuthority(scheme, path, query, fragment) => // Matches UrlWithoutAuthoritys
 }
 ```

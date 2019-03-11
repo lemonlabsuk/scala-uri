@@ -41,4 +41,12 @@ class GithubIssuesTests extends FlatSpec with Matchers with OptionValues {
     val url = Url.parse("soundcloud://sounds:78237871")
     url.port should equal(Some(78237871))
   }
+
+  "Github Issue #30" should "handle correctly percent encoded URLs when ignoreInvalidPercentEncoding=true" in {
+    implicit val c = UriConfig(
+      decoder = PercentDecoder(ignoreInvalidPercentEncoding = true)
+    )
+    val url = Url.parse("http://example.com/path%20with%20space")
+    url.toString should equal("http://example.com/path%20with%20space")
+  }
 }

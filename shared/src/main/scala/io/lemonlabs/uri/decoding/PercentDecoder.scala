@@ -10,19 +10,20 @@ object PercentDecoder extends PercentDecoder(ignoreInvalidPercentEncoding = fals
     "PercentDecoder(ignoreInvalidPercentEncoding=true) or NoopDecoder to suppress this Exception"
 
   protected val cs = "UTF-8"
+  protected val percentByte = '%'.toByte
 }
 
 case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDecoder {
 
   def decode(s: String) = {
 
-    def toHexByte(hex: String) = try {
-      if (hex.length != 2) {
-        throw new UriDecodeException(s"Encountered '%' followed by a non hex number '$hex'. $errorMessage")
-      }
-      Integer.parseInt(hex, 16).toByte
+    def toHexByte(hex: String): Option[Byte] = try {
+      if (hex.length != 2)
+        None
+      else
+        Some(Integer.parseInt(hex, 16).toByte)
     } catch {
-      case e: NumberFormatException => throw new UriDecodeException(s"Encountered '%' followed by a non hex number '$hex'. $errorMessage")
+      case e: NumberFormatException => None
     }
 
     @tailrec
@@ -30,9 +31,16 @@ case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDeco
       remaining match {
         case Nil =>
           result
-        case '%' :: xs if !ignoreInvalidPercentEncoding =>
-          val hex = xs.take(2)
-          go(xs.drop(2), result :+ toHexByte(hex.mkString))
+        case '%' :: xs =>
+          val hex = xs.take(2).mkString
+          toHexByte(hex) match {
+            case Some(b) =>
+              go(xs.drop(2), result :+ b)
+            case None if ignoreInvalidPercentEncoding =>
+              go(xs, result :+ percentByte)
+            case _ =>
+              throw new UriDecodeException(s"Encountered '%' followed by a non hex number '$hex'. $errorMessage")
+          }
         case ch :: xs =>
           go(xs, result ++ ch.toString.getBytes(cs))
       }

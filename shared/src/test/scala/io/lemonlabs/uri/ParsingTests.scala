@@ -23,6 +23,10 @@ class ParsingTests extends FlatSpec with Matchers {
     url.isDefined should equal(true)
   }
 
+  "Parsing a null URI" should "result in a None" in {
+    Uri.parseOption(null) shouldBe None
+  }
+
   "Parsing a relative URI" should "result in a valid Uri object" in {
     val url = Url.parse("/uris-in-scala.html")
     url.schemeOption should equal (None)

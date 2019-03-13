@@ -78,7 +78,7 @@ object Uri {
     Some(uri.path)
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Uri] =
-    UriParser.parseUri(s.toString)
+    Try(s.toString).flatMap(UriParser.parseUri)
 
   def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[Uri] =
     parseTry(s).toOption

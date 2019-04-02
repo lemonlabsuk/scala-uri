@@ -16,13 +16,23 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
     capture((1 to maxLength).times(Digit)) ~> extractInt
   }
 
+  def _octet: Rule1[Int] = rule {
+    _int(3) ~> ((octet: Int) => test(0x00 <= octet && octet <= 0xFF) ~ push(octet))
+  }
+
   def _scheme: Rule1[String] = rule {
     capture(Alpha ~ zeroOrMore(AlphaNum | anyOf("+-.")))
   }
 
-  def _ip_v4: Rule1[IpV4] = rule {
+  def _ip_v4_old: Rule1[IpV4] = rule {
     _int(3) ~ '.' ~ _int(3) ~ '.' ~ _int(3) ~ '.' ~ _int(3) ~> extractIpv4
   }
+
+  def _ip_v4_new: Rule1[IpV4] = rule {
+    _octet ~ '.' ~ _octet ~ '.' ~ _octet ~ '.' ~ _octet ~> extractIpv4
+  }
+
+  def _ip_v4: Rule1[IpV4] = _ip_v4_new
 
   def _ip_v6_hex_piece: Rule1[String] = rule {
     capture((1 to 4).times(HexDigit))
@@ -219,7 +229,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   def pathDecoder = conf.pathDecoder
   def queryDecoder = conf.queryDecoder
   def fragmentDecoder = conf.fragmentDecoder
-  
+
   private[uri] def mapParseError[T](t: Try[T], name: => String): Try[T] =
     t.recoverWith {
       case pe @ ParseError(_, _, _) =>
@@ -227,49 +237,49 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
         Failure(new UriParsingException(s"Invalid $name could not be parsed. $detail"))
     }
 
-  def parseIpV6(): Try[IpV6] = 
+  def parseIpV6(): Try[IpV6] =
     mapParseError(rule(_ip_v6 ~ EOI).run(), "IPv6")
 
-  def parseIpV4(): Try[IpV4] = 
+  def parseIpV4(): Try[IpV4] =
     mapParseError(rule(_ip_v4 ~ EOI).run(), "IPv4")
 
-  def parseDomainName(): Try[DomainName] = 
+  def parseDomainName(): Try[DomainName] =
     mapParseError(rule(_domain_name ~ EOI).run(), "Domain Name")
 
-  def parseHost(): Try[Host] = 
+  def parseHost(): Try[Host] =
     mapParseError(rule(_host ~ EOI).run(), "Host")
 
-  def parseUserInfo(): Try[UserInfo] = 
+  def parseUserInfo(): Try[UserInfo] =
     mapParseError(rule(_user_info ~ EOI).run(), "User Info")
 
-  def parseUrlWithoutAuthority(): Try[UrlWithoutAuthority] = 
+  def parseUrlWithoutAuthority(): Try[UrlWithoutAuthority] =
     mapParseError(rule(_url_without_authority ~ EOI).run(), "Url")
 
-  def parseAbsoluteUrl(): Try[AbsoluteUrl] = 
+  def parseAbsoluteUrl(): Try[AbsoluteUrl] =
     mapParseError(rule(_abs_url ~ EOI).run(), "Url")
 
-  def parseProtocolRelativeUrl(): Try[ProtocolRelativeUrl] = 
+  def parseProtocolRelativeUrl(): Try[ProtocolRelativeUrl] =
     mapParseError(rule(_protocol_rel_url ~ EOI).run(), "Url")
 
-  def parseUrlWithAuthority(): Try[UrlWithAuthority] = 
+  def parseUrlWithAuthority(): Try[UrlWithAuthority] =
     mapParseError(rule(_url_with_authority ~ EOI).run(), "Url")
 
-  def parseRelativeUrl(): Try[RelativeUrl] = 
+  def parseRelativeUrl(): Try[RelativeUrl] =
     mapParseError(rule(_rel_url ~ EOI).run(), "Url")
 
-  def parsePath(): Try[UrlPath] = 
+  def parsePath(): Try[UrlPath] =
     mapParseError(rule(_path ~ EOI).run(), "Path")
 
-  def parseAuthority(): Try[Authority] = 
+  def parseAuthority(): Try[Authority] =
     mapParseError(rule(_authority ~ EOI).run(), "Authority")
 
-  def parseUrl(): Try[Url] = 
+  def parseUrl(): Try[Url] =
     mapParseError(rule(_url ~ EOI).run(), "URL")
 
-  def parseQuery(): Try[QueryString] = 
+  def parseQuery(): Try[QueryString] =
     mapParseError(rule(_query_string ~ EOI).run(), "Query String")
 
-  def parseQueryParam(): Try[(String, Option[String])] = 
+  def parseQueryParam(): Try[(String, Option[String])] =
     mapParseError(rule(_query_param_or_tok ~ EOI).run(), "Query Parameter")
 }
 

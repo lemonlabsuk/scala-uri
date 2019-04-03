@@ -82,6 +82,11 @@ class ParsingTests extends FlatSpec with Matchers {
     url.hostOption should equal(Some(DomainName("1.2.3")))
   }
 
+  it should "NOT parse as IPv4 if there are more than four octets and number is out of octet range" in {
+    val url = Url.parse("http://333.333.333.333.333:9000")
+    url.hostOption should equal(Some(DomainName("333.333.333.333.333")))
+  }
+
   it should "parse with no path" in {
     val url = Url.parse("http://1.2.3.4")
     url.hostOption should equal(Some(IpV4(1, 2, 3, 4)))

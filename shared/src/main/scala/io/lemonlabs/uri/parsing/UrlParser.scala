@@ -24,15 +24,9 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
     capture(Alpha ~ zeroOrMore(AlphaNum | anyOf("+-.")))
   }
 
-  def _ip_v4_old: Rule1[IpV4] = rule {
-    _int(3) ~ '.' ~ _int(3) ~ '.' ~ _int(3) ~ '.' ~ _int(3) ~> extractIpv4
-  }
-
-  def _ip_v4_new: Rule1[IpV4] = rule {
+  def _ip_v4: Rule1[IpV4] = rule {
     _octet ~ '.' ~ _octet ~ '.' ~ _octet ~ '.' ~ _octet ~> extractIpv4
   }
-
-  def _ip_v4: Rule1[IpV4] = _ip_v4_new
 
   def _ip_v6_hex_piece: Rule1[String] = rule {
     capture((1 to 4).times(HexDigit))

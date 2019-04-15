@@ -3,7 +3,7 @@ import org.scalajs.sbtplugin.cross.CrossType
 
 name                            := "scala-uri root"
 scalaVersion in ThisBuild       := "2.12.6"
-crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.6", "2.13.0-M4")
+crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.8", "2.13.0-M5")
 
 val sharedSettings = Seq(
   name          := "scala-uri",
@@ -12,14 +12,14 @@ val sharedSettings = Seq(
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled" % "2.1.5",
     "com.chuusai"   %%% "shapeless" % "2.3.3",
-    "org.scalatest" %%% "scalatest" % "3.0.6-SNAP2" % "test"
+    "org.scalatest" %%% "scalatest" % "3.0.7" % "test"
   ),
   parallelExecution in Test := false
 )
 
 val jvmSettings = Seq(
   libraryDependencies ++= Seq(
-    "io.spray" %%  "spray-json" % "1.3.4"
+    "io.spray" %%  "spray-json" % "1.3.5"
   )
 )
 

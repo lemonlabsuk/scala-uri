@@ -1,9 +1,9 @@
 import sbt.Keys.libraryDependencies
-import org.scalajs.sbtplugin.cross.CrossType
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 name                            := "scala-uri root"
 scalaVersion in ThisBuild       := "2.12.6"
-crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.8", "2.13.0-M5")
+crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.8", "2.13.0-M4")
 
 val sharedSettings = Seq(
   name          := "scala-uri",
@@ -12,14 +12,14 @@ val sharedSettings = Seq(
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled" % "2.1.5",
     "com.chuusai"   %%% "shapeless" % "2.3.3",
-    "org.scalatest" %%% "scalatest" % "3.0.7" % "test"
+    "org.scalatest" %%% "scalatest" % "3.0.6-SNAP2" % "test"
   ),
   parallelExecution in Test := false
 )
 
 val jvmSettings = Seq(
   libraryDependencies ++= Seq(
-    "io.spray" %%  "spray-json" % "1.3.5"
+    "io.spray" %%  "spray-json" % "1.3.4"
   )
 )
 
@@ -58,21 +58,13 @@ val publishingSettings = Seq(
       </developers>
 )
 
-lazy val root = project.in(file("."))
-  .aggregate(scalaUriJvm, scalaUriJs)
-  .settings(
-    publish := {},
-    publishLocal := {}
-  )
-
 lazy val scalaUri =
-  crossProject.in(file("."))
+  crossProject(JSPlatform, JVMPlatform)
+    .crossType(CrossType.Full)
+    .in(file("."))
     .settings(sharedSettings)
     .settings(publishingSettings)
     .jvmSettings(jvmSettings)
-
-lazy val scalaUriJs     = scalaUri.js
-lazy val scalaUriJvm    = scalaUri.jvm
 
 lazy val updatePublicSuffixes = taskKey[Unit]("Updates the public suffix Trie at io.lemonlabs.uri.internet.PublicSuffixes")
 

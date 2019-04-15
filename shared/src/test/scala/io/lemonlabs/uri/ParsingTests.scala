@@ -268,6 +268,22 @@ class ParsingTests extends FlatSpec with Matchers {
     ))
   }
 
+  "A URL with file scheme" should "parse as an absolute URL" in {
+    val url = AbsoluteUrl.parse("file:///path/to/file")
+    url.scheme should equal("file")
+    url.host should equal(DomainName.empty)
+    url.path.toString() should equal("/path/to/file")
+    url.toString() should equal("file:///path/to/file")
+  }
+
+  it should "parse as a URL" in {
+    val url = Url.parse("file:///path/to/file")
+    url.schemeOption should equal(Some("file"))
+    url.hostOption should equal(Some(DomainName.empty))
+    url.path.toString() should equal("/path/to/file")
+    url.toString() should equal("file:///path/to/file")
+  }
+
   "Empty path parts" should "be maintained during parsing" in {
     val url = Url.parse("http://www.example.com/hi//bye")
     url.toString should equal("http://www.example.com/hi//bye")

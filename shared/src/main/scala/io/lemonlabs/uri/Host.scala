@@ -182,6 +182,8 @@ object DomainName {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): DomainName =
     parseTry(s).get
+
+  def empty: DomainName = DomainName("")
 }
 
 final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte) extends Host {

@@ -49,7 +49,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _domain_name: Rule1[DomainName] = rule {
-    capture(oneOrMore(noneOf(_host_end))) ~> extractDomainName
+    capture(zeroOrMore(noneOf(_host_end))) ~> extractDomainName
   }
 
   def _host: Rule1[Host] = rule {

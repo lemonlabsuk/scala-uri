@@ -8,7 +8,7 @@ assignees: theon
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
+A description of what the bug is.
 
 **To Reproduce**
 ```scala

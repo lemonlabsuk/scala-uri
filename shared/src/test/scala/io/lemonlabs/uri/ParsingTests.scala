@@ -337,7 +337,9 @@ class ParsingTests extends FlatSpec with Matchers {
 
   "URNs" should "parse everything after the scheme as the path" in {
     val urn = Urn.parse("urn:example:animal:ferret:nose")
+    urn.scheme should equal("urn")
     urn.schemeOption should equal(Some("urn"))
     urn.path.toString() should equal("example:animal:ferret:nose")
+    urn.toString() should equal("urn:example:animal:ferret:nose")
   }
 }

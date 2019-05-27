@@ -987,7 +987,8 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
 
   def self: Self = this
 
-  def schemeOption = Some("urn")
+  def scheme = "urn"
+  def schemeOption = Some(scheme)
 
   def nss: String = path.nss
   def nid: String = path.nid
@@ -1006,7 +1007,7 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
   def toUrn: Urn = this
 
   private[uri] def toString(c: UriConfig): String =
-    "urn:" + path.toString(c)
+    scheme + ":" + path.toString(c)
 }
 
 object Urn {

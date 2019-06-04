@@ -63,7 +63,7 @@ val protocolRelativeUrl = ProtocolRelativeUrl.parse("//www.scala-lang.org")
 import io.lemonlabs.uri.Urn
 
 val urn = Urn.parse("urn:isbn:0981531687")
-urn.schemeOption // This is Some("urn")
+urn.scheme // This is "urn"
 urn.nid // This is "isbn"
 urn.nss // This is "0981531687"
 ```

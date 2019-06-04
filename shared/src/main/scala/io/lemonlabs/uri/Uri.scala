@@ -23,7 +23,7 @@ import scala.util.Try
   * URNs will be in the form `urn:example:example2`
   *
  */
-sealed trait Uri {
+sealed trait Uri extends Product with Serializable {
   type Self <: Uri
   type SelfWithScheme <: Uri
 

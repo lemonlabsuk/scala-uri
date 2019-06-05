@@ -5,7 +5,7 @@ import io.lemonlabs.uri.parsing.{UrlParser, UrnParser}
 
 import scala.util.Try
 
-sealed trait Path {
+sealed trait Path extends Product with Serializable {
   def config: UriConfig
   def parts: Vector[String]
   private[uri] def toString(config: UriConfig): String

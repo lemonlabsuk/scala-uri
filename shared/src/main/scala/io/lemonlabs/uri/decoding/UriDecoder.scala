@@ -1,6 +1,6 @@
 package io.lemonlabs.uri.decoding
 
-trait UriDecoder {
+trait UriDecoder extends Product with Serializable {
   def decode(u: String): String
 
   def decodeTuple(kv: (String, Option[String])) =

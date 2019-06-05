@@ -1,6 +1,6 @@
 package io.lemonlabs.uri.encoding
 
-trait UriEncoder {
+trait UriEncoder extends Product with Serializable {
   def shouldEncode(ch: Char): Boolean
   def encodeChar(ch: Char): String
 

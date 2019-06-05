@@ -1,6 +1,6 @@
 package io.lemonlabs.uri.inet
 
-trait PublicSuffixSupport {
+trait PublicSuffixSupport extends Product with Serializable {
 
   /**
     * Returns the longest public suffix for the host in this URI. Examples include:

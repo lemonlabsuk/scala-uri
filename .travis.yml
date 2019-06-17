@@ -14,7 +14,7 @@ jdk:
 
 matrix:
   include:
-    - scala: 2.13.0-M4
+    - scala: 2.13.0
       env: COVERAGE=coverageOff
     - scala: 2.12.8
       env: COVERAGE=coverageOn

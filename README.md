@@ -575,6 +575,12 @@ uri.apexDomain // This returns Some("google.co.uk")
 
 **Note:** *Currently not supported for scala-js*
 
+**Note:** *To use it spray-json dependency is required*
+
+```scala
+"io.spray" %% "spray-json" % "1.3.2"
+```
+
 `scala-uri` uses the list of public suffixes from [publicsuffix.org](https://publicsuffix.org) to allow you to identify
 the TLD of your absolute URIs.
 

@@ -19,7 +19,7 @@ val sharedSettings = Seq(
 
 val jvmSettings = Seq(
   libraryDependencies ++= Seq(
-    "io.spray" %%  "spray-json" % "1.3.4"
+    "io.spray" %%  "spray-json" % "1.3.4" % Optional
   )
 )
 

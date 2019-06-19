@@ -576,11 +576,10 @@ uri.apexDomain // This returns Some("google.co.uk")
 
 **Note:** *Currently not supported for scala-js*
 
-**Note:** *To use it spray-json dependency is required*
+**Note:** *To use Public Suffixes you must include a supported JSON dependency*
 
-```scala
-"io.spray" %% "spray-json" % "1.3.4"
-```
+ * [circe](#circe)
+ * [spray-json](#spray-json)
 
 `scala-uri` uses the list of public suffixes from [publicsuffix.org](https://publicsuffix.org) to allow you to identify
 the TLD of your absolute URIs.
@@ -604,6 +603,28 @@ uri.publicSuffixes // This returns Vector("co.uk", "uk")
 ```
 
 These methods return `None` and `Vector.empty`, respectively for URLs without a Host (e.g. Relative URLs)
+
+### Circe
+
+To use Circe with scala-uri, you must add the following dependency to your SBT build:
+
+```scala
+"io.circe" %% "circe-parser"  % "0.10.0"
+```
+
+### spray-json
+
+To use spray-json with scala-uri, you must add the following dependency to your SBT build:
+
+```scala
+"io.spray" %% "spray-json" % "1.3.4"
+```
+
+and configure your `UriConfig` like so:
+
+```scala
+implicit val config: UriConfig = UriConfig(jsonSupport = SprayJsonSupport)
+```
 
 ## Punycode
 

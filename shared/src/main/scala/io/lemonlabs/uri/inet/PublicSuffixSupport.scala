@@ -1,6 +1,10 @@
 package io.lemonlabs.uri.inet
 
+import io.lemonlabs.uri.config.UriConfig
+
 trait PublicSuffixSupport extends Product with Serializable {
+
+  def conf: UriConfig
 
   /**
     * Returns the longest public suffix for the host in this URI. Examples include:

@@ -7,7 +7,7 @@ import spray.json._
 case object SprayJsonSupport extends JsonSupport {
   implicit lazy val trieFmt: JsonFormat[Trie] = lazyFormat(jsonFormat(Trie.apply, "c", "e"))
 
-  lazy val publicSuffixTrie: Trie = {
+  override lazy val publicSuffixTrie: Trie = {
     publicSuffixJson.parseJson.convertTo[Trie]
   }
 }

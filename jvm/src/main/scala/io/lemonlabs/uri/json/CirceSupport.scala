@@ -17,6 +17,6 @@ case object CirceSupport extends JsonSupport {
       new Trie(children, wordEnd)
     }
 
-  override def publicSuffixTrie: Trie =
+  override lazy val publicSuffixTrie: Trie =
     decode[Trie](publicSuffixJson).getOrElse(throw new UriException("Unable to parse public suffix JSON"))
 }

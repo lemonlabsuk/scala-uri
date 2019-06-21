@@ -609,7 +609,7 @@ These methods return `None` and `Vector.empty`, respectively for URLs without a 
 To use Circe with scala-uri, you must add the following dependency to your SBT build:
 
 ```scala
-"io.circe" %% "circe-parser"  % "0.10.0"
+"io.circe" %% "circe-parser"  % "0.12.0"
 ```
 
 ### spray-json

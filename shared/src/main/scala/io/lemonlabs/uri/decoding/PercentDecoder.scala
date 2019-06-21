@@ -1,5 +1,4 @@
 package io.lemonlabs.uri.decoding
-import io.lemonlabs.uri.decoding.PercentDecoder._
 
 import scala.annotation.tailrec
 
@@ -14,6 +13,7 @@ object PercentDecoder extends PercentDecoder(ignoreInvalidPercentEncoding = fals
 }
 
 case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDecoder {
+  import io.lemonlabs.uri.decoding.PercentDecoder._
 
   def decode(s: String) = {
 

@@ -1,1 +1,1 @@
-version in ThisBuild := sys.props.getOrElse("scala.uri.ver", "1.4.7")
+version in ThisBuild := sys.props.getOrElse("scala.uri.ver", "1.4.8")

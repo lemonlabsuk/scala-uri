@@ -23,9 +23,5 @@ matrix:
 
 sudo: false # Enable new travis container-based infrastructure
 
-
-before_install:
-  - rm -r ~/.ivy2
-
 after_success:
   - bash <(curl -s https://codecov.io/bash)

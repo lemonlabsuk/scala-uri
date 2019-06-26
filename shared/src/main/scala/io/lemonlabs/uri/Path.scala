@@ -71,10 +71,11 @@ sealed trait UrlPath extends Path {
 
 object UrlPath {
   def empty: UrlPath = EmptyPath
+
   val slash: UrlPath = AbsolutePath(Vector.empty)
 
   def apply(parts: Iterable[String]): UrlPath =
-    if(parts.isEmpty) EmptyPath
+    if (parts.isEmpty) EmptyPath
     else AbsolutePath(parts.toVector)
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrlPath] =
@@ -85,6 +86,19 @@ object UrlPath {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlPath =
     parseTry(s).get
+
+  /**
+    * Unlike `UrlPath.parse`, this method treats the supplied String as a raw path and does not
+    * require reserved characters to be PercentEncoded
+    */
+  def fromRaw(s: String)(implicit config: UriConfig = UriConfig.default): UrlPath = {
+    def parts = s.split('/').toVector
+    s.headOption match {
+      case None => EmptyPath
+      case Some('/') => AbsolutePath(parts.tail)
+      case _ => RootlessPath(parts)
+    }
+  }
 }
 
 /**

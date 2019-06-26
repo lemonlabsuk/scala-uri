@@ -5,7 +5,8 @@ import scala.annotation.tailrec
 
 object PercentDecoder extends PercentDecoder(ignoreInvalidPercentEncoding = false) {
   protected val errorMessage =
-    "It looks like this URL isn't Percent Encoded. If so, you can use either" +
+    "It looks like this URL isn't Percent Encoded. Ideally you should Percent Encode the relevant parts " +
+    "of your URL before passing to scala-uri. Alternatively, you can use a UriConfig with either " +
     "PercentDecoder(ignoreInvalidPercentEncoding=true) or NoopDecoder to suppress this Exception"
 
   protected val cs = "UTF-8"

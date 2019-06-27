@@ -71,7 +71,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _user_info: Rule1[UserInfo] = rule {
-    capture(oneOrMore(noneOf(":/?[]@"))) ~ optional(":" ~ capture(zeroOrMore(noneOf("@")))) ~ "@" ~> extractUserInfo
+    capture(zeroOrMore(noneOf(":/?[]@"))) ~ optional(":" ~ capture(zeroOrMore(noneOf("@")))) ~ "@" ~> extractUserInfo
   }
 
   def _port: Rule1[Int] = rule {

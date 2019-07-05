@@ -1,5 +1,6 @@
 import sbt.Keys.libraryDependencies
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
+import MimaSettings.mimaSettings
 
 name                            := "scala-uri root"
 scalaVersion in ThisBuild       := "2.13.0"
@@ -64,6 +65,7 @@ lazy val scalaUri =
     .in(file("."))
     .settings(sharedSettings)
     .settings(publishingSettings)
+    .settings(mimaSettings)
     .jvmSettings(jvmSettings)
 
 lazy val updatePublicSuffixes = taskKey[Unit]("Updates the public suffix Trie at io.lemonlabs.uri.internet.PublicSuffixes")

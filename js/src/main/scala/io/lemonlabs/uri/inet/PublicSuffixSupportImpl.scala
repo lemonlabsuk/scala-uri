@@ -2,7 +2,12 @@ package io.lemonlabs.uri.inet
 
 import io.lemonlabs.uri.{Host, NotImplementedForScalaJsError}
 
-trait PublicSuffixSupportImpl { this: Host =>
+object PublicSuffixSupportImpl {
+  lazy val trie: Trie =
+    throw NotImplementedForScalaJsError
+}
+
+trait PublicSuffixSupportImpl { self: Host =>
   /**
     * Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`

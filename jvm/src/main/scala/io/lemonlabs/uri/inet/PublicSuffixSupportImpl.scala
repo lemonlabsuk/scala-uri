@@ -16,7 +16,7 @@ object PublicSuffixSupportImpl {
   }
 }
 
-trait PublicSuffixSupportImpl { this: Host =>
+trait PublicSuffixSupportImpl { self: Host =>
   /**
     * Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`

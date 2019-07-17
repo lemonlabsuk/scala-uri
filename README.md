@@ -32,8 +32,6 @@ To include it in your SBT project from maven central:
 
 There are also demo projects for both [scala](https://github.com/lemonlabsuk/scala-uri-demo) and [scala-js](https://github.com/lemonlabsuk/scala-uri-scalajs-example) to help you get up and running quickly.
 
-*Note:* This library works best when using Scala `2.11.2+`. Due a bug in older versions of Scala, this library  can result in `StackOverflowException`s for very large URLs when using versions of Scala older than `2.11.2`. [More details](https://github.com/NET-A-PORTER/scala-uri/issues/51#issuecomment-45759462)
-
 ## Parsing
 
 ### Parse a URL
@@ -665,8 +663,9 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 
 ## Including scala-uri your project
 
-`scala-uri` `1.x.x` is currently built with support for scala `2.13.x`, `2.12.x`, `2.11.x`
+`scala-uri` `1.x.x` is currently built with support for scala `2.13.x`, `2.12.x`
 
+ * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
  * For `2.9.x` support use `scala-uri` `0.3.6` from branch [`0.3.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.3.x)
 
@@ -691,6 +690,10 @@ For maven users you should use (for 2.12.x):
 Contributions to `scala-uri` are always welcome. Check out the [Contributing Guidelines](https://github.com/lemonlabsuk/scala-uri/blob/master/README.md)
 
 # Migration guides
+
+## 1.x.x to 1.5.x
+
+ * scala 2.11 support dropped, please upgrade to 2.12 or 2.13
 
 ## 0.5.x to 1.x.x
 

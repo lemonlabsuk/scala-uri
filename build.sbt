@@ -9,10 +9,11 @@ crossScalaVersions in ThisBuild := Seq("2.12.8", "2.13.0")
 val sharedSettings = Seq(
   name          := "scala-uri",
   organization  := "io.lemonlabs",
-  scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature", "-Xfatal-warnings"),
+  scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"),
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled" % "2.1.7",
     "com.chuusai"   %%% "shapeless" % "2.3.3",
+    "com.github.mpilquist" %% "simulacrum" % "0.19.0",
     "org.scalatest" %%% "scalatest" % "3.0.8" % "test"
   ),
   parallelExecution in Test := false

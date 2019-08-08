@@ -64,8 +64,8 @@ class TypesafeUrlDsl private[typesafe](val url: Url) extends AnyVal {
   def withParams[A: TraversableParams](params: A): Url =
     url.addParamsOptionValues(params.toSeq)
 
-  def withParams[A : QueryKeyValue](params: A*): Url =
-    withParams(params.toList)
+  def withParams[A : QueryKeyValue](param1: A, param2: A, params: A*): Url =
+    withParams((Seq(param1, param2) ++ params).toList)
 
   /**
     * Operator precedence in Scala will mean that our DSL will not always be executed left to right.

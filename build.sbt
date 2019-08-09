@@ -6,16 +6,37 @@ name                            := "scala-uri root"
 scalaVersion in ThisBuild       := "2.13.0"
 crossScalaVersions in ThisBuild := Seq("2.12.8", "2.13.0")
 
+lazy val paradisePlugin = Def.setting{
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, v)) if v <= 12 =>
+      Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.patch))
+    case _ =>
+      // if scala 2.13.0-M4 or later, macro annotations merged into scala-reflect
+      // https://github.com/scala/scala/pull/6606
+      Nil
+  }
+}
+
 val sharedSettings = Seq(
   name          := "scala-uri",
   organization  := "io.lemonlabs",
-  scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8", "-feature", "-Xfatal-warnings"),
+  scalacOptions := Seq(
+    "-unchecked",
+    "-deprecation",
+    "-encoding",
+    "utf8",
+    "-feature",
+    "-Xfatal-warnings",
+    "-language:higherKinds")
+    ++ (if(scalaVersion.value.startsWith("2.13")) Seq("-Ymacro-annotations") else Nil),
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled" % "2.1.7",
     "com.chuusai"   %%% "shapeless" % "2.3.3",
+    "com.github.mpilquist" %% "simulacrum" % "0.19.0",
     "org.scalatest" %%% "scalatest" % "3.0.8" % "test"
   ),
-  parallelExecution in Test := false
+  libraryDependencies ++= paradisePlugin.value,
+  parallelExecution in Test := false,
 )
 
 val jvmSettings = Seq(

@@ -23,3 +23,9 @@ sudo: false # Enable new travis container-based infrastructure
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt
+    - $HOME/.coursier

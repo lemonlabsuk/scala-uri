@@ -25,7 +25,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "1.4.10"
+"io.lemonlabs" %% "scala-uri" % "1.5.0"
 ```
 
 [Migration Guide](#05x-to-1xx) from 0.5.x
@@ -665,14 +665,14 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 
 `scala-uri` `1.x.x` is currently built with support for scala `2.13.x`, `2.12.x`
 
- * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
+ * For `2.11.x` support use `scala-uri` `1.5.0` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
  * For `2.9.x` support use `scala-uri` `0.3.6` from branch [`0.3.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.3.x)
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "1.4.10"
+"io.lemonlabs" %% "scala-uri" % "1.5.0"
 ```
 
 For maven users you should use (for 2.12.x):
@@ -681,7 +681,7 @@ For maven users you should use (for 2.12.x):
 <dependency>
     <groupId>io.lemonlabs</groupId>
     <artifactId>scala-uri_2.12</artifactId>
-    <version>1.4.10</version>
+    <version>1.5.0</version>
 </dependency>
 ```
 

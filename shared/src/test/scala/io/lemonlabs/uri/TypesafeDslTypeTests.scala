@@ -35,7 +35,27 @@ class TypesafeDslTypeTests extends FlatSpec with Matchers {
     uri.toString should equal("/uris-in-scala.html?param=some&param2")
   }
 
-  "Foo" should "render correctly" in {
+  "Foo" should "render correctly as path part" in {
+    final case class Foo(a: String, b: Int)
+    object Foo {
+      implicit val pathPart: PathPart[Foo] = (foo: Foo) => s"${foo.a}/${foo.b}"
+    }
+
+    val uri = "/uris-in-scala.html" / Foo(a = "user", b = 1)
+    uri.toString should equal("/uris-in-scala.html/user/1")
+  }
+
+  "Foo" should "render correctly as fragment" in {
+    final case class Foo(a: String, b: Int)
+    object Foo {
+      implicit val pathPart: Fragment[Foo] = (foo: Foo) => s"${foo.a}-${foo.b}"
+    }
+
+    val uri = "/uris-in-scala.html" `#` Foo(a = "user", b = 1)
+    uri.toString should equal("/uris-in-scala.html#user-1")
+  }
+
+  "Foo" should "render correctly as query parameters" in {
     final case class Foo(a: String)
     object Foo {
       implicit val fooQueryKeyValue: QueryKeyValue[Foo] = new QueryKeyValue[Foo] {

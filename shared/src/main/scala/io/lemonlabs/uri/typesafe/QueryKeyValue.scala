@@ -2,6 +2,8 @@ package io.lemonlabs.uri.typesafe
 
 import shapeless._
 import shapeless.labelled._
+import shapeless.ops.coproduct.Reify
+import shapeless.ops.hlist.ToList
 import simulacrum.typeclass
 
 import scala.language.implicitConversions
@@ -20,7 +22,18 @@ trait QueryKeyInstance {
   def queryValue(a: A): Option[String]
 }
 
-object QueryValue extends QueryValueInstances
+object QueryValue extends QueryValueInstances {
+
+  def derive[A]: Derivation[A] = new Derivation[A](())
+
+  class Derivation[A](private val dummy: Unit) extends AnyVal {
+    def by[C <: Coproduct, R <: HList](key: A => String)(implicit gen: Generic.Aux[A, C],
+                                                         reify: Reify.Aux[C, R],
+                                                         toList: ToList[R, A]): QueryValue[A] =
+      a => toList(reify()).iterator.map(x => x -> key(x)).toMap.get(a)
+  }
+}
+
 
 trait QueryValueInstances1 {
   private def fromToString[A](a: A): Option[String] = Option(a.toString)
@@ -84,6 +97,5 @@ object TraversableParams extends TraversableParamsInstances {
 
   def product[A, R <: HList](implicit gen: LabelledGeneric.Aux[A, R], R: TraversableParams[R]): TraversableParams[A] =
     (a: A) => R.toSeq(gen.to(a))
-
 }
 

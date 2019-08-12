@@ -100,6 +100,29 @@ class TypesafeDslTypeTests extends FlatSpec with Matchers {
       uriWithoutBexludingNones.toString should equal("/uris-in-scala.html?a=1")
     }
   }
+
+  "QueryValue" should "derive type class for coproduct type correctly" in {
+    sealed trait Foo {
+      def name: String
+    }
+
+    case object A extends Foo {
+      val name: String = "A"
+    }
+
+    case object B extends Foo {
+      val name: String = "B"
+    }
+
+    object Foo {
+      implicit val queryValue: QueryValue[Foo] = QueryValue.derive[Foo].by(_.name)
+    }
+
+    val uriA = "/uris-in-scala.html" ? ("foo" -> A)
+    val uriB = "/uris-in-scala.html" ? ("foo" -> B)
+    uriA.toString should equal("/uris-in-scala.html?foo=A")
+    uriB.toString should equal("/uris-in-scala.html?foo=B")
+  }
 }
 
 

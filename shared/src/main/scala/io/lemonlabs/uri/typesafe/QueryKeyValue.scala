@@ -1,6 +1,9 @@
 package io.lemonlabs.uri.typesafe
 
+import shapeless._
+import shapeless.labelled._
 import simulacrum.typeclass
+
 import scala.language.implicitConversions
 
 @typeclass trait QueryKey[A] {
@@ -30,7 +33,7 @@ trait QueryValueInstances1 {
 }
 
 trait QueryValueInstances extends QueryValueInstances1 {
-  implicit def optionQueryValue[A : QueryValue]: QueryValue[Option[A]] = _.flatMap(QueryValue[A].queryValue)
+  implicit def optionQueryValue[A: QueryValue]: QueryValue[Option[A]] = _.flatMap(QueryValue[A].queryValue)
 }
 
 @typeclass trait QueryKeyValue[A] {
@@ -50,12 +53,6 @@ trait QueryKeyValueInstances {
     }
 }
 
-@typeclass trait TraversableParams[A] {
-  def toSeq(a: A): Seq[(String, Option[String])]
-}
-
-object TraversableParams extends TraversableParamsInstances
-
 trait TraversableParamsInstances {
   implicit def seqTraversableParams[A](implicit tc: QueryKeyValue[A]): TraversableParams[Seq[A]] =
     (ax: Seq[A]) => ax.map((a: A) => tc.queryKey(a) -> tc.queryValue(a))
@@ -66,3 +63,27 @@ trait TraversableParamsInstances {
   implicit def traversableParams[K, V](implicit tck: QueryKey[K], tcv: QueryValue[V]): TraversableParams[Map[K, V]] =
     (ax: Map[K, V]) => ax.map { case (k, v) => tck.queryKey(k) -> tcv.queryValue(v) }.toSeq
 }
+
+@typeclass trait TraversableParams[A] {
+  def toSeq(a: A): Seq[(String, Option[String])]
+}
+
+object TraversableParams extends TraversableParamsInstances {
+
+  implicit def field[K <: Symbol, V](implicit K: Witness.Aux[K], V: QueryValue[V]): TraversableParams[FieldType[K, V]] =
+    (a: FieldType[K, V]) => Seq(K.value.name -> V.queryValue(a))
+
+  implicit def sub[K <: Symbol, V](implicit K: Witness.Aux[K], V: TraversableParams[V]): TraversableParams[FieldType[K, V]] =
+    (a: FieldType[K, V]) => V.toSeq(a)
+
+  implicit val hnil: TraversableParams[HNil] =
+    (_: HNil) => Seq.empty
+
+  implicit def hcons[H, T <: HList](implicit H: TraversableParams[H], T: TraversableParams[T]): TraversableParams[H :: T] =
+    (a: H :: T) => H.toSeq(a.head) ++ T.toSeq(a.tail)
+
+  def product[A, R <: HList](implicit gen: LabelledGeneric.Aux[A, R], R: TraversableParams[R]): TraversableParams[A] =
+    (a: A) => R.toSeq(gen.to(a))
+
+}
+

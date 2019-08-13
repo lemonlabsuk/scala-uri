@@ -4,7 +4,7 @@ import MimaSettings.mimaSettings
 
 name                            := "scala-uri root"
 scalaVersion in ThisBuild       := "2.13.0"
-crossScalaVersions in ThisBuild := Seq("2.12.8", "2.13.0")
+crossScalaVersions in ThisBuild := Seq("2.12.9", "2.13.0")
 
 lazy val paradisePlugin = Def.setting{
   CrossVersion.partialVersion(scalaVersion.value) match {

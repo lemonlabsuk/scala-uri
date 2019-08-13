@@ -657,6 +657,70 @@ val uri5 = "http://theon.github.com/scala-uri" `#` "fragments"
 uri5.toString //This is: http://theon.github.com/scala-uri#fragments
 ```
 
+
+## Typesafe URL builder DSL
+
+The version of DSL which relies on the types to render urls providing better control over
+the way values would be translated to url parts.
+
+Apart from the API alike abovementioned one it is possible to user arbitrary types as parts of url:  
+
+```scala
+import io.lemonlabs.typesafe.dsl._
+
+// Query Strings
+
+final case class Foo(a: Int, b: String)
+
+object Foo {
+  implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
+}
+
+val uri = "http://theon.github.com/scala-uri" withParams Foo(a = 1, b = "bar")
+uri.toString //This is: http://theon.github.com/scala-uri?a=1&b=bar
+
+sealed trait Bar {
+  def name: String
+}
+
+case object A extends Bar {
+  val name: String = "A"
+}
+
+case object B extends Bar {
+  val name: String = "B"
+}
+
+object Bar {
+  implicit val queryValue: QueryValue[Bar] = QueryValue.derive[Bar].by(_.name)
+}
+
+val uri2 = "http://theon.github.com/scala-uri" ? ("foo" -> A)
+uri2.toString //This is: http://theon.github.com/scala-uri?foo=A
+
+// Paths
+
+final case class Foo(a: String, b: Int)
+
+object Foo {
+  implicit val pathPart: PathPart[Foo] = (foo: Foo) => s"${foo.a}/${foo.b}"
+}
+
+
+val uri4 = "http://theon.github.com" / "scala-uri" / Foo(a = "user", b = 1)
+uri4.toString //This is: http://theon.github.com/scala-uri/user/1
+
+// Fragments
+
+final case class Foo(a: String, b: Int)
+object Foo {
+  implicit val pathPart: Fragment[Foo] = (foo: Foo) => s"${foo.a}-${foo.b}"
+}
+
+val uri5 = "http://theon.github.com/scala-uri" `#` Foo(a = "user", b = 1)
+uri5.toString //This is: http://theon.github.com/scala-uri#user-1
+```
+
 ## scala-js support
 
 See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs-example) for usage

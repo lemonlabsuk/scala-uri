@@ -110,13 +110,13 @@ class ConversionTests extends WordSpec with Matchers {
     "not convert toUrn" in {
       val url: Uri = Uri.parse("mailto:example@example.com")
       val e = the[UriConversionException] thrownBy url.toUrn
-      e.getMessage should equal("UrlWithoutAuthority cannot be converted to Urn")
+      e.getMessage should equal("SimpleUrlWithoutAuthority cannot be converted to Urn")
     }
 
     "not convert toAbsoluteUrl" in {
       val url: Url = Url.parse("mailto:example@example.com")
       val e = the[UriConversionException] thrownBy url.toAbsoluteUrl
-      e.getMessage should equal("UrlWithoutAuthority cannot be converted to AbsoluteUrl")
+      e.getMessage should equal("SimpleUrlWithoutAuthority cannot be converted to AbsoluteUrl")
     }
 
     "convert toRelativeUrl" in {
@@ -129,7 +129,7 @@ class ConversionTests extends WordSpec with Matchers {
     "not convert toProtocolRelativeUrl" in {
       val url: Url = Url.parse("mailto:example@example.com")
       val e = the[UriConversionException] thrownBy url.toProtocolRelativeUrl
-      e.getMessage should equal("UrlWithoutAuthority cannot be converted to ProtocolRelativeUrl")
+      e.getMessage should equal("SimpleUrlWithoutAuthority cannot be converted to ProtocolRelativeUrl")
     }
   }
 

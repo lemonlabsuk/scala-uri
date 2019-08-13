@@ -16,7 +16,7 @@ object PercentDecoder extends PercentDecoder(ignoreInvalidPercentEncoding = fals
 case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDecoder {
   import io.lemonlabs.uri.decoding.PercentDecoder._
 
-  def decode(s: String) = {
+  def decodeBytes(s: String, charset: String): Array[Byte] = {
 
     def toHexByte(hex: String): Option[Byte] = try {
       if (hex.length != 2)
@@ -43,9 +43,12 @@ case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDeco
               throw new UriDecodeException(s"Encountered '%' followed by a non hex number '$hex'. $errorMessage")
           }
         case ch :: xs =>
-          go(xs, result ++ ch.toString.getBytes(cs))
+          go(xs, result ++ ch.toString.getBytes(charset))
       }
 
-    new String(go(s.toCharArray.toList, Array.empty), cs)
+    go(s.toCharArray.toList, Array.empty)
   }
+
+  def decode(s: String): String =
+    new String(decodeBytes(s, cs), cs)
 }

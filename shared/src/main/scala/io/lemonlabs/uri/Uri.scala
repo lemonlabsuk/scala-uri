@@ -1,5 +1,7 @@
 package io.lemonlabs.uri
 
+import java.util.Base64
+
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UriParser, UrlParser, UrnParser}
 
@@ -894,19 +896,14 @@ object AbsoluteUrl {
 /**
   * Represents URLs that do not have an authority, for example: `mailto:example@example.com`
   */
-final case class UrlWithoutAuthority(scheme: String,
-                               path: UrlPath,
-                               query: QueryString,
-                               fragment: Option[String])
-                              (implicit val config: UriConfig = UriConfig.default) extends Url {
+sealed trait UrlWithoutAuthority extends Url {
 
-  type Self = UrlWithoutAuthority
-  type SelfWithScheme = UrlWithoutAuthority
+  type Self <: UrlWithoutAuthority
+  type SelfWithScheme <: UrlWithoutAuthority
   type SelfWithAuthority = AbsoluteUrl
 
-  def self: UrlWithoutAuthority = this
+  def scheme: String
 
-  def schemeOption: Option[String] = Some(scheme)
   def hostOption: Option[Host] = None
   def port: Option[Int] = None
   def user: Option[String] = None
@@ -919,7 +916,40 @@ final case class UrlWithoutAuthority(scheme: String,
   def shortestSubdomain: Option[String] = None
   def longestSubdomain: Option[String] = None
 
-  def withScheme(scheme: String): UrlWithoutAuthority =
+}
+
+object UrlWithoutAuthority {
+
+  def apply(scheme: String, path: UrlPath, query: QueryString, fragment: Option[String])(implicit config: UriConfig = UriConfig.default): UrlWithoutAuthority =
+    SimpleUrlWithoutAuthority(scheme, path, query, fragment)(config)
+
+  def unapply(url: UrlWithoutAuthority): Option[(String, UrlPath, QueryString, Option[String])] =
+    Some((url.scheme, url.path, url.query, url.fragment))
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlWithoutAuthority =
+    parseTry(s).get
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[UrlWithoutAuthority] =
+    parseTry(s).toOption
+
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrlWithoutAuthority] =
+    UrlParser.parseUrlWithoutAuthority(s.toString)
+}
+
+final case class SimpleUrlWithoutAuthority(scheme: String,
+                               path: UrlPath,
+                               query: QueryString,
+                               fragment: Option[String])
+                              (implicit val config: UriConfig = UriConfig.default) extends UrlWithoutAuthority {
+
+  type Self = SimpleUrlWithoutAuthority
+  type SelfWithScheme = SimpleUrlWithoutAuthority
+
+  def self: SimpleUrlWithoutAuthority = this
+
+  def schemeOption: Option[String] = Some(scheme)
+
+  def withScheme(scheme: String): SimpleUrlWithoutAuthority =
     copy(scheme = scheme)
 
   /**
@@ -937,7 +967,7 @@ final case class UrlWithoutAuthority(scheme: String,
     * @param path the new path to set
     * @return a new Url with the specified path
     */
-  def withPath(path: UrlPath): UrlWithoutAuthority =
+  def withPath(path: UrlPath): SimpleUrlWithoutAuthority =
     copy(path = path)
 
   /**
@@ -952,27 +982,121 @@ final case class UrlWithoutAuthority(scheme: String,
   def withAuthority(authority: Authority): AbsoluteUrl =
     AbsoluteUrl(scheme, authority, path.toAbsoluteOrEmpty, query, fragment)
 
-  def withFragment(fragment: Option[String]): UrlWithoutAuthority =
+  def withFragment(fragment: Option[String]): SimpleUrlWithoutAuthority =
     copy(fragment = fragment)
 
-  def withQueryString(query: QueryString): UrlWithoutAuthority =
+  def withQueryString(query: QueryString): SimpleUrlWithoutAuthority =
     copy(query = query)
 
   private[uri] def toString(c: UriConfig): String =
     scheme + ":" + path.toString(c) + query.toString(c) + fragmentToString(c)
 }
 
-object UrlWithoutAuthority {
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlWithoutAuthority =
+object SimpleUrlWithoutAuthority {
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): SimpleUrlWithoutAuthority =
     parseTry(s).get
 
-  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[UrlWithoutAuthority] =
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[SimpleUrlWithoutAuthority] =
     parseTry(s).toOption
 
-  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrlWithoutAuthority] =
-    UrlParser.parseUrlWithoutAuthority(s.toString)
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[SimpleUrlWithoutAuthority] =
+    UrlParser.parseSimpleUrlWithoutAuthority(s.toString)
 }
 
+/**
+  * Represents URLs with the data scheme, for example: `data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678`
+  */
+final case class DataUrl(mediaType: MediaType,
+                         base64: Boolean,
+                         data:  Array[Byte])
+                        (implicit val config: UriConfig = UriConfig.default) extends UrlWithoutAuthority {
+
+  type Self = DataUrl
+  type SelfWithScheme = UrlWithoutAuthority
+
+  def self: DataUrl = this
+
+  val scheme = "data"
+  def schemeOption: Option[String] = Some(scheme)
+
+  def query: QueryString = QueryString.empty
+  def fragment: Option[String] = None
+  def path: UrlPath = RootlessPath.fromParts(pathString(config))
+
+  protected def pathString(c: UriConfig): String = {
+    val base64Str = if(base64) ";base64" else ""
+    val dataStr =
+      if(base64)
+        Base64.getEncoder.encodeToString(data)
+      else
+        c.pathEncoder.encode(data, mediaType.charset)
+    mediaType.toString + base64Str + dataStr
+  }
+
+  def withScheme(scheme: String): UrlWithoutAuthority =
+    if(scheme.equalsIgnoreCase("data"))
+      this
+    else
+      SimpleUrlWithoutAuthority(scheme, path, query, fragment)
+
+  /**
+    * Copies this Url but with the host set as the given value.
+    *
+    * @param host the new host to set
+    * @return a new Url with the specified host
+    */
+  def withHost(host: Host): AbsoluteUrl =
+    AbsoluteUrl(scheme, Authority(host), path.toAbsoluteOrEmpty, query, fragment)
+
+  /**
+    * Copies this Url but with the path set as the given value.
+    *
+    * @param path the new path to set
+    * @return a new Url with the specified path
+    */
+  def withPath(path: UrlPath): DataUrl =
+    DataUrl.parse(scheme + ":" + path.toString())
+
+  /**
+    * Copies this Url but with the port set as the given value.
+    *
+    * @param port the new port to set
+    * @return a new Url with the specified port
+    */
+  def withPort(port: Int): AbsoluteUrl =
+    AbsoluteUrl(scheme, Authority(host = "", port), path.toAbsoluteOrEmpty, query, fragment)
+
+  def withAuthority(authority: Authority): AbsoluteUrl =
+    AbsoluteUrl(scheme, authority, path.toAbsoluteOrEmpty, query, fragment)
+
+  def withFragment(fragment: Option[String]): DataUrl =
+    this
+
+  def withQueryString(query: QueryString): DataUrl =
+    this
+
+  private[uri] def toString(c: UriConfig): String =
+    scheme + ":" + pathString(c)
+}
+
+object DataUrl {
+  def fromBase64(mediaType: MediaType, data: String)(implicit config: UriConfig = UriConfig.default): DataUrl = {
+    val base64Data = config.pathDecoder.decodeBytes(data, mediaType.charset)
+    DataUrl(mediaType, base64 = true, Base64.getDecoder.decode(base64Data))
+  }
+
+  def fromPercentEncoded(mediaType: MediaType, data: String)(implicit config: UriConfig = UriConfig.default): DataUrl =
+    DataUrl(mediaType, base64 = true, config.pathDecoder.decodeBytes(data, mediaType.charset))
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): DataUrl =
+    parseTry(s).get
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[DataUrl] =
+    parseTry(s).toOption
+
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[DataUrl] =
+    UrlParser.parseDataUrl(s.toString)
+}
 
 /**
   * Represents a URN. See [[https://www.ietf.org/rfc/rfc2141 RFC 2141]]

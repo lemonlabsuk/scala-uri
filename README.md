@@ -43,7 +43,7 @@ val url = Url.parse("https://www.scala-lang.org")
 ```
 
 The returned value has type `Url` with an underlying implementation of `AbsoluteUrl`, `RelativeUrl`,
-`UrlWithoutAuthority` or `ProtocolRelativeUrl`. If you know your URL will always be one of these types, you can
+`UrlWithoutAuthority`, `ProtocolRelativeUrl` or `DataUrl`. If you know your URL will always be one of these types, you can
 use the following `parse` methods to get a more specific return type
 
 ```scala
@@ -53,6 +53,7 @@ val absoluteUrl = AbsoluteUrl.parse("https://www.scala-lang.org")
 val relativeUrl = RelativeUrl.parse("/index.html")
 val mailtoUrl = UrlWithoutAuthority.parse("mailto:test@example.com")
 val protocolRelativeUrl = ProtocolRelativeUrl.parse("//www.scala-lang.org")
+val dataUrl = DataUrl.parse("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D")
 ```
 
 ## Parse a URN
@@ -187,7 +188,8 @@ uri match {
     case UrlWithAuthority(authority, path, query, fragment) => // Matches AbsoluteUrl and ProtocolRelativeUrl
     case AbsoluteUrl(scheme, authority, path, query, fragment) => // Matches AbsoluteUrl
     case ProtocolRelativeUrl(authority, path, query, fragment) => // Matches ProtocolRelativeUrl
-    case UrlWithoutAuthority(scheme, path, query, fragment) => // Matches UrlWithoutAuthoritys
+    case UrlWithoutAuthority(scheme, path, query, fragment) => // Matches UrlWithoutAuthorityUrl
+    case DataUrl(mediaType, base64, data) => // Matches DataUrl
 }
 ```
 

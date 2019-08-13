@@ -4,9 +4,13 @@ trait UriEncoder extends Product with Serializable {
   def shouldEncode(ch: Char): Boolean
   def encodeChar(ch: Char): String
 
-  def encode(s: String, charset: String) = {
-    val chars = s.getBytes(charset).map(_.toChar)
+  def encode(s: String, charset: String): String = {
+    val bytes = s.getBytes(charset)
+    encode(bytes, charset)
+  }
 
+  def encode(bytes: Array[Byte], charset: String): String = {
+    val chars = bytes.map(_.toChar)
     val encChars = chars.flatMap(ch => {
       if (shouldEncode(ch)) {
         encodeChar(ch).getBytes(charset)

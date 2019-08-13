@@ -10,7 +10,7 @@ script: >
  cd "$TRAVIS_BUILD_DIR"
 
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 matrix:
   include:

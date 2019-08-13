@@ -729,7 +729,7 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 
 ## Including scala-uri your project
 
-`scala-uri` `1.x.x` is currently built with support for scala `2.13.x`, `2.12.x`
+`scala-uri` `2.x.x` is currently built with support for scala `2.13.x`, `2.12.x`
 
  * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
@@ -741,12 +741,12 @@ Release builds are available in maven central. For SBT users just add the follow
 "io.lemonlabs" %% "scala-uri" % "2.0.0-M1"
 ```
 
-For maven users you should use (for 2.12.x):
+For maven users you should use (for 2.13.x):
 
 ```xml
 <dependency>
     <groupId>io.lemonlabs</groupId>
-    <artifactId>scala-uri_2.12</artifactId>
+    <artifactId>scala-uri_2.13</artifactId>
     <version>2.0.0-M1</version>
 </dependency>
 ```
@@ -756,6 +756,12 @@ For maven users you should use (for 2.12.x):
 Contributions to `scala-uri` are always welcome. Check out the [Contributing Guidelines](https://github.com/lemonlabsuk/scala-uri/blob/master/README.md)
 
 # Migration guides
+
+## 1.x.x to 2.x.x
+
+ * *Binary Incompatibility*: The case class `UrlWithoutAuthority` has been renamed `SimpleUrlWithoutAuthority`.
+   There is now a trait called `UrlWithoutAuthority`. This trait has a companion object with `apply`, `unapply` and `parse`
+   methods, so it mostly can be used in the same way as the previous case class.
 
 ## 1.x.x to 1.5.x
 

@@ -617,7 +617,7 @@ To use Circe with scala-uri, you must add the following dependency to your SBT b
 To use spray-json with scala-uri, you must add the following dependency to your SBT build:
 
 ```scala
-"io.spray" %% "spray-json" % "1.3.4"
+"io.spray" %% "spray-json" % "1.3.5"
 ```
 
 and configure your `UriConfig` like so:

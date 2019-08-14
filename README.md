@@ -19,6 +19,7 @@
  * Support for [user information](#user-information) e.g. `ftp://user:password@mysite.com`
  * Support for [URNs](#parse-a-urn)
  * Support for [mailto](#mailto) URLs
+ * Support for [data](#data-urls) URLs as defined in [RFC2397](https://tools.ietf.org/html/rfc2397)
  * Support for [scala-js](#scala-js-support)
  * No dependencies on existing web frameworks
 
@@ -43,7 +44,7 @@ val url = Url.parse("https://www.scala-lang.org")
 ```
 
 The returned value has type `Url` with an underlying implementation of `AbsoluteUrl`, `RelativeUrl`,
-`UrlWithoutAuthority` or `ProtocolRelativeUrl`. If you know your URL will always be one of these types, you can
+`UrlWithoutAuthority`, `ProtocolRelativeUrl` or `DataUrl`. If you know your URL will always be one of these types, you can
 use the following `parse` methods to get a more specific return type
 
 ```scala
@@ -53,6 +54,7 @@ val absoluteUrl = AbsoluteUrl.parse("https://www.scala-lang.org")
 val relativeUrl = RelativeUrl.parse("/index.html")
 val mailtoUrl = UrlWithoutAuthority.parse("mailto:test@example.com")
 val protocolRelativeUrl = ProtocolRelativeUrl.parse("//www.scala-lang.org")
+val dataUrl = DataUrl.parse("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D")
 ```
 
 ## Parse a URN
@@ -187,7 +189,8 @@ uri match {
     case UrlWithAuthority(authority, path, query, fragment) => // Matches AbsoluteUrl and ProtocolRelativeUrl
     case AbsoluteUrl(scheme, authority, path, query, fragment) => // Matches AbsoluteUrl
     case ProtocolRelativeUrl(authority, path, query, fragment) => // Matches ProtocolRelativeUrl
-    case UrlWithoutAuthority(scheme, path, query, fragment) => // Matches UrlWithoutAuthoritys
+    case UrlWithoutAuthority(scheme, path, query, fragment) => // Matches UrlWithoutAuthorityUrl
+    case DataUrl(mediaType, base64, data) => // Matches DataUrl
 }
 ```
 
@@ -628,6 +631,41 @@ mailto.path // This is "someone@example.com"
 mailto.query.param("subject") // This is Some("Hello")
 ```
 
+## Data URLs
+
+Data URLs are defined in [RFC2397](https://tools.ietf.org/html/rfc2397)
+
+### Base64 encoded data URLs
+
+```scala
+import java.io.ByteArrayInputStream
+import io.lemonlabs.uri.DataUrl
+import javax.imageio.ImageIO
+
+// A data URL containing a PNG image of a red dot
+val dataUrl = DataUrl.parse("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==")
+
+dataUrl.scheme // This is "data"
+dataUrl.mediaType.value // This is "image/png"
+dataUrl.base64 // This is true
+
+// Convert the image data to a java.awt.image.BufferedImage
+val image = ImageIO.read(new ByteArrayInputStream(dataUrl.data))
+```
+
+### Percent encoded data URLs
+
+```scala
+val dataUrl = DataUrl.parse("data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678")
+
+dataUrl.mediaType.value // This is text/plain
+dataUrl.mediaType.charset // This is UTF-8
+dataUrl.mediaType.parameters // This is Vector("charset" -> "UTF-8", "page" -> "21")
+dataUrl.base64 // This is false
+
+dataUrl.dataAsString // This is "the data:1234,5678"
+```
+
 ## URL builder DSL
 
 By importing `io.lemonlabs.uri.dsl._`, you may use a DSL to construct URLs
@@ -727,7 +765,7 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 
 ## Including scala-uri your project
 
-`scala-uri` `1.x.x` is currently built with support for scala `2.13.x`, `2.12.x`
+`scala-uri` `2.x.x` is currently built with support for scala `2.13.x`, `2.12.x`
 
  * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
@@ -739,12 +777,12 @@ Release builds are available in maven central. For SBT users just add the follow
 "io.lemonlabs" %% "scala-uri" % "2.0.0-M1"
 ```
 
-For maven users you should use (for 2.12.x):
+For maven users you should use (for 2.13.x):
 
 ```xml
 <dependency>
     <groupId>io.lemonlabs</groupId>
-    <artifactId>scala-uri_2.12</artifactId>
+    <artifactId>scala-uri_2.13</artifactId>
     <version>2.0.0-M1</version>
 </dependency>
 ```
@@ -754,6 +792,19 @@ For maven users you should use (for 2.12.x):
 Contributions to `scala-uri` are always welcome. Check out the [Contributing Guidelines](https://github.com/lemonlabsuk/scala-uri/blob/master/README.md)
 
 # Migration guides
+
+## 1.x.x to 2.x.x
+
+ * *Binary Incompatibility*: The case class `UrlWithoutAuthority` has been renamed `SimpleUrlWithoutAuthority`.
+   There is now a trait called `UrlWithoutAuthority`. This trait has a companion object with `apply`, `unapply` and `parse`
+   methods, so it mostly can be used in the same way as the previous case class.
+ * Forward slashes in paths are now percent encoded by default.
+   This means `Url.parse("/%2F/").toString` returns `"/%2F/"` rather than `///` in previous versions
+   To return to the previous behavior, you can bring a `UriConfig` like so into scope
+   ```scala
+    import io.lemonlabs.uri.encoding.PercentEncoder._
+    implicit val c = UriConfig.default.copy(pathEncoder = PercentEncoder(PATH_CHARS_TO_ENCODE - '/'))
+   ```
 
 ## 1.x.x to 1.5.x
 

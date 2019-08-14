@@ -3,6 +3,8 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.parsing.UriParsingException
 import org.scalatest.{FlatSpec, Matchers}
 
+import scala.util.Success
+
 
 class ParsingTests extends FlatSpec with Matchers {
 
@@ -346,5 +348,77 @@ class ParsingTests extends FlatSpec with Matchers {
     urn.schemeOption should equal(Some("urn"))
     urn.path.toString() should equal("example:animal:ferret:nose")
     urn.toString() should equal("urn:example:animal:ferret:nose")
+  }
+
+  "UrlWithoutAuthority" should "parse a mailto as a Success" in {
+    val url = UrlWithoutAuthority.parseTry("mailto:test@test.com")
+    url.isSuccess shouldBe true
+    url.get shouldBe a[SimpleUrlWithoutAuthority]
+  }
+
+  it should "parse a data URL as a Success" in {
+    val url = UrlWithoutAuthority.parseTry("data:,A%20brief%20note")
+    url.isSuccess shouldBe true
+    url.get shouldBe a[DataUrl]
+  }
+
+  it should "parse a absolute URL to a Failure" in {
+    val url = UrlWithoutAuthority.parseTry("//example.com")
+    url.isSuccess shouldBe false
+  }
+
+  it should "parse an Option to a Some" in {
+    val url = UrlWithoutAuthority.parseOption("mailto:test@test.com")
+    url.isDefined shouldBe true
+    url.get shouldBe a[SimpleUrlWithoutAuthority]
+  }
+
+  it should "parse an Option to a None" in {
+    val url = UrlWithoutAuthority.parseOption("//example.com")
+    url should equal(None)
+  }
+
+  "SimpleUrlWithoutAuthority" should "parse a mailto as a Success" in {
+    val url = SimpleUrlWithoutAuthority.parseTry("mailto:test@test.com")
+    url.isSuccess shouldBe true
+    url.get shouldBe a[SimpleUrlWithoutAuthority]
+  }
+
+  it should "parse a absolute URL to a Failure" in {
+    val url = SimpleUrlWithoutAuthority.parseTry("//example.com")
+    url.isSuccess shouldBe false
+  }
+
+  it should "parse an Option to a Some" in {
+    val url = SimpleUrlWithoutAuthority.parseOption("mailto:test@test.com")
+    url.isDefined shouldBe true
+    url.get shouldBe a[SimpleUrlWithoutAuthority]
+  }
+
+  it should "parse an Option to a None" in {
+    val url = SimpleUrlWithoutAuthority.parseOption("//example.com")
+    url should equal(None)
+  }
+
+  "DataUrl" should "parse a data URL as a Success" in {
+    val url = DataUrl.parseTry("data:,A%20brief%20note")
+    url.isSuccess shouldBe true
+    url.get shouldBe a[DataUrl]
+  }
+
+  it should "parse a Try to a Failure" in {
+    val url = DataUrl.parseTry("//example.com")
+    url.isSuccess shouldBe false
+  }
+
+  it should "parse an Option to a Some" in {
+    val url = DataUrl.parseOption("data:,A%20brief%20note")
+    url.isDefined shouldBe true
+    url.get shouldBe a[DataUrl]
+  }
+
+  it should "parse an Option to a None" in {
+    val url = DataUrl.parseOption("//example.com")
+    url should equal(None)
   }
 }

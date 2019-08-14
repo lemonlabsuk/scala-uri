@@ -13,8 +13,10 @@ class TypesafeUrlDsl private[typesafe](val url: Url) extends AnyVal {
     * @param a The path part
     * @return A new Uri with this path part appended
     */
-  def /[A : PathPart](a: A): Url =
-    url.addPathPart(a.path)
+  def /[A : PathPart](a: A): Url = {
+    val parts = a.path.split('/')
+    url.addPathParts(parts)
+  }
 
   /**
     * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this

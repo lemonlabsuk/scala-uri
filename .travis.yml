@@ -1,6 +1,7 @@
 --- 
 language: scala
 script: >
+ sbt ++$TRAVIS_SCALA_VERSION check &&
  sbt $COVERAGE ++$TRAVIS_SCALA_VERSION coverage test coverageReport &&
  sbt ++$TRAVIS_SCALA_VERSION test &&
  cd target &&

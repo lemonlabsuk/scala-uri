@@ -37,6 +37,7 @@ val sharedSettings = Seq(
   ),
   libraryDependencies ++= paradisePlugin.value,
   parallelExecution in Test := false,
+  scalafmtOnCompile := true,
 )
 
 val jvmSettings = Seq(
@@ -92,3 +93,6 @@ lazy val scalaUri =
 lazy val updatePublicSuffixes = taskKey[Unit]("Updates the public suffix Trie at io.lemonlabs.uri.internet.PublicSuffixes")
 
 updatePublicSuffixes := UpdatePublicSuffixTrie.generate()
+
+addCommandAlias("check", ";scalafmtCheckAll;scalafmtSbtCheck")
+addCommandAlias("fmt", ";scalafmtAll;scalafmtSbt")

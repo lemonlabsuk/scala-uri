@@ -8,7 +8,10 @@ import org.parboiled2._
 import scala.collection.immutable
 import scala.util.{Failure, Try}
 
-class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
+class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
+
+  def input: ParserInput =
+    inputRaw.linesIterator.mkString // Remove newlines
 
   val _host_end = ":/?#"
 
@@ -140,22 +143,22 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _media_type_param: Rule1[(String, String)] = rule {
-    capture(zeroOrMore(noneOf("="))) ~ "=" ~ capture(zeroOrMore(noneOf(";"))) ~> extractMediaTypeParam
+    capture(zeroOrMore(noneOf(";,="))) ~ "=" ~ capture(zeroOrMore(noneOf(";,"))) ~ optional(";") ~> extractMediaTypeParam
   }
 
   /*
    * https://tools.ietf.org/html/rfc1341
    */
   def _media_type: Rule1[MediaType] = rule {
-    capture(zeroOrMore(noneOf(";,"))) ~ zeroOrMore(_media_type_param).separatedBy(";") ~> extractMediaType
+    capture(zeroOrMore(noneOf(";,"))) ~ optional(";") ~ zeroOrMore(_media_type_param) ~> extractMediaType
   }
 
   def _data_url_base64: Rule1[DataUrl] = rule {
-    "data:" ~ _media_type ~ ";base64," ~ capture(zeroOrMore(ANY)) ~> extractBase64DataUrl
+    "data:" ~ _media_type ~ "base64," ~ capture(zeroOrMore(ANY)) ~> extractBase64DataUrl
   }
 
   def _data_url_percent_encoded: Rule1[DataUrl] = rule {
-    "data:" ~ _media_type ~ capture(zeroOrMore(ANY)) ~> extractPercentEncodedDataUrl
+    "data:" ~ _media_type ~ "," ~ capture(zeroOrMore(ANY)) ~> extractPercentEncodedDataUrl
   }
 
   def _data_url: Rule1[DataUrl] = rule {

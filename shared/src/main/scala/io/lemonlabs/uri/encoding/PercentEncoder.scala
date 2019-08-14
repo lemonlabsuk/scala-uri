@@ -27,7 +27,7 @@ object PercentEncoder {
   )
 
   val PATH_CHARS_TO_ENCODE = Set (
-    ' ', '%', '<', '>', '[', ']', '#', '{', '}', '^', '`', '|', '?'
+    ' ', '%', '<', '>', '[', ']', '#', '{', '}', '^', '`', '|', '?', '/'
   )
 
   val QUERY_CHARS_TO_ENCODE = Set (

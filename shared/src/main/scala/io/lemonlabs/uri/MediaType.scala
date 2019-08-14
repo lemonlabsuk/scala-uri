@@ -14,20 +14,45 @@ case class MediaType(rawValue: Option[String], parameters: Vector[(String,String
 
 
   private def typeDelimiterIndex = value.indexOf('/')
+  private def suffixDelimiterIndex = {
+    val lastPlusIndex = value.lastIndexOf('+')
+    if(lastPlusIndex > typeDelimiterIndex) lastPlusIndex
+    else value.length
+  }
 
+  /**
+    * @return The type for this mediatype. For example, will return `application`
+    *         for the mediatype `application/ld+json`
+    */
   def typ = typeDelimiterIndex match {
     case -1 => value
     case index  => value.slice(0, index)
   }
 
+  /**
+    * @return The subtype for this mediatype. For example, will return `ld`
+    *         for the mediatype `application/ld+json`. Returns empty string if there is no subtype.
+    */
   def subTyp = typeDelimiterIndex match {
     case -1 => ""
-    case index => value.substring(index + 1)
+    case index => value.slice(index + 1, suffixDelimiterIndex)
+  }
+
+  /**
+    * @return The suffix for this mediatype. For example, will return `json`
+    *         for the mediatype `application/ld+json`. Returns empty string if there is no suffix.
+    */
+  def suffix: String = {
+    val index = math.min(suffixDelimiterIndex + 1, value.length)
+    value.substring(index)
   }
 
   def rawCharset: Option[String] = parameters.collectFirst {
-    case (k,v) if k.equalsIgnoreCase("charset") => v
+    case (k,v) if quotedStringEquals(k, "charset") => v
   }
+
+  private def quotedStringEquals(s: String, matches: String): Boolean =
+    s.equalsIgnoreCase(matches) || s.equalsIgnoreCase("\"" + matches + "\"")
 
   override def toString: String =
     rawValue.getOrElse("") + parameters.foldLeft("") { case (str, (key, v)) => s"$str;$key=$v" }

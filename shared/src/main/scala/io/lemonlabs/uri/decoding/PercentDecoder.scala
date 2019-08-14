@@ -43,7 +43,7 @@ case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDeco
               throw new UriDecodeException(s"Encountered '%' followed by a non hex number '$hex'. $errorMessage")
           }
         case ch :: xs =>
-          go(xs, result ++ ch.toString.getBytes(charset))
+          go(xs, result ++ ch.toString.getBytes(cs))
       }
 
     go(s.toCharArray.toList, Array.empty)

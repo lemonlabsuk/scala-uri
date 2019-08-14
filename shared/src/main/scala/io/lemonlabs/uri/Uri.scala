@@ -1021,16 +1021,24 @@ final case class DataUrl(mediaType: MediaType,
 
   def query: QueryString = QueryString.empty
   def fragment: Option[String] = None
-  def path: UrlPath = RootlessPath.fromParts(pathString(config))
+  def path: UrlPath = RootlessPath.fromParts(pathString(config.withNoEncoding))
+
+  /**
+    * @return The data from this data URL using the charset provided by the URL's mediatype
+    */
+  def dataAsString: String =
+    new String(data, mediaType.charset)
 
   protected def pathString(c: UriConfig): String = {
     val base64Str = if(base64) ";base64" else ""
     val dataStr =
-      if(base64)
-        Base64.getEncoder.encodeToString(data)
-      else
+      if(base64) {
+        val b64Encoded = Base64.getEncoder.encodeToString(data)
+        c.pathEncoder.encode(b64Encoded, mediaType.charset)
+      } else {
         c.pathEncoder.encode(data, mediaType.charset)
-    mediaType.toString + base64Str + dataStr
+      }
+    mediaType.toString + base64Str + "," + dataStr
   }
 
   def withScheme(scheme: String): UrlWithoutAuthority =
@@ -1086,7 +1094,7 @@ object DataUrl {
   }
 
   def fromPercentEncoded(mediaType: MediaType, data: String)(implicit config: UriConfig = UriConfig.default): DataUrl =
-    DataUrl(mediaType, base64 = true, config.pathDecoder.decodeBytes(data, mediaType.charset))
+    DataUrl(mediaType, base64 = false, config.pathDecoder.decodeBytes(data, mediaType.charset))
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): DataUrl =
     parseTry(s).get

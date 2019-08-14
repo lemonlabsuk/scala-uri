@@ -6,6 +6,19 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class DataUrlTests extends FlatSpec with Matchers {
 
+  "Authority, querystring, etc" should "be empty" in {
+    val dataUrl = DataUrl.parse("data:,A%20brief%20note")
+    dataUrl.port should equal(None)
+    dataUrl.user should equal(None)
+    dataUrl.password should equal(None)
+    dataUrl.publicSuffix should equal(None)
+    dataUrl.publicSuffixes should equal(Vector.empty)
+    dataUrl.subdomain should equal(None)
+    dataUrl.subdomains should equal(Vector.empty)
+    dataUrl.shortestSubdomain should equal(None)
+    dataUrl.longestSubdomain should equal(None)
+  }
+
   /**
     * From Section 4 Examples in https://tools.ietf.org/html/rfc2397
     */
@@ -90,5 +103,52 @@ class DataUrlTests extends FlatSpec with Matchers {
     dataUrl.mediaType.typ should equal("text")
     dataUrl.mediaType.subTyp should equal("")
     dataUrl.mediaType.suffix should equal("")
+  }
+
+  "Changing scheme" should "return a SimpleUrlWithoutAuthority" in {
+    val dataUrl = DataUrl.parse("data:,A%20brief%20note")
+    val mailto = dataUrl.withScheme("mailto")
+    mailto shouldBe a[SimpleUrlWithoutAuthority]
+    mailto.toString() should equal("mailto:,A%20brief%20note")
+  }
+
+  it should "return a DataUrl if the scheme is data" in {
+    val dataUrl = DataUrl.parse("data:,A%20brief%20note")
+    val dataUrl2 = dataUrl.withScheme("data")
+    dataUrl2 should be theSameInstanceAs dataUrl
+  }
+
+  "Changing fragment" should "return self" in {
+    val dataUrl = DataUrl.parse("data:,A%20brief%20note")
+    val url = dataUrl.withFragment("fragment")
+    url should be theSameInstanceAs dataUrl
+  }
+
+  "Changing querystring" should "return self" in {
+    val dataUrl = DataUrl.parse("data:,A%20brief%20note")
+    val url = dataUrl.withQueryString("a" -> "b")
+    url should be theSameInstanceAs dataUrl
+  }
+
+  "Changing Host" should "return an AbsoluteUrl" in {
+    val dataUrl = DataUrl.parse("data:,A%20brief%20note")
+    val absoluteUrl = dataUrl.withHost(DomainName("example.com"))
+    absoluteUrl shouldBe an[AbsoluteUrl]
+    absoluteUrl.toString() should equal("data://example.com/,A%20brief%20note")
+  }
+
+  "Changing Port" should "return an AbsoluteUrl" in {
+    val dataUrl = DataUrl.parse("data:,A%20brief%20note")
+    val absoluteUrl = dataUrl.withPort(8080)
+    absoluteUrl shouldBe an[AbsoluteUrl]
+    absoluteUrl.toString() should equal("data://:8080/,A%20brief%20note")
+  }
+
+  "Changing Authority" should "return an AbsoluteUrl" in {
+    implicit val config: UriConfig = UriConfig.default
+    val dataUrl = DataUrl.parse("data:,A%20brief%20note")
+    val absoluteUrl = dataUrl.withAuthority(Authority("example.com", 8080))
+    absoluteUrl shouldBe an[AbsoluteUrl]
+    absoluteUrl.toString() should equal("data://example.com:8080/,A%20brief%20note")
   }
 }

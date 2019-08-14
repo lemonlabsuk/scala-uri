@@ -95,7 +95,7 @@ class TypesafeDslTypeTests extends FlatSpec with Matchers {
       implicit val traversableParams: TraversableParams[Bar] = TraversableParams.product
     }
 
-    val uri = "/uris-in-scala.html" withParams Bar(c = 2,foo = Foo(a = 1, b = "bar"))
+    val uri = "/uris-in-scala.html" withParams Bar(c = 2, foo = Foo(a = 1, b = "bar"))
     uri.toString should equal("/uris-in-scala.html?c=2&a=1&b=bar")
   }
 
@@ -144,5 +144,3 @@ class TypesafeDslTypeTests extends FlatSpec with Matchers {
     uriB.toString should equal("/uris-in-scala.html?foo=B")
   }
 }
-
-

@@ -22,7 +22,7 @@ import scala.util.Try
   *
   * URNs will be in the form `urn:example:example2`
   *
- */
+  */
 sealed trait Uri extends Product with Serializable {
   type Self <: Uri
   type SelfWithScheme <: Uri
@@ -494,18 +494,18 @@ sealed trait Url extends Uri {
 
   def toAbsoluteUrl: AbsoluteUrl = this match {
     case a: AbsoluteUrl => a
-    case _ => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to AbsoluteUrl")
+    case _              => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to AbsoluteUrl")
   }
 
   def toRelativeUrl: RelativeUrl = this match {
     case r: RelativeUrl => r
-    case _ => RelativeUrl(path, query, fragment)
+    case _              => RelativeUrl(path, query, fragment)
   }
 
   def toProtocolRelativeUrl: ProtocolRelativeUrl = this match {
     case p: ProtocolRelativeUrl => p
-    case a: AbsoluteUrl => ProtocolRelativeUrl(a.authority, a.path, a.query, a.fragment)
-    case _ => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to ProtocolRelativeUrl")
+    case a: AbsoluteUrl         => ProtocolRelativeUrl(a.authority, a.path, a.query, a.fragment)
+    case _                      => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to ProtocolRelativeUrl")
   }
 
   def toUrl: Url = this
@@ -529,21 +529,20 @@ object Url {
             port: Int = -1,
             path: String = "",
             query: QueryString = QueryString.empty,
-            fragment: String = null)
-           (implicit config: UriConfig = UriConfig.default): Url = {
+            fragment: String = null)(implicit config: UriConfig = UriConfig.default): Url = {
 
     val urlPath = UrlPath.parse(path)
     val frag = Option(fragment)
     def authority = {
-      val portOpt = if(port > 0) Some(port) else None
+      val portOpt = if (port > 0) Some(port) else None
       Authority(UserInfo(Option(user), Option(password)), Host.parse(host), portOpt)
     }
 
     (scheme, host) match {
       case (null, null) => RelativeUrl(urlPath, query, frag)
-      case (   _, null) => UrlWithoutAuthority(scheme, urlPath, query, frag)
-      case (null,    _) => ProtocolRelativeUrl(authority, urlPath.toAbsoluteOrEmpty, query, frag)
-      case (   _,    _) => AbsoluteUrl(scheme, authority, urlPath.toAbsoluteOrEmpty, query, frag)
+      case (_, null)    => UrlWithoutAuthority(scheme, urlPath, query, frag)
+      case (null, _)    => ProtocolRelativeUrl(authority, urlPath.toAbsoluteOrEmpty, query, frag)
+      case (_, _)       => AbsoluteUrl(scheme, authority, urlPath.toAbsoluteOrEmpty, query, frag)
     }
   }
 
@@ -568,10 +567,9 @@ object Url {
   *  -  Rootless Relative
   *    (with dot segment): `../index.html?a=b`
   */
-final case class RelativeUrl(path: UrlPath,
-                       query: QueryString,
-                       fragment: Option[String])
-                      (implicit val config: UriConfig = UriConfig.default) extends Url {
+final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option[String])(
+    implicit val config: UriConfig = UriConfig.default
+) extends Url {
 
   type Self = RelativeUrl
   type SelfWithAuthority = ProtocolRelativeUrl
@@ -612,10 +610,8 @@ final case class RelativeUrl(path: UrlPath,
   def withPath(path: UrlPath): RelativeUrl =
     copy(path = path)
 
-
   def withFragment(fragment: Option[String]): RelativeUrl =
     copy(fragment = fragment)
-
 
   def withQueryString(query: QueryString): RelativeUrl =
     copy(query = query)
@@ -784,10 +780,10 @@ object UrlWithAuthority {
   * Represents absolute URLs, for example: `//example.com`
   */
 final case class ProtocolRelativeUrl(authority: Authority,
-                               path: AbsoluteOrEmptyPath,
-                               query: QueryString,
-                               fragment: Option[String])
-                              (implicit val config: UriConfig = UriConfig.default) extends UrlWithAuthority {
+                                     path: AbsoluteOrEmptyPath,
+                                     query: QueryString,
+                                     fragment: Option[String])(implicit val config: UriConfig = UriConfig.default)
+    extends UrlWithAuthority {
 
   type Self = ProtocolRelativeUrl
   type SelfWithScheme = AbsoluteUrl
@@ -839,11 +835,11 @@ object ProtocolRelativeUrl {
   * Represents absolute URLs, for example: `http://example.com`
   */
 final case class AbsoluteUrl(scheme: String,
-                       authority: Authority,
-                       path: AbsoluteOrEmptyPath,
-                       query: QueryString,
-                       fragment: Option[String])
-                      (implicit val config: UriConfig = UriConfig.default) extends UrlWithAuthority {
+                             authority: Authority,
+                             path: AbsoluteOrEmptyPath,
+                             query: QueryString,
+                             fragment: Option[String])(implicit val config: UriConfig = UriConfig.default)
+    extends UrlWithAuthority {
 
   type Self = AbsoluteUrl
   type SelfWithScheme = AbsoluteUrl
@@ -894,11 +890,9 @@ object AbsoluteUrl {
 /**
   * Represents URLs that do not have an authority, for example: `mailto:example@example.com`
   */
-final case class UrlWithoutAuthority(scheme: String,
-                               path: UrlPath,
-                               query: QueryString,
-                               fragment: Option[String])
-                              (implicit val config: UriConfig = UriConfig.default) extends Url {
+final case class UrlWithoutAuthority(scheme: String, path: UrlPath, query: QueryString, fragment: Option[String])(
+    implicit val config: UriConfig = UriConfig.default
+) extends Url {
 
   type Self = UrlWithoutAuthority
   type SelfWithScheme = UrlWithoutAuthority
@@ -972,7 +966,6 @@ object UrlWithoutAuthority {
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrlWithoutAuthority] =
     UrlParser.parseUrlWithoutAuthority(s.toString)
 }
-
 
 /**
   * Represents a URN. See [[https://www.ietf.org/rfc/rfc2141 RFC 2141]]

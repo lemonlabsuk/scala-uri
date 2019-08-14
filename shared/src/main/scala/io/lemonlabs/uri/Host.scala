@@ -108,7 +108,7 @@ final case class DomainName(value: String) extends Host with PublicSuffixSupport
     publicSuffix map { ps =>
       val apexDomainStart = value.dropRight(ps.length + 1).lastIndexOf('.')
 
-      if(apexDomainStart == -1) value
+      if (apexDomainStart == -1) value
       else value.substring(apexDomainStart + 1)
     }
 
@@ -125,7 +125,7 @@ final case class DomainName(value: String) extends Host with PublicSuffixSupport
   def subdomain: Option[String] = longestSubdomain flatMap { ls =>
     ls.lastIndexOf('.') match {
       case -1 => None
-      case i => Some(ls.substring(0, i))
+      case i  => Some(ls.substring(0, i))
     }
   }
 
@@ -167,7 +167,7 @@ final case class DomainName(value: String) extends Host with PublicSuffixSupport
   def longestSubdomain: Option[String] = {
     val publicSuffixLength: Int = publicSuffix.map(_.length + 1).getOrElse(0)
     value.dropRight(publicSuffixLength) match {
-      case "" => None
+      case ""    => None
       case other => Some(other)
     }
   }
@@ -227,8 +227,15 @@ object IpV4 {
     parseTry(s).get
 }
 
-final case class IpV6(piece1: Char, piece2: Char, piece3: Char, piece4: Char,
-                piece5: Char, piece6: Char, piece7: Char, piece8: Char) extends Host {
+final case class IpV6(piece1: Char,
+                      piece2: Char,
+                      piece3: Char,
+                      piece4: Char,
+                      piece5: Char,
+                      piece6: Char,
+                      piece7: Char,
+                      piece8: Char)
+    extends Host {
 
   def piece1Int: Int = piece1.toInt
   def piece2Int: Int = piece2.toInt
@@ -285,22 +292,55 @@ final case class IpV6(piece1: Char, piece2: Char, piece3: Char, piece4: Char,
 }
 
 object IpV6 {
-  def apply(piece1: Int, piece2: Int, piece3: Int, piece4: Int,
-            piece5: Int, piece6: Int, piece7: Int, piece8: Int): IpV6 = {
-    require(piece1 >= 0 && piece2 >= 0 && piece3 >= 0 && piece4 >= 0 &&
-            piece5 >= 0 && piece6 >= 0 && piece7 >= 0 && piece8 >= 0, "IPv6 pieces must be >= 0")
-    require(piece1 <= Char.MaxValue && piece2 <= Char.MaxValue && piece3<= Char.MaxValue && piece4 <= Char.MaxValue &&
-            piece5 <= Char.MaxValue && piece6 <= Char.MaxValue && piece7 <= Char.MaxValue && piece8 <= Char.MaxValue,
-            "IPv6 Pieces must be <= " + Char.MaxValue.toInt)
-    new IpV6(piece1.toChar, piece2.toChar, piece3.toChar, piece4.toChar,
-             piece5.toChar, piece6.toChar, piece7.toChar, piece8.toChar)
+  def apply(piece1: Int,
+            piece2: Int,
+            piece3: Int,
+            piece4: Int,
+            piece5: Int,
+            piece6: Int,
+            piece7: Int,
+            piece8: Int): IpV6 = {
+    require(
+      piece1 >= 0 && piece2 >= 0 && piece3 >= 0 && piece4 >= 0 &&
+        piece5 >= 0 && piece6 >= 0 && piece7 >= 0 && piece8 >= 0,
+      "IPv6 pieces must be >= 0"
+    )
+    require(
+      piece1 <= Char.MaxValue && piece2 <= Char.MaxValue && piece3 <= Char.MaxValue && piece4 <= Char.MaxValue &&
+        piece5 <= Char.MaxValue && piece6 <= Char.MaxValue && piece7 <= Char.MaxValue && piece8 <= Char.MaxValue,
+      "IPv6 Pieces must be <= " + Char.MaxValue.toInt
+    )
+    new IpV6(
+      piece1.toChar,
+      piece2.toChar,
+      piece3.toChar,
+      piece4.toChar,
+      piece5.toChar,
+      piece6.toChar,
+      piece7.toChar,
+      piece8.toChar
+    )
   }
 
-  def apply(piece1: String, piece2: String, piece3: String, piece4: String,
-            piece5: String, piece6: String, piece7: String, piece8: String): IpV6 = {
+  def apply(piece1: String,
+            piece2: String,
+            piece3: String,
+            piece4: String,
+            piece5: String,
+            piece6: String,
+            piece7: String,
+            piece8: String): IpV6 = {
     def hexToInt(hex: String) = Integer.parseInt(hex, 16)
-    IpV6(hexToInt(piece1), hexToInt(piece2), hexToInt(piece3), hexToInt(piece4),
-         hexToInt(piece5), hexToInt(piece6), hexToInt(piece7), hexToInt(piece8))
+    IpV6(
+      hexToInt(piece1),
+      hexToInt(piece2),
+      hexToInt(piece3),
+      hexToInt(piece4),
+      hexToInt(piece5),
+      hexToInt(piece6),
+      hexToInt(piece7),
+      hexToInt(piece8)
+    )
   }
 
   def fromIntPieces(pieces: immutable.Seq[Int]): IpV6 = {

@@ -3,14 +3,13 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.parsing.UriParsingException
 import org.scalatest.{FlatSpec, Matchers}
 
-
 class ParsingTests extends FlatSpec with Matchers {
 
   "Parsing an absolute URI" should "result in a valid Uri object" in {
     val url = Url.parse("http://theon.github.com/uris-in-scala.html")
-    url.schemeOption should equal (Some("http"))
-    url.hostOption should equal (Some(DomainName("theon.github.com")))
-    url.path.toString() should equal ("/uris-in-scala.html")
+    url.schemeOption should equal(Some("http"))
+    url.hostOption should equal(Some(DomainName("theon.github.com")))
+    url.path.toString() should equal("/uris-in-scala.html")
   }
 
   it should "result in a Success Try" in {
@@ -29,15 +28,15 @@ class ParsingTests extends FlatSpec with Matchers {
 
   "Parsing a relative URI" should "result in a valid Uri object" in {
     val url = Url.parse("/uris-in-scala.html")
-    url.schemeOption should equal (None)
-    url.hostOption should equal (None)
-    url.path.toString() should equal ("/uris-in-scala.html")
+    url.schemeOption should equal(None)
+    url.hostOption should equal(None)
+    url.path.toString() should equal("/uris-in-scala.html")
   }
 
   "Parsing a URI with querystring parameters" should "result in a valid Uri object" in {
     val url = Url.parse("/uris-in-scala.html?query_param_one=hello&query_param_one=goodbye&query_param_two=false")
-    url.query.params should equal (
-      Vector (
+    url.query.params should equal(
+      Vector(
         "query_param_one" -> Some("hello"),
         "query_param_one" -> Some("goodbye"),
         "query_param_two" -> Some("false")
@@ -47,8 +46,8 @@ class ParsingTests extends FlatSpec with Matchers {
 
   "Parsing a URI with not properly URL-encoded querystring parameters" should "result in a valid Uri object" in {
     val url = Url.parse("/uris-in-scala.html?query_param_one=hello=world&query_param_two=false")
-    url.query.params should equal (
-      Vector (
+    url.query.params should equal(
+      Vector(
         "query_param_one" -> Some("hello=world"),
         "query_param_two" -> Some("false")
       )
@@ -57,8 +56,8 @@ class ParsingTests extends FlatSpec with Matchers {
 
   "Parsing a URI with a zero-length querystring parameter" should "result in a valid Uri object" in {
     val url = Url.parse("/uris-in-scala.html?query_param_one=&query_param_two=false")
-    url.query.params should equal (
-      Vector (
+    url.query.params should equal(
+      Vector(
         "query_param_one" -> Some(""),
         "query_param_two" -> Some("false")
       )
@@ -69,7 +68,7 @@ class ParsingTests extends FlatSpec with Matchers {
     val url = Url.parse("http://127.0.0.1:9000/uris-in-scala.html")
     url.hostOption should equal(Some(IpV4(127, 0, 0, 1)))
     url.port should equal(Some(9000))
-    url.toString should equal ("http://127.0.0.1:9000/uris-in-scala.html")
+    url.toString should equal("http://127.0.0.1:9000/uris-in-scala.html")
   }
 
   it should "NOT parse as IPv4 if there are more than four octets" in {
@@ -97,7 +96,7 @@ class ParsingTests extends FlatSpec with Matchers {
     val url = Url.parse("http://[2001:db8::7]:9000/uris-in-scala.html")
     url.hostOption should equal(Some(IpV6("2001", "db8", "0", "0", "0", "0", "0", "7")))
     url.port should equal(Some(9000))
-    url.toString should equal ("http://[2001:db8::7]:9000/uris-in-scala.html")
+    url.toString should equal("http://[2001:db8::7]:9000/uris-in-scala.html")
   }
 
   it should "parse with no path" in {
@@ -134,9 +133,11 @@ class ParsingTests extends FlatSpec with Matchers {
     val nineSegIp = "http://[1:2:3:4:5:6:7:8:9]:9000"
     val e = the[UriParsingException] thrownBy Url.parse(nineSegIp)
 
-    e.getMessage should equal("""Invalid URL could not be parsed. Invalid input ']', expected HexDigit or ':' (line 1, column 26):
+    e.getMessage should equal(
+      """Invalid URL could not be parsed. Invalid input ']', expected HexDigit or ':' (line 1, column 26):
                                 |http://[1:2:3:4:5:6:7:8:9]:9000
-                                |                         ^""".stripMargin)
+                                |                         ^""".stripMargin
+    )
 
     Url.parseTry(nineSegIp).isFailure should equal(true)
     Url.parseOption(nineSegIp) should equal(None)
@@ -145,7 +146,9 @@ class ParsingTests extends FlatSpec with Matchers {
   it should "NOT parse IPv6 with more than 6 segments and a ::" in {
     val tooManySegs = "http://[1:2:3::4:5:6:7]:9000"
     val e = the[UriParsingException] thrownBy Url.parse(tooManySegs)
-    e.getMessage should equal("IPv6 has too many pieces. Must be either exactly eight hex pieces or fewer than six hex pieces with a '::'")
+    e.getMessage should equal(
+      "IPv6 has too many pieces. Must be either exactly eight hex pieces or fewer than six hex pieces with a '::'"
+    )
 
     Url.parseTry(tooManySegs).isFailure should equal(true)
     Url.parseOption(tooManySegs) should equal(None)
@@ -153,8 +156,8 @@ class ParsingTests extends FlatSpec with Matchers {
 
   "Parsing a url with relative scheme" should "result in a Uri with None for scheme" in {
     val url = Url.parse("//theon.github.com/uris-in-scala.html")
-    url.schemeOption should equal (None)
-    url.toString should equal ("//theon.github.com/uris-in-scala.html")
+    url.schemeOption should equal(None)
+    url.toString should equal("//theon.github.com/uris-in-scala.html")
   }
 
   "Parsing a url with relative scheme" should "result in the correct host" in {
@@ -169,22 +172,22 @@ class ParsingTests extends FlatSpec with Matchers {
 
   "Parsing a url with a fragment" should "result in a Uri with Some for fragment" in {
     val url = Url.parse("//theon.github.com#fragged")
-    url.fragment should equal (Some("fragged"))
+    url.fragment should equal(Some("fragged"))
   }
 
   "Parsing a url with a query string and fragment" should "result in a Uri with Some for fragment" in {
     val url = Url.parse("//theon.github.com/uris-in-scala.html?ham=true#fragged")
-    url.fragment should equal (Some("fragged"))
+    url.fragment should equal(Some("fragged"))
   }
 
   "Parsing a url without a fragment" should "result in a Uri with None for fragment" in {
     val url = Url.parse("//theon.github.com/uris-in-scala.html")
-    url.fragment should equal (None)
+    url.fragment should equal(None)
   }
 
   "Parsing a url without an empty fragment" should "result in a Uri with Some(empty string) for fragment" in {
     val url = Url.parse("//theon.github.com/uris-in-scala.html#")
-    url.fragment should equal (Some(""))
+    url.fragment should equal(Some(""))
   }
 
   "Parsing a url with user" should "result in a Uri with the username" in {
@@ -222,7 +225,7 @@ class ParsingTests extends FlatSpec with Matchers {
   "Url with @ in query string" should "parse correctly" in {
     val url = Url.parse("http://www.mywebsite.com?a=b@")
     url.schemeOption should equal(Some("http"))
-    url.hostOption should equal (Some(DomainName("www.mywebsite.com")))
+    url.hostOption should equal(Some(DomainName("www.mywebsite.com")))
   }
 
   "Query string param with hash as value" should "be parsed as fragment" in {
@@ -243,7 +246,6 @@ class ParsingTests extends FlatSpec with Matchers {
     url2.query.params("q") should equal(Vector(Some("foo")))
     url2.toString should equal("//cythrawll.github.com/scala-url.html?q=foo&ham")
 
-
     val url3 = Url.parse("//cythrawll.github.com/scala-url.html?ham&q=foo")
     url3.hostOption should equal(Some(DomainName("cythrawll.github.com")))
     url3.query.params("ham") should equal(Vector(None))
@@ -253,19 +255,21 @@ class ParsingTests extends FlatSpec with Matchers {
 
   "Parsing a url with two query strings that doesn't have a value in different ways" should "work and preserve the difference" in {
     val url = Url.parse("//cythrawll.github.com/scala-url.html?ham&jam=&q=foo")
-    url.hostOption should equal (Some(DomainName("cythrawll.github.com")))
+    url.hostOption should equal(Some(DomainName("cythrawll.github.com")))
     url.query.params("ham") should equal(Vector(None))
     url.query.params("jam") should equal(Vector(Some("")))
-    url.query.params("q")   should equal(Vector(Some("foo")))
+    url.query.params("q") should equal(Vector(Some("foo")))
     url.toString should equal("//cythrawll.github.com/scala-url.html?ham&jam=&q=foo")
   }
 
   it should "not be parsed by default" in {
     val url = Url.parse("http://stackoverflow.com/path;paramOne=value;paramTwo=value2/pathTwo;paramOne=value")
-    url.path.parts should equal(Vector(
-      "path;paramOne=value;paramTwo=value2",
-      "pathTwo;paramOne=value"
-    ))
+    url.path.parts should equal(
+      Vector(
+        "path;paramOne=value;paramTwo=value2",
+        "pathTwo;paramOne=value"
+      )
+    )
   }
 
   "A URL with file scheme" should "parse as an absolute URL" in {
@@ -309,12 +313,14 @@ class ParsingTests extends FlatSpec with Matchers {
   "Url.parse" should "provide paramMap as a Map of String to Vector of String" in {
     val parsed = Url.parse("/?a=b&a=c&d=&e&f&f=g")
 
-    parsed.query.paramMap should be (Map(
-      "a" -> Vector("b", "c"),
-      "d" -> Vector(""),
-      "e" -> Vector.empty,
-      "f" -> Vector("g")
-    ))
+    parsed.query.paramMap should be(
+      Map(
+        "a" -> Vector("b", "c"),
+        "d" -> Vector(""),
+        "e" -> Vector.empty,
+        "f" -> Vector("g")
+      )
+    )
   }
 
   "Url.parseQuery" should "parse a query string starting with a ?" in {

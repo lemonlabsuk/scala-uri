@@ -58,11 +58,12 @@ class ToUriTests extends WordSpec with Matchers {
       javaUri.toASCIIString should equal(url.toString)
     }
   }
-  
+
   "apply" should {
 
     "handle exotic/reserved characters in query string" in {
-      val javaUri: URI = new URI("http://user:password@www.example.com/test?weird%3D%26key=strange%25value&arrow=%E2%87%94")
+      val javaUri: URI =
+        new URI("http://user:password@www.example.com/test?weird%3D%26key=strange%25value&arrow=%E2%87%94")
       val url = Uri(javaUri).toUrl
       url.schemeOption should equal(Some("http"))
       url.hostOption should equal(Some(DomainName("www.example.com")))

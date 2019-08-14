@@ -12,7 +12,9 @@ class DataUrlJvmTests extends FlatSpec with Matchers {
     * From https://en.wikipedia.org/wiki/Data_URI_scheme#HTML
     */
   "The DataUrl for a red dot PNG image" should "have the correct pixel values in Java BufferedImage" in {
-    val dataUrl = DataUrl.parse("data:image/png;base64,iVBORw0KGgoAAA\nANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4\n//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU\n5ErkJggg==")
+    val dataUrl = DataUrl.parse(
+      "data:image/png;base64,iVBORw0KGgoAAA\nANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4\n//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU\n5ErkJggg=="
+    )
     val image = ImageIO.read(new ByteArrayInputStream(dataUrl.data))
 
     // Image is a red dot, transparent in the top left corner of image

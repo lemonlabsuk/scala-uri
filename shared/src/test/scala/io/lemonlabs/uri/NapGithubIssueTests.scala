@@ -6,20 +6,20 @@ import io.lemonlabs.uri.parsing.UriParsingException
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
 /**
- * Test Suite to ensure that bugs raised by awesome github peeps NEVER come back
+  * Test Suite to ensure that bugs raised by awesome github peeps NEVER come back
   *
   * These bugs were raised at the old github page https://github.com/net-a-porter/scala-uri/issues
- */
+  */
 class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
 
   "Github Issue #2" should "now be fixed. Pluses in querystrings should be encoded when using the conservative encoder" in {
     val uri = Url.parse("http://theon.github.com/?+=+")
-    uri.toString(UriConfig.conservative) should equal ("http://theon.github.com/?%2B=%2B")
+    uri.toString(UriConfig.conservative) should equal("http://theon.github.com/?%2B=%2B")
   }
 
   "Github Issue #4" should "now be fixed. Port numbers should be rendered by toString" in {
     val uri = Url.parse("http://theon.github.com:8080/test?p=1")
-    uri.toString should equal ("http://theon.github.com:8080/test?p=1")
+    uri.toString should equal("http://theon.github.com:8080/test?p=1")
   }
 
   "Github Issue #5" should "now be fixed. The characters {} should now be percent encoded" in {
@@ -31,32 +31,32 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
     import dsl._
     val uri = Url.parse("/blah?blah=blah")
     val uriString: String = uri
-    uriString should equal ("/blah?blah=blah")
+    uriString should equal("/blah?blah=blah")
   }
 
   "Github Issue #7" should "now be fixed. Calling uri.toString() (with parentheses) should now behave the same as uri.toString " in {
     val uri = Url.parse("/blah?blah=blah")
-    uri.toString() should equal ("/blah?blah=blah")
+    uri.toString() should equal("/blah?blah=blah")
   }
 
   "Github Issue #8" should "now be fixed. Parsed relative uris should have no scheme" in {
     val uri = Url.parse("abc")
 
     uri.schemeOption should equal(None)
-    uri.hostOption should equal (None)
-    uri.path.toString() should equal ("abc")
+    uri.hostOption should equal(None)
+    uri.path.toString() should equal("abc")
   }
 
   "Github Issue #15" should "now be fixed. Empty Query String values are parsed" in {
     val uri = Url.parse("http://localhost:8080/ping?oi=TscV16GUGtlU&ppc=&bpc=")
 
-    uri.schemeOption should equal (Some("http"))
-    uri.hostOption should equal (Some(DomainName("localhost")))
-    uri.port.value should equal (8080)
-    uri.path.toString() should equal ("/ping")
-    uri.query.params("oi") should equal (Vector(Some("TscV16GUGtlU")))
-    uri.query.params("ppc") should equal (Vector(Some("")))
-    uri.query.params("bpc") should equal (Vector(Some("")))
+    uri.schemeOption should equal(Some("http"))
+    uri.hostOption should equal(Some(DomainName("localhost")))
+    uri.port.value should equal(8080)
+    uri.path.toString() should equal("/ping")
+    uri.query.params("oi") should equal(Vector(Some("TscV16GUGtlU")))
+    uri.query.params("ppc") should equal(Vector(Some("")))
+    uri.query.params("bpc") should equal(Vector(Some("")))
   }
 
   "Github Issue #12" should "now be fixed. Parsing URIs parse percent escapes" in {
@@ -72,7 +72,7 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
 
   "Github Issue #19" should "now be fixed" in {
     val uri = Url.parse("/coldplay.com?singer=chris%26will")
-    uri.toString should equal ("/coldplay.com?singer=chris%26will")
+    uri.toString should equal("/coldplay.com?singer=chris%26will")
   }
 
   "Github Issue #26" should "now be fixed" in {
@@ -88,15 +88,19 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
   }
 
   "Github Issue #55" should "now be fixed" in {
-    val uri = Url.parse("http://localhost:9002/iefjiefjief-efefeffe-fefefee/toto?access_token=ijifjijef-fekieifj-fefoejfoef&gquery=filter(time_before_closing%3C=45)")
+    val uri = Url.parse(
+      "http://localhost:9002/iefjiefjief-efefeffe-fefefee/toto?access_token=ijifjijef-fekieifj-fefoejfoef&gquery=filter(time_before_closing%3C=45)"
+    )
     uri.query.param("gquery") should equal(Some("filter(time_before_closing<=45)"))
-    uri.toString should equal("http://localhost:9002/iefjiefjief-efefeffe-fefefee/toto?access_token=ijifjijef-fekieifj-fefoejfoef&gquery=filter(time_before_closing%3C%3D45)")
+    uri.toString should equal(
+      "http://localhost:9002/iefjiefjief-efefeffe-fefefee/toto?access_token=ijifjijef-fekieifj-fefoejfoef&gquery=filter(time_before_closing%3C%3D45)"
+    )
   }
 
   "Github Issue #56" should "now be fixed" in {
     val badPort = "http://test.net:8o8o"
 
-    val ex = the [UriParsingException] thrownBy Url.parse(badPort)
+    val ex = the[UriParsingException] thrownBy Url.parse(badPort)
     ex.getMessage should startWith("Invalid URL could not be parsed")
 
     Url.parseTry(badPort).isSuccess should equal(false)
@@ -109,8 +113,12 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
   }
 
   "Github Issue #65 example 2" should "now be fixed" in {
-    val uri = Url.parse("http://localhost:9000/mlb/2014/06/15/david-wrights-slump-continues-why-new-york-mets-franchise-third-baseman-must-be-gone-before-seasons-end/?utm_source=RantSports&utm_medium=HUBRecirculation&utm_term=MLBNew York MetsGrid")
-    uri.toString should equal("http://localhost:9000/mlb/2014/06/15/david-wrights-slump-continues-why-new-york-mets-franchise-third-baseman-must-be-gone-before-seasons-end/?utm_source=RantSports&utm_medium=HUBRecirculation&utm_term=MLBNew%20York%20MetsGrid")
+    val uri = Url.parse(
+      "http://localhost:9000/mlb/2014/06/15/david-wrights-slump-continues-why-new-york-mets-franchise-third-baseman-must-be-gone-before-seasons-end/?utm_source=RantSports&utm_medium=HUBRecirculation&utm_term=MLBNew York MetsGrid"
+    )
+    uri.toString should equal(
+      "http://localhost:9000/mlb/2014/06/15/david-wrights-slump-continues-why-new-york-mets-franchise-third-baseman-must-be-gone-before-seasons-end/?utm_source=RantSports&utm_medium=HUBRecirculation&utm_term=MLBNew%20York%20MetsGrid"
+    )
   }
 
   "Github Issue #65 example 3" should "now be fixed" in {
@@ -167,8 +175,11 @@ class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
     val withPath = p.addPathParts("some", "path", "segments")
     withPath.toString should equal("http://localhost:1234/some/path/segments")
 
-    val withPathAndQuery = p.addPathParts("some", "path", "segments").addParam("returnUrl", "http://localhost:1234/some/path/segments")
-    withPathAndQuery.toString should equal("http://localhost:1234/some/path/segments?returnUrl=http://localhost:1234/some/path/segments")
+    val withPathAndQuery =
+      p.addPathParts("some", "path", "segments").addParam("returnUrl", "http://localhost:1234/some/path/segments")
+    withPathAndQuery.toString should equal(
+      "http://localhost:1234/some/path/segments?returnUrl=http://localhost:1234/some/path/segments"
+    )
   }
 
   "Github Issue #114" should "now be fixed" in {

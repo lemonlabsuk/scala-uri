@@ -94,9 +94,9 @@ object UrlPath {
   def fromRaw(s: String)(implicit config: UriConfig = UriConfig.default): UrlPath = {
     def parts = s.split('/').toVector
     s.headOption match {
-      case None => EmptyPath
+      case None      => EmptyPath
       case Some('/') => AbsolutePath(parts.tail)
-      case _ => RootlessPath(parts)
+      case _         => RootlessPath(parts)
     }
   }
 }
@@ -139,7 +139,8 @@ case object EmptyPath extends AbsoluteOrEmptyPath {
   override private[uri] def toString(c: UriConfig): String = ""
 }
 
-final case class RootlessPath(parts: Vector[String])(implicit val config: UriConfig = UriConfig.default) extends UrlPath {
+final case class RootlessPath(parts: Vector[String])(implicit val config: UriConfig = UriConfig.default)
+    extends UrlPath {
 
   def toRootless: RootlessPath =
     this
@@ -148,7 +149,7 @@ final case class RootlessPath(parts: Vector[String])(implicit val config: UriCon
     AbsolutePath(parts)
 
   def toAbsoluteOrEmpty: AbsoluteOrEmptyPath =
-    if(parts.isEmpty) EmptyPath
+    if (parts.isEmpty) EmptyPath
     else AbsolutePath(parts)
 
   def withParts(otherParts: Iterable[String]): UrlPath =
@@ -169,7 +170,8 @@ object RootlessPath {
 /**
   * An AbsolutePath is a path that starts with a slash
   */
-final case class AbsolutePath(parts: Vector[String])(implicit val config: UriConfig = UriConfig.default) extends AbsoluteOrEmptyPath {
+final case class AbsolutePath(parts: Vector[String])(implicit val config: UriConfig = UriConfig.default)
+    extends AbsoluteOrEmptyPath {
 
   def toAbsolute: AbsolutePath =
     this

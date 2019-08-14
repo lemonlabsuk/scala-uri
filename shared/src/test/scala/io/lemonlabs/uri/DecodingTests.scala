@@ -1,25 +1,33 @@
 package io.lemonlabs.uri
 
-import org.scalatest.{Matchers, FlatSpec}
-import io.lemonlabs.uri.decoding.{UriDecodeException, NoopDecoder}
+import org.scalatest.{FlatSpec, Matchers}
+import io.lemonlabs.uri.decoding.{NoopDecoder, UriDecodeException}
 import io.lemonlabs.uri.config.UriConfig
 
 class DecodingTests extends FlatSpec with Matchers {
 
   "Reserved characters" should "be percent decoded during parsing" in {
-    val uri = Url.parse("http://theon.github.com/uris-in-scala.html?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D")
-    uri.toStringRaw should equal ("http://theon.github.com/uris-in-scala.html?reserved=:/?#[]@!$&'()*+,;={}\\\n\r")
+    val uri = Url.parse(
+      "http://theon.github.com/uris-in-scala.html?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D"
+    )
+    uri.toStringRaw should equal("http://theon.github.com/uris-in-scala.html?reserved=:/?#[]@!$&'()*+,;={}\\\n\r")
   }
 
   it should "be percent decoded in the fragment" in {
-    val uri = Url.parse("http://theon.github.com/uris-in-scala.html#%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D")
-    uri.toStringRaw should equal ("http://theon.github.com/uris-in-scala.html#:/?#[]@!$&'()*+,;={}\\\n\r")
+    val uri = Url.parse(
+      "http://theon.github.com/uris-in-scala.html#%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D"
+    )
+    uri.toStringRaw should equal("http://theon.github.com/uris-in-scala.html#:/?#[]@!$&'()*+,;={}\\\n\r")
   }
 
   "Percent decoding" should "be disabled when requested" in {
     implicit val c = UriConfig(decoder = NoopDecoder)
-    val uri = Url.parse("http://theon.github.com/uris-in-scala.html?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D")
-    uri.toStringRaw should equal ("http://theon.github.com/uris-in-scala.html?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D")
+    val uri = Url.parse(
+      "http://theon.github.com/uris-in-scala.html?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D"
+    )
+    uri.toStringRaw should equal(
+      "http://theon.github.com/uris-in-scala.html?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D"
+    )
   }
 
   it should "decode 2-byte groups" in {

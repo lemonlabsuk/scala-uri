@@ -14,5 +14,5 @@ trait PathPartInstances1 {
 }
 
 trait PathPartInstances extends PathPartInstances1 {
-  implicit def optionPathPart[A : PathPart]: PathPart[Option[A]] = a => a.map(PathPart[A].path).getOrElse("")
+  implicit def optionPathPart[A: PathPart]: PathPart[Option[A]] = a => a.map(PathPart[A].path).getOrElse("")
 }

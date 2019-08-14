@@ -33,10 +33,12 @@ class DataUrlTests extends FlatSpec with Matchers {
 
   "Mediatype parameters" should "be parsed" in {
     val dataUrl = DataUrl.parse("data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678")
-    dataUrl.mediaType.parameters should equal(Vector(
-      "charset" -> "UTF-8",
-      "page" -> "21"
-    ))
+    dataUrl.mediaType.parameters should equal(
+      Vector(
+        "charset" -> "UTF-8",
+        "page" -> "21"
+      )
+    )
   }
 
   "A quoted charset" should "be respected" in {
@@ -68,7 +70,6 @@ class DataUrlTests extends FlatSpec with Matchers {
     dataUrl.dataAsString should equal("<h1>Hello, World!</h1>")
     dataUrl.toString() should equal("data:text/html,%3Ch1%3EHello,%20World!%3C%2Fh1%3E")
   }
-
 
   /**
     * From https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs

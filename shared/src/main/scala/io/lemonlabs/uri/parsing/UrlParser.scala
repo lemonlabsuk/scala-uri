@@ -100,8 +100,8 @@ class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.defau
   }
 
   /**
-   * A sequence of path parts optionally starting with a slash
-   */
+    * A sequence of path parts optionally starting with a slash
+    */
   def _path: Rule1[UrlPath] = rule {
     capture(optional("/")) ~ zeroOrMore(_path_segment).separatedBy("/") ~> extractRelPath
   }
@@ -181,42 +181,40 @@ class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.defau
     _abs_url | _protocol_rel_url | _url_without_authority | _rel_url
   }
 
-  val extractAbsoluteUrl = (scheme: String, authority: Authority, path: AbsoluteOrEmptyPath, qs: QueryString, f: Option[String]) =>
-    AbsoluteUrl(scheme, authority, path, qs, f)
+  val extractAbsoluteUrl =
+    (scheme: String, authority: Authority, path: AbsoluteOrEmptyPath, qs: QueryString, f: Option[String]) =>
+      AbsoluteUrl(scheme, authority, path, qs, f)
 
-  val extractProtocolRelativeUrl = (authority: Authority, path: AbsoluteOrEmptyPath, qs: QueryString, f: Option[String]) =>
-    ProtocolRelativeUrl(authority, path, qs, f)
+  val extractProtocolRelativeUrl =
+    (authority: Authority, path: AbsoluteOrEmptyPath, qs: QueryString, f: Option[String]) =>
+      ProtocolRelativeUrl(authority, path, qs, f)
 
-  val extractRelativeUrl = (path: UrlPath, qs: QueryString, f: Option[String]) =>
-    RelativeUrl(path, qs, f)
+  val extractRelativeUrl = (path: UrlPath, qs: QueryString, f: Option[String]) => RelativeUrl(path, qs, f)
 
   val extractUrlWithoutAuthority = (scheme: String, path: UrlPath, qs: QueryString, f: Option[String]) =>
     SimpleUrlWithoutAuthority(scheme, path, qs, f)
 
-  val extractInt = (num: String) =>
-    num.toInt
+  val extractInt = (num: String) => num.toInt
 
-  val extractHexToInt = (num: String) =>
-    Integer.parseInt(num, 16)
+  val extractHexToInt = (num: String) => Integer.parseInt(num, 16)
 
-  val extractIpv4 = (a: Int, b: Int, c: Int, d: Int) =>
-    IpV4(a, b, c, d)
+  val extractIpv4 = (a: Int, b: Int, c: Int, d: Int) => IpV4(a, b, c, d)
 
-  val extractFullIpv6 = (pieces: immutable.Seq[String]) =>
-    IpV6.fromHexPieces(pieces)
+  val extractFullIpv6 = (pieces: immutable.Seq[String]) => IpV6.fromHexPieces(pieces)
 
   val extractIpv6WithEluded = (beforeEluded: immutable.Seq[String], afterEluded: immutable.Seq[String]) => {
     val eladedPieces = 8 - beforeEluded.size - afterEluded.size
-    if(eladedPieces < 2) {
-      throw new UriParsingException("IPv6 has too many pieces. Must be either exactly eight hex pieces or fewer than six hex pieces with a '::'")
+    if (eladedPieces < 2) {
+      throw new UriParsingException(
+        "IPv6 has too many pieces. Must be either exactly eight hex pieces or fewer than six hex pieces with a '::'"
+      )
     }
     IpV6.fromHexPieces(
       beforeEluded ++ Vector.fill(eladedPieces)("0") ++ afterEluded
     )
   }
 
-  val extractDomainName = (domainName: String) =>
-    DomainName(domainName)
+  val extractDomainName = (domainName: String) => DomainName(domainName)
 
   val extractUserInfo = (user: String, pass: Option[String]) =>
     UserInfo(Some(pathDecoder.decode(user)), pass.map(pathDecoder.decode))
@@ -224,42 +222,36 @@ class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.defau
   val extractAuthority = (userInfo: Option[UserInfo], host: Host, port: Option[Int]) =>
     Authority(userInfo.getOrElse(UserInfo.empty), host, port)
 
-  val extractFragment = (x: String) =>
-    fragmentDecoder.decode(x)
+  val extractFragment = (x: String) => fragmentDecoder.decode(x)
 
   val extractQueryString = (tuples: immutable.Seq[(String, Option[String])]) =>
     QueryString(tuples.toVector.map(queryDecoder.decodeTuple))
 
-  val extractPathPart = (pathPart: String) =>
-    pathDecoder.decode(pathPart)
+  val extractPathPart = (pathPart: String) => pathDecoder.decode(pathPart)
 
   val extractAbsOrEmptyPath = (pp: immutable.Seq[String]) =>
-    if(pp.isEmpty) EmptyPath
+    if (pp.isEmpty) EmptyPath
     else AbsolutePath(pp.toVector)
 
   val extractRelPath = (maybeSlash: String, pp: immutable.Seq[String]) =>
-    if(maybeSlash.nonEmpty)
+    if (maybeSlash.nonEmpty)
       AbsolutePath(pp.toVector)
-    else if(pp == Seq(""))
+    else if (pp == Seq(""))
       UrlPath.empty
     else
       RootlessPath(pp.toVector)
 
-  val extractMediaTypeParam = (k: String, v: String) =>
-    k -> v
+  val extractMediaTypeParam = (k: String, v: String) => k -> v
 
-  val extractMediaType = (value: String, params: immutable.Seq[(String,String)]) => {
-    MediaType(if(value.isEmpty) None else Some(value), params.toVector)
+  val extractMediaType = (value: String, params: immutable.Seq[(String, String)]) => {
+    MediaType(if (value.isEmpty) None else Some(value), params.toVector)
   }
 
-  val extractBase64DataUrl = (mediaType: MediaType, data: String) =>
-    DataUrl.fromBase64(mediaType, data)
+  val extractBase64DataUrl = (mediaType: MediaType, data: String) => DataUrl.fromBase64(mediaType, data)
 
-  val extractPercentEncodedDataUrl = (mediaType: MediaType, data: String) =>
-    DataUrl.fromPercentEncoded(mediaType, data)
+  val extractPercentEncodedDataUrl = (mediaType: MediaType, data: String) => DataUrl.fromPercentEncoded(mediaType, data)
 
-  val extractTuple = (k: String, v: String) =>
-    k -> Some(v)
+  val extractTuple = (k: String, v: String) => k -> Some(v)
 
   val extractTok = (k: String) => k -> None
 
@@ -349,7 +341,9 @@ object UrlParser {
   def parseUrlWithoutAuthority(s: String)(implicit config: UriConfig = UriConfig.default): Try[UrlWithoutAuthority] =
     UrlParser(s).parseUrlWithoutAuthority()
 
-  def parseSimpleUrlWithoutAuthority(s: String)(implicit config: UriConfig = UriConfig.default): Try[SimpleUrlWithoutAuthority] =
+  def parseSimpleUrlWithoutAuthority(
+      s: String
+  )(implicit config: UriConfig = UriConfig.default): Try[SimpleUrlWithoutAuthority] =
     UrlParser(s).parseSimpleUrlWithoutAuthority()
 
   def parseDataUrl(s: String)(implicit config: UriConfig = UriConfig.default): Try[DataUrl] =
@@ -377,7 +371,7 @@ object UrlParser {
     UrlParser(s).parseUrl()
 
   def parseQuery(s: String)(implicit config: UriConfig = UriConfig.default): Try[QueryString] = {
-    val withQuestionMark = if(s.head == '?') s else "?" + s
+    val withQuestionMark = if (s.head == '?') s else "?" + s
     UrlParser(withQuestionMark).parseQuery()
   }
 

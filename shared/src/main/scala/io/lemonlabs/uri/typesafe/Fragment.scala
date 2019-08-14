@@ -15,5 +15,5 @@ trait FragmentInstances1 {
 }
 
 trait FragmentInstances extends FragmentInstances1 {
-  implicit def optionFragment[A : Fragment]: Fragment[Option[A]] = _.map(Fragment[A].fragment).getOrElse("")
+  implicit def optionFragment[A: Fragment]: Fragment[Option[A]] = _.map(Fragment[A].fragment).getOrElse("")
 }

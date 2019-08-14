@@ -1,6 +1,6 @@
 package io.lemonlabs.uri
 
-case class MediaType(rawValue: Option[String], parameters: Vector[(String,String)]) {
+case class MediaType(rawValue: Option[String], parameters: Vector[(String, String)]) {
 
   /**
     * @return the value of this mediatype. Defaults to text/plain as per RFC2397 section 2
@@ -12,11 +12,10 @@ case class MediaType(rawValue: Option[String], parameters: Vector[(String,String
     */
   def charset: String = rawCharset.getOrElse("US-ASCII")
 
-
   private def typeDelimiterIndex = value.indexOf('/')
   private def suffixDelimiterIndex = {
     val lastPlusIndex = value.lastIndexOf('+')
-    if(lastPlusIndex > typeDelimiterIndex) lastPlusIndex
+    if (lastPlusIndex > typeDelimiterIndex) lastPlusIndex
     else value.length
   }
 
@@ -25,8 +24,8 @@ case class MediaType(rawValue: Option[String], parameters: Vector[(String,String
     *         for the mediatype `application/ld+json`
     */
   def typ = typeDelimiterIndex match {
-    case -1 => value
-    case index  => value.slice(0, index)
+    case -1    => value
+    case index => value.slice(0, index)
   }
 
   /**
@@ -34,7 +33,7 @@ case class MediaType(rawValue: Option[String], parameters: Vector[(String,String
     *         for the mediatype `application/ld+json`. Returns empty string if there is no subtype.
     */
   def subTyp = typeDelimiterIndex match {
-    case -1 => ""
+    case -1    => ""
     case index => value.slice(index + 1, suffixDelimiterIndex)
   }
 
@@ -48,7 +47,7 @@ case class MediaType(rawValue: Option[String], parameters: Vector[(String,String
   }
 
   def rawCharset: Option[String] = parameters.collectFirst {
-    case (k,v) if quotedStringEquals(k, "charset") => v
+    case (k, v) if quotedStringEquals(k, "charset") => v
   }
 
   private def quotedStringEquals(s: String, matches: String): Boolean =

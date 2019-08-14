@@ -7,13 +7,14 @@ import io.lemonlabs.uri.typesafe.PathPart.ops._
 import io.lemonlabs.uri.typesafe.Fragment.ops._
 import io.lemonlabs.uri.typesafe.{Fragment, PathPart, QueryKeyValue, TraversableParams}
 
-class TypesafeUrlDsl private[typesafe](val url: Url) extends AnyVal {
+class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
+
   /**
     * Appends a path part to the path of this URI
     * @param a The path part
     * @return A new Uri with this path part appended
     */
-  def /[A : PathPart](a: A): Url = {
+  def /[A: PathPart](a: A): Url = {
     val parts = a.path.split('/')
     url.addPathParts(parts)
   }
@@ -24,7 +25,7 @@ class TypesafeUrlDsl private[typesafe](val url: Url) extends AnyVal {
     * @param a Value which provides the key and the value for query parameter
     * @return A new Uri with the new Query String parameter
     */
-  def ?[A : QueryKeyValue](a: A): Url =
+  def ?[A: QueryKeyValue](a: A): Url =
     url.addParam(a.queryKey, a.queryValue)
 
   /**
@@ -34,7 +35,7 @@ class TypesafeUrlDsl private[typesafe](val url: Url) extends AnyVal {
     * @param a Value which provides the key and the value for query parameter
     * @return A new Uri with the new Query String parameter
     */
-  def /?[A : QueryKeyValue](a: A): Url =
+  def /?[A: QueryKeyValue](a: A): Url =
     /("").addParam(a.queryKey, a.queryValue)
 
   /**
@@ -43,7 +44,7 @@ class TypesafeUrlDsl private[typesafe](val url: Url) extends AnyVal {
     * @param a Value which provides the key and the value for query parameter
     * @return A new Uri with the new Query String parameter
     */
-  def &[A : QueryKeyValue](a: A): Url =
+  def &[A: QueryKeyValue](a: A): Url =
     url.addParam(a.queryKey, a.queryValue)
 
   /**
@@ -53,20 +54,20 @@ class TypesafeUrlDsl private[typesafe](val url: Url) extends AnyVal {
     * @param a Value which provides the key and the value for query parameter
     * @return A new Uri with the new Query String parameter
     */
-  def &&[A : QueryKeyValue](a: A): Url = a.queryValue.map(_ => &(a)).getOrElse(url)
+  def &&[A: QueryKeyValue](a: A): Url = a.queryValue.map(_ => &(a)).getOrElse(url)
 
   /**
     * Adds a fragment to the end of the uri
     * @param a Value representing the fragment
     * @return A new Uri with this fragment
     */
-  def `#`[A : Fragment](a: A): Url =
+  def `#`[A: Fragment](a: A): Url =
     url.withFragment(a.fragment)
 
   def withParams[A: TraversableParams](params: A): Url =
     url.addParamsOptionValues(params.toSeq)
 
-  def withParams[A : QueryKeyValue](param1: A, param2: A, params: A*): Url =
+  def withParams[A: QueryKeyValue](param1: A, param2: A, params: A*): Url =
     withParams((Seq(param1, param2) ++ params).toList)
 
   /**
@@ -90,7 +91,8 @@ class TypesafeUrlDsl private[typesafe](val url: Url) extends AnyVal {
     * @return A Uri with the right hand DSL merged into us
     */
   private def merge(other: Url): Url =
-    url.withFragment(other.fragment.orElse(url.fragment))
+    url
+      .withFragment(other.fragment.orElse(url.fragment))
       .withQueryString(url.query.addParams(other.query))
       .withPath(url.path.addParts(other.path.parts))
 

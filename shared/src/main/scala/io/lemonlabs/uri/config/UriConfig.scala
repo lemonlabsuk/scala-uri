@@ -1,6 +1,6 @@
 package io.lemonlabs.uri.config
 
-import io.lemonlabs.uri.encoding.{NoopEncoder, UriEncoder, PercentEncoder}
+import io.lemonlabs.uri.encoding.{NoopEncoder, PercentEncoder, UriEncoder}
 import io.lemonlabs.uri.decoding.{PercentDecoder, UriDecoder}
 import PercentEncoder._
 
@@ -21,22 +21,23 @@ case class UriConfig(userInfoEncoder: UriEncoder,
 
 object UriConfig {
 
-  val default = UriConfig(userInfoEncoder = PercentEncoder(USER_INFO_CHARS_TO_ENCODE),
-                          pathEncoder = PercentEncoder(PATH_CHARS_TO_ENCODE),
-                          queryEncoder = PercentEncoder(QUERY_CHARS_TO_ENCODE),
-                          fragmentEncoder = PercentEncoder(FRAGMENT_CHARS_TO_ENCODE),
-                          userInfoDecoder = PercentDecoder,
-                          pathDecoder = PercentDecoder,
-                          queryDecoder = PercentDecoder,
-                          fragmentDecoder = PercentDecoder,
-                          charset = "UTF-8",
-                          renderQuery = RenderQuery.default)
-
+  val default = UriConfig(
+    userInfoEncoder = PercentEncoder(USER_INFO_CHARS_TO_ENCODE),
+    pathEncoder = PercentEncoder(PATH_CHARS_TO_ENCODE),
+    queryEncoder = PercentEncoder(QUERY_CHARS_TO_ENCODE),
+    fragmentEncoder = PercentEncoder(FRAGMENT_CHARS_TO_ENCODE),
+    userInfoDecoder = PercentDecoder,
+    pathDecoder = PercentDecoder,
+    queryDecoder = PercentDecoder,
+    fragmentDecoder = PercentDecoder,
+    charset = "UTF-8",
+    renderQuery = RenderQuery.default
+  )
 
   /**
-   * Probably more than you need to percent encode. Wherever possible try to use a tighter Set of characters
-   * to encode depending on your use case
-   */
+    * Probably more than you need to percent encode. Wherever possible try to use a tighter Set of characters
+    * to encode depending on your use case
+    */
   val conservative = UriConfig(PercentEncoder(), PercentDecoder)
 
   def apply(encoder: UriEncoder = PercentEncoder(),

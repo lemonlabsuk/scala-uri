@@ -5,11 +5,7 @@ import io.lemonlabs.uri.parsing.UrlParser
 
 import scala.util.Try
 
-
-case class Authority(userInfo: UserInfo,
-                     host: Host,
-                     port: Option[Int])
-                    (implicit config: UriConfig) {
+case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(implicit config: UriConfig) {
 
   def user: Option[String] = userInfo.user
   def password: Option[String] = userInfo.password

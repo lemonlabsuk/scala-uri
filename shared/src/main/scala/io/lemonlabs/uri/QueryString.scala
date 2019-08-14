@@ -46,9 +46,9 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def addParam(k: String): QueryString =
     addParam(k, None)
 
-/**
-  * Adds a new Query String parameter key-value pair.
-  */
+  /**
+    * Adds a new Query String parameter key-value pair.
+    */
   def addParam(kv: (String, String)): QueryString =
     QueryString(params :+ (kv._1 -> Some(kv._2)))
 
@@ -79,7 +79,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * Adds all the specified key-value pairs as parameters to the query
     */
   def addParams(kvs: Iterable[(String, String)]): QueryString =
-    addParamsOptionValues(kvs.map { case (k,v) => (k, Some(v)) })
+    addParamsOptionValues(kvs.map { case (k, v) => (k, Some(v)) })
 
   /**
     * Adds all the specified key-value pairs as parameters to the query
@@ -121,7 +121,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     */
   def map(f: PartialFunction[(String, Option[String]), (String, Option[String])]): QueryString = {
     QueryString(params.map { kv =>
-      if(f.isDefinedAt(kv)) f(kv) else kv
+      if (f.isDefinedAt(kv)) f(kv) else kv
     })
   }
 
@@ -196,7 +196,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def filterValues(f: String => Boolean): QueryString =
     QueryString(params.filter {
       case (_, Some(v)) => f(v)
-      case _ => false
+      case _            => false
     })
 
   /**
@@ -276,11 +276,11 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     }
 
     val paramsAsString = c.renderQuery match {
-      case All =>          params.map(paramToString)
+      case All          => params.map(paramToString)
       case ExcludeNones => params.collect(someToString)
     }
 
-    if(paramsAsString.isEmpty) ""
+    if (paramsAsString.isEmpty) ""
     else "?" + paramsAsString.mkString("&")
   }
 

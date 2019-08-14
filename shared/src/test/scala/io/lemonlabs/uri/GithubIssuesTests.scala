@@ -5,7 +5,6 @@ import io.lemonlabs.uri.decoding.{PercentDecoder, UriDecodeException}
 import io.lemonlabs.uri.encoding.NoopEncoder
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
-
 /**
   * Test Suite to ensure that bugs raised by awesome github peeps NEVER come back
   *

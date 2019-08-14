@@ -1,4 +1,4 @@
-import java.io.{PrintWriter, File}
+import java.io.{File, PrintWriter}
 
 import scala.io.{Codec, Source}
 
@@ -23,7 +23,7 @@ object UpdatePublicSuffixTrie {
       children.get(ch)
 
     def insert(value: List[Char]): Trie = value match {
-      case Nil     => copy(wordEnd = true)
+      case Nil => copy(wordEnd = true)
       case x :: xs =>
         next(x) match {
           case None =>
@@ -37,7 +37,7 @@ object UpdatePublicSuffixTrie {
     override def toString(): String = {
       s"""Trie(
             Map(${children.map(kv => s"'${kv._1}' -> ${kv._2.toString()}").mkString(",")})
-            ${if(wordEnd) ", wordEnd = true" else ""}
+            ${if (wordEnd) ", wordEnd = true" else ""}
           )
         """
     }

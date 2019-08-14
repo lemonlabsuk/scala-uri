@@ -12,7 +12,10 @@ case class Trie(children: Map[Char, Trie], wordEnd: Boolean = false) {
     children.get(c)
 
   def matches(s: String): Vector[String] = {
-    @tailrec def collectMatches(previous: String, stillToGo: List[Char], current: Trie, matches: Vector[String]): Vector[String] = stillToGo match {
+    @tailrec def collectMatches(previous: String,
+                                stillToGo: List[Char],
+                                current: Trie,
+                                matches: Vector[String]): Vector[String] = stillToGo match {
       case Nil =>
         matches
       case x :: xs =>
@@ -21,7 +24,7 @@ case class Trie(children: Map[Char, Trie], wordEnd: Boolean = false) {
             matches
           case Some(next) =>
             val newPrevious = previous + x
-            val newMatches = if(next.wordEnd && xs.headOption.contains('.')) newPrevious +: matches else matches
+            val newMatches = if (next.wordEnd && xs.headOption.contains('.')) newPrevious +: matches else matches
             collectMatches(newPrevious, xs, next, newMatches)
         }
     }

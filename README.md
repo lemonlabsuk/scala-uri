@@ -661,6 +661,8 @@ val dataUrl = DataUrl.parse("data:text/plain;charset=UTF-8;page=21,the%20data:12
 dataUrl.mediaType.value // This is text/plain
 dataUrl.mediaType.charset // This is UTF-8
 dataUrl.mediaType.parameters // This is Vector("charset" -> "UTF-8", "page" -> "21")
+dataUrl.base64 // This is false
+
 dataUrl.dataAsString // This is "the data:1234,5678"
 ```
 

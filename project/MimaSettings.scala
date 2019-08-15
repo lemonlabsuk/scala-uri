@@ -5,7 +5,7 @@ import sbt._
 
 object MimaSettings {
 
-  val previousVersions = (8 to 10).map(patch => s"1.4.$patch").toSet
+  val previousVersions = (0 to 0).map(patch => s"1.5.$patch").toSet
 
   val mimaSettings = MimaPlugin.mimaDefaultSettings ++ Seq(
     mimaPreviousArtifacts := {

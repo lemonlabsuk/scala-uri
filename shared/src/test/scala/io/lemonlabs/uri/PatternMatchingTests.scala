@@ -20,7 +20,7 @@ class PatternMatchingTests extends FlatSpec with Matchers {
   }
 
   "RelativeUrl.unapply" should "extract the path, query and fragment" in {
-    val RelativeUrl(path, query, fragment)= Url.parse("/test?query=string#frag")
+    val RelativeUrl(path, query, fragment) = Url.parse("/test?query=string#frag")
     path should equal(AbsolutePath.fromParts("test"))
     query should equal(QueryString.fromPairs("query" -> "string"))
     fragment should equal(Some("frag"))

@@ -12,8 +12,8 @@ case class PercentEncoder(charsToEncode: Set[Char] = DEFAULT_CHARS_TO_ENCODE) ex
   def toHex(ch: Char) = "%04x".format(ch.toInt).substring(2).toUpperCase
 
   /**
-   * Determines if this character is in the ASCII range (excluding control characters)
-   */
+    * Determines if this character is in the ASCII range (excluding control characters)
+    */
   def ascii(ch: Char) = ch > 31 && ch < 127
 
   def --(chars: Char*) = new PercentEncoder(charsToEncode.diff(chars.toSet))
@@ -22,31 +22,31 @@ case class PercentEncoder(charsToEncode: Set[Char] = DEFAULT_CHARS_TO_ENCODE) ex
 
 object PercentEncoder {
 
-  val USER_INFO_CHARS_TO_ENCODE = Set (
+  val USER_INFO_CHARS_TO_ENCODE = Set(
     ' ', '%', '<', '>', '[', ']', '#', '{', '}', '^', '`', '|', '?', '@', ':', '/'
   )
 
-  val PATH_CHARS_TO_ENCODE = Set (
+  val PATH_CHARS_TO_ENCODE = Set(
     ' ', '%', '<', '>', '[', ']', '#', '{', '}', '^', '`', '|', '?'
   )
 
-  val QUERY_CHARS_TO_ENCODE = Set (
+  val QUERY_CHARS_TO_ENCODE = Set(
     ' ', '%', '<', '>', '[', ']', '#', '{', '}', '^', '`', '|', '&', '\\', '+', '='
   )
 
-  val FRAGMENT_CHARS_TO_ENCODE = Set (
+  val FRAGMENT_CHARS_TO_ENCODE = Set(
     ' ', '%', '<', '>', '[', ']', '#', '{', '}', '^', '`', '|'
   )
 
-  val GEN_DELIMS = Set(':', '/', '?',  '#', '[', ']', '@')
-  val SUB_DELIMS  = Set('!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=')
+  val GEN_DELIMS = Set(':', '/', '?', '#', '[', ']', '@')
+  val SUB_DELIMS = Set('!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=')
   val RESERVED = GEN_DELIMS ++ SUB_DELIMS
 
   val EXCLUDED = Set('"') // RFC 2396 section 2.4.3
 
   /**
-   * Probably more than you need to percent encode. Wherever possible try to use a tighter Set of characters
-   * to encode depending on your use case
-   */
+    * Probably more than you need to percent encode. Wherever possible try to use a tighter Set of characters
+    * to encode depending on your use case
+    */
   val DEFAULT_CHARS_TO_ENCODE = RESERVED ++ PATH_CHARS_TO_ENCODE ++ QUERY_CHARS_TO_ENCODE ++ EXCLUDED
 }

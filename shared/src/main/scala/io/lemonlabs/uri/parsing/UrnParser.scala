@@ -9,36 +9,35 @@ import scala.util.{Failure, Try}
 
 class UrnParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
 
-    def _empty: Rule0 = MATCH
+  def _empty: Rule0 = MATCH
 
-    def _nid: Rule1[String] = rule {
-      capture(zeroOrMore(AlphaNum | '-'))
-    }
+  def _nid: Rule1[String] = rule {
+    capture(zeroOrMore(AlphaNum | '-'))
+  }
 
-    def _nss: Rule1[String] = rule {
-      capture(_p_char ~ zeroOrMore(_p_char | '/'))
-    }
+  def _nss: Rule1[String] = rule {
+    capture(_p_char ~ zeroOrMore(_p_char | '/'))
+  }
 
-    def _urn_path: Rule1[UrnPath] = rule {
-      _nid ~ ":" ~ _nss ~> extractUrnPath
-    }
+  def _urn_path: Rule1[UrnPath] = rule {
+    _nid ~ ":" ~ _nss ~> extractUrnPath
+  }
 
-    def _urn: Rule1[Urn] = rule {
-      "urn:" ~ _urn_path ~> extractUrn
-    }
+  def _urn: Rule1[Urn] = rule {
+    "urn:" ~ _urn_path ~> extractUrn
+  }
 
   val extractUrnPath = (nid: String, nss: String) => {
-    if(nid.length < 2)
+    if (nid.length < 2)
       throw new UriParsingException(s"URN nid '$nid' is too short. Must be at least two character long")
 
-    if(nid.head == '-' || nid.last == '-')
+    if (nid.head == '-' || nid.last == '-')
       throw new UriParsingException(s"URN nid '$nid' cannot start or end with a '-'")
 
     UrnPath(nid, conf.pathDecoder.decode(nss))
   }
 
-  val extractUrn = (urnPath: UrnPath) =>
-    Urn(urnPath)
+  val extractUrn = (urnPath: UrnPath) => Urn(urnPath)
 
   private[uri] def mapParseError[T](t: Try[T], name: => String): Try[T] =
     t.recoverWith {

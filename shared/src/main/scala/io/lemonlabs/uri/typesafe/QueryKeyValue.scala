@@ -39,8 +39,11 @@ trait QueryValueInstances1 {
 
   implicit val stringQueryValue: QueryValue[String] = Option(_)
   implicit val booleanQueryValue: QueryValue[Boolean] = fromToString
+  implicit val charQueryValue: QueryValue[Char] = fromToString
   implicit val intQueryValue: QueryValue[Int] = fromToString
+  implicit val longQueryValue: QueryValue[Long] = fromToString
   implicit val floatQueryValue: QueryValue[Float] = fromToString
+  implicit val doubleQueryValue: QueryValue[Double] = fromToString
   implicit val noneQueryValue: QueryValue[None.type] = _ => None
 }
 

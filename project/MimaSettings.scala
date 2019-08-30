@@ -1,5 +1,5 @@
 import com.typesafe.tools.mima.core.{ProblemFilters, ReversedMissingMethodProblem}
-import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportBinaryIssues, mimaBinaryIssueFilters}
+import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPreviousArtifacts, mimaReportBinaryIssues}
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import sbt.Keys._
 import sbt._

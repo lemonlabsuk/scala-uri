@@ -37,18 +37,18 @@ object QueryValue extends QueryValueInstances {
 trait QueryValueInstances1 {
   private def fromToString[A](a: A): Option[String] = Option(a.toString)
 
-  implicit val stringQueryValue: QueryValue[String] = Option(_)
-  implicit val booleanQueryValue: QueryValue[Boolean] = fromToString
-  implicit val charQueryValue: QueryValue[Char] = fromToString
-  implicit val intQueryValue: QueryValue[Int] = fromToString
-  implicit val longQueryValue: QueryValue[Long] = fromToString
-  implicit val floatQueryValue: QueryValue[Float] = fromToString
-  implicit val doubleQueryValue: QueryValue[Double] = fromToString
-  implicit val noneQueryValue: QueryValue[None.type] = _ => None
+  implicit final val stringQueryValue: QueryValue[String] = Option(_)
+  implicit final val booleanQueryValue: QueryValue[Boolean] = fromToString
+  implicit final val charQueryValue: QueryValue[Char] = fromToString
+  implicit final val intQueryValue: QueryValue[Int] = fromToString
+  implicit final val longQueryValue: QueryValue[Long] = fromToString
+  implicit final val floatQueryValue: QueryValue[Float] = fromToString
+  implicit final val doubleQueryValue: QueryValue[Double] = fromToString
+  implicit final val noneQueryValue: QueryValue[None.type] = _ => None
 }
 
 trait QueryValueInstances extends QueryValueInstances1 {
-  implicit def optionQueryValue[A: QueryValue]: QueryValue[Option[A]] = _.flatMap(QueryValue[A].queryValue)
+  implicit final def optionQueryValue[A: QueryValue]: QueryValue[Option[A]] = _.flatMap(QueryValue[A].queryValue)
 }
 
 @typeclass trait QueryKeyValue[A] {

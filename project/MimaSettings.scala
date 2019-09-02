@@ -1,4 +1,4 @@
-import com.typesafe.tools.mima.core.{ProblemFilters, ReversedMissingMethodProblem}
+import com.typesafe.tools.mima.core.{DirectMissingMethodProblem, ProblemFilters, ReversedMissingMethodProblem}
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPreviousArtifacts, mimaReportBinaryIssues}
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import sbt.Keys._
@@ -17,7 +17,8 @@ object MimaSettings {
       }
     },
     mimaBinaryIssueFilters ++= Seq(
-      ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*")
+      ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*"),
+      ProblemFilters.exclude[DirectMissingMethodProblem]("io.lemonlabs.uri.typesafe.dsl.TypesafeUrlDsl.*")
     ),
     test in Test := {
       mimaReportBinaryIssues.value

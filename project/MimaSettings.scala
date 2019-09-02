@@ -5,7 +5,7 @@ import sbt.Keys._
 import sbt._
 
 object MimaSettings {
-
+  
   //val previousVersions = (0 to 0).map(patch => s"2.0.$patch").toSet
   val previousVersions = (1 to 1).map(milestone => s"2.0.0-M$milestone").toSet
 
@@ -23,6 +23,7 @@ object MimaSettings {
     ),
     test in Test := {
       mimaReportBinaryIssues.value
+      mimaBinaryIssueFilters.value
       (test in Test).value
     }
   )

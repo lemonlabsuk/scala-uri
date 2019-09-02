@@ -27,6 +27,16 @@ class TypesafeDslTests extends FlatSpec with Matchers {
     uri.toString should equal("/uris-in-scala.html?testOne=1&testTwo=2")
   }
 
+  "A relative URI with query string Tuple2 parameter" should "render correctly" in {
+    val uri = "/uris-in-scala.html" ? ("testOne", "1")
+    uri.toString should equal("/uris-in-scala.html?testOne=1")
+  }
+
+  "A relative URI with multiple query string Tuple2 parameters" should "render correctly" in {
+    val uri = "/uris-in-scala.html" ? ("testOne", "1") & ("testTwo", 2)
+    uri.toString should equal("/uris-in-scala.html?testOne=1&testTwo=2")
+  }
+
   "Multiple query string parameters with the same name" should "render correctly" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testOne" -> "2")
     uri.toString should equal("/uris-in-scala.html?testOne=1&testOne=2")

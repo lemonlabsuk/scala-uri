@@ -14,12 +14,13 @@ import scala.language.implicitConversions
 
 object QueryKey extends QueryKeyInstance
 
-trait QueryKeyInstance {
+sealed trait QueryKeyInstance {
   implicit val stringQueryKey: QueryKey[String] = a => a
 }
 
-@typeclass trait QueryValue[-A] {
+@typeclass trait QueryValue[-A] { self =>
   def queryValue(a: A): Option[String]
+  def contramap[B](f: B => A): QueryValue[B] = (b: B) => self.queryValue(f(b))
 }
 
 object QueryValue extends QueryValueInstances {
@@ -34,18 +35,20 @@ object QueryValue extends QueryValueInstances {
   }
 }
 
-trait QueryValueInstances1 {
-  private def fromToString[A](a: A): Option[String] = Option(a.toString)
-
-  implicit val stringQueryValue: QueryValue[String] = Option(_)
-  implicit val booleanQueryValue: QueryValue[Boolean] = fromToString
-  implicit val intQueryValue: QueryValue[Int] = fromToString
-  implicit val floatQueryValue: QueryValue[Float] = fromToString
-  implicit val noneQueryValue: QueryValue[None.type] = _ => None
+sealed trait QueryValueInstances1 {
+  implicit final val stringQueryValue: QueryValue[String] = Option(_)
+  implicit final val booleanQueryValue: QueryValue[Boolean] = stringQueryValue.contramap(_.toString)
+  implicit final val charQueryValue: QueryValue[Char] = stringQueryValue.contramap(_.toString)
+  implicit final val intQueryValue: QueryValue[Int] = stringQueryValue.contramap(_.toString)
+  implicit final val longQueryValue: QueryValue[Long] = stringQueryValue.contramap(_.toString)
+  implicit final val floatQueryValue: QueryValue[Float] = stringQueryValue.contramap(_.toString)
+  implicit final val doubleQueryValue: QueryValue[Double] = stringQueryValue.contramap(_.toString)
+  implicit final val uuidQueryValue: QueryValue[java.util.UUID] = stringQueryValue.contramap(_.toString)
+  implicit final val noneQueryValue: QueryValue[None.type] = _ => None
 }
 
-trait QueryValueInstances extends QueryValueInstances1 {
-  implicit def optionQueryValue[A: QueryValue]: QueryValue[Option[A]] = _.flatMap(QueryValue[A].queryValue)
+sealed trait QueryValueInstances extends QueryValueInstances1 {
+  implicit final def optionQueryValue[A: QueryValue]: QueryValue[Option[A]] = _.flatMap(QueryValue[A].queryValue)
 }
 
 @typeclass trait QueryKeyValue[A] {
@@ -56,7 +59,7 @@ trait QueryValueInstances extends QueryValueInstances1 {
 
 object QueryKeyValue extends QueryKeyValueInstances
 
-trait QueryKeyValueInstances {
+sealed trait QueryKeyValueInstances {
   implicit def tuple2QueryKeyValue[K: QueryKey, V: QueryValue]: QueryKeyValue[(K, V)] =
     new QueryKeyValue[(K, V)] {
       def queryKey(a: (K, V)): String = QueryKey[K].queryKey(a._1)
@@ -65,7 +68,7 @@ trait QueryKeyValueInstances {
     }
 }
 
-trait TraversableParamsInstances {
+sealed trait TraversableParamsInstances {
   implicit def seqTraversableParams[A](implicit tc: QueryKeyValue[A]): TraversableParams[Seq[A]] =
     (ax: Seq[A]) => ax.map((a: A) => tc.queryKey(a) -> tc.queryValue(a))
 

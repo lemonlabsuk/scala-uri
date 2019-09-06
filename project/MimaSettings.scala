@@ -8,6 +8,10 @@ object MimaSettings {
 
   val previousVersions = (0 to 1).map(patch => s"1.5.$patch").toSet
 
+  val mimaExcludes = Seq(
+    ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*")
+  )
+
   val mimaSettings = MimaPlugin.mimaDefaultSettings ++ Seq(
     mimaPreviousArtifacts := {
       CrossVersion.partialVersion(scalaVersion.value) match {
@@ -16,10 +20,17 @@ object MimaSettings {
         case _ => Set.empty
       }
     },
-    mimaBinaryIssueFilters ++= Seq(
-      ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*"),
-      ProblemFilters.exclude[DirectMissingMethodProblem]("io.lemonlabs.uri.typesafe.dsl.TypesafeUrlDsl.*")
-    ),
+    mimaBinaryIssueFilters ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, 12)) =>
+          mimaExcludes ++ Seq(
+            // In scala 2.12 adding a method to a value class breaks binary compatibility (see here: ).
+            // This was fixed in scala 2.13, which is why we only exclude from mima for 2.12
+            ProblemFilters.exclude[DirectMissingMethodProblem]("io.lemonlabs.uri.typesafe.dsl.TypesafeUrlDsl.*")
+          )
+        case _ => mimaExcludes
+      }
+    },
     test in Test := {
       mimaReportBinaryIssues.value
       mimaBinaryIssueFilters.value

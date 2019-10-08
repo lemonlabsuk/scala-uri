@@ -3,8 +3,8 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import MimaSettings.mimaSettings
 
 name                            := "scala-uri root"
-scalaVersion in ThisBuild       := "2.13.0"
-crossScalaVersions in ThisBuild := Seq("2.12.10", "2.13.1")
+scalaVersion in ThisBuild       := "2.13.1"
+crossScalaVersions in ThisBuild := Seq("2.12.10", scalaVersion.value)
 skip in publish                 := true // Do not publish the root project
 
 lazy val paradisePlugin = Def.setting {

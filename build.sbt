@@ -31,10 +31,10 @@ val sharedSettings = Seq(
   )
     ++ (if (scalaVersion.value.startsWith("2.13")) Seq("-Ymacro-annotations") else Nil),
   libraryDependencies ++= Seq(
-    "org.parboiled"        %%% "parboiled"  % "2.1.8",
-    "com.chuusai"          %%% "shapeless"  % "2.3.3",
-    "com.github.mpilquist" %%% "simulacrum" % "0.19.0",
-    "org.scalatest"        %%% "scalatest"  % "3.0.8" % "test"
+    "org.parboiled" %%% "parboiled"  % "2.1.8",
+    "com.chuusai"   %%% "shapeless"  % "2.3.3",
+    "org.typelevel" %%% "simulacrum" % "1.0.0",
+    "org.scalatest" %%% "scalatest"  % "3.0.8" % "test"
   ),
   libraryDependencies ++= paradisePlugin.value,
   parallelExecution in Test := false,

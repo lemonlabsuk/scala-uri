@@ -816,6 +816,9 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
 
 ## 1.x.x to 2.x.x
 
+ * Users will now need to add a json dependency to their SBT build to use [Public Suffixes](#public-suffixes) (and other future
+   features that require a JSON library). scala-uri no longer pulls in spray-json by default. See the
+   [Public Suffixes](#public-suffixes) section of this page for more details.
  * *Binary Incompatibility*: The case class `UrlWithoutAuthority` has been renamed `SimpleUrlWithoutAuthority`.
    There is now a trait called `UrlWithoutAuthority`. This trait has a companion object with `apply`, `unapply` and `parse`
    methods, so it mostly can be used in the same way as the previous case class.

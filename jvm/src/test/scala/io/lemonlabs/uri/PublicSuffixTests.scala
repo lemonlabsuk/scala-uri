@@ -1,5 +1,7 @@
 package io.lemonlabs.uri
 
+import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.json.{CirceSupport, SprayJsonSupport}
 import org.scalatest.{FlatSpec, Matchers}
 
 class PublicSuffixTests extends FlatSpec with Matchers {
@@ -25,5 +27,17 @@ class PublicSuffixTests extends FlatSpec with Matchers {
   it should "return None for relative URLs" in {
     val uri = Url.parse("/blah")
     uri.publicSuffix should equal(None)
+  }
+
+  "SprayJsonSupport" should "return public suffixes" in {
+    implicit val config: UriConfig = UriConfig(jsonSupport = SprayJsonSupport)
+    val uri = Url.parse("http://www.google.co.uk/blah")
+    uri.publicSuffixes should equal(Vector("co.uk", "uk"))
+  }
+
+  "CirceSupport" should "return public suffixes" in {
+    implicit val config: UriConfig = UriConfig(jsonSupport = CirceSupport)
+    val uri = Url.parse("http://www.google.co.uk/blah")
+    uri.publicSuffixes should equal(Vector("co.uk", "uk"))
   }
 }

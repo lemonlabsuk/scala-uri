@@ -48,6 +48,7 @@ val jvmSettings = Seq(
 )
 
 val publishingSettings = Seq(
+  description             := "Simple scala library for building and parsing URIs",
   publishMavenStyle       := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ =>

@@ -27,13 +27,17 @@ val sharedSettings = Seq(
     "utf8",
     "-feature",
     "-Xfatal-warnings",
-    "-language:higherKinds"
+    "-language:higherKinds",
+    // Silence warnings for deprecated scala-uri code
+    "-P:silencer:pathFilters=.*io/lemonlabs/uri/dsl/package.scala;.*io/lemonlabs/uri/DslTests.scala;.*io/lemonlabs/uri/DslTypeTests.scala"
   )
     ++ (if (scalaVersion.value.startsWith("2.13")) Seq("-Ymacro-annotations") else Nil),
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled"  % "2.1.8",
     "com.chuusai"   %%% "shapeless"  % "2.3.3",
     "org.typelevel" %%% "simulacrum" % "1.0.0",
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.4.4" cross CrossVersion.full),
+    "com.github.ghik" % "silencer-lib" % "1.4.4" % Provided cross CrossVersion.full,
     "org.scalatest" %%% "scalatest"  % "3.0.8" % "test"
   ),
   libraryDependencies ++= paradisePlugin.value,

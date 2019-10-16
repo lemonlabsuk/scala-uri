@@ -6,6 +6,10 @@ import io.lemonlabs.uri.parsing.UrlParser
 /**
   * Value class to add DSL functionality to Urls
   */
+@deprecated(
+  "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+  "2.0.0"
+)
 class UrlDsl(val url: Url) extends AnyVal {
 
   import url.config
@@ -21,6 +25,10 @@ class UrlDsl(val url: Url) extends AnyVal {
     * @param kv Tuple2 representing the query string parameter
     * @return A new Uri with the new Query String parameter
     */
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def ?(kv: (String, Any)): Url =
     url.addParam(kv._1, anyToQueryValue(kv._2))
 
@@ -28,6 +36,10 @@ class UrlDsl(val url: Url) extends AnyVal {
     * Adds a new Query String. The specified String is parsed as a Query String param.
     * @return A new Uri with the new Query String parameter
     */
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def ?(kv: String): Url =
     url.addParamOptionValue(UrlParser.parseQueryParam(kv).get)
 
@@ -38,6 +50,10 @@ class UrlDsl(val url: Url) extends AnyVal {
     * @param kv Tuple2 representing the query string parameter
     * @return A new Uri with the new Query String parameter
     */
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def /?(kv: (String, Any)): Url =
     /("").addParam(kv._1, anyToQueryValue(kv._2))
 
@@ -48,6 +64,10 @@ class UrlDsl(val url: Url) extends AnyVal {
     * @param kv Tuple2 representing the query string parameter
     * @return A new Uri with the new Query String parameter
     */
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def &&(kv: (String, Any)): Url = kv match {
     case (k, None) => url
     case (k, v)    => &(k, v)
@@ -59,6 +79,10 @@ class UrlDsl(val url: Url) extends AnyVal {
     * @param kv Tuple2 representing the query string parameter
     * @return A new Uri with the new Query String parameter
     */
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def &(kv: (String, Any)): Url =
     url.addParam(kv._1, anyToQueryValue(kv._2))
 
@@ -66,6 +90,10 @@ class UrlDsl(val url: Url) extends AnyVal {
     * Adds a new Query String. The specified String is parsed as a Query String param.
     * @return A new Uri with the new Query String parameter
     */
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def &(kv: String): Url =
     ?(kv)
 
@@ -75,6 +103,10 @@ class UrlDsl(val url: Url) extends AnyVal {
     * @param kvs A list of key-value pairs to add as query parameters
     * @return A new Url with the new Query String parameters
     */
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def addParams(kvs: Iterable[(String, Any)]): Url =
     url.addParamsOptionValues(kvs.map { case (k, v) => (k, anyToQueryValue(v)) })
 
@@ -83,6 +115,10 @@ class UrlDsl(val url: Url) extends AnyVal {
     * @param fragment String representing the fragment
     * @return A new Uri with this fragment
     */
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def `#`(fragment: String): Url =
     url.withFragment(fragment)
 
@@ -91,6 +127,10 @@ class UrlDsl(val url: Url) extends AnyVal {
     * @param pp The path part
     * @return A new Uri with this path part appended
     */
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def /(pp: String): Url =
     url.addPathPart(pp)
 
@@ -120,8 +160,27 @@ class UrlDsl(val url: Url) extends AnyVal {
       .withQueryString(url.query.addParams(other.query))
       .withPath(url.path.addParts(other.path.parts))
 
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def /(other: Url): Url = merge(other)
+
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def ?(other: Url): Url = merge(other)
+
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def `#`(other: Url): Url = merge(other)
+
+  @deprecated(
+    "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
+    "2.0.0"
+  )
   def &(other: Url): Url = merge(other)
 }

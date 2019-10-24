@@ -26,7 +26,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "2.0.0-M1"
+"io.lemonlabs" %% "scala-uri" % "2.0.0-M2"
 ```
 
 [Migration Guide](#05x-to-1xx) from 0.5.x
@@ -614,7 +614,7 @@ supported JSON library configured. Currently the following JSON libraries are su
 To use Circe with scala-uri, you must add the following dependency to your SBT build:
 
 ```scala
-"io.lemonlabs" %% "scala-uri-circe"  % "2.0.0-M1"
+"io.lemonlabs" %% "scala-uri-circe"  % "2.0.0-M2"
 ```
 
 and add the following import at the call site 
@@ -630,7 +630,7 @@ import io.lemonlabs.uri.json._
 To use spray-json with scala-uri, you must add the following dependency to your SBT build:
 
 ```scala
-"io.lemonlabs" %% "scala-uri-spray-json"  % "2.0.0-M1"
+"io.lemonlabs" %% "scala-uri-spray-json"  % "2.0.0-M2"
 ```
 
 and add the following import at the call site 
@@ -808,7 +808,7 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "2.0.0-M1"
+"io.lemonlabs" %% "scala-uri" % "2.0.0-M2"
 ```
 
 For maven users you should use (for 2.13.x):
@@ -817,7 +817,7 @@ For maven users you should use (for 2.13.x):
 <dependency>
     <groupId>io.lemonlabs</groupId>
     <artifactId>scala-uri_2.13</artifactId>
-    <version>2.0.0-M1</version>
+    <version>2.0.0-M2</version>
 </dependency>
 ```
 

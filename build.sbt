@@ -35,14 +35,14 @@ val sharedSettings = Seq(
     // Silence warnings for deprecated scala-uri code
     "-P:silencer:pathFilters=.*io/lemonlabs/uri/dsl/package.scala;.*io/lemonlabs/uri/DslTests.scala;.*io/lemonlabs/uri/DslTypeTests.scala"
   )
-  ++ (if (scalaVersion.value.startsWith("2.13")) Seq("-Ymacro-annotations") else Nil),
+    ++ (if (scalaVersion.value.startsWith("2.13")) Seq("-Ymacro-annotations") else Nil),
   parallelExecution in Test := false,
   scalafmtOnCompile         := true
 )
 
 val scalaUriSettings = Seq(
-  name         := "scala-uri",
-  description  := "Simple scala library for building and parsing URIs",
+  name        := "scala-uri",
+  description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled"  % "2.1.8",
     "com.chuusai"   %%% "shapeless"  % "2.3.3",
@@ -95,10 +95,12 @@ lazy val core =
     .settings(sharedSettings)
     .settings(publishingSettings)
     .settings(mimaSettings)
-    .settings(Seq(
-      name         := "scala-uri-core",
-      description  := "Core code used by scala-uri modules"
-    ))
+    .settings(
+      Seq(
+        name        := "scala-uri-core",
+        description := "Core code used by scala-uri modules"
+      )
+    )
 
 lazy val jsonCirce =
   crossProject(JVMPlatform)
@@ -107,27 +109,31 @@ lazy val jsonCirce =
     .settings(sharedSettings)
     .settings(publishingSettings)
     .settings(mimaSettings)
-    .settings(Seq(
-      name         := "scala-uri-circe",
-      description  := "circe support for scala-uri",
-      libraryDependencies ++= Seq(
-        "io.circe" %%% "circe-parser" % "0.12.1"
+    .settings(
+      Seq(
+        name        := "scala-uri-circe",
+        description := "circe support for scala-uri",
+        libraryDependencies ++= Seq(
+          "io.circe" %%% "circe-parser" % "0.12.1"
+        )
       )
-    ))
-  .dependsOn(core)
+    )
+    .dependsOn(core)
 
 lazy val jsonSprayJson =
   (project in file("json/spray-json"))
     .settings(sharedSettings)
     .settings(publishingSettings)
     .settings(mimaSettings)
-    .settings(Seq(
-      name         := "scala-uri-spray-json",
-      description  := "spray-json support for scala-uri",
-      libraryDependencies ++= Seq(
-        "io.spray" %% "spray-json"   % "1.3.5"
+    .settings(
+      Seq(
+        name        := "scala-uri-spray-json",
+        description := "spray-json support for scala-uri",
+        libraryDependencies ++= Seq(
+          "io.spray" %% "spray-json" % "1.3.5"
+        )
       )
-    ))
+    )
     .dependsOn(core.jvm)
 
 lazy val scalaUri =

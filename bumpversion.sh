@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 
-VER=$(git tag --sort=committerdate | tail -n1)
+echo "Running SBT to determine current version. Please wait..."
+VER=$(sbt 'project scalaUriJVM' 'show version' | tail -n 1 | cut -f2 -d' ')
 
 echo "Current version is $VER, what is the next version?"
 read -r NEW_VER

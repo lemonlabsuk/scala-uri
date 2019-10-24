@@ -20,7 +20,7 @@
  * Support for [URNs](#parse-a-urn)
  * Support for [mailto](#mailto) URLs
  * Support for [data](#data-urls) URLs as defined in [RFC2397](https://tools.ietf.org/html/rfc2397)
- * Support for [scala-js](#scala-js-support)
+ * Support for [Scala.js](#scala-js-support)
  * No dependencies on existing web frameworks
 
 To include it in your SBT project from maven central:
@@ -31,7 +31,7 @@ To include it in your SBT project from maven central:
 
 [Migration Guide](#05x-to-1xx) from 0.5.x
 
-There are also demo projects for both [scala](https://github.com/lemonlabsuk/scala-uri-demo) and [scala-js](https://github.com/lemonlabsuk/scala-uri-scalajs-example) to help you get up and running quickly.
+There are also demo projects for both [scala](https://github.com/lemonlabsuk/scala-uri-demo) and [Scala.js](https://github.com/lemonlabsuk/scala-uri-scalajs-example) to help you get up and running quickly.
 
 ## Parsing
 
@@ -532,7 +532,7 @@ uri.toString // This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F
 
 ## Subdomains
 
-**Note:** *Currently not supported for scala-js*
+**Note:** *Currently not supported for Scala.js*
 
 ```scala
 import io.lemonlabs.uri.Url
@@ -560,7 +560,7 @@ These methods return `None` or `Vector.empty` for URLs without a Host (e.g. Rela
 
 ## Apex Domains
 
-**Note:** *Currently not supported for scala-js*
+**Note:** *Currently not supported for Scala.js*
 
 The method `apexDomain` returns the [apex domain](https://help.github.com/articles/about-supported-custom-domains/#apex-domains)
 for the URL (e.g. `example.com` for `http://www.example.com/path`)
@@ -574,12 +574,9 @@ uri.apexDomain // This returns Some("google.co.uk")
 
 ## Public Suffixes
 
-**Note:** *Currently not supported for scala-js*
+**Note:** *Currently not supported for Scala.js*
 
-**Note:** *To use Public Suffixes you must include a supported JSON dependency*
-
- * [circe](#circe)
- * [spray-json](#spray-json)
+**Note:** *To use Public Suffixes you must configure scala-uri with a [supported JSON dependency](#json-support)*
 
 `scala-uri` uses the list of public suffixes from [publicsuffix.org](https://publicsuffix.org) to allow you to identify
 the TLD of your absolute URIs.
@@ -604,31 +601,47 @@ uri.publicSuffixes // This returns Vector("co.uk", "uk")
 
 These methods return `None` and `Vector.empty`, respectively for URLs without a Host (e.g. Relative URLs)
 
+## JSON Support
+
+Some scala-uri functionality (such as [Public Suffixes](#public-suffixes) and [subdomains](#subdomains)) requires a 
+supported JSON library configured. Currently the following JSON libraries are supported:
+
+ * [circe](#circe)
+ * [spray-json](#spray-json)
+
 ### Circe
 
 To use Circe with scala-uri, you must add the following dependency to your SBT build:
 
 ```scala
-"io.circe" %% "circe-parser"  % "0.12.1"
+"io.lemonlabs" %% "scala-uri-circe"  % "2.0.0-M1"
+```
+
+and add the following import at the call site 
+
+```scala
+import io.lemonlabs.uri.json._
 ```
 
 ### spray-json
 
+**Note:** *Not supported for Scala.js*
+
 To use spray-json with scala-uri, you must add the following dependency to your SBT build:
 
 ```scala
-"io.spray" %% "spray-json" % "1.3.5"
+"io.lemonlabs" %% "scala-uri-spray-json"  % "2.0.0-M1"
 ```
 
-and configure your `UriConfig` like so:
+and add the following import at the call site 
 
 ```scala
-implicit val config: UriConfig = UriConfig(jsonSupport = SprayJsonSupport)
+import io.lemonlabs.uri.json._
 ```
 
 ## Punycode
 
-**Note:** *Currently not supported for scala-js*
+**Note:** *Currently not supported for Scala.js*
 
 See [RFC 3490](http://www.ietf.org/rfc/rfc3490.txt)
 
@@ -780,7 +793,7 @@ val uri5 = "http://theon.github.com/scala-uri" `#` Foo(a = "user", b = 1)
 uri5.toString //This is: http://theon.github.com/scala-uri#user-1
 ```
 
-## scala-js support
+## Scala.js support
 
 See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs-example) for usage
 
@@ -816,9 +829,9 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
 
 ## 1.x.x to 2.x.x
 
- * Users will now need to add a json dependency to their SBT build to use [Public Suffixes](#public-suffixes) (and other future
-   features that require a JSON library). scala-uri no longer pulls in spray-json by default. See the
-   [Public Suffixes](#public-suffixes) section of this page for more details.
+ * Users will now need to add a second scala-uri json module dependency to their SBT build to use [Public Suffixes](#public-suffixes) 
+   (and other future features that require a JSON library). scala-uri no longer pulls in spray-json by default. See the
+   [JSON Support](#json-support) section of this page for more details.
  * *Binary Incompatibility*: The case class `UrlWithoutAuthority` has been renamed `SimpleUrlWithoutAuthority`.
    There is now a trait called `UrlWithoutAuthority`. This trait has a companion object with `apply`, `unapply` and `parse`
    methods, so it mostly can be used in the same way as the previous case class.
@@ -865,8 +878,8 @@ and discussion [here](https://github.com/NET-A-PORTER/scala-uri/pull/113).
  * Methods `addParam` and `addParams`  that took Option arguments are now called `addParamOptionValue` and `addParamsOptionValues`
  * Method `replaceAllParams` has been replaced with `withQueryString` or `withQueryStringOptionValues`
  * Method `removeAllParams` has been replaced with `withQueryString(QueryString.empty)`
- * Method `subdomain` has been removed from the scala-js version. The implementation was incorrect and did not
-   match the JVM version of `subdomain`. Once public suffixes are supported for the scala-js version, a correct
+ * Method `subdomain` has been removed from the Scala.js version. The implementation was incorrect and did not
+   match the JVM version of `subdomain`. Once public suffixes are supported for the Scala.js version, a correct
    implementation of `subdomain` can be added
  * Implicit `UriConfig`s now need to be where your `Uri`s are parsed/constructed, rather than where they are rendered
  * Method `hostParts` has been removed from `Uri`. This method predated `publicSuffix` and `subdomain` which are more
@@ -878,7 +891,7 @@ and discussion [here](https://github.com/NET-A-PORTER/scala-uri/pull/113).
 
  * Matrix parameters have been removed. If you still need this, raise an issue
  * scala 2.10 support dropped, please upgrade to 2.11 or 2.12 to use scala-uri 0.5.x
- * scala-js support added
+ * Scala.js support added
 
 ## 0.3.x to 0.4.x
 

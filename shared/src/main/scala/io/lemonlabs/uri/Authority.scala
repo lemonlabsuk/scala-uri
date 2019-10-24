@@ -1,11 +1,14 @@
 package io.lemonlabs.uri
 
 import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.json.JsonSupport
 import io.lemonlabs.uri.parsing.UrlParser
 
 import scala.util.Try
 
-case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(implicit config: UriConfig) {
+case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(
+    implicit config: UriConfig = UriConfig.default
+) {
 
   def user: Option[String] = userInfo.user
   def password: Option[String] = userInfo.password
@@ -17,7 +20,7 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(implicit
     *
     * @return the longest public suffix for the host in this URI
     */
-  def publicSuffix: Option[String] =
+  def publicSuffix(implicit jsonSupport: JsonSupport): Option[String] =
     host.publicSuffix
 
   /**
@@ -27,7 +30,7 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(implicit
     *
     * @return all public suffixes for the host in this URI
     */
-  def publicSuffixes: Vector[String] =
+  def publicSuffixes(implicit jsonSupport: JsonSupport): Vector[String] =
     host.publicSuffixes
 
   /**
@@ -40,7 +43,7 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(implicit
     *
     * @return the second largest subdomain for this URL's host
     */
-  def subdomain: Option[String] =
+  def subdomain(implicit jsonSupport: JsonSupport): Option[String] =
     host.subdomain
 
   /**
@@ -49,7 +52,7 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(implicit
     *
     * @return all subdomains for this URL's host
     */
-  def subdomains: Vector[String] =
+  def subdomains(implicit jsonSupport: JsonSupport): Vector[String] =
     host.subdomains
 
   /**
@@ -58,7 +61,7 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(implicit
     *
     * @return the shortest subdomain for this URL's host
     */
-  def shortestSubdomain: Option[String] =
+  def shortestSubdomain(implicit jsonSupport: JsonSupport): Option[String] =
     host.shortestSubdomain
 
   /**
@@ -67,7 +70,7 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(implicit
     *
     * @return the longest subdomain for this URL's host
     */
-  def longestSubdomain: Option[String] =
+  def longestSubdomain(implicit jsonSupport: JsonSupport): Option[String] =
     host.longestSubdomain
 
   private[uri] def toString(c: UriConfig, hostToString: Host => String): String = {

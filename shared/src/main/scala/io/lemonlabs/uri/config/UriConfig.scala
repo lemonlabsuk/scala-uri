@@ -1,10 +1,8 @@
 package io.lemonlabs.uri.config
 
-import io.lemonlabs.uri.encoding.{NoopEncoder, PercentEncoder, UriEncoder}
 import io.lemonlabs.uri.decoding.{PercentDecoder, UriDecoder}
-import PercentEncoder._
-import io.lemonlabs.uri.json.JsonSupportDefaults
-import io.lemonlabs.uri.json.JsonSupport
+import io.lemonlabs.uri.encoding.PercentEncoder._
+import io.lemonlabs.uri.encoding.{NoopEncoder, PercentEncoder, UriEncoder}
 
 case class UriConfig(userInfoEncoder: UriEncoder,
                      pathEncoder: UriEncoder,
@@ -15,8 +13,7 @@ case class UriConfig(userInfoEncoder: UriEncoder,
                      queryDecoder: UriDecoder,
                      fragmentDecoder: UriDecoder,
                      charset: String,
-                     renderQuery: RenderQuery,
-                     jsonSupport: JsonSupport) {
+                     renderQuery: RenderQuery) {
 
   def withNoEncoding = copy(pathEncoder = NoopEncoder, queryEncoder = NoopEncoder, fragmentEncoder = NoopEncoder)
 
@@ -34,8 +31,7 @@ object UriConfig {
     queryDecoder = PercentDecoder,
     fragmentDecoder = PercentDecoder,
     charset = "UTF-8",
-    renderQuery = RenderQuery.default,
-    jsonSupport = JsonSupportDefaults.default
+    renderQuery = RenderQuery.default
   )
 
   /**
@@ -47,7 +43,6 @@ object UriConfig {
   def apply(encoder: UriEncoder = PercentEncoder(),
             decoder: UriDecoder = PercentDecoder,
             charset: String = "UTF-8",
-            renderQuery: RenderQuery = RenderQuery.default,
-            jsonSupport: JsonSupport = JsonSupportDefaults.default): UriConfig =
-    UriConfig(encoder, encoder, encoder, encoder, decoder, decoder, decoder, decoder, charset, renderQuery, jsonSupport)
+            renderQuery: RenderQuery = RenderQuery.default): UriConfig =
+    UriConfig(encoder, encoder, encoder, encoder, decoder, decoder, decoder, decoder, charset, renderQuery)
 }

@@ -6,17 +6,13 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class DataUrlTests extends FlatSpec with Matchers {
 
-  "Authority, querystring, etc" should "be empty" in {
+  "Authority, querystring, fragment" should "be empty" in {
     val dataUrl = DataUrl.parse("data:,A%20brief%20note")
     dataUrl.port should equal(None)
     dataUrl.user should equal(None)
     dataUrl.password should equal(None)
-    dataUrl.publicSuffix should equal(None)
-    dataUrl.publicSuffixes should equal(Vector.empty)
-    dataUrl.subdomain should equal(None)
-    dataUrl.subdomains should equal(Vector.empty)
-    dataUrl.shortestSubdomain should equal(None)
-    dataUrl.longestSubdomain should equal(None)
+    dataUrl.query should equal(QueryString.empty)
+    dataUrl.fragment should equal(None)
   }
 
   /**

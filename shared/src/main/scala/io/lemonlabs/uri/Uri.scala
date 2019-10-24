@@ -3,6 +3,7 @@ package io.lemonlabs.uri
 import java.util.Base64
 
 import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.json.JsonSupport
 import io.lemonlabs.uri.parsing.{UriParser, UrlParser, UrnParser}
 
 import scala.util.Try
@@ -122,7 +123,7 @@ sealed trait Url extends Uri {
     *
     * @return the longest public suffix for the host in this URI
     */
-  def publicSuffix: Option[String]
+  def publicSuffix(implicit jsonSupport: JsonSupport): Option[String]
 
   /**
     * Returns all longest public suffixes for the host in this URI. Examples include:
@@ -131,7 +132,7 @@ sealed trait Url extends Uri {
     *
     * @return all public suffixes for the host in this URI
     */
-  def publicSuffixes: Vector[String]
+  def publicSuffixes(implicit jsonSupport: JsonSupport): Vector[String]
 
   /**
     * Returns the second largest subdomain for this URL's host.
@@ -143,28 +144,28 @@ sealed trait Url extends Uri {
     *
     * @return the second largest subdomain for this URL's host
     */
-  def subdomain: Option[String]
+  def subdomain(implicit jsonSupport: JsonSupport): Option[String]
 
   /**
     * Returns all subdomains for this URL's host.
     * E.g. for http://a.b.c.example.com returns a, a.b, a.b.c and a.b.c.example
     * @return all subdomains for this URL's host
     */
-  def subdomains: Vector[String]
+  def subdomains(implicit jsonSupport: JsonSupport): Vector[String]
 
   /**
     * Returns the shortest subdomain for this URL's host.
     * E.g. for http://a.b.c.example.com returns a
     * @return the shortest subdomain for this URL's host
     */
-  def shortestSubdomain: Option[String]
+  def shortestSubdomain(implicit jsonSupport: JsonSupport): Option[String]
 
   /**
     * Returns the longest subdomain for this URL's host.
     * E.g. for http://a.b.c.example.com returns a.b.c.example
     * @return the longest subdomain for this URL's host
     */
-  def longestSubdomain: Option[String]
+  def longestSubdomain(implicit jsonSupport: JsonSupport): Option[String]
 
   /**
     * Copies this Url but with the authority set as the given value.
@@ -479,7 +480,7 @@ sealed trait Url extends Uri {
     *
     * @return the apex domain for this URL
     */
-  def apexDomain: Option[String] =
+  def apexDomain(implicit jsonSupport: JsonSupport): Option[String] =
     hostOption.flatMap(_.apexDomain)
 
   /**
@@ -587,12 +588,12 @@ final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option
   def user: Option[String] = None
   def password: Option[String] = None
 
-  def publicSuffix: Option[String] = None
-  def publicSuffixes: Vector[String] = Vector.empty
-  def subdomain: Option[String] = None
-  def subdomains: Vector[String] = Vector.empty
-  def shortestSubdomain: Option[String] = None
-  def longestSubdomain: Option[String] = None
+  def publicSuffix(implicit jsonSupport: JsonSupport): Option[String] = None
+  def publicSuffixes(implicit jsonSupport: JsonSupport): Vector[String] = Vector.empty
+  def subdomain(implicit jsonSupport: JsonSupport): Option[String] = None
+  def subdomains(implicit jsonSupport: JsonSupport): Vector[String] = Vector.empty
+  def shortestSubdomain(implicit jsonSupport: JsonSupport): Option[String] = None
+  def longestSubdomain(implicit jsonSupport: JsonSupport): Option[String] = None
 
   def withScheme(scheme: String): UrlWithoutAuthority =
     UrlWithoutAuthority(scheme, path, query, fragment)
@@ -699,7 +700,7 @@ sealed trait UrlWithAuthority extends Url {
     *
     * @return the longest public suffix for the host in this URI
     */
-  def publicSuffix: Option[String] =
+  def publicSuffix(implicit jsonSupport: JsonSupport): Option[String] =
     authority.publicSuffix
 
   /**
@@ -709,7 +710,7 @@ sealed trait UrlWithAuthority extends Url {
     *
     * @return all public suffixes for the host in this URI
     */
-  def publicSuffixes: Vector[String] =
+  def publicSuffixes(implicit jsonSupport: JsonSupport): Vector[String] =
     authority.publicSuffixes
 
   /**
@@ -722,7 +723,7 @@ sealed trait UrlWithAuthority extends Url {
     *
     * @return the second largest subdomain for this URL's host
     */
-  def subdomain: Option[String] =
+  def subdomain(implicit jsonSupport: JsonSupport): Option[String] =
     authority.subdomain
 
   /**
@@ -730,7 +731,7 @@ sealed trait UrlWithAuthority extends Url {
     * E.g. for http://a.b.c.example.com returns a, a.b, a.b.c and a.b.c.example
     * @return all subdomains for this URL's host
     */
-  def subdomains: Vector[String] =
+  def subdomains(implicit jsonSupport: JsonSupport): Vector[String] =
     authority.subdomains
 
   /**
@@ -738,7 +739,7 @@ sealed trait UrlWithAuthority extends Url {
     * E.g. for http://a.b.c.example.com returns a
     * @return the shortest subdomain for this URL's host
     */
-  def shortestSubdomain: Option[String] =
+  def shortestSubdomain(implicit jsonSupport: JsonSupport): Option[String] =
     authority.shortestSubdomain
 
   /**
@@ -746,7 +747,7 @@ sealed trait UrlWithAuthority extends Url {
     * E.g. for http://a.b.c.example.com returns a.b.c.example
     * @return the longest subdomain for this URL's host
     */
-  def longestSubdomain: Option[String] =
+  def longestSubdomain(implicit jsonSupport: JsonSupport): Option[String] =
     authority.longestSubdomain
 
   /**
@@ -905,12 +906,12 @@ sealed trait UrlWithoutAuthority extends Url {
   def user: Option[String] = None
   def password: Option[String] = None
 
-  def publicSuffix: Option[String] = None
-  def publicSuffixes: Vector[String] = Vector.empty
-  def subdomain: Option[String] = None
-  def subdomains: Vector[String] = Vector.empty
-  def shortestSubdomain: Option[String] = None
-  def longestSubdomain: Option[String] = None
+  def publicSuffix(implicit jsonSupport: JsonSupport): Option[String] = None
+  def publicSuffixes(implicit jsonSupport: JsonSupport): Vector[String] = Vector.empty
+  def subdomain(implicit jsonSupport: JsonSupport): Option[String] = None
+  def subdomains(implicit jsonSupport: JsonSupport): Vector[String] = Vector.empty
+  def shortestSubdomain(implicit jsonSupport: JsonSupport): Option[String] = None
+  def longestSubdomain(implicit jsonSupport: JsonSupport): Option[String] = None
 
 }
 

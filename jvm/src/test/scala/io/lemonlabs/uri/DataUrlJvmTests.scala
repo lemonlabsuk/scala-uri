@@ -5,8 +5,19 @@ import java.io.ByteArrayInputStream
 
 import javax.imageio.ImageIO
 import org.scalatest.{FlatSpec, Matchers}
+import io.lemonlabs.uri.json._
 
 class DataUrlJvmTests extends FlatSpec with Matchers {
+
+  "publicSuffixes and subdomains" should "be empty" in {
+    val dataUrl = DataUrl.parse("data:,A%20brief%20note")
+    dataUrl.publicSuffix should equal(None)
+    dataUrl.publicSuffixes should equal(Vector.empty)
+    dataUrl.subdomain should equal(None)
+    dataUrl.subdomains should equal(Vector.empty)
+    dataUrl.shortestSubdomain should equal(None)
+    dataUrl.longestSubdomain should equal(None)
+  }
 
   /**
     * From https://en.wikipedia.org/wiki/Data_URI_scheme#HTML

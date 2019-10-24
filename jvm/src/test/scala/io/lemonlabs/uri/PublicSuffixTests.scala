@@ -27,4 +27,22 @@ class PublicSuffixTests extends FlatSpec with Matchers {
     val uri = Url.parse("/blah")
     uri.publicSuffix should equal(None)
   }
+
+  "RelativeUrls" should "not return public suffixes" in {
+    val uri = RelativeUrl.parse("/blah")
+    uri.publicSuffix should equal(None)
+    uri.publicSuffixes should equal(Vector.empty)
+  }
+
+  "IPv4s" should "not return public suffixes" in {
+    val uri = IpV4.parse("1.2.3.4")
+    uri.publicSuffix should equal(None)
+    uri.publicSuffixes should equal(Vector.empty)
+  }
+
+  "IPv6s" should "not return public suffixes" in {
+    val uri = IpV6.parse("[::1]")
+    uri.publicSuffix should equal(None)
+    uri.publicSuffixes should equal(Vector.empty)
+  }
 }

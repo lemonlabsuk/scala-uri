@@ -83,4 +83,28 @@ class SubdomainTests extends FlatSpec with Matchers {
     val subdomain = Url.parse("http://a.com/").shortestSubdomain
     subdomain should equal(Some("a"))
   }
+
+  "RelativeUrls" should "not return subdomains" in {
+    val uri = RelativeUrl.parse("/blah")
+    uri.subdomain should equal(None)
+    uri.subdomains should equal(Vector.empty)
+    uri.shortestSubdomain should equal(None)
+    uri.longestSubdomain should equal(None)
+  }
+
+  "IPv4s" should "not return subdomains" in {
+    val uri = IpV4.parse("1.2.3.4")
+    uri.subdomain should equal(None)
+    uri.subdomains should equal(Vector.empty)
+    uri.shortestSubdomain should equal(None)
+    uri.longestSubdomain should equal(None)
+  }
+
+  "IPv6s" should "not return subdomains" in {
+    val uri = IpV6.parse("[::1]")
+    uri.subdomain should equal(None)
+    uri.subdomains should equal(Vector.empty)
+    uri.shortestSubdomain should equal(None)
+    uri.longestSubdomain should equal(None)
+  }
 }

@@ -611,6 +611,8 @@ supported JSON library configured. Currently the following JSON libraries are su
 
 ### Circe
 
+**Note:** *Not supported for Scala.js*
+
 To use Circe with scala-uri, you must add the following dependency to your SBT build:
 
 ```scala

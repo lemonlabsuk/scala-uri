@@ -5,6 +5,7 @@ import MimaSettings.mimaSettings
 name                            := "scala-uri root"
 scalaVersion in ThisBuild       := "2.13.0"
 crossScalaVersions in ThisBuild := Seq("2.12.10", "2.13.1")
+skip in publish                 := true // Do not publish the root project
 
 lazy val paradisePlugin = Def.setting {
   CrossVersion.partialVersion(scalaVersion.value) match {
@@ -53,6 +54,7 @@ val scalaUriSettings = Seq(
 
 val publishingSettings = Seq(
   publishMavenStyle       := true,
+  skip in publish         := false,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ =>
     false

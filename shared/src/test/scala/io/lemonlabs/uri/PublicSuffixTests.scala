@@ -1,7 +1,6 @@
 package io.lemonlabs.uri
 
 import org.scalatest.{FlatSpec, Matchers}
-import io.lemonlabs.uri.json._
 
 class PublicSuffixTests extends FlatSpec with Matchers {
 

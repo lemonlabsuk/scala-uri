@@ -2,7 +2,6 @@ package io.lemonlabs.uri
 
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.inet._
-import io.lemonlabs.uri.json.JsonSupport
 import io.lemonlabs.uri.parsing.UrlParser
 
 import scala.annotation.tailrec
@@ -21,7 +20,7 @@ sealed trait Host {
     *
     * @return the longest public suffix for the host in this URI
     */
-  def publicSuffix(implicit jsonSupport: JsonSupport): Option[String]
+  def publicSuffix: Option[String]
 
   /**
     * Returns all longest public suffixes for the host in this URI. Examples include:
@@ -30,7 +29,7 @@ sealed trait Host {
     *
     * @return all public suffixes for the host in this URI
     */
-  def publicSuffixes(implicit jsonSupport: JsonSupport): Vector[String]
+  def publicSuffixes: Vector[String]
 
   /**
     * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
@@ -50,7 +49,7 @@ sealed trait Host {
     *
     * @return the apex domain for this domain
     */
-  def apexDomain(implicit jsonSupport: JsonSupport): Option[String]
+  def apexDomain: Option[String]
 
   /**
     * Returns the second largest subdomain for this URL's host.
@@ -62,7 +61,7 @@ sealed trait Host {
     *
     * @return the second largest subdomain for this URL's host
     */
-  def subdomain(implicit jsonSupport: JsonSupport): Option[String]
+  def subdomain: Option[String]
 
   /**
     * Returns all subdomains for this URL's host.
@@ -70,7 +69,7 @@ sealed trait Host {
     *
     * @return all subdomains for this URL's host
     */
-  def subdomains(implicit jsonSupport: JsonSupport): Vector[String]
+  def subdomains: Vector[String]
 
   /**
     * Returns the shortest subdomain for this URL's host.
@@ -78,7 +77,7 @@ sealed trait Host {
     *
     * @return the shortest subdomain for this URL's host
     */
-  def shortestSubdomain(implicit jsonSupport: JsonSupport): Option[String]
+  def shortestSubdomain: Option[String]
 
   /**
     * Returns the longest subdomain for this URL's host.
@@ -86,7 +85,7 @@ sealed trait Host {
     *
     * @return the longest subdomain for this URL's host
     */
-  def longestSubdomain(implicit jsonSupport: JsonSupport): Option[String]
+  def longestSubdomain: Option[String]
 }
 
 object Host {
@@ -114,8 +113,8 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     *
     * @return the longest public suffix for the host in this URI
     */
-  def publicSuffix(implicit jsonSupport: JsonSupport): Option[String] =
-    jsonSupport.publicSuffixTrie.longestMatch(value.reverse).map(_.reverse)
+  def publicSuffix: Option[String] =
+    PublicSuffixTrie.publicSuffixTrie.longestMatch(value.reverse).map(_.reverse)
 
   /**
     * Returns all longest public suffixes for the host in this URI. Examples include:
@@ -124,8 +123,8 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     *
     * @return all public suffixes for the host in this URI
     */
-  def publicSuffixes(implicit jsonSupport: JsonSupport): Vector[String] =
-    jsonSupport.publicSuffixTrie.matches(value.reverse).map(_.reverse)
+  def publicSuffixes: Vector[String] =
+    PublicSuffixTrie.publicSuffixTrie.matches(value.reverse).map(_.reverse)
 
   /**
     * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
@@ -146,7 +145,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     *
     * @return the apex domain for this domain
     */
-  def apexDomain(implicit jsonSupport: JsonSupport): Option[String] =
+  def apexDomain: Option[String] =
     publicSuffix map { ps =>
       val apexDomainStart = value.dropRight(ps.length + 1).lastIndexOf('.')
 
@@ -164,7 +163,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     *
     * @return the second largest subdomain for this host
     */
-  def subdomain(implicit jsonSupport: JsonSupport): Option[String] = longestSubdomain flatMap { ls =>
+  def subdomain: Option[String] = longestSubdomain flatMap { ls =>
     ls.lastIndexOf('.') match {
       case -1 => None
       case i  => Some(ls.substring(0, i))
@@ -177,7 +176,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     *
     * @return all subdomains for this host
     */
-  def subdomains(implicit jsonSupport: JsonSupport): Vector[String] = {
+  def subdomains: Vector[String] = {
     def concatHostParts(longestSubdomainStr: String) = {
       val parts = longestSubdomainStr.split('.').toVector
       if (parts.size == 1) parts
@@ -197,7 +196,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     *
     * @return the shortest subdomain for this host
     */
-  def shortestSubdomain(implicit jsonSupport: JsonSupport): Option[String] =
+  def shortestSubdomain: Option[String] =
     longestSubdomain.map(_.takeWhile(_ != '.'))
 
   /**
@@ -206,7 +205,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     *
     * @return the longest subdomain for this host
     */
-  def longestSubdomain(implicit jsonSupport: JsonSupport): Option[String] = {
+  def longestSubdomain: Option[String] = {
     val publicSuffixLength: Int = publicSuffix.map(_.length + 1).getOrElse(0)
     value.dropRight(publicSuffixLength) match {
       case ""    => None
@@ -244,13 +243,13 @@ final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte)(im
 
   def value: String = s"$octet1Int.$octet2Int.$octet3Int.$octet4Int"
 
-  def apexDomain(implicit jsonSupport: JsonSupport): Option[String] = None
-  def publicSuffix(implicit jsonSupport: JsonSupport): Option[String] = None
-  def publicSuffixes(implicit jsonSupport: JsonSupport): Vector[String] = Vector.empty
-  def subdomain(implicit jsonSupport: JsonSupport): Option[String] = None
-  def subdomains(implicit jsonSupport: JsonSupport): Vector[String] = Vector.empty
-  def shortestSubdomain(implicit jsonSupport: JsonSupport): Option[String] = None
-  def longestSubdomain(implicit jsonSupport: JsonSupport): Option[String] = None
+  def apexDomain: Option[String] = None
+  def publicSuffix: Option[String] = None
+  def publicSuffixes: Vector[String] = Vector.empty
+  def subdomain: Option[String] = None
+  def subdomains: Vector[String] = Vector.empty
+  def shortestSubdomain: Option[String] = None
+  def longestSubdomain: Option[String] = None
 }
 
 object IpV4 {
@@ -318,13 +317,13 @@ final case class IpV6(piece1: Char,
     longestRun(0, (-1, -1), 0)
   }
 
-  def apexDomain(implicit jsonSupport: JsonSupport): Option[String] = None
-  def publicSuffix(implicit jsonSupport: JsonSupport): Option[String] = None
-  def publicSuffixes(implicit jsonSupport: JsonSupport): Vector[String] = Vector.empty
-  def subdomain(implicit jsonSupport: JsonSupport): Option[String] = None
-  def subdomains(implicit jsonSupport: JsonSupport): Vector[String] = Vector.empty
-  def shortestSubdomain(implicit jsonSupport: JsonSupport): Option[String] = None
-  def longestSubdomain(implicit jsonSupport: JsonSupport): Option[String] = None
+  def apexDomain: Option[String] = None
+  def publicSuffix: Option[String] = None
+  def publicSuffixes: Vector[String] = Vector.empty
+  def subdomain: Option[String] = None
+  def subdomains: Vector[String] = Vector.empty
+  def shortestSubdomain: Option[String] = None
+  def longestSubdomain: Option[String] = None
 
   def value: String = elidedStartAndEnd() match {
     case (-1, -1) => toStringNonNormalised

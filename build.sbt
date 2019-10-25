@@ -38,7 +38,8 @@ val sharedSettings = Seq(
   )
     ++ (if (scalaVersion.value.startsWith("2.13")) Seq("-Ymacro-annotations") else Nil),
   parallelExecution in Test := false,
-  scalafmtOnCompile         := true
+  scalafmtOnCompile         := true,
+  coverageExcludedPackages  := "io.lemonlabs.uri.inet.PublicSuffixTrie.*"
 )
 
 val scalaUriSettings = Seq(
@@ -90,54 +91,6 @@ val publishingSettings = Seq(
       </developers>
 )
 
-lazy val core =
-  crossProject(JSPlatform, JVMPlatform)
-    .crossType(CrossType.Full)
-    .in(file("core"))
-    .settings(sharedSettings)
-    .settings(publishingSettings)
-    .settings(mimaSettings)
-    .settings(
-      Seq(
-        name        := "scala-uri-core",
-        description := "Core code used by scala-uri modules"
-      )
-    )
-
-lazy val jsonCirce =
-  crossProject(JVMPlatform)
-    .crossType(CrossType.Full)
-    .in(file("json/circe"))
-    .settings(sharedSettings)
-    .settings(publishingSettings)
-    .settings(mimaSettings)
-    .settings(
-      Seq(
-        name        := "scala-uri-circe",
-        description := "circe support for scala-uri",
-        libraryDependencies ++= Seq(
-          "io.circe" %%% "circe-parser" % "0.12.1"
-        )
-      )
-    )
-    .dependsOn(core)
-
-lazy val jsonSprayJson =
-  (project in file("json/spray-json"))
-    .settings(sharedSettings)
-    .settings(publishingSettings)
-    .settings(mimaSettings)
-    .settings(
-      Seq(
-        name        := "scala-uri-spray-json",
-        description := "spray-json support for scala-uri",
-        libraryDependencies ++= Seq(
-          "io.spray" %% "spray-json" % "1.3.5"
-        )
-      )
-    )
-    .dependsOn(core.jvm)
-
 lazy val scalaUri =
   crossProject(JSPlatform, JVMPlatform)
     .crossType(CrossType.Full)
@@ -146,13 +99,18 @@ lazy val scalaUri =
     .settings(scalaUriSettings)
     .settings(publishingSettings)
     .settings(mimaSettings)
-    .dependsOn(core)
-    .jvmConfigure(_.dependsOn(jsonCirce.jvm % Optional, jsonSprayJson % Optional))
 
 lazy val updatePublicSuffixes =
   taskKey[Unit]("Updates the public suffix Trie at io.lemonlabs.uri.internet.PublicSuffixes")
 
 updatePublicSuffixes := UpdatePublicSuffixTrie.generate()
+
+lazy val testPublicSuffixes =
+  taskKey[Unit](
+    "Makes a small public suffix Trie at io.lemonlabs.uri.internet.PublicSuffixes which can be use to run the tests and can be instrumented without exceeding JVM class size limits"
+  )
+
+testPublicSuffixes := UpdatePublicSuffixTrie.generateTestVersion()
 
 addCommandAlias("check", ";scalafmtCheckAll;scalafmtSbtCheck")
 addCommandAlias("fmt", ";scalafmtAll;scalafmtSbt")

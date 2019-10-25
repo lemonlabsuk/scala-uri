@@ -1,7 +1,6 @@
 package io.lemonlabs.uri
 
 import io.lemonlabs.uri.config.UriConfig
-import io.lemonlabs.uri.json.JsonSupport
 import io.lemonlabs.uri.parsing.UrlParser
 
 import scala.util.Try
@@ -20,7 +19,7 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(
     *
     * @return the longest public suffix for the host in this URI
     */
-  def publicSuffix(implicit jsonSupport: JsonSupport): Option[String] =
+  def publicSuffix: Option[String] =
     host.publicSuffix
 
   /**
@@ -30,7 +29,7 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(
     *
     * @return all public suffixes for the host in this URI
     */
-  def publicSuffixes(implicit jsonSupport: JsonSupport): Vector[String] =
+  def publicSuffixes: Vector[String] =
     host.publicSuffixes
 
   /**
@@ -43,7 +42,7 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(
     *
     * @return the second largest subdomain for this URL's host
     */
-  def subdomain(implicit jsonSupport: JsonSupport): Option[String] =
+  def subdomain: Option[String] =
     host.subdomain
 
   /**
@@ -52,7 +51,7 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(
     *
     * @return all subdomains for this URL's host
     */
-  def subdomains(implicit jsonSupport: JsonSupport): Vector[String] =
+  def subdomains: Vector[String] =
     host.subdomains
 
   /**
@@ -61,7 +60,7 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(
     *
     * @return the shortest subdomain for this URL's host
     */
-  def shortestSubdomain(implicit jsonSupport: JsonSupport): Option[String] =
+  def shortestSubdomain: Option[String] =
     host.shortestSubdomain
 
   /**
@@ -70,7 +69,7 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(
     *
     * @return the longest subdomain for this URL's host
     */
-  def longestSubdomain(implicit jsonSupport: JsonSupport): Option[String] =
+  def longestSubdomain: Option[String] =
     host.longestSubdomain
 
   private[uri] def toString(c: UriConfig, hostToString: Host => String): String = {

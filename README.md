@@ -663,6 +663,8 @@ dataUrl.dataAsString // This is "the data:1234,5678"
 
 ## URL builder DSL
 
+**Note:** *This DSL is now deprecated. Please use the [Typesafe URL builder DSL](#typesafe-url-builder-dsl)*
+
 By importing `io.lemonlabs.uri.dsl._`, you may use a DSL to construct URLs
 
 ```scala
@@ -795,6 +797,7 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
    There is now a trait called `UrlWithoutAuthority`. This trait has a companion object with `apply`, `unapply` and `parse`
    methods, so it mostly can be used in the same way as the previous case class.
  * Parsing a Data URL will now return an instance of [`DataUrl`](#data-urls) rather than `UrlWithoutAuthority`
+ * The [URL builder DSL](#url-builder-dsl) has been deprecated in favour of the [Typesafe URL builder DSL](#typesafe-url-builder-dsl)
  * Forward slashes in paths are now percent encoded by default.
    This means `Url.parse("/%2F/").toString` returns `"/%2F/"` rather than `///` in previous versions
    To return to the previous behavior, you can bring a `UriConfig` like so into scope

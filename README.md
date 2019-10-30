@@ -20,7 +20,7 @@
  * Support for [URNs](#parse-a-urn)
  * Support for [mailto](#mailto) URLs
  * Support for [data](#data-urls) URLs as defined in [RFC2397](https://tools.ietf.org/html/rfc2397)
- * Support for [Scala.js](#scala-js-support)
+ * Support for [Scala.js](#scalajs-support)
  * No dependencies on existing web frameworks
 
 To include it in your SBT project from maven central:

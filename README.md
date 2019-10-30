@@ -29,7 +29,12 @@ To include it in your SBT project from maven central:
 "io.lemonlabs" %% "scala-uri" % "2.0.0-M3"
 ```
 
-[Migration Guide](#05x-to-1xx) from 0.5.x
+## Migration Guides
+
+ * [2.0.0+](#1xx-to-2xx)
+ * [1.5.0+](#1xx-to-15x)
+ * [1.0.0+](#05x-to-1xx)
+ * [Older versions](#04x-to-05x)
 
 There are also demo projects for both [scala](https://github.com/lemonlabsuk/scala-uri-demo) and [Scala.js](https://github.com/lemonlabsuk/scala-uri-scalajs-example) to help you get up and running quickly.
 
@@ -789,6 +794,7 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
  * *Binary Incompatibility*: The case class `UrlWithoutAuthority` has been renamed `SimpleUrlWithoutAuthority`.
    There is now a trait called `UrlWithoutAuthority`. This trait has a companion object with `apply`, `unapply` and `parse`
    methods, so it mostly can be used in the same way as the previous case class.
+ * Parsing a Data URL will now return an instance of [`DataUrl`](#data-urls) rather than `UrlWithoutAuthority`
  * Forward slashes in paths are now percent encoded by default.
    This means `Url.parse("/%2F/").toString` returns `"/%2F/"` rather than `///` in previous versions
    To return to the previous behavior, you can bring a `UriConfig` like so into scope

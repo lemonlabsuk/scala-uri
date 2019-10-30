@@ -9,7 +9,7 @@ script: >
  git clone https://github.com/lemonlabsuk/scala-uri-demo.git &&
  cd scala-uri-demo &&
  git checkout 2.0.0 &&
- sbt -Dscala.ver=$TRAVIS_SCALA_VERSION -Dscala.uri.ver=2.0.0-M2 test &&
+ sbt -Dscala.ver=$TRAVIS_SCALA_VERSION -Dscala.uri.ver=2.0.0-M3 test &&
  cd "$TRAVIS_BUILD_DIR"
 
 jdk:

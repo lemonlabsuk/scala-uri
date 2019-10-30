@@ -5,7 +5,6 @@ import java.io.ByteArrayInputStream
 
 import javax.imageio.ImageIO
 import org.scalatest.{FlatSpec, Matchers}
-import io.lemonlabs.uri.json._
 
 class DataUrlJvmTests extends FlatSpec with Matchers {
 

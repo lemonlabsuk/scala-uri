@@ -532,8 +532,6 @@ uri.toString // This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F
 
 ## Subdomains
 
-**Note:** *Currently not supported for Scala.js*
-
 ```scala
 import io.lemonlabs.uri.Url
 
@@ -574,10 +572,6 @@ uri.apexDomain // This returns Some("google.co.uk")
 
 ## Public Suffixes
 
-**Note:** *Currently not supported for Scala.js*
-
-**Note:** *To use Public Suffixes you must configure scala-uri with a [supported JSON dependency](#json-support)*
-
 `scala-uri` uses the list of public suffixes from [publicsuffix.org](https://publicsuffix.org) to allow you to identify
 the TLD of your absolute URIs.
 
@@ -600,46 +594,6 @@ uri.publicSuffixes // This returns Vector("co.uk", "uk")
 ```
 
 These methods return `None` and `Vector.empty`, respectively for URLs without a Host (e.g. Relative URLs)
-
-## JSON Support
-
-Some scala-uri functionality (such as [Public Suffixes](#public-suffixes) and [subdomains](#subdomains)) requires a 
-supported JSON library configured. Currently the following JSON libraries are supported:
-
- * [circe](#circe)
- * [spray-json](#spray-json)
-
-### Circe
-
-**Note:** *Not supported for Scala.js*
-
-To use Circe with scala-uri, you must add the following dependency to your SBT build:
-
-```scala
-"io.lemonlabs" %% "scala-uri-circe"  % "2.0.0-M2"
-```
-
-and add the following import at the call site 
-
-```scala
-import io.lemonlabs.uri.json._
-```
-
-### spray-json
-
-**Note:** *Not supported for Scala.js*
-
-To use spray-json with scala-uri, you must add the following dependency to your SBT build:
-
-```scala
-"io.lemonlabs" %% "scala-uri-spray-json"  % "2.0.0-M2"
-```
-
-and add the following import at the call site 
-
-```scala
-import io.lemonlabs.uri.json._
-```
 
 ## Punycode
 
@@ -831,9 +785,7 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
 
 ## 1.x.x to 2.x.x
 
- * Users will now need to add a scala-uri json dependency to their SBT build to use [Public Suffixes](#public-suffixes) 
-   (and other future features that require a JSON library). scala-uri no longer pulls in spray-json by default. See the
-   [JSON Support](#json-support) section of this page for more details.
+ * scala-uri no longer depends on a JSON library.
  * *Binary Incompatibility*: The case class `UrlWithoutAuthority` has been renamed `SimpleUrlWithoutAuthority`.
    There is now a trait called `UrlWithoutAuthority`. This trait has a companion object with `apply`, `unapply` and `parse`
    methods, so it mostly can be used in the same way as the previous case class.

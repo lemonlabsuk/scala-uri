@@ -1,6 +1,7 @@
 --- 
 language: scala
 script: >
+ sbt testPublicSuffixes &&
  sbt ++$TRAVIS_SCALA_VERSION check &&
  sbt $COVERAGE ++$TRAVIS_SCALA_VERSION coverage test coverageReport &&
  sbt ++$TRAVIS_SCALA_VERSION test &&
@@ -18,7 +19,7 @@ matrix:
   include:
     - scala: 2.13.0
       env: COVERAGE=coverageOff
-    - scala: 2.12.9
+    - scala: 2.12.10
       env: COVERAGE=coverageOn
 
 sudo: false # Enable new travis container-based infrastructure

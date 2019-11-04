@@ -4,6 +4,7 @@
 [![codecov.io](http://codecov.io/github/lemonlabsuk/scala-uri/coverage.svg?branch=master)](https://codecov.io/gh/lemonlabsuk/scala-uri/branch/master)
 [![Slack](https://lemonlabs.io/slack/badge.svg)](https://lemonlabs.io/slack)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](#scalajs-support)
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
@@ -762,7 +763,7 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 
 ## Including scala-uri your project
 
-`scala-uri` `2.x.x` is currently built with support for scala `2.13.x`, `2.12.x`
+`scala-uri` `2.x.x` is currently built with support for Scala `2.13.x`, Scala `2.12.x` and Scala.js `0.6.17+` 
 
  * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)

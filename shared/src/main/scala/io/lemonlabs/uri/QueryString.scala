@@ -1,5 +1,7 @@
 package io.lemonlabs.uri
 
+import cats.implicits._
+import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.{All, ExcludeNones, UriConfig}
 import io.lemonlabs.uri.parsing.UrlParser
 
@@ -281,7 +283,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     }
 
     if (paramsAsString.isEmpty) ""
-    else "?" + paramsAsString.mkString("&")
+    else paramsAsString.mkString("&")
   }
 
   /**
@@ -318,4 +320,8 @@ object QueryString {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): QueryString =
     parseTry(s).get
+
+  implicit val eqQueryString: Eq[QueryString] = Eq.fromUniversalEquals
+  implicit val showQueryString: Show[QueryString] = Show.fromToString
+  implicit val orderQueryString: Order[QueryString] = Order.by(_.params)
 }

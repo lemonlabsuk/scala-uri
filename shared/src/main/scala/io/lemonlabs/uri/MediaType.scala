@@ -1,5 +1,8 @@
 package io.lemonlabs.uri
 
+import cats.implicits._
+import cats.{Eq, Order, Show}
+
 case class MediaType(rawValue: Option[String], parameters: Vector[(String, String)]) {
 
   /**
@@ -55,4 +58,12 @@ case class MediaType(rawValue: Option[String], parameters: Vector[(String, Strin
 
   override def toString: String =
     rawValue.getOrElse("") + parameters.foldLeft("") { case (str, (key, v)) => s"$str;$key=$v" }
+}
+
+object MediaType {
+  implicit val eqMediaType: Eq[MediaType] = Eq.fromUniversalEquals
+  implicit val showMediaType: Show[MediaType] = Show.fromToString
+  implicit val orderMediaType: Order[MediaType] = Order.by { mediaType =>
+    (mediaType.rawValue, mediaType.parameters)
+  }
 }

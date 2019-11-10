@@ -5,6 +5,7 @@
 [![Slack](https://lemonlabs.io/slack/badge.svg)](https://lemonlabs.io/slack)
 [![Maven Central](https://img.shields.io/maven-central/v/io.lemonlabs/scala-uri_2.13/2)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](#scalajs-support)
+[![Cats Friendly Badge](https://typelevel.org/cats/img/cats-badge-tiny.png)](#cats-support) 
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
@@ -22,6 +23,7 @@
  * Support for [mailto](#mailto) URLs
  * Support for [data](#data-urls) URLs as defined in [RFC2397](https://tools.ietf.org/html/rfc2397)
  * Support for [Scala.js](#scalajs-support)
+ * Support for [cats](#cats-support)
  * No dependencies on existing web frameworks
 
 To include it in your SBT project from maven central:
@@ -761,6 +763,16 @@ uri5.toString //This is: http://theon.github.com/scala-uri#user-1
 
 See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs-example) for usage
 
+## Cats Support
+
+scala-uri provides type class instances of `cats.Eq`, `cats.Show` and `cats.Order` for:
+`Uri `, `Url`, `RelativeUrl`, `UrlWithAuthority`, `ProtocolRelativeUrl`, `AbsoluteUrl`, 
+`UrlWithoutAuthority`, `SimpleUrlWithoutAuthority`, `DataUrl`, `Urn`, `Authority`, `UserInfo`, 
+`Host`, `DomainName`, `IpV4`, `IpV6`, `MediaType`, `Path`, `UrlPath`, `AbsoluteOrEmptyPath`, 
+`RootlessPath`, `AbsolutePath`, `UrnPath`, `QueryString`
+
+The type class instances exist in the companion objects for these types.
+
 ## Including scala-uri your project
 
 `scala-uri` `2.x.x` is currently built with support for Scala `2.13.x`, Scala `2.12.x` and Scala.js `0.6.17+` 
@@ -797,8 +809,14 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
  * *Binary Incompatibility*: The case class `UrlWithoutAuthority` has been renamed `SimpleUrlWithoutAuthority`.
    There is now a trait called `UrlWithoutAuthority`. This trait has a companion object with `apply`, `unapply` and `parse`
    methods, so it mostly can be used in the same way as the previous case class.
- * Parsing a Data URL will now return an instance of [`DataUrl`](#data-urls) rather than `UrlWithoutAuthority`
+ * *Binary Incompatibility*: Parsing a Data URL will now return an instance of [`DataUrl`](#data-urls) rather than `UrlWithoutAuthority`
+ * *Binary Incompatibility*: `UserInfo.user` is now of type `String` rather than `Option[String]`
+   * *Binary Incompatibility*`Authority.userInfo` is now of type `Option[UserInfo]`
+   * *Binary Incompatibility*: `UserInfo.empty` method removed
  * The [URL builder DSL](#url-builder-dsl) has been deprecated in favour of the [Typesafe URL builder DSL](#typesafe-url-builder-dsl)
+ * `Authority.parse` no longer expects it's string argument to start with `//`, as this is not part of the Authority, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
+ * `UserInfo.parse` no longer expects it's string argument to end with a `@`, as this is not part of the UserInfo, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
+ * `QueryString.toString` no longer returns a leading `?`, as this is not part of the query string, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
  * Forward slashes in paths are now percent encoded by default.
    This means `Url.parse("/%2F/").toString` returns `"/%2F/"` rather than `///` in previous versions
    To return to the previous behavior, you can bring a `UriConfig` like so into scope

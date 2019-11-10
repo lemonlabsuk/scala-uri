@@ -74,7 +74,7 @@ class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.defau
   }
 
   def _user_info: Rule1[UserInfo] = rule {
-    capture(zeroOrMore(noneOf(":/?[]@"))) ~ optional(":" ~ capture(zeroOrMore(noneOf("@")))) ~ "@" ~> extractUserInfo
+    capture(zeroOrMore(noneOf(":/?[]@"))) ~ optional(":" ~ capture(zeroOrMore(noneOf("@")))) ~> extractUserInfo
   }
 
   def _port: Rule1[Int] = rule {
@@ -82,7 +82,7 @@ class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.defau
   }
 
   def _authority: Rule1[Authority] = rule {
-    "//" ~ (optional(_user_info) ~ _host_in_authority ~ optional(_port)) ~> extractAuthority
+    (optional(_user_info ~ "@") ~ _host_in_authority ~ optional(_port)) ~> extractAuthority
   }
 
   def _path_segment: Rule1[String] = rule {
@@ -131,7 +131,7 @@ class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.defau
   }
 
   def _abs_url: Rule1[AbsoluteUrl] = rule {
-    _scheme ~ ":" ~ _authority ~ _path_for_authority ~ _maybe_query_string ~ optional(_fragment) ~> extractAbsoluteUrl
+    _scheme ~ "://" ~ _authority ~ _path_for_authority ~ _maybe_query_string ~ optional(_fragment) ~> extractAbsoluteUrl
   }
 
   def _url_without_authority: Rule1[UrlWithoutAuthority] = rule {
@@ -166,7 +166,7 @@ class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.defau
   }
 
   def _protocol_rel_url: Rule1[ProtocolRelativeUrl] = rule {
-    _authority ~ _path_for_authority ~ _maybe_query_string ~ optional(_fragment) ~> extractProtocolRelativeUrl
+    "//" ~ _authority ~ _path_for_authority ~ _maybe_query_string ~ optional(_fragment) ~> extractProtocolRelativeUrl
   }
 
   def _rel_url: Rule1[RelativeUrl] = rule {
@@ -217,10 +217,9 @@ class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.defau
   val extractDomainName = (domainName: String) => DomainName(domainName)
 
   val extractUserInfo = (user: String, pass: Option[String]) =>
-    UserInfo(Some(pathDecoder.decode(user)), pass.map(pathDecoder.decode))
+    UserInfo(pathDecoder.decode(user), pass.map(pathDecoder.decode))
 
-  val extractAuthority = (userInfo: Option[UserInfo], host: Host, port: Option[Int]) =>
-    Authority(userInfo.getOrElse(UserInfo.empty), host, port)
+  val extractAuthority = (userInfo: Option[UserInfo], host: Host, port: Option[Int]) => Authority(userInfo, host, port)
 
   val extractFragment = (x: String) => fragmentDecoder.decode(x)
 

@@ -303,12 +303,12 @@ class ParsingTests extends FlatSpec with Matchers {
 
   "A URL with userinfo" should "parse as an URL" in {
     val url = Url.parse("http://:@www.example.com")
-    url.toUrl.toAbsoluteUrl.userInfo should equal(UserInfo(Some(""), Some("")))
+    url.toUrl.toAbsoluteUrl.userInfo should equal(Some(UserInfo("", Some(""))))
   }
 
   "exotic/reserved characters in user info" should "be decoded" in {
-    val parsedUserInfo = UserInfo.parse("user%3A:p%40ssword%E2%87%94@")
-    parsedUserInfo.user should equal(Some("user:"))
+    val parsedUserInfo = UserInfo.parse("user%3A:p%40ssword%E2%87%94")
+    parsedUserInfo.user should equal("user:")
     parsedUserInfo.password should equal(Some("p@ssword⇔"))
   }
 

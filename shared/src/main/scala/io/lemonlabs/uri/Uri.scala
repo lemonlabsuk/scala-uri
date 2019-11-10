@@ -2,6 +2,8 @@ package io.lemonlabs.uri
 
 import java.util.Base64
 
+import cats.implicits._
+import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UriParser, UrlParser, UrnParser}
 
@@ -87,6 +89,12 @@ object Uri {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Uri =
     parseTry(s).get
+
+  import cats.implicits._
+
+  implicit val eqUri: Eq[Uri] = Eq.fromUniversalEquals
+  implicit val showUri: Show[Uri] = Show.fromToString
+  implicit val orderUri: Order[Uri] = Order.by(_.toString())
 }
 
 /**
@@ -520,6 +528,12 @@ sealed trait Url extends Uri {
     */
   def toStringPunycode: String =
     toString(config)
+
+  protected def queryToString(config: UriConfig): String =
+    query.toString(config) match {
+      case "" => ""
+      case s  => "?" + s
+    }
 }
 
 object Url {
@@ -537,7 +551,8 @@ object Url {
     val frag = Option(fragment)
     def authority = {
       val portOpt = if (port > 0) Some(port) else None
-      Authority(UserInfo(Option(user), Option(password)), Host.parse(host), portOpt)
+      val userInfo = Option(user).map(u => UserInfo(u, Option(password)))
+      Authority(userInfo, Host.parse(host), portOpt)
     }
 
     (scheme, host) match {
@@ -559,6 +574,10 @@ object Url {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Url] =
     UrlParser.parseUrl(s.toString)
+
+  implicit val eqUrl: Eq[Url] = Eq.fromUniversalEquals
+  implicit val showUrl: Show[Url] = Show.fromToString
+  implicit val orderUrl: Order[Url] = Order.by(_.toString())
 }
 
 /**
@@ -619,7 +638,7 @@ final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option
     copy(query = query)
 
   private[uri] def toString(c: UriConfig): String =
-    path.toString(c) + query.toString(c) + fragmentToString(c)
+    path.toString(c) + queryToString(c) + fragmentToString(c)
 }
 
 object RelativeUrl {
@@ -634,6 +653,12 @@ object RelativeUrl {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[RelativeUrl] =
     UrlParser.parseRelativeUrl(s.toString)
+
+  implicit val eqRelUrl: Eq[RelativeUrl] = Eq.fromUniversalEquals
+  implicit val showRelUrl: Show[RelativeUrl] = Show.fromToString
+  implicit val orderRelUrl: Order[RelativeUrl] = Order.by { url =>
+    (url.path, url.query, url.fragment)
+  }
 }
 
 /**
@@ -654,7 +679,7 @@ sealed trait UrlWithAuthority extends Url {
   def hostOption: Option[Host] = Some(host)
 
   def port: Option[Int] = authority.port
-  def userInfo: UserInfo = authority.userInfo
+  def userInfo: Option[UserInfo] = authority.userInfo
   def user: Option[String] = authority.user
   def password: Option[String] = authority.password
 
@@ -668,8 +693,7 @@ sealed trait UrlWithAuthority extends Url {
     * @return a new Url with the specified user
     */
   def withUser(user: String): Self = {
-    val newUserInfo = userInfo.copy(user = Some(user))
-    withAuthority(authority.copy(userInfo = newUserInfo))
+    withAuthority(authority.copy(userInfo = Some(UserInfo(user, password))))
   }
 
   /**
@@ -679,8 +703,7 @@ sealed trait UrlWithAuthority extends Url {
     * @return a new Url with the specified password
     */
   def withPassword(password: String): Self = {
-    val newUserInfo = userInfo.copy(password = Some(password))
-    withAuthority(authority.copy(userInfo = newUserInfo))
+    withAuthority(authority.copy(userInfo = Some(UserInfo(user.getOrElse(""), password))))
   }
 
   /**
@@ -776,6 +799,10 @@ object UrlWithAuthority {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrlWithAuthority] =
     UrlParser.parseUrlWithAuthority(s.toString)
+
+  implicit val eqUrlWithAuthority: Eq[UrlWithAuthority] = Eq.fromUniversalEquals
+  implicit val showUrlWithAuthority: Show[UrlWithAuthority] = Show.fromToString
+  implicit val orderUrlWithAuthority: Order[UrlWithAuthority] = Order.by(_.toString())
 }
 
 /**
@@ -819,7 +846,7 @@ final case class ProtocolRelativeUrl(authority: Authority,
     copy(query = query)
 
   private[uri] def toString(c: UriConfig, hostToString: Host => String): String =
-    "//" + authority.toString(c, hostToString) + path.toString(c) + query.toString(c) + fragmentToString(c)
+    "//" + authority.toString(c, hostToString) + path.toString(c) + queryToString(c) + fragmentToString(c)
 }
 
 object ProtocolRelativeUrl {
@@ -831,6 +858,12 @@ object ProtocolRelativeUrl {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[ProtocolRelativeUrl] =
     UrlParser.parseProtocolRelativeUrl(s.toString)
+
+  implicit val eqProtocolRelUrl: Eq[ProtocolRelativeUrl] = Eq.fromUniversalEquals
+  implicit val showProtocolRelUrl: Show[ProtocolRelativeUrl] = Show.fromToString
+  implicit val orderProtocolRelUrl: Order[ProtocolRelativeUrl] = Order.by { url =>
+    (url.authority, url.path, url.query, url.fragment)
+  }
 }
 
 /**
@@ -875,7 +908,7 @@ final case class AbsoluteUrl(scheme: String,
     copy(query = query)
 
   private[uri] def toString(c: UriConfig, hostToString: Host => String): String =
-    scheme + "://" + authority.toString(c, hostToString) + path.toString(c) + query.toString(c) + fragmentToString(c)
+    scheme + "://" + authority.toString(c, hostToString) + path.toString(c) + queryToString(c) + fragmentToString(c)
 }
 
 object AbsoluteUrl {
@@ -887,6 +920,12 @@ object AbsoluteUrl {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[AbsoluteUrl] =
     UrlParser.parseAbsoluteUrl(s.toString)
+
+  implicit val eqAbsUrl: Eq[AbsoluteUrl] = Eq.fromUniversalEquals
+  implicit val showAbsUrl: Show[AbsoluteUrl] = Show.fromToString
+  implicit val orderAbsUrl: Order[AbsoluteUrl] = Order.by { url =>
+    (url.scheme, url.authority, url.path, url.query, url.fragment)
+  }
 }
 
 /**
@@ -932,6 +971,12 @@ object UrlWithoutAuthority {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrlWithoutAuthority] =
     UrlParser.parseUrlWithoutAuthority(s.toString)
+
+  implicit val eqUrlWithoutAuthority: Eq[UrlWithoutAuthority] = Eq.fromUniversalEquals
+  implicit val showUrlWithoutAuthority: Show[UrlWithoutAuthority] = Show.fromToString
+  implicit val orderUrlWithoutAuthority: Order[UrlWithoutAuthority] = Order.by { url =>
+    (url.scheme, url.path, url.query, url.fragment)
+  }
 }
 
 final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query: QueryString, fragment: Option[String])(
@@ -985,7 +1030,7 @@ final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query:
     copy(query = query)
 
   private[uri] def toString(c: UriConfig): String =
-    scheme + ":" + path.toString(c) + query.toString(c) + fragmentToString(c)
+    scheme + ":" + path.toString(c) + queryToString(c) + fragmentToString(c)
 }
 
 object SimpleUrlWithoutAuthority {
@@ -997,6 +1042,12 @@ object SimpleUrlWithoutAuthority {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[SimpleUrlWithoutAuthority] =
     UrlParser.parseSimpleUrlWithoutAuthority(s.toString)
+
+  implicit val eqSimpleUrlWithoutAuthority: Eq[SimpleUrlWithoutAuthority] = Eq.fromUniversalEquals
+  implicit val showSimpleUrlWithoutAuthority: Show[SimpleUrlWithoutAuthority] = Show.fromToString
+  implicit val orderSimpleUrlWithoutAuthority: Order[SimpleUrlWithoutAuthority] = Order.by { url =>
+    (url.scheme, url.path, url.query, url.fragment)
+  }
 }
 
 /**
@@ -1099,6 +1150,10 @@ object DataUrl {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[DataUrl] =
     UrlParser.parseDataUrl(s.toString)
+
+  implicit val eqDataUrl: Eq[DataUrl] = Eq.fromUniversalEquals
+  implicit val showDataUrl: Show[DataUrl] = Show.fromToString
+  implicit val orderDataUrl: Order[DataUrl] = Order.by(_.toString())
 }
 
 /**
@@ -1149,4 +1204,8 @@ object Urn {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Urn] =
     UrnParser.parseUrn(s.toString)
+
+  implicit val eqUrn: Eq[Urn] = Eq.fromUniversalEquals
+  implicit val showUrn: Show[Urn] = Show.fromToString
+  implicit val orderUrn: Order[Urn] = Order.by(_.path)
 }

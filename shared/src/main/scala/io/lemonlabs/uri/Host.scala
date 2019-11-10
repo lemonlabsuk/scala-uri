@@ -1,5 +1,7 @@
 package io.lemonlabs.uri
 
+import cats.implicits._
+import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.inet._
 import io.lemonlabs.uri.parsing.UrlParser
@@ -100,6 +102,10 @@ object Host {
 
   def unapply(host: Host): Option[String] =
     Some(host.toString)
+
+  implicit val eqHost: Eq[Host] = Eq.fromUniversalEquals
+  implicit val showHost: Show[Host] = Show.fromToString
+  implicit val orderHost: Order[Host] = Order.by(_.value)
 }
 
 final case class DomainName(value: String)(implicit val conf: UriConfig = UriConfig.default)
@@ -225,6 +231,10 @@ object DomainName {
     parseTry(s).get
 
   def empty: DomainName = DomainName("")
+
+  implicit val eqDomainName: Eq[DomainName] = Eq.fromUniversalEquals
+  implicit val showDomainName: Show[DomainName] = Show.fromToString
+  implicit val orderDomainName: Order[DomainName] = Order.by(_.value)
 }
 
 final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte)(implicit val conf: UriConfig =
@@ -268,6 +278,10 @@ object IpV4 {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): IpV4 =
     parseTry(s).get
+
+  implicit val eqIpV4: Eq[IpV4] = Eq.fromUniversalEquals
+  implicit val showIpV4: Show[IpV4] = Show.fromToString
+  implicit val orderIpV4: Order[IpV4] = Order.by(_.octets)
 }
 
 final case class IpV6(piece1: Char,
@@ -404,4 +418,8 @@ object IpV6 {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): IpV6 =
     parseTry(s).get
+
+  implicit val eqIpV6: Eq[IpV6] = Eq.fromUniversalEquals
+  implicit val showIpV6: Show[IpV6] = Show.fromToString
+  implicit val orderIpV6: Order[IpV6] = Order.by(_.pieces)
 }

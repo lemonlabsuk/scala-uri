@@ -8,8 +8,8 @@ crossScalaVersions in ThisBuild := Seq("2.12.10", "2.13.1")
 skip in publish                 := true // Do not publish the root project
 
 lazy val paradisePlugin = Def.setting {
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, v)) if v <= 12 =>
+  VersionNumber(scalaVersion.value) match {
+    case v if v.matchesSemVer(SemanticSelector("<2.13.0-M4")) =>
       Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.patch))
     case _ =>
       // if scala 2.13.0-M4 or later, macro annotations merged into scala-reflect
@@ -22,8 +22,10 @@ val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
     compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.4.4" cross CrossVersion.full),
-    "com.github.ghik" % "silencer-lib" % "1.4.4" % Provided cross CrossVersion.full,
-    "org.scalatest"   %%% "scalatest"  % "3.0.8" % "test"
+    "com.github.ghik" % "silencer-lib" % "1.4.4"  % Provided cross CrossVersion.full,
+    "org.scalatest"   %%% "scalatest"  % "3.0.8"  % Test,
+    "org.scalacheck"  %%% "scalacheck" % "1.14.1" % Test,
+    "org.typelevel"   %%% "cats-laws"  % "2.0.0"  % Test
   ),
   scalacOptions := Seq(
     "-unchecked",
@@ -35,8 +37,13 @@ val sharedSettings = Seq(
     "-language:higherKinds",
     // Silence warnings for deprecated scala-uri code
     "-P:silencer:pathFilters=.*io/lemonlabs/uri/dsl/package.scala;.*io/lemonlabs/uri/DslTests.scala;.*io/lemonlabs/uri/DslTypeTests.scala"
-  )
-    ++ (if (scalaVersion.value.startsWith("2.13")) Seq("-Ymacro-annotations") else Nil),
+  ) ++ (
+    VersionNumber(scalaVersion.value) match {
+      case v if v.matchesSemVer(SemanticSelector(">=2.13")) => Seq("-Ymacro-annotations")
+      case v if v.matchesSemVer(SemanticSelector("<=2.12")) => Seq("-Ypartial-unification")
+      case _                                                => Nil
+    }
+  ),
   parallelExecution in Test := false,
   scalafmtOnCompile         := true,
   coverageExcludedPackages  := "io.lemonlabs.uri.inet.PublicSuffixTrie.*"
@@ -48,7 +55,8 @@ val scalaUriSettings = Seq(
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled"  % "2.1.8",
     "com.chuusai"   %%% "shapeless"  % "2.3.3",
-    "org.typelevel" %%% "simulacrum" % "1.0.0"
+    "org.typelevel" %%% "simulacrum" % "1.0.0",
+    "org.typelevel" %%% "cats-core"  % "2.0.0"
   ),
   libraryDependencies ++= paradisePlugin.value
 )

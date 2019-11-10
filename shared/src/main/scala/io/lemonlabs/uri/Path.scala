@@ -1,5 +1,7 @@
 package io.lemonlabs.uri
 
+import cats.implicits._
+import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UrlParser, UrnParser}
 
@@ -36,6 +38,10 @@ object Path {
 
   def unapply(path: Path): Option[Vector[String]] =
     Some(path.parts)
+
+  implicit val eqPath: Eq[Path] = Eq.fromUniversalEquals
+  implicit val showPath: Show[Path] = Show.fromToString
+  implicit val orderPath: Order[Path] = Order.by(_.toString())
 }
 
 object PathParts {
@@ -99,6 +105,10 @@ object UrlPath {
       case _         => RootlessPath(parts)
     }
   }
+
+  implicit val eqUrlPath: Eq[UrlPath] = Eq.fromUniversalEquals
+  implicit val showUrlPath: Show[UrlPath] = Show.fromToString
+  implicit val orderUrlPath: Order[UrlPath] = Order.by(_.toString())
 }
 
 /**
@@ -114,6 +124,11 @@ sealed trait AbsoluteOrEmptyPath extends UrlPath {
 
   def toRootless: RootlessPath =
     RootlessPath(parts)
+}
+object AbsoluteOrEmptyPath {
+  implicit val eqAbsoluteOrEmptyPath: Eq[AbsoluteOrEmptyPath] = Eq.fromUniversalEquals
+  implicit val showAbsoluteOrEmptyPath: Show[AbsoluteOrEmptyPath] = Show.fromToString
+  implicit val orderAbsoluteOrEmptyPath: Order[AbsoluteOrEmptyPath] = Order.by(_.toString())
 }
 
 case object EmptyPath extends AbsoluteOrEmptyPath {
@@ -165,6 +180,10 @@ final case class RootlessPath(parts: Vector[String])(implicit val config: UriCon
 object RootlessPath {
   def fromParts(parts: String*)(implicit config: UriConfig = UriConfig.default): RootlessPath =
     new RootlessPath(parts.toVector)
+
+  implicit val eqRootlessPath: Eq[RootlessPath] = Eq.fromUniversalEquals
+  implicit val showRootlessPath: Show[RootlessPath] = Show.fromToString
+  implicit val orderRootlessPath: Order[RootlessPath] = Order.by(_.parts)
 }
 
 /**
@@ -192,6 +211,10 @@ final case class AbsolutePath(parts: Vector[String])(implicit val config: UriCon
 object AbsolutePath {
   def fromParts(parts: String*)(implicit config: UriConfig = UriConfig.default): AbsolutePath =
     new AbsolutePath(parts.toVector)
+
+  implicit val eqAbsolutePath: Eq[AbsolutePath] = Eq.fromUniversalEquals
+  implicit val showAbsolutePath: Show[AbsolutePath] = Show.fromToString
+  implicit val orderAbsolutePath: Order[AbsolutePath] = Order.by(_.parts)
 }
 
 final case class UrnPath(nid: String, nss: String)(implicit val config: UriConfig = UriConfig.default) extends Path {
@@ -218,4 +241,10 @@ object UrnPath {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrnPath =
     parseTry(s).get
+
+  implicit val eqUrnPath: Eq[UrnPath] = Eq.fromUniversalEquals
+  implicit val showUrnPath: Show[UrnPath] = Show.fromToString
+  implicit val orderUrnPath: Order[UrnPath] = Order.by { path =>
+    (path.nid, path.nss)
+  }
 }

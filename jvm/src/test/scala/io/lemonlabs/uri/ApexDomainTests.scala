@@ -3,7 +3,6 @@ package io.lemonlabs.uri
 import org.scalatest.{FlatSpec, Matchers}
 
 class ApexDomainTests extends FlatSpec with Matchers {
-
   "IPv4" should "not return apex domain" in {
     Url.parse("http://1.2.3.4").apexDomain should equal(None)
   }
@@ -23,5 +22,4 @@ class ApexDomainTests extends FlatSpec with Matchers {
   it should "not return a apexDomain when there is no known public suffix" in {
     Url.parse("http://google.blahblahblah").apexDomain should equal(None)
   }
-
 }

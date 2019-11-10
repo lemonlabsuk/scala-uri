@@ -3,7 +3,6 @@ package io.lemonlabs.uri.encoding
 import PercentEncoder._
 
 case class PercentEncoder(charsToEncode: Set[Char] = DEFAULT_CHARS_TO_ENCODE) extends UriEncoder {
-
   def shouldEncode(ch: Char) = {
     !ascii(ch) || charsToEncode.contains(ch)
   }
@@ -21,7 +20,6 @@ case class PercentEncoder(charsToEncode: Set[Char] = DEFAULT_CHARS_TO_ENCODE) ex
 }
 
 object PercentEncoder {
-
   val USER_INFO_CHARS_TO_ENCODE = Set(
     ' ', '%', '<', '>', '[', ']', '#', '{', '}', '^', '`', '|', '?', '@', ':', '/'
   )

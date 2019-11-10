@@ -111,7 +111,6 @@ object Host {
 final case class DomainName(value: String)(implicit val conf: UriConfig = UriConfig.default)
     extends Host
     with PunycodeSupport {
-
   /**
     * Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`
@@ -240,7 +239,6 @@ object DomainName {
 final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte)(implicit val conf: UriConfig =
                                                                                 UriConfig.default)
     extends Host {
-
   private def uByteToInt(b: Byte): Int = b & 0xff
 
   def octet1Int: Int = uByteToInt(octet1)
@@ -293,7 +291,6 @@ final case class IpV6(piece1: Char,
                       piece7: Char,
                       piece8: Char)(implicit val conf: UriConfig = UriConfig.default)
     extends Host {
-
   def piece1Int: Int = piece1.toInt
   def piece2Int: Int = piece2.toInt
   def piece3Int: Int = piece3.toInt

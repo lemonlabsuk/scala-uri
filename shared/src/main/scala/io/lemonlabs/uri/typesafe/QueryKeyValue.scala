@@ -24,7 +24,6 @@ sealed trait QueryKeyInstance {
 }
 
 object QueryValue extends QueryValueInstances {
-
   def derive[A]: Derivation[A] = new Derivation[A](())
 
   class Derivation[A](private val dummy: Unit) extends AnyVal {
@@ -84,7 +83,6 @@ sealed trait TraversableParamsInstances {
 }
 
 object TraversableParams extends TraversableParamsInstances {
-
   implicit def field[K <: Symbol, V](implicit K: Witness.Aux[K], V: QueryValue[V]): TraversableParams[FieldType[K, V]] =
     (a: FieldType[K, V]) => Seq(K.value.name -> V.queryValue(a))
 

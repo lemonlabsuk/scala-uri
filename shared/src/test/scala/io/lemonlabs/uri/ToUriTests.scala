@@ -60,7 +60,6 @@ class ToUriTests extends WordSpec with Matchers {
   }
 
   "apply" should {
-
     "handle exotic/reserved characters in query string" in {
       val javaUri: URI =
         new URI("http://user:password@www.example.com/test?weird%3D%26key=strange%25value&arrow=%E2%87%94")

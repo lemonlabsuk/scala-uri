@@ -11,7 +11,6 @@ import io.lemonlabs.uri.parsing.UrlParser
   "2.0.0"
 )
 class UrlDsl(val url: Url) extends AnyVal {
-
   import url.config
 
   private def anyToQueryValue(any: Any): Option[String] = any match {

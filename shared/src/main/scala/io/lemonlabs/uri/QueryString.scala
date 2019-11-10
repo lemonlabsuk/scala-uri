@@ -8,7 +8,6 @@ import io.lemonlabs.uri.parsing.UrlParser
 import scala.util.Try
 
 case class QueryString(params: Vector[(String, Option[String])])(implicit config: UriConfig = UriConfig.default) {
-
   lazy val paramMap: Map[String, Vector[String]] = params.foldLeft(Map.empty[String, Vector[String]]) {
     case (m, (k, Some(v))) =>
       val values = m.getOrElse(k, Vector.empty)

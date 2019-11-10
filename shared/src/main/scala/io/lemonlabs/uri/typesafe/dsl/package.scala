@@ -4,7 +4,6 @@ import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.{RelativeUrl, Url}
 
 package object dsl {
-
   import PathPart.ops._
 
   import scala.language.implicitConversions

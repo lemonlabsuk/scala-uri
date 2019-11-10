@@ -118,7 +118,6 @@ object UrlPath {
   *   When authority is present, the path must either be empty or begin with a slash ("/") character.
   */
 sealed trait AbsoluteOrEmptyPath extends UrlPath {
-
   def toAbsoluteOrEmpty: AbsoluteOrEmptyPath =
     this
 
@@ -132,7 +131,6 @@ object AbsoluteOrEmptyPath {
 }
 
 case object EmptyPath extends AbsoluteOrEmptyPath {
-
   def isEmpty: Boolean =
     true
 
@@ -156,7 +154,6 @@ case object EmptyPath extends AbsoluteOrEmptyPath {
 
 final case class RootlessPath(parts: Vector[String])(implicit val config: UriConfig = UriConfig.default)
     extends UrlPath {
-
   def toRootless: RootlessPath =
     this
 
@@ -191,7 +188,6 @@ object RootlessPath {
   */
 final case class AbsolutePath(parts: Vector[String])(implicit val config: UriConfig = UriConfig.default)
     extends AbsoluteOrEmptyPath {
-
   def toAbsolute: AbsolutePath =
     this
 
@@ -218,7 +214,6 @@ object AbsolutePath {
 }
 
 final case class UrnPath(nid: String, nss: String)(implicit val config: UriConfig = UriConfig.default) extends Path {
-
   def parts: Vector[String] =
     Vector(nid, nss)
 

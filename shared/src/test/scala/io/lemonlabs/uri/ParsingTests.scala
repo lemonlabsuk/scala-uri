@@ -6,7 +6,6 @@ import org.scalatest.{FlatSpec, Matchers}
 import scala.util.Success
 
 class ParsingTests extends FlatSpec with Matchers {
-
   "Parsing an absolute URI" should "result in a valid Uri object" in {
     val url = Url.parse("http://theon.github.com/uris-in-scala.html")
     url.schemeOption should equal(Some("http"))

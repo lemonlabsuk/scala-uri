@@ -10,7 +10,6 @@ import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding.NoopDecoder
 
 class SerializableTests extends FlatSpec with Matchers {
-
   private[this] def serializeAndDeserialize[A <: Serializable](a: A): A = {
     val bytes = new ByteArrayOutputStream
     new ObjectOutputStream(bytes).writeObject(a)

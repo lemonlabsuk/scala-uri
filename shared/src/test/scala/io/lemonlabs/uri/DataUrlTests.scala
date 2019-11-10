@@ -5,7 +5,6 @@ import io.lemonlabs.uri.encoding.PercentEncoder
 import org.scalatest.{FlatSpec, Matchers}
 
 class DataUrlTests extends FlatSpec with Matchers {
-
   "Authority, querystring, fragment" should "be empty" in {
     val dataUrl = DataUrl.parse("data:,A%20brief%20note")
     dataUrl.port should equal(None)

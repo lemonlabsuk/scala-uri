@@ -9,7 +9,6 @@ import scala.collection.immutable
 import scala.util.{Failure, Try}
 
 class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
-
   def input: ParserInput =
     inputRaw.linesIterator.mkString // Remove newlines
 
@@ -318,7 +317,6 @@ class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.defau
 }
 
 object UrlParser {
-
   def apply(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlParser =
     new UrlParser(s.toString)
 

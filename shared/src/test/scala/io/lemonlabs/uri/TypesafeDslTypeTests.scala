@@ -7,7 +7,6 @@ import shapeless._
 import shapeless.labelled._
 
 class TypesafeDslTypeTests extends FlatSpec with Matchers {
-
   import io.lemonlabs.uri.typesafe.dsl._
 
   "String" should "render correctly" in {
@@ -70,7 +69,6 @@ class TypesafeDslTypeTests extends FlatSpec with Matchers {
   }
 
   "TraversableParams" should "derive type class for case class correctly" in {
-
     final case class Foo(a: Int, b: String)
 
     object Foo {
@@ -82,7 +80,6 @@ class TypesafeDslTypeTests extends FlatSpec with Matchers {
   }
 
   "TraversableParams" should "derive type class for case classes structure correctly" in {
-
     final case class Foo(a: Int, b: String)
 
     object Foo {
@@ -100,7 +97,6 @@ class TypesafeDslTypeTests extends FlatSpec with Matchers {
   }
 
   "TraversableParams" should "derive type class for case class with optional field correctly" in {
-
     final case class Foo(a: Int, b: Option[String])
 
     object Foo {

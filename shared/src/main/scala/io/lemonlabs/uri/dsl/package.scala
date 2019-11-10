@@ -3,7 +3,6 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.config.UriConfig
 
 package object dsl {
-
   import scala.language.implicitConversions
 
   implicit def urlToUrlDsl(uri: Url): UrlDsl = new UrlDsl(uri)

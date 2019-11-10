@@ -3,7 +3,6 @@ package io.lemonlabs.uri
 import org.scalatest.{FlatSpec, Matchers}
 
 class HostTests extends FlatSpec with Matchers {
-
   "IpV4" should "convert Ints to octets and back to Ints" in {
     val ip = IpV4(100, 255, 0, 1)
     ip.octet1Int should equal(100)

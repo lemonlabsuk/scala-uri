@@ -10,7 +10,6 @@ import scala.util.Try
 case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
     implicit config: UriConfig = UriConfig.default
 ) {
-
   def user: Option[String] = userInfo.map(_.user)
   def password: Option[String] = userInfo.flatMap(_.password)
 
@@ -94,7 +93,6 @@ case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
 }
 
 object Authority {
-
   def apply(host: String)(implicit config: UriConfig): Authority =
     new Authority(None, Host.parse(host), port = None)
 

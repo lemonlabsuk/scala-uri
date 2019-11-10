@@ -12,7 +12,6 @@ object UpdatePublicSuffixTrie {
     def empty = Trie(Map.empty, wordEnd = false)
   }
   case class Trie(children: Map[Char, Trie], wordEnd: Boolean = false) {
-
     def +(kv: (Char, Trie)): Trie =
       this.copy(children = children + kv)
 
@@ -28,7 +27,6 @@ object UpdatePublicSuffixTrie {
           case Some(child) =>
             this + (x -> child.insert(xs))
         }
-
     }
 
     def size: Int = children.size + children.values.map(_.size).sum
@@ -37,7 +35,6 @@ object UpdatePublicSuffixTrie {
 
     //Look into changing this to a scala macro?
     override def toString(): String = {
-
       def toString(charBreadcrumbs: String, t: Trie): String = {
         def toStringInline(t: Trie): String =
           trieString(t.children.mapValues(toStringInline), t.wordEnd)
@@ -74,7 +71,6 @@ object UpdatePublicSuffixTrie {
 
       toString("", this)
     }
-
   }
 
   def generateTestVersion(): Unit = {

@@ -4,7 +4,6 @@ import io.lemonlabs.uri.config.{All, ExcludeNones, UriConfig}
 import org.scalatest.{FlatSpec, Matchers}
 
 class DslTests extends FlatSpec with Matchers {
-
   import dsl._
 
   "A simple absolute URI" should "render correctly" in {

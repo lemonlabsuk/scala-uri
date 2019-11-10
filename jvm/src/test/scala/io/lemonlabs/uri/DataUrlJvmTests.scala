@@ -7,7 +7,6 @@ import javax.imageio.ImageIO
 import org.scalatest.{FlatSpec, Matchers}
 
 class DataUrlJvmTests extends FlatSpec with Matchers {
-
   "publicSuffixes and subdomains" should "be empty" in {
     val dataUrl = DataUrl.parse("data:,A%20brief%20note")
     dataUrl.publicSuffix should equal(None)

@@ -10,7 +10,6 @@ import io.lemonlabs.uri.typesafe.Fragment.ops._
 import io.lemonlabs.uri.typesafe.{Fragment, PathPart, QueryKey, QueryKeyValue, QueryValue, TraversableParams}
 
 class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
-
   /**
     * Appends a path part to the path of this URI
     * @param a The path part

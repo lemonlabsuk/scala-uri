@@ -3,7 +3,6 @@ package io.lemonlabs.uri
 import org.scalatest.{Matchers, WordSpec}
 
 class ConversionTests extends WordSpec with Matchers {
-
   "AbsoluteUrl" should {
     "convert toUrl with a cast" in {
       val url: Uri = Uri.parse("http://www.example.com/path?q=1#fragment")

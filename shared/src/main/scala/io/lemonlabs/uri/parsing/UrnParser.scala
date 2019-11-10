@@ -8,7 +8,6 @@ import org.parboiled2._
 import scala.util.{Failure, Try}
 
 class UrnParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
-
   def _empty: Rule0 = MATCH
 
   def _nid: Rule1[String] = rule {

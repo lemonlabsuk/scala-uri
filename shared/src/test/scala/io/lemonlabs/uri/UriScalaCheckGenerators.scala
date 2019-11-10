@@ -9,7 +9,6 @@ import cats.implicits._
 import org.scalacheck.Gen.{const, some}
 
 trait UriScalaCheckGenerators {
-
   private val unicodeChar: Gen[Char] = Gen.frequency(
     (9, Gen.asciiChar),
     (1, Arbitrary.arbChar.arbitrary)

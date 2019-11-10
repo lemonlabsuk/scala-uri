@@ -8,7 +8,6 @@ import org.typelevel.discipline.Laws
 import cats.implicits._
 
 class CatsLawTests extends FunSuite with Checkers with UriScalaCheckGenerators {
-
   // When upgrading to scalatest 3.1.0, this should come from discipline-scalatest
   def checkAll(name: String, ruleSet: Laws#RuleSet): Unit = {
     for ((id, prop) <- ruleSet.all.properties)
@@ -42,5 +41,4 @@ class CatsLawTests extends FunSuite with Checkers with UriScalaCheckGenerators {
   checkAll("AbsolutePath.OrderTests", OrderTests[AbsolutePath].order)
   checkAll("UrnPath.OrderTests", OrderTests[UrnPath].order)
   checkAll("QueryString.OrderTests", OrderTests[QueryString].order)
-
 }

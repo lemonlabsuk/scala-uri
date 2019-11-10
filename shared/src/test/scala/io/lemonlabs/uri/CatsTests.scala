@@ -5,7 +5,6 @@ import cats.implicits._
 import cats.kernel.Comparison
 
 class CatsTests extends FlatSpec with Matchers {
-
   trait CatsTestCase {
     val convertToEqualizer = () // shadow ScalaTest
   }

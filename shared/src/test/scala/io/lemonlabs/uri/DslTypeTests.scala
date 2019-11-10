@@ -3,7 +3,6 @@ package io.lemonlabs.uri
 import org.scalatest.{FlatSpec, Matchers}
 
 class DslTypeTests extends FlatSpec with Matchers {
-
   import dsl._
 
   "String" should "render correctly" in {

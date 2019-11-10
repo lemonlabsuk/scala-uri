@@ -1,7 +1,6 @@
 package io.lemonlabs.uri.inet
 
 trait PublicSuffixSupport extends Product with Serializable {
-
   /**
     * Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`
@@ -19,5 +18,4 @@ trait PublicSuffixSupport extends Product with Serializable {
     * @return all public suffixes for the host in this URI
     */
   def publicSuffixes: Vector[String]
-
 }

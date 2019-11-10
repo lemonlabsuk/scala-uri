@@ -84,7 +84,6 @@ object Host {
 }
 
 final case class DomainName(value: String) extends Host with PublicSuffixSupportImpl with PunycodeSupport {
-
   /**
     * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
     *         operation of <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
@@ -187,7 +186,6 @@ object DomainName {
 }
 
 final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte) extends Host {
-
   private def uByteToInt(b: Byte): Int = b & 0xff
 
   def octet1Int: Int = uByteToInt(octet1)
@@ -236,7 +234,6 @@ final case class IpV6(piece1: Char,
                       piece7: Char,
                       piece8: Char)
     extends Host {
-
   def piece1Int: Int = piece1.toInt
   def piece2Int: Int = piece2.toInt
   def piece3Int: Int = piece3.toInt

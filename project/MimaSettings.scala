@@ -5,7 +5,6 @@ import sbt.Keys._
 import sbt._
 
 object MimaSettings {
-
   val previousVersions = (0 to 1).map(patch => s"1.5.$patch").toSet
 
   val mimaExcludes = Seq(

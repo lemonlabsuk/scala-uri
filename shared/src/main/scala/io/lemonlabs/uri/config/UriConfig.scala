@@ -14,13 +14,10 @@ case class UriConfig(userInfoEncoder: UriEncoder,
                      fragmentDecoder: UriDecoder,
                      charset: String,
                      renderQuery: RenderQuery) {
-
   def withNoEncoding = copy(pathEncoder = NoopEncoder, queryEncoder = NoopEncoder, fragmentEncoder = NoopEncoder)
-
 }
 
 object UriConfig {
-
   val default = UriConfig(
     userInfoEncoder = PercentEncoder(USER_INFO_CHARS_TO_ENCODE),
     pathEncoder = PercentEncoder(PATH_CHARS_TO_ENCODE),

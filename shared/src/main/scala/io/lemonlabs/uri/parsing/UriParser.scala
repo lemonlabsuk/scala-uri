@@ -8,7 +8,6 @@ import org.parboiled2.CharPredicate.{AlphaNum, HexDigit}
 import scala.util.Try
 
 trait UriParser {
-
   val _unreserved: CharPredicate =
     AlphaNum ++ CharPredicate("-._~")
 

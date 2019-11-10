@@ -11,7 +11,6 @@ import org.scalatest.{FlatSpec, Matchers, OptionValues}
   * These bugs were raised at the old github page https://github.com/net-a-porter/scala-uri/issues
   */
 class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
-
   "Github Issue #2" should "now be fixed. Pluses in querystrings should be encoded when using the conservative encoder" in {
     val uri = Url.parse("http://theon.github.com/?+=+")
     uri.toString(UriConfig.conservative) should equal("http://theon.github.com/?%2B=%2B")

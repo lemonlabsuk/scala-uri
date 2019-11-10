@@ -15,7 +15,6 @@ object UpdatePublicSuffixTrie {
     def empty = Trie(Map.empty, wordEnd = false)
   }
   case class Trie(children: Map[Char, Trie], wordEnd: Boolean = false) {
-
     def +(kv: (Char, Trie)): Trie =
       this.copy(children = children + kv)
 
@@ -31,7 +30,6 @@ object UpdatePublicSuffixTrie {
           case Some(child) =>
             this + (x -> child.insert(xs))
         }
-
     }
 
     override def toString(): String = {
@@ -41,7 +39,6 @@ object UpdatePublicSuffixTrie {
           )
         """
     }
-
   }
 
   def generate(): Unit = {

@@ -4,7 +4,6 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers
 
 class ApplyTests extends FlatSpec with Matchers {
-
   "Url apply method" should "accept scheme, host and path" in {
     val url = Url(scheme = "http", host = "theon.github.com", path = "/blah")
     url shouldBe an[AbsoluteUrl]

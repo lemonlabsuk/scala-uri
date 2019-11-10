@@ -3,7 +3,6 @@ package io.lemonlabs.uri
 import org.scalatest.{FlatSpec, Matchers}
 
 class PathTests extends FlatSpec with Matchers {
-
   "UrlPath.fromRaw" should "create an EmptyPath" in {
     UrlPath.fromRaw("") should equal(EmptyPath)
   }

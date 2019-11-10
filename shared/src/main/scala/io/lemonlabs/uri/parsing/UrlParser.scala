@@ -9,7 +9,6 @@ import scala.collection.immutable
 import scala.util.{Failure, Try}
 
 class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
-
   val _host_end = ":/?#"
 
   def _int(maxLength: Int): Rule1[Int] = rule {
@@ -273,7 +272,6 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
 }
 
 object UrlParser {
-
   def apply(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlParser =
     new UrlParser(s.toString)
 

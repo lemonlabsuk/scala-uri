@@ -3,7 +3,6 @@ package io.lemonlabs.uri
 import org.scalatest.{FlatSpec, Matchers}
 
 class PunycodeTests extends FlatSpec with Matchers {
-
   "Github Issue #26" should "support punycode encoded toString for absolute URLs" in {
     val url = Url.parse("https://はじめよう.みんな/howto.html")
     url.toString should equal("https://はじめよう.みんな/howto.html")

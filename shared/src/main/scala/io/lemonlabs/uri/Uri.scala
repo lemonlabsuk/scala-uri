@@ -70,7 +70,6 @@ sealed trait Uri extends Product with Serializable {
 }
 
 object Uri {
-
   def apply(javaUri: java.net.URI): Uri =
     parse(javaUri.toASCIIString)
 
@@ -521,7 +520,6 @@ sealed trait Url extends Uri {
 }
 
 object Url {
-
   def apply(scheme: String = null,
             user: String = null,
             password: String = null,
@@ -530,7 +528,6 @@ object Url {
             path: String = "",
             query: QueryString = QueryString.empty,
             fragment: String = null)(implicit config: UriConfig = UriConfig.default): Url = {
-
     val urlPath = UrlPath.parse(path)
     val frag = Option(fragment)
     def authority = {
@@ -570,7 +567,6 @@ object Url {
 final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option[String])(
     implicit val config: UriConfig = UriConfig.default
 ) extends Url {
-
   type Self = RelativeUrl
   type SelfWithAuthority = ProtocolRelativeUrl
   type SelfWithScheme = UrlWithoutAuthority
@@ -641,7 +637,6 @@ object RelativeUrl {
   *  - Protocol Relative URL: `//example.com`
   */
 sealed trait UrlWithAuthority extends Url {
-
   type Self <: UrlWithAuthority
   type SelfWithScheme <: UrlWithAuthority
   type SelfWithAuthority = Self
@@ -762,7 +757,6 @@ sealed trait UrlWithAuthority extends Url {
 }
 
 object UrlWithAuthority {
-
   def unapply(url: UrlWithAuthority): Option[(Authority, UrlPath, QueryString, Option[String])] =
     Some((url.authority, url.path, url.query, url.fragment))
 
@@ -784,7 +778,6 @@ final case class ProtocolRelativeUrl(authority: Authority,
                                      query: QueryString,
                                      fragment: Option[String])(implicit val config: UriConfig = UriConfig.default)
     extends UrlWithAuthority {
-
   type Self = ProtocolRelativeUrl
   type SelfWithScheme = AbsoluteUrl
 
@@ -840,7 +833,6 @@ final case class AbsoluteUrl(scheme: String,
                              query: QueryString,
                              fragment: Option[String])(implicit val config: UriConfig = UriConfig.default)
     extends UrlWithAuthority {
-
   type Self = AbsoluteUrl
   type SelfWithScheme = AbsoluteUrl
 
@@ -893,7 +885,6 @@ object AbsoluteUrl {
 final case class UrlWithoutAuthority(scheme: String, path: UrlPath, query: QueryString, fragment: Option[String])(
     implicit val config: UriConfig = UriConfig.default
 ) extends Url {
-
   type Self = UrlWithoutAuthority
   type SelfWithScheme = UrlWithoutAuthority
   type SelfWithAuthority = AbsoluteUrl
@@ -974,7 +965,6 @@ object UrlWithoutAuthority {
   * URNs will be in the form `urn:nid:nss`
   */
 final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.default) extends Uri {
-
   type Self = Urn
   type SelfWithScheme = UrlWithoutAuthority
 

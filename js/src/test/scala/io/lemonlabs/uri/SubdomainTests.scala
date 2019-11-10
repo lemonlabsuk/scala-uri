@@ -6,7 +6,6 @@ import org.scalatest.{FlatSpec, Matchers}
   * PublicSuffixes and Subdomains are not implemented yet for scala-js
   */
 class SubdomainTests extends FlatSpec with Matchers {
-
   "longestSubdomain" should "return a.b.c for http://a.b.c.com/" in {
     a[NotImplementedError] should be thrownBy Url.parse("http://a.b.c.com/").longestSubdomain
   }

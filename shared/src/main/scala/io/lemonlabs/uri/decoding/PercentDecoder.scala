@@ -17,7 +17,6 @@ case class PercentDecoder(ignoreInvalidPercentEncoding: Boolean) extends UriDeco
   import io.lemonlabs.uri.decoding.PercentDecoder._
 
   def decode(s: String): String = {
-
     def toHexByte(hex: String): Option[Byte] =
       try {
         if (hex.length != 2)

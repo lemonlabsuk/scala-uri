@@ -7,7 +7,6 @@ import io.lemonlabs.uri.parsing.UrlParser
   * Value class to add DSL functionality to Urls
   */
 class UrlDsl(val url: Url) extends AnyVal {
-
   import url.config
 
   private def anyToQueryValue(any: Any): Option[String] = any match {

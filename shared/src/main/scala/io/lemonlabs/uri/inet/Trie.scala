@@ -7,7 +7,6 @@ object Trie {
 }
 
 case class Trie(children: Map[Char, Trie], wordEnd: Boolean = false) {
-
   def next(c: Char): Option[Trie] =
     children.get(c)
 

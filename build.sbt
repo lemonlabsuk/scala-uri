@@ -2,6 +2,8 @@ import sbt.Keys.libraryDependencies
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import MimaSettings.mimaSettings
 
+import scala.xml.transform.{RewriteRule, RuleTransformer}
+
 name                            := "scala-uri root"
 scalaVersion in ThisBuild       := "2.13.1"
 crossScalaVersions in ThisBuild := Seq("2.12.10", scalaVersion.value)
@@ -55,10 +57,22 @@ val scalaUriSettings = Seq(
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled"  % "2.1.8",
     "com.chuusai"   %%% "shapeless"  % "2.3.3",
-    "org.typelevel" %%% "simulacrum" % "1.0.0",
+    "org.typelevel" %%% "simulacrum" % "1.0.0" % Provided,
     "org.typelevel" %%% "cats-core"  % "2.0.0"
   ),
-  libraryDependencies ++= paradisePlugin.value
+  libraryDependencies ++= paradisePlugin.value,
+  pomPostProcess := { node =>
+    new RuleTransformer(new RewriteRule {
+      override def transform(node: xml.Node): Seq[xml.Node] = node match {
+        case e: xml.Elem
+          if e.label == "dependency" &&
+            e.child.exists(child => child.label == "groupId" && child.text == "org.typelevel") &&
+            e.child.exists(child => child.label == "artifactId" && child.text.startsWith("simulacrum_")) =>
+          Nil
+        case _ => Seq(node)
+      }
+    }).transform(node).head
+  }
 )
 
 val publishingSettings = Seq(

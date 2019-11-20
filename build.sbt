@@ -2,6 +2,8 @@ import sbt.Keys.libraryDependencies
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import MimaSettings.mimaSettings
 
+import scala.xml.transform.{RewriteRule, RuleTransformer}
+
 name                            := "scala-uri root"
 scalaVersion in ThisBuild       := "2.13.0"
 crossScalaVersions in ThisBuild := Seq("2.12.10", "2.13.1")
@@ -33,12 +35,24 @@ val sharedSettings = Seq(
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled"  % "2.1.8",
     "com.chuusai"   %%% "shapeless"  % "2.3.3",
-    "org.typelevel" %%% "simulacrum" % "1.0.0",
-    "org.scalatest" %%% "scalatest"  % "3.0.8" % "test"
+    "org.typelevel" %%% "simulacrum" % "1.0.0" % Provided,
+    "org.scalatest" %%% "scalatest"  % "3.0.8" % Test
   ),
   libraryDependencies ++= paradisePlugin.value,
   parallelExecution in Test := false,
-  scalafmtOnCompile         := true
+  scalafmtOnCompile         := true,
+  pomPostProcess := { node =>
+    new RuleTransformer(new RewriteRule {
+      override def transform(node: xml.Node): Seq[xml.Node] = node match {
+        case e: xml.Elem
+            if e.label == "dependency" &&
+              e.child.exists(child => child.label == "groupId" && child.text == "org.typelevel") &&
+              e.child.exists(child => child.label == "artifactId" && child.text.startsWith("simulacrum_")) =>
+          Nil
+        case _ => Seq(node)
+      }
+    }).transform(node).head
+  }
 )
 
 val jvmSettings = Seq(

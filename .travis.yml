@@ -15,9 +15,9 @@ jdk:
 
 matrix:
   include:
-    - scala: 2.13.0
+    - scala: 2.13.1
       env: COVERAGE=coverageOff
-    - scala: 2.12.9
+    - scala: 2.12.10
       env: COVERAGE=coverageOn
 
 sudo: false # Enable new travis container-based infrastructure

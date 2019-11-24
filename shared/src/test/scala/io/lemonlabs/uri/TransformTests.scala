@@ -2,6 +2,7 @@ package io.lemonlabs.uri
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import io.lemonlabs.uri.typesafe.QueryKeyValue
 
 class TransformTests extends AnyWordSpec with Matchers {
   "mapQuery" should {
@@ -11,6 +12,21 @@ class TransformTests extends AnyWordSpec with Matchers {
         case (k, v) => (k, v map (_ + "TEST"))
       }
       uri2.toString should equal("/test?param_1=helloTEST&param_2=goodbyeTEST&param_3=falseTEST")
+    }
+
+    "transform query params with a QueryKeyValue type class instance" in {
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye&param_3=false")
+
+      case class UppercaseParam(key: String, value: Option[String])
+      object UppercaseParam {
+        implicit val queryKeyValue: QueryKeyValue[UppercaseParam] =
+          QueryKeyValue(_.key.toUpperCase, _.value.map(_.toUpperCase))
+      }
+
+      val uri2 = uri.mapQuery {
+        case (k, v) => UppercaseParam(k, v)
+      }
+      uri2.toString should equal("/test?PARAM_1=HELLO&PARAM_2=GOODBYE&PARAM_3=FALSE")
     }
 
     "transform query param names" in {

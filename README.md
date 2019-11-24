@@ -446,7 +446,7 @@ import io.lemonlabs.uri.config._
 
 implicit val config: UriConfig = UriConfig(renderQuery = ExcludeNones)
 
-val url = Url.parse("http://github.com/lemonlabsuk").addParamsOptionValues("a" -> Some("some"), "b" -> None)
+val url = Url.parse("http://github.com/lemonlabsuk").addParams("a" -> Some("some"), "b" -> None)
 url.toString // This is http://github.com/lemonlabsuk?a=some
 ```
 
@@ -811,12 +811,27 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
    methods, so it mostly can be used in the same way as the previous case class.
  * *Binary Incompatibility*: Parsing a Data URL will now return an instance of [`DataUrl`](#data-urls) rather than `UrlWithoutAuthority`
  * *Binary Incompatibility*: `UserInfo.user` is now of type `String` rather than `Option[String]`
-   * *Binary Incompatibility*`Authority.userInfo` is now of type `Option[UserInfo]`
-   * *Binary Incompatibility*: `UserInfo.empty` method removed
+ * *Binary Incompatibility*: `Authority.userInfo` is now of type `Option[UserInfo]`
+ * *Binary Incompatibility*: `UserInfo.empty` method removed
+ * *Binary Incompatibility*: `QueryString.fromPairOptions` removed. Use `QueryString.fromPairs` instead.
+ * *Binary Incompatibility*: `Url.withQueryStringOptionValues` removed. Use `withQueryString` instead.
+ * *Binary Incompatibility*: `Url.addParamsOptionValues` and `QueryString.addParamsOptionValues` have been renames to `addParams`
+ * `TypesafeUrlDsl`
+    * *Binary Incompatibility*: `withParams[A: TraversableParams](params: A)` renamed to `addParams`
+    * `/(PathPart)` no longer splits the part by slash. If you want to add multiple path parts use `/(TraversablePathParts)` instead
+ * Type Classes
+   * *Binary Incompatibility*: `Fragment[A].fragment` returns `Option[String]` rather than `String`
+   * *Binary Incompatibility*: `Url.withFragment` now takes argument of type `T: Fragment` rather than `String` and `Option[String]` 
+     Type Class instances are provided the method can be used with `String` and `Option[String]` values just as before
+   * *Binary Incompatibility*: `Url.addPathParts` and `Url.addPathPart` now takes arguments of type `P: TraversablePathParts` or `P: PathPart` rather than `Iterable[String]` or `String`
+     Type Class instances are provided the methods can be used with `String` and `Iterable[String]` values just as before
+   * *Binary Incompatibility*: `Url.withQueryString`, `Url.addParam`, `Url.addParams`, `Url.replaceParams`, `Url.removeParams`, 
+     `Url.mapQuery`, `Url.flatMapQuery`, `Url.collectQuery`, `Url.mapQueryNames` and `Url.mapQueryValues` now takes argument of type `KV: QueryKeyValue`, `K: QueryKey` or `V: QueryValue` rather than `(String, String)` or `String`
+     Type Class instances are provided the methods can be used with `(String, String)` or `String` values just as before   
  * The [URL builder DSL](#url-builder-dsl) has been deprecated in favour of the [Typesafe URL builder DSL](#typesafe-url-builder-dsl)
  * `Authority.parse` no longer expects it's string argument to start with `//`, as this is not part of the Authority, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
  * `UserInfo.parse` no longer expects it's string argument to end with a `@`, as this is not part of the UserInfo, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
- * `QueryString.toString` no longer returns a leading `?`, as this is not part of the query string, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
+ * `QueryString.toString` no longer returns a leading `?`, as this is not part of the query string, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt) 
  * Forward slashes in paths are now percent encoded by default.
    This means `Url.parse("/%2F/").toString` returns `"/%2F/"` rather than `///` in previous versions
    To return to the previous behavior, you can bring a `UriConfig` like so into scope

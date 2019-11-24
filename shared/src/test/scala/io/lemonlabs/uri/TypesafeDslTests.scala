@@ -92,7 +92,7 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
 
   "withQueryString" should "replace all query params" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
-    val newUri = uri.withQueryStringOptionValues("testThree" -> Some("3"), "testFour" -> Some("4"))
+    val newUri = uri.withQueryString("testThree" -> Some("3"), "testFour" -> Some("4"))
     newUri.toString should equal("/uris-in-scala.html?testThree=3&testFour=4")
   }
 
@@ -175,23 +175,23 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
     uri.toAbsoluteUrl.withPassword("not-so-secret").toString() should equal("http://user:not-so-secret@moonpig.com/#hi")
   }
 
-  "A sequence of query params" should "get added successsfully" in {
-    val uri = "http://example.com".withParams(("name", true), ("key2", false))
+  "A sequence of query params" should "get added successfully" in {
+    val uri = "http://example.com".addParams(("name", true), ("key2", false))
     uri.query.params("name") should equal(Some("true") :: Nil)
     uri.query.params("key2") should equal(Some("false") :: Nil)
     uri.toString should equal("http://example.com?name=true&key2=false")
   }
 
-  "A list of query params" should "get added successsfully" in {
-    val uri = "http://example.com".withParams(List(("name", true), ("key2", false)))
+  "A list of query params" should "get added successfully" in {
+    val uri = "http://example.com".addParams(List(("name", true), ("key2", false)))
     uri.query.params("name") should equal(Some("true") :: Nil)
     uri.query.params("key2") should equal(Some("false") :: Nil)
     uri.toString should equal("http://example.com?name=true&key2=false")
   }
 
-  "A map of query params" should "get added successsfully" in {
+  "A map of query params" should "get added successfully" in {
     val p = Map("name" -> true, "key2" -> false)
-    val uri = "http://example.com".withParams(p)
+    val uri = "http://example.com".addParams(p)
     uri.query.params("name") should equal(Some("true") :: Nil)
     uri.query.params("key2") should equal(Some("false") :: Nil)
     uri.toString should equal("http://example.com?name=true&key2=false")
@@ -199,14 +199,14 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
 
   "A list of query params" should "get added to a URL already with query params successsfully" in {
     val p = ("name", true) :: ("key2", false) :: Nil
-    val uri = ("http://example.com" ? ("name" -> Some("param1"))).withParams(p)
+    val uri = ("http://example.com" ? ("name" -> Some("param1"))).addParams(p)
     uri.query.params("name") should equal(Vector(Some("param1"), Some("true")))
     uri.query.params("key2") should equal(Some("false") :: Nil)
   }
 
   "A map of query params" should "get added to a URL already with query params successsfully" in {
     val p = Map("name" -> true, "key2" -> false)
-    val uri = ("http://example.com" ? ("name" -> Some("param1"))).withParams(p)
+    val uri = ("http://example.com" ? ("name" -> Some("param1"))).addParams(p)
     uri.query.params("name") should equal(Vector(Some("param1"), Some("true")))
     uri.query.params("key2") should equal(Some("false") :: Nil)
   }

@@ -4,6 +4,11 @@ import cats.implicits._
 import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.{All, ExcludeNones, UriConfig}
 import io.lemonlabs.uri.parsing.UrlParser
+import io.lemonlabs.uri.typesafe.{QueryKey, QueryKeyValue, QueryValue, TraversableParams}
+import io.lemonlabs.uri.typesafe.TraversableParams.ops._
+import io.lemonlabs.uri.typesafe.QueryKeyValue.ops._
+import io.lemonlabs.uri.typesafe.QueryValue.ops._
+import io.lemonlabs.uri.typesafe.QueryKey.ops._
 
 import scala.util.Try
 
@@ -21,14 +26,6 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   }
 
   /**
-    * Adds a new parameter key-value pair.
-    *
-    * @return A new instance with the new parameter added
-    */
-  def addParam(k: String, v: String): QueryString =
-    addParam(k, Some(v))
-
-  /**
     * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
     *
     * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
@@ -36,22 +33,8 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     *
     * @return A new instance with the new parameter added
     */
-  def addParam(k: String, v: Option[String]): QueryString =
-    QueryString(params :+ (k -> v))
-
-  /**
-    * Adds a new parameter key with no value, e.g. `?param`
-    *
-    * @return A new instance with the new parameter added
-    */
-  def addParam(k: String): QueryString =
-    addParam(k, None)
-
-  /**
-    * Adds a new Query String parameter key-value pair.
-    */
-  def addParam(kv: (String, String)): QueryString =
-    QueryString(params :+ (kv._1 -> Some(kv._2)))
+  def addParam[K: QueryKey, V: QueryValue](k: K, v: V): QueryString =
+    QueryString(params :+ (k.queryKey -> v.queryValue))
 
   /**
     * Adds a new Query String parameter key-value pair.
@@ -61,8 +44,8 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     *
     * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
     */
-  def addParamOptionValue(kv: (String, Option[String])): QueryString =
-    QueryString(params :+ kv)
+  def addParam[KV: QueryKeyValue](kv: KV): QueryString =
+    QueryString(params :+ (kv.queryKey -> kv.queryValue))
 
   /**
     * Adds all the specified key-value pairs as parameters to the query
@@ -72,15 +55,14 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
 
   /**
     * Adds all the specified key-value pairs as parameters to the query
+    *
+    * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
+    *
+    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     */
-  def addParams(kvs: (String, String)*): QueryString =
-    addParams(kvs)
-
-  /**
-    * Adds all the specified key-value pairs as parameters to the query
-    */
-  def addParams(kvs: Iterable[(String, String)]): QueryString =
-    addParamsOptionValues(kvs.map { case (k, v) => (k, Some(v)) })
+  def addParams[KV: QueryKeyValue](first: KV, second: KV, kvs: KV*): QueryString =
+    addParams(first +: second +: kvs)
 
   /**
     * Adds all the specified key-value pairs as parameters to the query
@@ -90,19 +72,8 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
     * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     */
-  def addParamsOptionValues(kvs: Iterable[(String, Option[String])]): QueryString =
-    QueryString(params ++ kvs)
-
-  /**
-    * Adds all the specified key-value pairs as parameters to the query
-    *
-    * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    *
-    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
-    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
-    */
-  def addParamsOptionValues(kvs: (String, Option[String])*): QueryString =
-    addParamsOptionValues(kvs)
+  def addParams[P: TraversableParams](kvs: P): QueryString =
+    QueryString(params ++ kvs.toSeq)
 
   def params(key: String): Vector[Option[String]] = params.collect {
     case (k, v) if k == key => v
@@ -120,10 +91,10 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @param f A function that returns a new Parameter when applied to each Parameter
     * @return
     */
-  def map(f: PartialFunction[(String, Option[String]), (String, Option[String])]): QueryString = {
-    QueryString(params.map { kv =>
-      if (f.isDefinedAt(kv)) f(kv) else kv
-    })
+  def map[KV: QueryKeyValue](f: PartialFunction[(String, Option[String]), KV]): QueryString = {
+    QueryString(params.iterator.map { kv =>
+      if (f.isDefinedAt(kv)) f(kv).queryKeyValue else kv
+    }.toVector)
   }
 
   /**
@@ -134,8 +105,8 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @param f A function that returns a new Parameter when applied to each Parameter
     * @return
     */
-  def collect(f: PartialFunction[(String, Option[String]), (String, Option[String])]): QueryString =
-    QueryString(params.collect(f))
+  def collect[KV: QueryKeyValue](f: PartialFunction[(String, Option[String]), KV]): QueryString =
+    QueryString(params.collect(f.andThen(_.queryKeyValue)))
 
   /**
     * Transforms each parameter by applying the specified Function
@@ -143,8 +114,8 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @param f A function that returns a collection of Parameters when applied to each parameter
     * @return
     */
-  def flatMap(f: ((String, Option[String])) => Iterable[(String, Option[String])]): QueryString =
-    QueryString(params.flatMap(f))
+  def flatMap[A: TraversableParams](f: ((String, Option[String])) => A): QueryString =
+    QueryString(params.flatMap(f.andThen(_.toSeq)))
 
   /**
     * Transforms each parameter name by applying the specified Function
@@ -152,9 +123,9 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @param f
     * @return
     */
-  def mapNames(f: String => String): QueryString =
+  def mapNames[K: QueryKey](f: String => K): QueryString =
     QueryString(params.map {
-      case (n, v) => (f(n), v)
+      case (n, v) => (f(n).queryKey, v)
     })
 
   /**
@@ -163,9 +134,9 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @param f
     * @return
     */
-  def mapValues(f: String => String): QueryString =
+  def mapValues[V: QueryValue](f: String => V): QueryString =
     QueryString(params.map {
-      case (n, v) => (n, v map f)
+      case (n, v) => (n, v.flatMap(f.andThen(_.queryValue)))
     })
 
   /**
@@ -222,34 +193,23 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @param v value to replace with
     * @return A new QueryString with the result of the replace
     */
-  def replaceAll(k: String, v: Option[String]): QueryString =
-    QueryString(params.filterNot(_._1 == k) :+ (k -> v))
-
-  /**
-    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
-    * with the specified value.
-    *
-    * @param k Key for the Query String parameter(s) to replace
-    * @param v value to replace with
-    * @return A new QueryString with the result of the replace
-    */
-  def replaceAll(k: String, v: String): QueryString =
-    replaceAll(k, Some(v))
+  def replaceAll[K: QueryKey, V: QueryValue](k: K, v: V): QueryString =
+    QueryString(params.filterNot(_._1 == k.queryKey) :+ (k.queryKey -> v.queryValue))
 
   /**
     * Removes all Query String parameters with the specified key
     * @param k Key for the Query String parameter(s) to remove
     * @return
     */
-  def removeAll(k: String): QueryString =
-    filterNames(_ != k)
+  def removeAll[K: QueryKey](k: K): QueryString =
+    filterNames(_ != k.queryKey)
 
   /**
     * Removes all Query String parameters with a name in the specified list
     * @param k Names of Query String parameter(s) to remove
     * @return
     */
-  def removeAll(k: String*): QueryString =
+  def removeAll[K: QueryKey](k: K*): QueryString =
     removeAll(k)
 
   /**
@@ -257,8 +217,8 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @param k Names of Query String parameter(s) to remove
     * @return
     */
-  def removeAll(k: Iterable[String]): QueryString =
-    filterNames(name => !k.exists(_ == name))
+  def removeAll[K: QueryKey](k: Iterable[K]): QueryString =
+    filterNames(name => !k.exists(_.queryKey == name))
 
   def isEmpty: Boolean = params.isEmpty
   def nonEmpty: Boolean = params.nonEmpty
@@ -297,16 +257,13 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
 }
 
 object QueryString {
-  def fromPairOptions(params: (String, Option[String])*)(implicit config: UriConfig = UriConfig.default): QueryString =
+  def fromPairs[KV: QueryKeyValue](first: KV, kv: KV*)(
+      implicit config: UriConfig = UriConfig.default
+  ): QueryString =
+    fromTraversable(first +: kv)
+
+  def fromTraversable[A: TraversableParams](params: A)(implicit config: UriConfig = UriConfig.default): QueryString =
     new QueryString(params.toVector)
-
-  def fromPairs(params: (String, String)*)(implicit config: UriConfig = UriConfig.default): QueryString =
-    fromTraversable(params)
-
-  def fromTraversable(params: Iterable[(String, String)])(implicit config: UriConfig = UriConfig.default): QueryString =
-    new QueryString(params.toVector.map {
-      case (k, v) => (k, Some(v))
-    })
 
   def empty(implicit config: UriConfig = UriConfig.default): QueryString =
     new QueryString(Vector.empty)

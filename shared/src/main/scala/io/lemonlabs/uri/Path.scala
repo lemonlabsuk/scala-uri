@@ -4,6 +4,10 @@ import cats.implicits._
 import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UrlParser, UrnParser}
+import io.lemonlabs.uri.typesafe.{PathPart, TraversablePathParts}
+
+import io.lemonlabs.uri.typesafe.PathPart.ops._
+import io.lemonlabs.uri.typesafe.TraversablePathParts.ops._
 
 import scala.util.Try
 
@@ -56,14 +60,14 @@ sealed trait UrlPath extends Path {
   def toAbsolute: AbsolutePath
   def toAbsoluteOrEmpty: AbsoluteOrEmptyPath
 
-  def addPart(part: String): UrlPath =
-    withParts(parts :+ part)
+  def addPart[P: PathPart](part: P): UrlPath =
+    withParts(parts :+ part.path)
 
-  def addParts(otherParts: String*): UrlPath =
-    addParts(otherParts)
+  def addParts[P: TraversablePathParts](otherParts: P): UrlPath =
+    withParts(parts = parts ++ otherParts.toSeq)
 
-  def addParts(otherParts: Iterable[String]): UrlPath =
-    withParts(parts = parts ++ otherParts)
+  def addParts[P: PathPart](first: P, second: P, otherParts: P*): UrlPath =
+    addParts((Vector(first, second) ++ otherParts).map(_.path))
 
   /**
     * Returns the encoded path. By default non ASCII characters in the path are percent encoded.

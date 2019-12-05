@@ -1,8 +1,9 @@
 package io.lemonlabs.uri
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class PatternMatchingTests extends FlatSpec with Matchers {
+class PatternMatchingTests extends AnyFlatSpec with Matchers {
   "Uri.unapply" should "extract the path" in {
     val Uri(path) = Urn.parse("urn:nid:nss")
     path should equal(UrnPath("nid", "nss"))

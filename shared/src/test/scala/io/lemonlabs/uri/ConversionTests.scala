@@ -1,8 +1,9 @@
 package io.lemonlabs.uri
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ConversionTests extends WordSpec with Matchers {
+class ConversionTests extends AnyWordSpec with Matchers {
   "AbsoluteUrl" should {
     "convert toUrl with a cast" in {
       val url: Uri = Uri.parse("http://www.example.com/path?q=1#fragment")

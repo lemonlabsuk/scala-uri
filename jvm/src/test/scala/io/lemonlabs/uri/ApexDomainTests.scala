@@ -1,8 +1,9 @@
 package io.lemonlabs.uri
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class ApexDomainTests extends FlatSpec with Matchers {
+class ApexDomainTests extends AnyFlatSpec with Matchers {
   "IPv4" should "not return apex domain" in {
     Url.parse("http://1.2.3.4").apexDomain should equal(None)
   }

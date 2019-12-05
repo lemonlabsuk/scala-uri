@@ -3,14 +3,16 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding.PermissivePercentDecoder
 import io.lemonlabs.uri.parsing.UriParsingException
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Test Suite to ensure that bugs raised by awesome github peeps NEVER come back
   *
   * These bugs were raised at the old github page https://github.com/net-a-porter/scala-uri/issues
   */
-class NapGithubIssueTests extends FlatSpec with Matchers with OptionValues {
+class NapGithubIssueTests extends AnyFlatSpec with Matchers with OptionValues {
   "Github Issue #2" should "now be fixed. Pluses in querystrings should be encoded when using the conservative encoder" in {
     val uri = Url.parse("http://theon.github.com/?+=+")
     uri.toString(UriConfig.conservative) should equal("http://theon.github.com/?%2B=%2B")

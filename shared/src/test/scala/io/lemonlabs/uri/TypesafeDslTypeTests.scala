@@ -2,11 +2,12 @@ package io.lemonlabs.uri
 
 import io.lemonlabs.uri.config.{ExcludeNones, UriConfig}
 import io.lemonlabs.uri.typesafe._
-import org.scalatest.{FlatSpec, Matchers}
 import shapeless._
 import shapeless.labelled._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class TypesafeDslTypeTests extends FlatSpec with Matchers {
+class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
   import io.lemonlabs.uri.typesafe.dsl._
 
   "String" should "render correctly" in {

@@ -1,9 +1,10 @@
 package io.lemonlabs.uri
 
 import io.lemonlabs.uri.config.{All, ExcludeNones, UriConfig}
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class TypesafeDslTests extends FlatSpec with Matchers {
+class TypesafeDslTests extends AnyFlatSpec with Matchers {
   import io.lemonlabs.uri.typesafe.dsl._
 
   "A simple absolute URI" should "render correctly" in {

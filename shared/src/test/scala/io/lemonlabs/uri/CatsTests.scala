@@ -1,10 +1,11 @@
 package io.lemonlabs.uri
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import cats.implicits._
 import cats.kernel.Comparison
 
-class CatsTests extends FlatSpec with Matchers {
+class CatsTests extends AnyFlatSpec with Matchers {
   trait CatsTestCase {
     val convertToEqualizer = () // shadow ScalaTest
   }

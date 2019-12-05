@@ -1,8 +1,9 @@
 package io.lemonlabs.uri
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class PunycodeTests extends FlatSpec with Matchers {
+class PunycodeTests extends AnyFlatSpec with Matchers {
   "Github Issue #26" should "support punycode encoded toString for absolute URLs" in {
     val url = Url.parse("https://はじめよう.みんな/howto.html")
     url.toString should equal("https://はじめよう.みんな/howto.html")

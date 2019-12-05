@@ -1,7 +1,7 @@
 package io.lemonlabs.uri
 
 import cats.kernel.laws.discipline.OrderTests
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.Checkers
 import org.typelevel.discipline.Laws
 import cats.implicits._
@@ -10,7 +10,7 @@ import cats.laws.discipline.eq._
 import cats.laws.discipline.{ContravariantTests, ExhaustiveCheck}
 import io.lemonlabs.uri.typesafe.{Fragment, PathPart, QueryKey, QueryValue, TraversableParams}
 
-class CatsLawTests extends FunSuite with Checkers with UriScalaCheckGenerators {
+class CatsLawTests extends AnyFunSuite with Checkers with UriScalaCheckGenerators {
   // When upgrading to scalatest 3.1.0, this should come from discipline-scalatest
   def checkAll(name: String, ruleSet: Laws#RuleSet): Unit = {
     for ((id, prop) <- ruleSet.all.properties)

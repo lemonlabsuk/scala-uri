@@ -1,8 +1,9 @@
 package io.lemonlabs.uri
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class SubdomainTests extends FlatSpec with Matchers {
+class SubdomainTests extends AnyFlatSpec with Matchers {
   "longestSubdomain" should "return a.b.c for http://a.b.c.com/" in {
     val subdomain = Url.parse("http://a.b.c.com/").longestSubdomain
     subdomain should equal(Some("a.b.c"))

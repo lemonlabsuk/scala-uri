@@ -1,11 +1,12 @@
 package io.lemonlabs.uri
 
 import io.lemonlabs.uri.parsing.UriParsingException
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.util.Success
 
-class ParsingTests extends FlatSpec with Matchers {
+class ParsingTests extends AnyFlatSpec with Matchers {
   "Parsing an absolute URI" should "result in a valid Uri object" in {
     val url = Url.parse("http://theon.github.com/uris-in-scala.html")
     url.schemeOption should equal(Some("http"))

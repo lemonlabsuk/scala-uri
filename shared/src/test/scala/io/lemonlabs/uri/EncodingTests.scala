@@ -1,9 +1,10 @@
 package io.lemonlabs.uri
 
 import io.lemonlabs.uri.config.UriConfig
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class EncodingTests extends FlatSpec with Matchers {
+class EncodingTests extends AnyFlatSpec with Matchers {
   import encoding._
 
   "URI paths" should "be percent encoded" in {

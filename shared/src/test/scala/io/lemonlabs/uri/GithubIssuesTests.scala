@@ -3,14 +3,16 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding.{PercentDecoder, UriDecodeException}
 import io.lemonlabs.uri.encoding.NoopEncoder
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Test Suite to ensure that bugs raised by awesome github peeps NEVER come back
   *
   * These bugs were raised on thr github issues page https://github.com/lemonlabsuk/scala-uri/issues
   */
-class GithubIssuesTests extends FlatSpec with Matchers with OptionValues {
+class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
   "Github Issue #1" should "throw UriDecodeException when url contains invalid percent encoding" in {
     Vector("/?x=%3", "/%3", "/?a=%3&b=whatever", "/?%3=okay").foreach { part =>
       withClue(part) {

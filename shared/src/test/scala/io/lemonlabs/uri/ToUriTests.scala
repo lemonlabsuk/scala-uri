@@ -3,9 +3,10 @@ package io.lemonlabs.uri
 import java.net.URI
 
 import io.lemonlabs.uri.config.UriConfig
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class ToUriTests extends WordSpec with Matchers {
+class ToUriTests extends AnyWordSpec with Matchers {
   "toJavaURI" should {
     "handle simple URL" in {
       val strUri: String = "http://www.example.com"

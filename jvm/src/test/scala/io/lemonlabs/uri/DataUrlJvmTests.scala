@@ -4,9 +4,10 @@ import java.awt.Color
 import java.io.ByteArrayInputStream
 
 import javax.imageio.ImageIO
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class DataUrlJvmTests extends FlatSpec with Matchers {
+class DataUrlJvmTests extends AnyFlatSpec with Matchers {
   "publicSuffixes and subdomains" should "be empty" in {
     val dataUrl = DataUrl.parse("data:,A%20brief%20note")
     dataUrl.publicSuffix should equal(None)

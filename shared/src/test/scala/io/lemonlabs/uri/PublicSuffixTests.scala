@@ -1,8 +1,9 @@
 package io.lemonlabs.uri
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class PublicSuffixTests extends FlatSpec with Matchers {
+class PublicSuffixTests extends AnyFlatSpec with Matchers {
   "Uri publicSuffix method" should "match the longest public suffix" in {
     val uri = Url.parse("http://www.google.co.uk/blah")
     uri.publicSuffix should equal(Some("co.uk"))

@@ -6,6 +6,7 @@ import cats.Show
 import io.lemonlabs.uri.encoding.PercentEncoder
 import org.scalacheck.{Arbitrary, Cogen, Gen}
 import cats.implicits._
+import io.lemonlabs.uri.typesafe.{Fragment, PathPart, QueryKey, QueryValue, TraversableParams}
 import org.scalacheck.Gen.{const, some}
 
 trait UriScalaCheckGenerators {
@@ -237,6 +238,13 @@ trait UriScalaCheckGenerators {
   implicit val randUri: Arbitrary[Uri] = Arbitrary(
     Gen.oneOf(randUrn.arbitrary, randDataUrl.arbitrary, randSimpleUrlWithoutAuthority.arbitrary, randAbsoluteUrl.arbitrary, randProtocolRelativeUrl.arbitrary, randRelativeUrl.arbitrary)
   )
+
+  implicit def arbitraryFragment[A: Cogen]: Arbitrary[Fragment[A]] = Arbitrary(implicitly[Arbitrary[A => String]].arbitrary.map(f => f(_)))
+  implicit def arbitraryPathPart[A: Cogen]: Arbitrary[PathPart[A]] = Arbitrary(implicitly[Arbitrary[A => String]].arbitrary.map(f => f(_)))
+  implicit def arbitraryQueryValue[A: Cogen]: Arbitrary[QueryValue[A]] = Arbitrary(implicitly[Arbitrary[A => Option[String]]].arbitrary.map(f => f(_)))
+  implicit def arbitraryQueryKey[A: Cogen]: Arbitrary[QueryKey[A]] = Arbitrary(implicitly[Arbitrary[A => String]].arbitrary.map(f => f(_)))
+  implicit def arbitraryTraversableParams[A: Cogen]: Arbitrary[TraversableParams[A]] =
+    Arbitrary(implicitly[Arbitrary[A => List[(String, Option[String])]]].arbitrary.map(f => f(_)))
 
   implicit def uriCogen[T <: Uri: Show]: Cogen[T] =
     Cogen[String].contramap(_.show)

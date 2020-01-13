@@ -84,6 +84,7 @@ object Host {
 }
 
 final case class DomainName(value: String) extends Host with PublicSuffixSupportImpl with PunycodeSupport {
+
   /**
     * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
     *         operation of <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.

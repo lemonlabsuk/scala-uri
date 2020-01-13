@@ -1,8 +1,9 @@
 package io.lemonlabs.uri
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class TransformTests extends WordSpec with Matchers {
+class TransformTests extends AnyWordSpec with Matchers {
   "mapQuery" should {
     "transform query params" in {
       val uri = Url.parse("/test?param_1=hello&param_2=goodbye&param_3=false")

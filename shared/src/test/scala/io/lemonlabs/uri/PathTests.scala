@@ -1,8 +1,9 @@
 package io.lemonlabs.uri
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class PathTests extends FlatSpec with Matchers {
+class PathTests extends AnyFlatSpec with Matchers {
   "UrlPath.fromRaw" should "create an EmptyPath" in {
     UrlPath.fromRaw("") should equal(EmptyPath)
   }

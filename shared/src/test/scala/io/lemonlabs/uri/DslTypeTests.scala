@@ -1,8 +1,9 @@
 package io.lemonlabs.uri
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class DslTypeTests extends FlatSpec with Matchers {
+class DslTypeTests extends AnyFlatSpec with Matchers {
   import dsl._
 
   "String" should "render correctly" in {

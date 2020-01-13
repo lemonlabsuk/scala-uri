@@ -1,6 +1,5 @@
 package io.lemonlabs.uri
 
-import org.scalatest.{FlatSpec, Matchers}
 import java.io.ByteArrayOutputStream
 import java.io.ObjectOutputStream
 import java.io.ByteArrayInputStream
@@ -8,8 +7,10 @@ import java.io.ObjectInputStream
 
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding.NoopDecoder
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class SerializableTests extends FlatSpec with Matchers {
+class SerializableTests extends AnyFlatSpec with Matchers {
   private[this] def serializeAndDeserialize[A <: Serializable](a: A): A = {
     val bytes = new ByteArrayOutputStream
     new ObjectOutputStream(bytes).writeObject(a)

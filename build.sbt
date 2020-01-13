@@ -36,7 +36,7 @@ val sharedSettings = Seq(
     "org.parboiled" %%% "parboiled"  % "2.1.8",
     "com.chuusai"   %%% "shapeless"  % "2.3.3",
     "org.typelevel" %%% "simulacrum" % "1.0.0" % Provided,
-    "org.scalatest" %%% "scalatest"  % "3.0.8" % Test
+    "org.scalatest" %%% "scalatest"  % "3.1.0" % Test
   ),
   libraryDependencies ++= paradisePlugin.value,
   parallelExecution in Test := false,

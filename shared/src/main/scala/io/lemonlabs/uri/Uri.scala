@@ -256,8 +256,8 @@ sealed trait Url extends Uri {
   /**
     * Replaces the all existing Query String parameters with a new set of query params
     */
-  def withQueryString[KV: QueryKeyValue](first: KV, params: KV*): Self =
-    withQueryString(QueryString.fromTraversable(first +: params))
+  def withQueryString[KV: QueryKeyValue](first: KV, second: KV, params: KV*): Self =
+    withQueryString(QueryString.fromTraversable(Seq(first, second) ++ params))
 
   def addPathPart[P: PathPart](part: P): Self =
     withPath(path.addPart(part))
@@ -344,11 +344,13 @@ sealed trait Url extends Uri {
 
   /**
     * Removes all Query String parameters with a name in the specified list
-    * @param k Names of Query String parameter(s) to remove
+    * @param first Name of a Query String parameter to remove
+    * @param second Name of another Query String parameter to remove
+    * @param rest Name of more Query String parameter(s) to remove
     * @return
     */
-  def removeParams[K: QueryKey](k: K*): Self =
-    withQueryString(query.removeAll(k))
+  def removeParams[K: QueryKey](first: K, second: K, rest: K*): Self =
+    withQueryString(query.removeAll(first, second, rest: _*))
 
   /**
     * Removes all Query String parameters with a name in the specified list

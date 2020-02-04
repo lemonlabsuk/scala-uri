@@ -206,11 +206,13 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
 
   /**
     * Removes all Query String parameters with a name in the specified list
-    * @param k Names of Query String parameter(s) to remove
+    * @param first Name of a Query String parameter to remove
+    * @param second Name of another Query String parameter to remove
+    * @param rest Names of more Query String parameter(s) to remove
     * @return
     */
-  def removeAll[K: QueryKey](k: K*): QueryString =
-    removeAll(k)
+  def removeAll[K: QueryKey](first: K, second: K, rest: K*): QueryString =
+    removeAll(Seq(first, second) ++ rest)
 
   /**
     * Removes all Query String parameters with a name in the specified list

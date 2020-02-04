@@ -1129,7 +1129,7 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
     * @return a new Uri with the specified scheme
     */
   def withScheme(scheme: String): UrlWithoutAuthority =
-    UrlWithoutAuthority(scheme, path.toUrlPath, QueryString.empty, fragment = None)
+    UrlWithoutAuthority(scheme, path.toUrlPath.toRootless, QueryString.empty, fragment = None)
 
   def toUrl: Url = throw new UriConversionException("Urn cannot be converted to Url")
   def toUrn: Urn = this

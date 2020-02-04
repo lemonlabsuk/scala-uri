@@ -1,5 +1,6 @@
 package io.lemonlabs.uri
 
+import io.lemonlabs.uri.config.UriConfig
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -66,6 +67,25 @@ class ConversionTests extends AnyWordSpec with Matchers {
       val e = the[UriConversionException] thrownBy url.toProtocolRelativeUrl
       e.getMessage should equal("RelativeUrl cannot be converted to ProtocolRelativeUrl")
     }
+
+    "convert to UrlWithoutAuthority via withScheme" in {
+      val url = RelativeUrl.parse("me@example.com")
+      val mailto: UrlWithoutAuthority = url.withScheme("mailto")
+      mailto.toString() should equal("mailto:me@example.com")
+    }
+
+    "convert to ProtocolRelativeUrl via withAuthority" in {
+      implicit val c: UriConfig = UriConfig.default
+      val url = RelativeUrl.parse("/index.html")
+      val url2: ProtocolRelativeUrl = url.withAuthority(Authority("example.com"))
+      url2.toString() should equal("//example.com/index.html")
+    }
+
+    "convert to ProtocolRelativeUrl via withHost" in {
+      val url = RelativeUrl.parse("/index.html")
+      val url2: ProtocolRelativeUrl = url.withHost(IpV4(127, 0, 0, 1))
+      url2.toString() should equal("//127.0.0.1/index.html")
+    }
   }
 
   "ProtocolRelativeUrl" should {
@@ -97,6 +117,37 @@ class ConversionTests extends AnyWordSpec with Matchers {
       val url: Url = Url.parse("//www.example.com/path?q=1#fragment")
       val protocolRelUrl: ProtocolRelativeUrl = url.toProtocolRelativeUrl
       protocolRelUrl should be theSameInstanceAs url
+    }
+
+    "convert to AbsoluteUrl via withScheme" in {
+      val url = ProtocolRelativeUrl.parse("//example.com")
+      val https: AbsoluteUrl = url.withScheme("https")
+      https.toString() should equal("https://example.com")
+    }
+
+    "stay as ProtocolRelativeUrl via withAuthority" in {
+      implicit val c: UriConfig = UriConfig.default
+      val url = ProtocolRelativeUrl.parse("//example.com/index.html")
+      val url2: ProtocolRelativeUrl = url.withAuthority(Authority("google.com"))
+      url2.toString() should equal("//google.com/index.html")
+    }
+
+    "stay as ProtocolRelativeUrl via withFragment" in {
+      val url = ProtocolRelativeUrl.parse("//example.com/index.html")
+      val url2: ProtocolRelativeUrl = url.withFragment("frag")
+      url2.toString() should equal("//example.com/index.html#frag")
+    }
+
+    "stay as ProtocolRelativeUrl via withPath" in {
+      val url = ProtocolRelativeUrl.parse("//example.com/index.html")
+      val url2: ProtocolRelativeUrl = url.withPath(UrlPath.parse("/path"))
+      url2.toString() should equal("//example.com/path")
+    }
+
+    "stay as ProtocolRelativeUrl via withQueryString" in {
+      val url = ProtocolRelativeUrl.parse("//example.com/index.html")
+      val url2: ProtocolRelativeUrl = url.withQueryString(QueryString.fromPairs("a" -> "b"))
+      url2.toString() should equal("//example.com/index.html?a=b")
     }
   }
 
@@ -131,6 +182,55 @@ class ConversionTests extends AnyWordSpec with Matchers {
       val e = the[UriConversionException] thrownBy url.toProtocolRelativeUrl
       e.getMessage should equal("SimpleUrlWithoutAuthority cannot be converted to ProtocolRelativeUrl")
     }
+
+    "stay as SimpleUrlWithoutAuthority via withScheme" in {
+      val url = SimpleUrlWithoutAuthority.parse("mailto:me@example.com")
+      val url2: SimpleUrlWithoutAuthority = url.withScheme("tel")
+      url2.toString() should equal("tel:me@example.com")
+    }
+
+    "convert to AbsoluteUrl via withAuthority" in {
+      implicit val c: UriConfig = UriConfig.default
+      val url = SimpleUrlWithoutAuthority.parse("mailto:me@example.com")
+      val url2: AbsoluteUrl = url.withAuthority(Authority("google.com"))
+      url2.toString() should equal("mailto://google.com/me@example.com")
+    }
+
+    "convert to AbsoluteUrl via withHost" in {
+      val url = SimpleUrlWithoutAuthority.parse("mailto:me@example.com")
+      val url2: AbsoluteUrl = url.withHost(DomainName("google.com"))
+      url2.toString() should equal("mailto://google.com/me@example.com")
+    }
+
+    "convert to AbsoluteUrl via withPort" in {
+      val url = SimpleUrlWithoutAuthority.parse("mailto:me@example.com")
+      val url2: AbsoluteUrl = url.withPort(8080)
+      url2.toString() should equal("mailto://:8080/me@example.com")
+    }
+
+    "stay as SimpleUrlWithoutAuthority via withFragment" in {
+      val url = SimpleUrlWithoutAuthority.parse("mailto:me@example.com")
+      val url2: SimpleUrlWithoutAuthority = url.withFragment("frag")
+      url2.toString() should equal("mailto:me@example.com#frag")
+    }
+
+    "stay as SimpleUrlWithoutAuthority via withPath" in {
+      val url = SimpleUrlWithoutAuthority.parse("mailto:me@example.com")
+      val url2: SimpleUrlWithoutAuthority = url.withPath(UrlPath.parse("someoneelse@example.com"))
+      url2.toString() should equal("mailto:someoneelse@example.com")
+    }
+
+    "stay as SimpleUrlWithoutAuthority via withQueryString" in {
+      val url = SimpleUrlWithoutAuthority.parse("mailto:me@example.com")
+      val url2: SimpleUrlWithoutAuthority = url.withQueryString(QueryString.fromPairs("a" -> "b"))
+      url2.toString() should equal("mailto:me@example.com?a=b")
+    }
+
+    "stay as DataUrl via withPath" in {
+      val dataUrl = DataUrl.parse("data:,A%20brief%20note")
+      val dataUrl2: DataUrl = dataUrl.withPath(UrlPath.parse(",A%20different%20note"))
+      dataUrl2.toString() should equal("data:,A%20different%20note")
+    }
   }
 
   "Urn" should {
@@ -145,6 +245,12 @@ class ConversionTests extends AnyWordSpec with Matchers {
       val urn: Uri = Uri.parse("urn:example:com")
       val sameUrn: Urn = urn.toUrn
       sameUrn should be theSameInstanceAs urn
+    }
+
+    "convert to SimpleUrlWithoutAuthority via withScheme" in {
+      val urn: Urn = Urn.parse("urn:44:12345")
+      val url: UrlWithoutAuthority = urn.withScheme("tel")
+      url.toString() should equal("tel:44/12345")
     }
   }
 }

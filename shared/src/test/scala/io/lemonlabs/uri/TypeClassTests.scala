@@ -34,6 +34,31 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
     uri.toString should equal("/uris-in-scala.html?param=some&param2")
   }
 
+  "Vector" should "render correctly as pathParts" in {
+    val uri = Url.parse("/a").addPathParts(Vector("b", "c", "d"))
+    uri.toString should equal("/a/b/c/d")
+  }
+
+  "Iterable" should "render correctly as pathParts" in {
+    val uri = Url.parse("/a").addPathParts(Iterable(true, false, true))
+    uri.toString should equal("/a/true/false/true")
+  }
+
+  "Seq" should "render correctly as pathParts" in {
+    val uri = Url.parse("/a").addPathParts(Seq(Some("b"), None, Some("c")))
+    uri.toString should equal("/a/b//c")
+  }
+
+  "List" should "render correctly as pathParts" in {
+    val uri = Url.parse("/a").addPathParts(List("b", "c", "d"))
+    uri.toString should equal("/a/b/c/d")
+  }
+
+  "A single item" should "render correctly as pathParts" in {
+    val uri = Url.parse("/a").addPathParts(5)
+    uri.toString should equal("/a/5")
+  }
+
   "Foo" should "render correctly as path part" in {
     final case class Foo(a: String, b: Int)
     object Foo {
@@ -63,6 +88,88 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
     val uri = Url.parse("/uris-in-scala.html") addParam Foo("foo_value")
     uri.toString should equal("/uris-in-scala.html?foo=foo_value")
+  }
+
+  "addPathParts(TraversablePathParts)" should "derive type class for case class correctly" in {
+    final case class Foo(a: Int, b: String)
+
+    object Foo {
+      implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
+    }
+
+    val uri = Url.parse("/uris-in-scala") addPathParts Foo(a = 1, b = "bar")
+    uri.toString should equal("/uris-in-scala/1/bar")
+  }
+
+  "addPathParts(TraversablePathParts)" should "derive type class for case classes structure correctly" in {
+    final case class Foo(a: Int, b: String)
+
+    object Foo {
+      implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
+    }
+
+    final case class Bar(c: Int, foo: Foo)
+
+    object Bar {
+      implicit val traversablePathParts: TraversablePathParts[Bar] = TraversablePathParts.product
+    }
+
+    val uri = Url.parse("/uris-in-scala") addPathParts Bar(c = 2, foo = Foo(a = 1, b = "bar"))
+    uri.toString should equal("/uris-in-scala/2/1/bar")
+  }
+
+  "addPathParts(TraversablePathParts)" should "derive type class for case class with optional field correctly" in {
+    final case class Foo(a: Int, b: Option[String])
+
+    object Foo {
+      implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
+    }
+
+    val uriWithB = Url.parse("/uris-in-scala") addPathParts Foo(a = 1, b = Some("bar"))
+    val uriWithoutB = Url.parse("/uris-in-scala") addPathParts Foo(a = 1, b = None)
+    uriWithB.toString should equal("/uris-in-scala/1/bar")
+    uriWithoutB.toString should equal("/uris-in-scala/1/")
+  }
+
+  "withPathParts(TraversablePathParts)" should "derive type class for case class correctly" in {
+    final case class Foo(a: Int, b: String)
+
+    object Foo {
+      implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
+    }
+
+    val uri = Url.parse("/uris-in-scala") withPathParts Foo(a = 1, b = "bar")
+    uri.toString should equal("/1/bar")
+  }
+
+  "withPathParts(TraversablePathParts)" should "derive type class for case classes structure correctly" in {
+    final case class Foo(a: Int, b: String)
+
+    object Foo {
+      implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
+    }
+
+    final case class Bar(c: Int, foo: Foo)
+
+    object Bar {
+      implicit val traversablePathParts: TraversablePathParts[Bar] = TraversablePathParts.product
+    }
+
+    val uri = Url.parse("/uris-in-scala") withPathParts Bar(c = 2, foo = Foo(a = 1, b = "bar"))
+    uri.toString should equal("/2/1/bar")
+  }
+
+  "withPathParts(TraversablePathParts)" should "derive type class for case class with optional field correctly" in {
+    final case class Foo(a: Int, b: Option[String])
+
+    object Foo {
+      implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
+    }
+
+    val uriWithB = Url.parse("/uris-in-scala") withPathParts Foo(a = 1, b = Some("bar"))
+    val uriWithoutB = Url.parse("/uris-in-scala") withPathParts Foo(a = 1, b = None)
+    uriWithB.toString should equal("/1/bar")
+    uriWithoutB.toString should equal("/1/")
   }
 
   "TraversableParams" should "derive type class for case class correctly" in {
@@ -135,5 +242,15 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
     val uriB = Url.parse("/uris-in-scala.html") addParam ("foo" -> B)
     uriA.toString should equal("/uris-in-scala.html?foo=A")
     uriB.toString should equal("/uris-in-scala.html?foo=B")
+  }
+
+  "removeParams(QueryKey,QueryKey,QueryKey*)" should "remove all specified params" in {
+    val url = Url.parse("/?a=1&b=2&c=3&d=4&e=5").removeParams("a", "c", "d", "e")
+    url.toString should equal("/?b=2")
+  }
+
+  "removeQueryString()" should "remove all params" in {
+    val url = Url.parse("/?a=1&b=2&c=3&d=4&e=5").removeQueryString()
+    url.toString should equal("/")
   }
 }

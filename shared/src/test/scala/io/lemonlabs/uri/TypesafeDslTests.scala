@@ -231,9 +231,46 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
     uri.toString should equal("http://host/path/to/resource?a=1&b=2#wow")
   }
 
-  "/? operator" should "add a slash to the path and a query param" in {
+  "/? operator" should "add a slash to the path and a tuple query param" in {
     val uri = "http://host" /? ("a" -> "1")
     uri.toString should equal("http://host/?a=1")
+  }
+
+  "/? operator" should "add a slash to the path and a query param" in {
+    val uri = "http://host" /? ("a", "1")
+    uri.toString should equal("http://host/?a=1")
+  }
+
+  "&& operator" should "add a tuple with Some value" in {
+    val uri = "http://host" && ("a" -> Some("1"))
+    uri.toString should equal("http://host?a=1")
+  }
+
+  "&& operator" should "add a Some value" in {
+    val uri = "http://host" && ("a", Some("1"))
+    uri.toString should equal("http://host?a=1")
+  }
+
+  "&& operator" should "not add a tuple with None value" in {
+    val uri = "http://host" && ("a" -> None)
+    uri.toString should equal("http://host")
+  }
+
+  "&& operator" should "not add a None value" in {
+    val uri = "http://host" && ("a", None)
+    uri.toString should equal("http://host")
+  }
+
+  "? operator" should "merge Urls" in {
+    val uri = "http://host" ? Url.parse("?a=b")
+    uri.query.params should equal(Vector("a" -> Some("b")))
+    uri.toString should equal("http://host?a=b")
+  }
+
+  "# operator" should "merge Urls" in {
+    val uri = "http://host" ? Url.parse("#a")
+    uri.fragment should equal(Some("a"))
+    uri.toString should equal("http://host#a")
   }
 
   it should "work alongside the / operator" in {

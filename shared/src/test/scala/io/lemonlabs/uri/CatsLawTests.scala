@@ -20,7 +20,7 @@ class CatsLawTests extends AnyFunSuite with Checkers with UriScalaCheckGenerator
   }
 
   implicit def eqFragment[A: ExhaustiveCheck]: Eq[Fragment[A]] =
-    Eq.by[Fragment[A], A => String](_.fragment)
+    Eq.by[Fragment[A], A => Option[String]](_.fragment)
 
   implicit def eqPathPart[A: ExhaustiveCheck]: Eq[PathPart[A]] =
     Eq.by[PathPart[A], A => String](_.path)
@@ -32,7 +32,7 @@ class CatsLawTests extends AnyFunSuite with Checkers with UriScalaCheckGenerator
     Eq.by[QueryKey[A], A => String](_.queryKey)
 
   implicit def eqTraversableParams[A: ExhaustiveCheck]: Eq[TraversableParams[A]] =
-    Eq.by[TraversableParams[A], A => List[(String, Option[String])]](_.toSeq)
+    Eq.by[TraversableParams[A], A => Vector[(String, Option[String])]](_.toVector)
 
   // Note: OrderTests also run EqTests, so no need to also kick off EqTests here
   checkAll("Uri.OrderTests", OrderTests[Uri].order)

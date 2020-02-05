@@ -239,7 +239,7 @@ trait UriScalaCheckGenerators {
     Gen.oneOf(randUrn.arbitrary, randDataUrl.arbitrary, randSimpleUrlWithoutAuthority.arbitrary, randAbsoluteUrl.arbitrary, randProtocolRelativeUrl.arbitrary, randRelativeUrl.arbitrary)
   )
 
-  implicit def arbitraryFragment[A: Cogen]: Arbitrary[Fragment[A]] = Arbitrary(implicitly[Arbitrary[A => String]].arbitrary.map(f => f(_)))
+  implicit def arbitraryFragment[A: Cogen]: Arbitrary[Fragment[A]] = Arbitrary(implicitly[Arbitrary[A => Option[String]]].arbitrary.map(f => f(_)))
   implicit def arbitraryPathPart[A: Cogen]: Arbitrary[PathPart[A]] = Arbitrary(implicitly[Arbitrary[A => String]].arbitrary.map(f => f(_)))
   implicit def arbitraryQueryValue[A: Cogen]: Arbitrary[QueryValue[A]] = Arbitrary(implicitly[Arbitrary[A => Option[String]]].arbitrary.map(f => f(_)))
   implicit def arbitraryQueryKey[A: Cogen]: Arbitrary[QueryKey[A]] = Arbitrary(implicitly[Arbitrary[A => String]].arbitrary.map(f => f(_)))

@@ -40,7 +40,7 @@ class UrlDsl(val url: Url) extends AnyVal {
     "2.0.0"
   )
   def ?(kv: String): Url =
-    url.addParamOptionValue(UrlParser.parseQueryParam(kv).get)
+    url.addParam(UrlParser.parseQueryParam(kv).get)
 
   /**
     * Adds a trailing forward slash to the path and a new Query String parameter key-value pair.
@@ -107,7 +107,7 @@ class UrlDsl(val url: Url) extends AnyVal {
     "2.0.0"
   )
   def addParams(kvs: Iterable[(String, Any)]): Url =
-    url.addParamsOptionValues(kvs.map { case (k, v) => (k, anyToQueryValue(v)) })
+    url.addParams(kvs.map { case (k, v) => (k, anyToQueryValue(v)) })
 
   /**
     * Adds a fragment to the end of the uri

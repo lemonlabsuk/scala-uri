@@ -353,6 +353,8 @@ class ParsingTests extends AnyFlatSpec with Matchers {
     urn.scheme should equal("urn")
     urn.schemeOption should equal(Some("urn"))
     urn.path.toString() should equal("example:animal:ferret:nose")
+    urn.nid should equal("example")
+    urn.nss should equal("animal:ferret:nose")
     urn.toString() should equal("urn:example:animal:ferret:nose")
   }
 

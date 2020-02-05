@@ -45,6 +45,9 @@ class ApplyTests extends AnyFlatSpec with Matchers {
     val url = Url(query = qs)
     url shouldBe an[RelativeUrl]
     url.schemeOption should equal(None)
+    url.user should equal(None)
+    url.password should equal(None)
+    url.port should equal(None)
     url.hostOption should equal(None)
     url.query should equal(qs)
   }
@@ -61,5 +64,12 @@ class ApplyTests extends AnyFlatSpec with Matchers {
   it should "automatically add a slash when missing if authority is specified" in {
     val url = Url(host = "example.com", path = "example")
     url.path.toString() should equal("/example")
+  }
+
+  "Urn apply method" should "construct from nid and nss" in {
+    val urn = Urn("nid", "nss:nss:nss")
+    urn.nid should equal("nid")
+    urn.nss should equal("nss:nss:nss")
+    urn.toString() should equal("urn:nid:nss:nss:nss")
   }
 }

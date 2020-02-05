@@ -6,6 +6,22 @@ import cats.implicits._
 import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UriParser, UrlParser, UrnParser}
+import io.lemonlabs.uri.typesafe.{
+  Fragment,
+  PathPart,
+  QueryKey,
+  QueryKeyValue,
+  QueryValue,
+  TraversableParams,
+  TraversablePathParts
+}
+import io.lemonlabs.uri.typesafe.TraversableParams.ops._
+import io.lemonlabs.uri.typesafe.QueryKeyValue.ops._
+import io.lemonlabs.uri.typesafe.QueryValue.ops._
+import io.lemonlabs.uri.typesafe.QueryKey.ops._
+import io.lemonlabs.uri.typesafe.PathPart.ops._
+import io.lemonlabs.uri.typesafe.TraversablePathParts.ops._
+import io.lemonlabs.uri.typesafe.Fragment.ops._
 
 import scala.util.Try
 
@@ -204,16 +220,7 @@ sealed trait Url extends Uri {
     * @param fragment the new fragment to set
     * @return a new Url with the specified fragment
     */
-  def withFragment(fragment: String): Self =
-    withFragment(Some(fragment))
-
-  /**
-    * Copies this Url but with the fragment set as the given value.
-    *
-    * @param fragment the new fragment to set
-    * @return a new Url with the specified fragment
-    */
-  def withFragment(fragment: Option[String]): Self
+  def withFragment[T: Fragment](fragment: T): Self
 
   /**
     * Copies this Url but with the path set as the given value.
@@ -222,6 +229,15 @@ sealed trait Url extends Uri {
     * @return a new Url with the specified path
     */
   def withPath(path: UrlPath): Self
+
+  /**
+    * Copies this Url but with the path set as the given value.
+    *
+    * @param parts the parts that make up the new path
+    * @return a new Url with the specified path
+    */
+  def withPathParts[P: TraversablePathParts](parts: P): Self =
+    withPath(UrlPath(parts.toSeq))
 
   /**
     * Copies this Url but with the query set as the given value.
@@ -233,27 +249,24 @@ sealed trait Url extends Uri {
 
   /**
     * Replaces the all existing Query String parameters with a new set of query params
-    *
-    * Pairs with values, such as ("k", Some("v")), represent query params with values, i.e ?k=v
-    * Pairs without values, such as ("k", None), represent query params without values, i.e ?k
     */
-  def withQueryStringOptionValues(params: (String, Option[String])*): Self =
-    withQueryString(QueryString(params.toVector))
+  def withQueryString[T: TraversableParams](params: T): Self =
+    withQueryString(QueryString.fromTraversable(params))
 
   /**
     * Replaces the all existing Query String parameters with a new set of query params
     */
-  def withQueryString(params: (String, String)*): Self =
-    withQueryString(QueryString.fromTraversable(params))
+  def withQueryString[KV: QueryKeyValue](first: KV, second: KV, params: KV*): Self =
+    withQueryString(QueryString.fromTraversable(Seq(first, second) ++ params))
 
-  def addPathPart(part: String): Self =
+  def addPathPart[P: PathPart](part: P): Self =
     withPath(path.addPart(part))
 
-  def addPathParts(parts: Iterable[String]): Self =
+  def addPathParts[P: TraversablePathParts](parts: P): Self =
     withPath(path.addParts(parts))
 
-  def addPathParts(parts: String*): Self =
-    withPath(path.addParts(parts))
+  def addPathParts[P: PathPart](first: P, second: P, parts: P*): Self =
+    withPath(path.addParts(first, second, parts: _*))
 
   /**
     * Adds a new Query String parameter key-value pair.
@@ -263,91 +276,47 @@ sealed trait Url extends Uri {
     * By default, pairs without values, i.e `None`, represent query params without values, i.e `?param`
     * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     *
-    * @param name name of the parameter
-    * @param value value for the parameter
+    * @param a value that provides a name/value pair for the parameter. Can be a Tuple of any basic value
+    *          types or a custom type if you provide a `QueryKeyValue` type-class
     * @return A new Url with the new Query String parameter
     */
-  def addParam(name: String, value: Option[String]): Self =
-    withQueryString(query.addParam(name, value))
+  def addParam[A: QueryKeyValue](a: A): Url =
+    withQueryString(query.addParam(a))
 
   /**
     * Adds a new Query String parameter key-value pair.
     *
-    * @param name name of the parameter
-    * @param value value for the parameter
-    * @return A new Url with the new Query String parameter
-    */
-  def addParam(name: String, value: String): Self =
-    withQueryString(query.addParam(name, value))
-
-  /**
-    * Adds a new Query String parameter key-value pair.
+    * Pairs with values, such as `Some("value")`, represent query params with values, i.e `?param=value`
     *
-    * @param kv name-value pair for the query parameter to be added
-    * @return A new Url with the new Query String parameter
-    */
-  def addParam(kv: (String, String)): Self =
-    withQueryString(query.addParam(kv))
-
-  /**
-    * Adds a new Query String parameter key-value pair.
-    *
-    * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    *
-    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    * By default, pairs without values, i.e `None`, represent query params without values, i.e `?param`
     * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     *
-    * @param kv name-value pair for the query parameter to be added
+    * @param k value that provides a name pair for the parameter. Can be a any basic value type or a
+    *          custom type if you provide a `QueryKey` type-class
+    * @param v value that provides a value for the parameter. Can be a any basic value type or a
+    *          custom type if you provide a `QueryValue` type-class
     * @return A new Url with the new Query String parameter
     */
-  def addParamOptionValue(kv: (String, Option[String])): Self =
-    withQueryString(query.addParamOptionValue(kv))
+  def addParam[K: QueryKey, V: QueryValue](k: K, v: V): Url =
+    withQueryString(query.addParam(k, v))
 
   /**
     * Adds all the specified key-value pairs as parameters to the query
     *
-    * @param kvs A list of key-value pairs to add as query parameters
+    * @param params A list of key-value pairs to add as query parameters
     * @return A new Url with the new Query String parameters
     */
-  def addParams(kvs: (String, String)*): Self =
-    withQueryString(query.addParams(kvs: _*))
+  def addParams[A: TraversableParams](params: A): Self =
+    withQueryString(query.addParams(params))
 
   /**
     * Adds all the specified key-value pairs as parameters to the query
     *
-    * @param kvs A list of key-value pairs to add as query parameters
+    * @param params A list of key-value pairs to add as query parameters
     * @return A new Url with the new Query String parameters
     */
-  def addParams(kvs: Iterable[(String, String)]): Self =
-    withQueryString(query.addParams(kvs))
-
-  /**
-    * Adds all the specified key-value pairs as parameters to the query
-    *
-    * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    *
-    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
-    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
-    *
-    * @param kvs A list of key-value pairs to add as query parameters
-    * @return A new Url with the new Query String parameters
-    */
-  def addParamsOptionValues(kvs: Iterable[(String, Option[String])]): Self =
-    withQueryString(query.addParamsOptionValues(kvs))
-
-  /**
-    * Adds all the specified key-value pairs as parameters to the query
-    *
-    * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    *
-    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
-    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
-    *
-    * @param kvs A list of key-value pairs to add as query parameters
-    * @return A new Url with the new Query String parameters
-    */
-  def addParamsOptionValues(kvs: (String, Option[String])*): Self =
-    withQueryString(query.addParamsOptionValues(kvs: _*))
+  def addParams[KV: QueryKeyValue](first: KV, second: KV, params: KV*): Self =
+    withQueryString(query.addParams(first, second, params: _*))
 
   /**
     * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
@@ -362,18 +331,7 @@ sealed trait Url extends Uri {
     * @param v value to replace with
     * @return A new Uri with the result of the replace
     */
-  def replaceParams(k: String, v: Option[String]): Self =
-    withQueryString(query.replaceAll(k, v))
-
-  /**
-    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
-    * with the specified value.
-    *
-    * @param k Key for the Query String parameter(s) to replace
-    * @param v value to replace with
-    * @return A new Uri with the result of the replace
-    */
-  def replaceParams(k: String, v: String): Self =
+  def replaceParams[K: QueryKey, V: QueryValue](k: K, v: V): Self =
     withQueryString(query.replaceAll(k, v))
 
   /**
@@ -381,23 +339,25 @@ sealed trait Url extends Uri {
     * @param k Key for the Query String parameter(s) to remove
     * @return
     */
-  def removeParams(k: String): Self =
+  def removeParams[K: QueryKey](k: K): Self =
     withQueryString(query.removeAll(k))
+
+  /**
+    * Removes all Query String parameters with a name in the specified list
+    * @param first Name of a Query String parameter to remove
+    * @param second Name of another Query String parameter to remove
+    * @param rest Name of more Query String parameter(s) to remove
+    * @return
+    */
+  def removeParams[K: QueryKey](first: K, second: K, rest: K*): Self =
+    withQueryString(query.removeAll(first, second, rest: _*))
 
   /**
     * Removes all Query String parameters with a name in the specified list
     * @param k Names of Query String parameter(s) to remove
     * @return
     */
-  def removeParams(k: String*): Self =
-    withQueryString(query.removeAll(k))
-
-  /**
-    * Removes all Query String parameters with a name in the specified list
-    * @param k Names of Query String parameter(s) to remove
-    * @return
-    */
-  def removeParams(k: Iterable[String]): Self =
+  def removeParams[K: QueryKey](k: Iterable[K]): Self =
     withQueryString(query.removeAll(k))
 
   /**
@@ -415,7 +375,7 @@ sealed trait Url extends Uri {
     * @param f A function that returns a new Parameter when applied to each Parameter
     * @return
     */
-  def mapQuery(f: PartialFunction[(String, Option[String]), (String, Option[String])]): Self =
+  def mapQuery[KV: QueryKeyValue](f: PartialFunction[(String, Option[String]), KV]): Self =
     withQueryString(query.map(f))
 
   /**
@@ -426,7 +386,7 @@ sealed trait Url extends Uri {
     * @param f A function that returns a new Parameter when applied to each Parameter
     * @return
     */
-  def collectQuery(f: PartialFunction[(String, Option[String]), (String, Option[String])]): Self =
+  def collectQuery[KV: QueryKeyValue](f: PartialFunction[(String, Option[String]), KV]): Self =
     withQueryString(query.collect(f))
 
   /**
@@ -435,7 +395,7 @@ sealed trait Url extends Uri {
     * @param f A function that returns a collection of Parameters when applied to each parameter
     * @return
     */
-  def flatMapQuery(f: ((String, Option[String])) => Iterable[(String, Option[String])]): Self =
+  def flatMapQuery[A: TraversableParams](f: ((String, Option[String])) => A): Self =
     withQueryString(query.flatMap(f))
 
   /**
@@ -444,7 +404,7 @@ sealed trait Url extends Uri {
     * @param f A function that returns a new Parameter name when applied to each Parameter name
     * @return
     */
-  def mapQueryNames(f: String => String): Self =
+  def mapQueryNames[K: QueryKey](f: String => K): Self =
     withQueryString(query.mapNames(f))
 
   /**
@@ -453,7 +413,7 @@ sealed trait Url extends Uri {
     * @param f A function that returns a new Parameter value when applied to each Parameter value
     * @return
     */
-  def mapQueryValues(f: String => String): Self =
+  def mapQueryValues[V: QueryValue](f: String => V): Self =
     withQueryString(query.mapValues(f))
 
   /**
@@ -627,8 +587,8 @@ final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option
   def withPath(path: UrlPath): RelativeUrl =
     copy(path = path)
 
-  def withFragment(fragment: Option[String]): RelativeUrl =
-    copy(fragment = fragment)
+  def withFragment[T: Fragment](fragment: T): RelativeUrl =
+    copy(fragment = fragment.fragment)
 
   def withQueryString(query: QueryString): RelativeUrl =
     copy(query = query)
@@ -820,8 +780,8 @@ final case class ProtocolRelativeUrl(authority: Authority,
   def withAuthority(authority: Authority): ProtocolRelativeUrl =
     copy(authority = authority)
 
-  def withFragment(fragment: Option[String]): ProtocolRelativeUrl =
-    copy(fragment = fragment)
+  def withFragment[T: Fragment](fragment: T): ProtocolRelativeUrl =
+    copy(fragment = fragment.fragment)
 
   /**
     * Copies this Url but with the path set as the given value.
@@ -881,8 +841,8 @@ final case class AbsoluteUrl(scheme: String,
   def withAuthority(authority: Authority): AbsoluteUrl =
     copy(authority = authority)
 
-  def withFragment(fragment: Option[String]): AbsoluteUrl =
-    copy(fragment = fragment)
+  def withFragment[T: Fragment](fragment: T): AbsoluteUrl =
+    copy(fragment = fragment.fragment)
 
   /**
     * Copies this Url but with the path set as the given value.
@@ -1011,8 +971,8 @@ final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query:
   def withAuthority(authority: Authority): AbsoluteUrl =
     AbsoluteUrl(scheme, authority, path.toAbsoluteOrEmpty, query, fragment)
 
-  def withFragment(fragment: Option[String]): SimpleUrlWithoutAuthority =
-    copy(fragment = fragment)
+  def withFragment[T: Fragment](fragment: T): SimpleUrlWithoutAuthority =
+    copy(fragment = fragment.fragment)
 
   def withQueryString(query: QueryString): SimpleUrlWithoutAuthority =
     copy(query = query)
@@ -1110,7 +1070,7 @@ final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte
   def withAuthority(authority: Authority): AbsoluteUrl =
     AbsoluteUrl(scheme, authority, path.toAbsoluteOrEmpty, query, fragment)
 
-  def withFragment(fragment: Option[String]): DataUrl =
+  def withFragment[T: Fragment](fragment: T): DataUrl =
     this
 
   def withQueryString(query: QueryString): DataUrl =
@@ -1169,7 +1129,7 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
     * @return a new Uri with the specified scheme
     */
   def withScheme(scheme: String): UrlWithoutAuthority =
-    UrlWithoutAuthority(scheme, path.toUrlPath, QueryString.empty, fragment = None)
+    UrlWithoutAuthority(scheme, path.toUrlPath.toRootless, QueryString.empty, fragment = None)
 
   def toUrl: Url = throw new UriConversionException("Urn cannot be converted to Url")
   def toUrn: Urn = this

@@ -727,7 +727,7 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 
 ## Including scala-uri your project
 
-`scala-uri` `1.x.x` is currently built with support for scala `2.13.x`, `2.12.x`
+`scala-uri` `1.5.x` is currently built with support for scala `2.13.x`, `2.12.x`
 
  * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)

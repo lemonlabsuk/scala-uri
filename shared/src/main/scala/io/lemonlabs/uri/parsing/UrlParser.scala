@@ -8,10 +8,7 @@ import org.parboiled2._
 import scala.collection.immutable
 import scala.util.{Failure, Try}
 
-class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
-  def input: ParserInput =
-    inputRaw.linesIterator.mkString // Remove newlines
-
+class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
   val _host_end = ":/?#"
 
   def _int(maxLength: Int): Rule1[Int] = rule {
@@ -73,7 +70,7 @@ class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.defau
   }
 
   def _user_info: Rule1[UserInfo] = rule {
-    capture(zeroOrMore(noneOf(":/?[]@"))) ~ optional(":" ~ capture(zeroOrMore(noneOf("@")))) ~> extractUserInfo
+    capture(zeroOrMore(noneOf(":/?[]@"))) ~ optional(":" ~ capture(zeroOrMore(noneOf("@")))) ~ "@" ~> extractUserInfo
   }
 
   def _port: Rule1[Int] = rule {
@@ -81,7 +78,7 @@ class UrlParser(val inputRaw: String)(implicit conf: UriConfig = UriConfig.defau
   }
 
   def _authority: Rule1[Authority] = rule {
-    (optional(_user_info ~ "@") ~ _host_in_authority ~ optional(_port)) ~> extractAuthority
+    (optional(_user_info) ~ _host_in_authority ~ optional(_port)) ~> extractAuthority
   }
 
   def _path_segment: Rule1[String] = rule {
@@ -333,7 +330,7 @@ object UrlParser {
     UrlParser(s).parseHost()
 
   def parseUserInfo(s: String)(implicit config: UriConfig = UriConfig.default): Try[UserInfo] =
-    UrlParser(s).parseUserInfo()
+    UrlParser(s + "@").parseUserInfo()
 
   def parseUrlWithoutAuthority(s: String)(implicit config: UriConfig = UriConfig.default): Try[UrlWithoutAuthority] =
     UrlParser(s).parseUrlWithoutAuthority()
@@ -343,8 +340,9 @@ object UrlParser {
   )(implicit config: UriConfig = UriConfig.default): Try[SimpleUrlWithoutAuthority] =
     UrlParser(s).parseSimpleUrlWithoutAuthority()
 
+  // Data URLs may be formatted with newlines, so strip them
   def parseDataUrl(s: String)(implicit config: UriConfig = UriConfig.default): Try[DataUrl] =
-    UrlParser(s).parseDataUrl()
+    UrlParser(s.replace("\n", "")).parseDataUrl()
 
   def parseAbsoluteUrl(s: String)(implicit config: UriConfig = UriConfig.default): Try[AbsoluteUrl] =
     UrlParser(s).parseAbsoluteUrl()

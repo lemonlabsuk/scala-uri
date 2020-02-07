@@ -1,5 +1,9 @@
 #!/usr/bin/env sh
 
+sbt updatePublicSuffixes
+git add shared/src/main/scala/io/lemonlabs/uri/inet/PublicSuffixTrie.scala
+git commit -m"Update public suffixes"
+
 echo "Running SBT to determine current version. Please wait..."
 VER=$(sbt 'project scalaUriJVM' 'show version' | tail -n 1 | cut -f2 -d' ')
 

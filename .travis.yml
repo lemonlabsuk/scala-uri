@@ -1,10 +1,7 @@
 --- 
 language: scala
 script: >
- sbt testPublicSuffixes &&
- sbt ++$TRAVIS_SCALA_VERSION check &&
- sbt $COVERAGE ++$TRAVIS_SCALA_VERSION coverage test coverageReport &&
- sbt ++$TRAVIS_SCALA_VERSION test &&
+ sbt $COVERAGE ++$TRAVIS_SCALA_VERSION testPublicSuffixes check mdoc coverage test coverageReport &&
  cd target &&
  git clone https://github.com/lemonlabsuk/scala-uri-demo.git &&
  cd scala-uri-demo &&

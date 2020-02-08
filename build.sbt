@@ -28,7 +28,7 @@ val sharedSettings = Seq(
     "org.scalatest"     %%% "scalatest"       % "3.1.0"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14" % "3.1.0.1" % Test,
     "org.scalacheck"    %%% "scalacheck"      % "1.14.3"  % Test,
-    "org.typelevel"     %%% "cats-laws"       % "2.0.0"   % Test
+    "org.typelevel"     %%% "cats-laws"       % "2.1.0"   % Test
   ),
   scalacOptions := Seq(
     "-unchecked",
@@ -59,7 +59,7 @@ val scalaUriSettings = Seq(
     "org.parboiled" %%% "parboiled"  % "2.1.8",
     "com.chuusai"   %%% "shapeless"  % "2.3.3",
     "org.typelevel" %%% "simulacrum" % "1.0.0" % Provided,
-    "org.typelevel" %%% "cats-core"  % "2.0.0" % Optional
+    "org.typelevel" %%% "cats-core"  % "2.1.0"
   ),
   libraryDependencies ++= paradisePlugin.value,
   pomPostProcess := { node =>
@@ -122,6 +122,17 @@ lazy val scalaUri =
     .settings(scalaUriSettings)
     .settings(publishingSettings)
     .settings(mimaSettings)
+
+lazy val docs = project
+  .in(file("scala0-uri-docs"))
+  .settings(
+    // README.md has examples with expected compiler warnings (deprecated code, exhaustive matches)
+    // Turn off these warnings to keep this noise down
+    // We can remove this if the following is implemented https://github.com/scalameta/mdoc/issues/286
+    scalacOptions := Seq("--no-warnings")
+  )
+  .dependsOn(scalaUri.jvm)
+  .enablePlugins(MdocPlugin)
 
 lazy val updatePublicSuffixes =
   taskKey[Unit]("Updates the public suffix Trie at io.lemonlabs.uri.internet.PublicSuffixes")

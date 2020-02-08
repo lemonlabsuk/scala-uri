@@ -1,13 +1,17 @@
 package io.lemonlabs.uri
 
+import cats.implicits._
+import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.UrlParser
 
 import scala.util.Try
 
-case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(implicit config: UriConfig) {
-  def user: Option[String] = userInfo.user
-  def password: Option[String] = userInfo.password
+case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
+    implicit config: UriConfig = UriConfig.default
+) {
+  def user: Option[String] = userInfo.map(_.user)
+  def password: Option[String] = userInfo.flatMap(_.password)
 
   /**
     * Returns the longest public suffix for the host in this URI. Examples include:
@@ -70,13 +74,8 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(implicit
     host.longestSubdomain
 
   private[uri] def toString(c: UriConfig, hostToString: Host => String): String = {
-    val userInfo = for {
-      userStr <- user
-      userStrEncoded = c.userInfoEncoder.encode(userStr, c.charset)
-      passwordStrEncoded = password.map(p => ":" + c.userInfoEncoder.encode(p, c.charset)).getOrElse("")
-    } yield userStrEncoded + passwordStrEncoded + "@"
-
-    userInfo.getOrElse("") + hostToString(host) + port.map(":" + _).getOrElse("")
+    val userInfoStr = userInfo.map(_.toString(c) + "@").getOrElse("")
+    userInfoStr + hostToString(host) + port.map(":" + _).getOrElse("")
   }
 
   /**
@@ -95,16 +94,16 @@ case class Authority(userInfo: UserInfo, host: Host, port: Option[Int])(implicit
 
 object Authority {
   def apply(host: String)(implicit config: UriConfig): Authority =
-    new Authority(UserInfo.empty, Host.parse(host), port = None)
+    new Authority(None, Host.parse(host), port = None)
 
   def apply(host: Host)(implicit config: UriConfig): Authority =
-    new Authority(UserInfo.empty, host, port = None)
+    new Authority(None, host, port = None)
 
   def apply(host: String, port: Int)(implicit config: UriConfig): Authority =
-    new Authority(UserInfo.empty, Host.parse(host), Some(port))
+    new Authority(None, Host.parse(host), Some(port))
 
   def apply(host: Host, port: Int)(implicit config: UriConfig): Authority =
-    new Authority(UserInfo.empty, host, Some(port))
+    new Authority(None, host, Some(port))
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Authority] =
     UrlParser.parseAuthority(s.toString)
@@ -114,17 +113,35 @@ object Authority {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Authority =
     parseTry(s).get
+
+  implicit val eqAuthority: Eq[Authority] = Eq.fromUniversalEquals
+  implicit val showAuthority: Show[Authority] = Show.fromToString
+  implicit val orderAuthority: Order[Authority] = Order.by { authority =>
+    (authority.userInfo, authority.host, authority.port)
+  }
 }
 
-case class UserInfo(user: Option[String], password: Option[String])
+case class UserInfo(user: String, password: Option[String])(
+    implicit config: UriConfig = UriConfig.default
+) {
+  private[uri] def toString(c: UriConfig): String = {
+    val userStrEncoded = c.userInfoEncoder.encode(user, c.charset)
+    val passwordStrEncoded = password.map(p => ":" + c.userInfoEncoder.encode(p, c.charset)).getOrElse("")
+    userStrEncoded + passwordStrEncoded
+  }
+
+  override def toString: String =
+    toString(config)
+
+  def toStringRaw: String =
+    toString(config.withNoEncoding)
+}
 object UserInfo {
   def apply(user: String): UserInfo =
-    new UserInfo(Some(user), password = None)
+    new UserInfo(user, password = None)
 
   def apply(user: String, password: String): UserInfo =
-    new UserInfo(Some(user), Some(password))
-
-  def empty = UserInfo(None, None)
+    new UserInfo(user, Some(password))
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UserInfo] =
     UrlParser.parseUserInfo(s.toString)
@@ -134,4 +151,10 @@ object UserInfo {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UserInfo =
     parseTry(s).get
+
+  implicit val eqUserInfo: Eq[UserInfo] = Eq.fromUniversalEquals
+  implicit val showUserInfo: Show[UserInfo] = Show.fromToString
+  implicit val orderUserInfo: Order[UserInfo] = Order.by { userInfo =>
+    (userInfo.user, userInfo.password)
+  }
 }

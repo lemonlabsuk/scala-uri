@@ -3,7 +3,9 @@
 [![Build Status](https://travis-ci.org/lemonlabsuk/scala-uri.svg?branch=master)](https://travis-ci.org/lemonlabsuk/scala-uri)
 [![codecov.io](http://codecov.io/github/lemonlabsuk/scala-uri/coverage.svg?branch=master)](https://codecov.io/gh/lemonlabsuk/scala-uri/branch/master)
 [![Slack](https://lemonlabs.io/slack/badge.svg)](https://lemonlabs.io/slack)
-[![Maven Central](https://img.shields.io/maven-central/v/io.lemonlabs/scala-uri_2.13/1)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)
+[![Maven Central](https://img.shields.io/maven-central/v/io.lemonlabs/scala-uri_2.13/2)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](#scalajs-support)
+[![Cats Friendly Badge](https://typelevel.org/cats/img/cats-badge-tiny.png)](#cats-support) 
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
@@ -19,18 +21,25 @@
  * Support for [user information](#user-information) e.g. `ftp://user:password@mysite.com`
  * Support for [URNs](#parse-a-urn)
  * Support for [mailto](#mailto) URLs
- * Support for [scala-js](#scala-js-support)
+ * Support for [data](#data-urls) URLs as defined in [RFC2397](https://tools.ietf.org/html/rfc2397)
+ * Support for [Scala.js](#scalajs-support)
+ * Support for [cats](#cats-support)
  * No dependencies on existing web frameworks
 
 To include it in your SBT project from maven central:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "1.5.1"
+"io.lemonlabs" %% "scala-uri" % "2.0.0-M5"
 ```
 
-[Migration Guide](#05x-to-1xx) from 0.5.x
+## Migration Guides
 
-There are also demo projects for both [scala](https://github.com/lemonlabsuk/scala-uri-demo) and [scala-js](https://github.com/lemonlabsuk/scala-uri-scalajs-example) to help you get up and running quickly.
+ * [2.0.0+](#1xx-to-2xx)
+ * [1.5.0+](#1xx-to-15x)
+ * [1.0.0+](#05x-to-1xx)
+ * [Older versions](#04x-to-05x)
+
+There are also demo projects for both [scala](https://github.com/lemonlabsuk/scala-uri-demo) and [Scala.js](https://github.com/lemonlabsuk/scala-uri-scalajs-example) to help you get up and running quickly.
 
 ## Parsing
 
@@ -43,7 +52,7 @@ val url = Url.parse("https://www.scala-lang.org")
 ```
 
 The returned value has type `Url` with an underlying implementation of `AbsoluteUrl`, `RelativeUrl`,
-`UrlWithoutAuthority` or `ProtocolRelativeUrl`. If you know your URL will always be one of these types, you can
+`UrlWithoutAuthority`, `ProtocolRelativeUrl` or `DataUrl`. If you know your URL will always be one of these types, you can
 use the following `parse` methods to get a more specific return type
 
 ```scala
@@ -53,6 +62,7 @@ val absoluteUrl = AbsoluteUrl.parse("https://www.scala-lang.org")
 val relativeUrl = RelativeUrl.parse("/index.html")
 val mailtoUrl = UrlWithoutAuthority.parse("mailto:test@example.com")
 val protocolRelativeUrl = ProtocolRelativeUrl.parse("//www.scala-lang.org")
+val dataUrl = DataUrl.parse("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D")
 ```
 
 ## Parse a URN
@@ -187,7 +197,8 @@ uri match {
     case UrlWithAuthority(authority, path, query, fragment) => // Matches AbsoluteUrl and ProtocolRelativeUrl
     case AbsoluteUrl(scheme, authority, path, query, fragment) => // Matches AbsoluteUrl
     case ProtocolRelativeUrl(authority, path, query, fragment) => // Matches ProtocolRelativeUrl
-    case UrlWithoutAuthority(scheme, path, query, fragment) => // Matches UrlWithoutAuthoritys
+    case UrlWithoutAuthority(scheme, path, query, fragment) => // Matches UrlWithoutAuthorityUrl
+    case DataUrl(mediaType, base64, data) => // Matches DataUrl
 }
 ```
 
@@ -435,7 +446,7 @@ import io.lemonlabs.uri.config._
 
 implicit val config: UriConfig = UriConfig(renderQuery = ExcludeNones)
 
-val url = Url.parse("http://github.com/lemonlabsuk").addParamsOptionValues("a" -> Some("some"), "b" -> None)
+val url = Url.parse("http://github.com/lemonlabsuk").addParams("a" -> Some("some"), "b" -> None)
 url.toString // This is http://github.com/lemonlabsuk?a=some
 ```
 
@@ -529,8 +540,6 @@ uri.toString // This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F
 
 ## Subdomains
 
-**Note:** *Currently not supported for scala-js*
-
 ```scala
 import io.lemonlabs.uri.Url
 
@@ -557,7 +566,7 @@ These methods return `None` or `Vector.empty` for URLs without a Host (e.g. Rela
 
 ## Apex Domains
 
-**Note:** *Currently not supported for scala-js*
+**Note:** *Currently not supported for Scala.js*
 
 The method `apexDomain` returns the [apex domain](https://help.github.com/articles/about-supported-custom-domains/#apex-domains)
 for the URL (e.g. `example.com` for `http://www.example.com/path`)
@@ -570,14 +579,6 @@ uri.apexDomain // This returns Some("google.co.uk")
 ```
 
 ## Public Suffixes
-
-**Note:** *Currently not supported for scala-js*
-
-**Note:** *To use it spray-json dependency is required*
-
-```scala
-"io.spray" %% "spray-json" % "1.3.4"
-```
 
 `scala-uri` uses the list of public suffixes from [publicsuffix.org](https://publicsuffix.org) to allow you to identify
 the TLD of your absolute URIs.
@@ -604,7 +605,7 @@ These methods return `None` and `Vector.empty`, respectively for URLs without a 
 
 ## Punycode
 
-**Note:** *Currently not supported for scala-js*
+**Note:** *Currently not supported for Scala.js*
 
 See [RFC 3490](http://www.ietf.org/rfc/rfc3490.txt)
 
@@ -628,7 +629,44 @@ mailto.path // This is "someone@example.com"
 mailto.query.param("subject") // This is Some("Hello")
 ```
 
+## Data URLs
+
+Data URLs are defined in [RFC2397](https://tools.ietf.org/html/rfc2397)
+
+### Base64 encoded data URLs
+
+```scala
+import java.io.ByteArrayInputStream
+import io.lemonlabs.uri.DataUrl
+import javax.imageio.ImageIO
+
+// A data URL containing a PNG image of a red dot
+val dataUrl = DataUrl.parse("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==")
+
+dataUrl.scheme // This is "data"
+dataUrl.mediaType.value // This is "image/png"
+dataUrl.base64 // This is true
+
+// Convert the image data to a java.awt.image.BufferedImage
+val image = ImageIO.read(new ByteArrayInputStream(dataUrl.data))
+```
+
+### Percent encoded data URLs
+
+```scala
+val dataUrl = DataUrl.parse("data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678")
+
+dataUrl.mediaType.value // This is text/plain
+dataUrl.mediaType.charset // This is UTF-8
+dataUrl.mediaType.parameters // This is Vector("charset" -> "UTF-8", "page" -> "21")
+dataUrl.base64 // This is false
+
+dataUrl.dataAsString // This is "the data:1234,5678"
+```
+
 ## URL builder DSL
+
+**Note:** *This DSL is now deprecated. Please use the [Typesafe URL builder DSL](#typesafe-url-builder-dsl)*
 
 By importing `io.lemonlabs.uri.dsl._`, you may use a DSL to construct URLs
 
@@ -721,13 +759,23 @@ val uri5 = "http://theon.github.com/scala-uri" `#` Foo(a = "user", b = 1)
 uri5.toString //This is: http://theon.github.com/scala-uri#user-1
 ```
 
-## scala-js support
+## Scala.js support
 
 See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs-example) for usage
 
+## Cats Support
+
+scala-uri provides type class instances of `cats.Eq`, `cats.Show` and `cats.Order` for:
+`Uri `, `Url`, `RelativeUrl`, `UrlWithAuthority`, `ProtocolRelativeUrl`, `AbsoluteUrl`, 
+`UrlWithoutAuthority`, `SimpleUrlWithoutAuthority`, `DataUrl`, `Urn`, `Authority`, `UserInfo`, 
+`Host`, `DomainName`, `IpV4`, `IpV6`, `MediaType`, `Path`, `UrlPath`, `AbsoluteOrEmptyPath`, 
+`RootlessPath`, `AbsolutePath`, `UrnPath`, `QueryString`
+
+The type class instances exist in the companion objects for these types.
+
 ## Including scala-uri your project
 
-`scala-uri` `1.5.x` is currently built with support for scala `2.13.x`, `2.12.x`
+`scala-uri` `2.x.x` is currently built with support for Scala `2.13.x`, Scala `2.12.x` and Scala.js `0.6.17+` 
 
  * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
@@ -736,16 +784,16 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "1.5.1"
+"io.lemonlabs" %% "scala-uri" % "2.0.0-M5"
 ```
 
-For maven users you should use (for 2.12.x):
+For maven users you should use (for 2.13.x):
 
 ```xml
 <dependency>
     <groupId>io.lemonlabs</groupId>
-    <artifactId>scala-uri_2.12</artifactId>
-    <version>1.5.1</version>
+    <artifactId>scala-uri_2.13</artifactId>
+    <version>2.0.0-M5</version>
 </dependency>
 ```
 
@@ -754,6 +802,43 @@ For maven users you should use (for 2.12.x):
 Contributions to `scala-uri` are always welcome. Check out the [Contributing Guidelines](https://github.com/lemonlabsuk/scala-uri/blob/master/README.md)
 
 # Migration guides
+
+## 1.x.x to 2.x.x
+
+ * scala-uri no longer depends on a JSON library.
+ * *Binary Incompatibility*: The case class `UrlWithoutAuthority` has been renamed `SimpleUrlWithoutAuthority`.
+   There is now a trait called `UrlWithoutAuthority`. This trait has a companion object with `apply`, `unapply` and `parse`
+   methods, so it mostly can be used in the same way as the previous case class.
+ * *Binary Incompatibility*: Parsing a Data URL will now return an instance of [`DataUrl`](#data-urls) rather than `UrlWithoutAuthority`
+ * *Binary Incompatibility*: `UserInfo.user` is now of type `String` rather than `Option[String]`
+ * *Binary Incompatibility*: `Authority.userInfo` is now of type `Option[UserInfo]`
+ * *Binary Incompatibility*: `UserInfo.empty` method removed
+ * *Binary Incompatibility*: `QueryString.fromPairOptions` removed. Use `QueryString.fromPairs` instead.
+ * *Binary Incompatibility*: `Url.withQueryStringOptionValues` removed. Use `withQueryString` instead.
+ * *Binary Incompatibility*: `Url.addParamsOptionValues` and `QueryString.addParamsOptionValues` have been renames to `addParams`
+ * `TypesafeUrlDsl`
+    * *Binary Incompatibility*: `withParams[A: TraversableParams](params: A)` renamed to `addParams`
+    * `/(PathPart)` no longer splits the part by slash. If you want to add multiple path parts use `/(TraversablePathParts)` instead
+ * Type Classes
+   * *Binary Incompatibility*: `Fragment[A].fragment` returns `Option[String]` rather than `String`
+   * *Binary Incompatibility*: `Url.withFragment` now takes argument of type `T: Fragment` rather than `String` and `Option[String]` 
+     Type Class instances are provided the method can be used with `String` and `Option[String]` values just as before
+   * *Binary Incompatibility*: `Url.addPathParts` and `Url.addPathPart` now takes arguments of type `P: TraversablePathParts` or `P: PathPart` rather than `Iterable[String]` or `String`
+     Type Class instances are provided the methods can be used with `String` and `Iterable[String]` values just as before
+   * *Binary Incompatibility*: `Url.withQueryString`, `Url.addParam`, `Url.addParams`, `Url.replaceParams`, `Url.removeParams`, 
+     `Url.mapQuery`, `Url.flatMapQuery`, `Url.collectQuery`, `Url.mapQueryNames` and `Url.mapQueryValues` now takes argument of type `KV: QueryKeyValue`, `K: QueryKey` or `V: QueryValue` rather than `(String, String)` or `String`
+     Type Class instances are provided the methods can be used with `(String, String)` or `String` values just as before   
+ * The [URL builder DSL](#url-builder-dsl) has been deprecated in favour of the [Typesafe URL builder DSL](#typesafe-url-builder-dsl)
+ * `Authority.parse` no longer expects it's string argument to start with `//`, as this is not part of the Authority, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
+ * `UserInfo.parse` no longer expects it's string argument to end with a `@`, as this is not part of the UserInfo, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
+ * `QueryString.toString` no longer returns a leading `?`, as this is not part of the query string, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt) 
+ * Forward slashes in paths are now percent encoded by default.
+   This means `Url.parse("/%2F/").toString` returns `"/%2F/"` rather than `///` in previous versions
+   To return to the previous behavior, you can bring a `UriConfig` like so into scope
+   ```scala
+    import io.lemonlabs.uri.encoding.PercentEncoder._
+    implicit val c = UriConfig.default.copy(pathEncoder = PercentEncoder(PATH_CHARS_TO_ENCODE - '/'))
+   ```
 
 ## 1.x.x to 1.5.x
 
@@ -790,8 +875,8 @@ and discussion [here](https://github.com/NET-A-PORTER/scala-uri/pull/113).
  * Methods `addParam` and `addParams`  that took Option arguments are now called `addParamOptionValue` and `addParamsOptionValues`
  * Method `replaceAllParams` has been replaced with `withQueryString` or `withQueryStringOptionValues`
  * Method `removeAllParams` has been replaced with `withQueryString(QueryString.empty)`
- * Method `subdomain` has been removed from the scala-js version. The implementation was incorrect and did not
-   match the JVM version of `subdomain`. Once public suffixes are supported for the scala-js version, a correct
+ * Method `subdomain` has been removed from the Scala.js version. The implementation was incorrect and did not
+   match the JVM version of `subdomain`. Once public suffixes are supported for the Scala.js version, a correct
    implementation of `subdomain` can be added
  * Implicit `UriConfig`s now need to be where your `Uri`s are parsed/constructed, rather than where they are rendered
  * Method `hostParts` has been removed from `Uri`. This method predated `publicSuffix` and `subdomain` which are more
@@ -803,7 +888,7 @@ and discussion [here](https://github.com/NET-A-PORTER/scala-uri/pull/113).
 
  * Matrix parameters have been removed. If you still need this, raise an issue
  * scala 2.10 support dropped, please upgrade to 2.11 or 2.12 to use scala-uri 0.5.x
- * scala-js support added
+ * Scala.js support added
 
 ## 0.3.x to 0.4.x
 

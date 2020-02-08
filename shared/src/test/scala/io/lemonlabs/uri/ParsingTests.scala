@@ -4,6 +4,8 @@ import io.lemonlabs.uri.parsing.UriParsingException
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+import scala.util.Success
+
 class ParsingTests extends AnyFlatSpec with Matchers {
   "Parsing an absolute URI" should "result in a valid Uri object" in {
     val url = Url.parse("http://theon.github.com/uris-in-scala.html")
@@ -301,12 +303,12 @@ class ParsingTests extends AnyFlatSpec with Matchers {
 
   "A URL with userinfo" should "parse as an URL" in {
     val url = Url.parse("http://:@www.example.com")
-    url.toUrl.toAbsoluteUrl.userInfo should equal(UserInfo(Some(""), Some("")))
+    url.toUrl.toAbsoluteUrl.userInfo should equal(Some(UserInfo("", Some(""))))
   }
 
   "exotic/reserved characters in user info" should "be decoded" in {
-    val parsedUserInfo = UserInfo.parse("user%3A:p%40ssword%E2%87%94@")
-    parsedUserInfo.user should equal(Some("user:"))
+    val parsedUserInfo = UserInfo.parse("user%3A:p%40ssword%E2%87%94")
+    parsedUserInfo.user should equal("user:")
     parsedUserInfo.password should equal(Some("p@ssword⇔"))
   }
 
@@ -351,6 +353,80 @@ class ParsingTests extends AnyFlatSpec with Matchers {
     urn.scheme should equal("urn")
     urn.schemeOption should equal(Some("urn"))
     urn.path.toString() should equal("example:animal:ferret:nose")
+    urn.nid should equal("example")
+    urn.nss should equal("animal:ferret:nose")
     urn.toString() should equal("urn:example:animal:ferret:nose")
+  }
+
+  "UrlWithoutAuthority" should "parse a mailto as a Success" in {
+    val url = UrlWithoutAuthority.parseTry("mailto:test@test.com")
+    url.isSuccess shouldBe true
+    url.get shouldBe a[SimpleUrlWithoutAuthority]
+  }
+
+  it should "parse a data URL as a Success" in {
+    val url = UrlWithoutAuthority.parseTry("data:,A%20brief%20note")
+    url.isSuccess shouldBe true
+    url.get shouldBe a[DataUrl]
+  }
+
+  it should "parse a absolute URL to a Failure" in {
+    val url = UrlWithoutAuthority.parseTry("//example.com")
+    url.isSuccess shouldBe false
+  }
+
+  it should "parse an Option to a Some" in {
+    val url = UrlWithoutAuthority.parseOption("mailto:test@test.com")
+    url.isDefined shouldBe true
+    url.get shouldBe a[SimpleUrlWithoutAuthority]
+  }
+
+  it should "parse an Option to a None" in {
+    val url = UrlWithoutAuthority.parseOption("//example.com")
+    url should equal(None)
+  }
+
+  "SimpleUrlWithoutAuthority" should "parse a mailto as a Success" in {
+    val url = SimpleUrlWithoutAuthority.parseTry("mailto:test@test.com")
+    url.isSuccess shouldBe true
+    url.get shouldBe a[SimpleUrlWithoutAuthority]
+  }
+
+  it should "parse a absolute URL to a Failure" in {
+    val url = SimpleUrlWithoutAuthority.parseTry("//example.com")
+    url.isSuccess shouldBe false
+  }
+
+  it should "parse an Option to a Some" in {
+    val url = SimpleUrlWithoutAuthority.parseOption("mailto:test@test.com")
+    url.isDefined shouldBe true
+    url.get shouldBe a[SimpleUrlWithoutAuthority]
+  }
+
+  it should "parse an Option to a None" in {
+    val url = SimpleUrlWithoutAuthority.parseOption("//example.com")
+    url should equal(None)
+  }
+
+  "DataUrl" should "parse a data URL as a Success" in {
+    val url = DataUrl.parseTry("data:,A%20brief%20note")
+    url.isSuccess shouldBe true
+    url.get shouldBe a[DataUrl]
+  }
+
+  it should "parse a Try to a Failure" in {
+    val url = DataUrl.parseTry("//example.com")
+    url.isSuccess shouldBe false
+  }
+
+  it should "parse an Option to a Some" in {
+    val url = DataUrl.parseOption("data:,A%20brief%20note")
+    url.isDefined shouldBe true
+    url.get shouldBe a[DataUrl]
+  }
+
+  it should "parse an Option to a None" in {
+    val url = DataUrl.parseOption("//example.com")
+    url should equal(None)
   }
 }

@@ -1,6 +1,11 @@
 #!/usr/bin/env sh
 
-VER=$(git tag --sort=committerdate | grep -E '^1\.' | tail -n1)
+sbt updatePublicSuffixes
+git add shared/src/main/scala/io/lemonlabs/uri/inet/PublicSuffixTrie.scala
+git commit -m"Update public suffixes"
+
+echo "Running SBT to determine current version. Please wait..."
+VER=$(sbt 'project scalaUriJVM' 'show version' | tail -n 1 | cut -f2 -d' ')
 
 echo "Current version is $VER, what is the next version?"
 read -r NEW_VER

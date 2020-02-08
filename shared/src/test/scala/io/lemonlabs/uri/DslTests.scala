@@ -82,7 +82,7 @@ class DslTests extends AnyFlatSpec with Matchers {
 
   "withQueryString" should "replace all query params" in {
     val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
-    val newUri = uri.withQueryStringOptionValues("testThree" -> Some("3"), "testFour" -> Some("4"))
+    val newUri = uri.withQueryString("testThree" -> Some("3"), "testFour" -> Some("4"))
     newUri.toString should equal("/uris-in-scala.html?testThree=3&testFour=4")
   }
 
@@ -165,7 +165,7 @@ class DslTests extends AnyFlatSpec with Matchers {
     uri.toAbsoluteUrl.withPassword("not-so-secret").toString() should equal("http://user:not-so-secret@moonpig.com/#hi")
   }
 
-  "A list of query params" should "get added successsfully" in {
+  "A list of query params" should "get added successfully" in {
     val p = ("name", true) :: ("key2", false) :: Nil
     val uri = "http://example.com".addParams(p)
     uri.query.params("name") should equal(Some("true") :: Nil)
@@ -173,7 +173,7 @@ class DslTests extends AnyFlatSpec with Matchers {
     uri.toString should equal("http://example.com?name=true&key2=false")
   }
 
-  "A map of query params" should "get added successsfully" in {
+  "A map of query params" should "get added successfully" in {
     val p = Map("name" -> true, "key2" -> false)
     val uri = "http://example.com".addParams(p)
     uri.query.params("name") should equal(Some("true") :: Nil)
@@ -253,7 +253,7 @@ class DslTests extends AnyFlatSpec with Matchers {
     val uri = "http://a/b" ? "c"
     uri.hostOption should equal(Some(DomainName("a")))
     uri.path.toString() should equal("/b")
-    uri.query should equal(QueryString.fromPairOptions("c" -> None))
+    uri.query should equal(QueryString.fromPairs("c" -> None))
   }
 
   it should "parse a key with empty value" in {

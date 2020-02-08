@@ -7,16 +7,25 @@ import io.lemonlabs.uri.typesafe.QueryValue.ops._
 import io.lemonlabs.uri.typesafe.QueryKey.ops._
 import io.lemonlabs.uri.typesafe.PathPart.ops._
 import io.lemonlabs.uri.typesafe.Fragment.ops._
-import io.lemonlabs.uri.typesafe.{Fragment, PathPart, QueryKey, QueryKeyValue, QueryValue, TraversableParams}
+import io.lemonlabs.uri.typesafe.{
+  Fragment,
+  PathPart,
+  QueryKey,
+  QueryKeyValue,
+  QueryValue,
+  TraversableParams,
+  TraversablePathParts
+}
 
 class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
   /**
-    * Appends a path part to the path of this URI
+    * Appends path parts to the path of this URI
     * @param a The path part
-    * @return A new Uri with this path part appended
+    * @return A new Uri with these path parts appended
     */
-  def /[A: PathPart](a: A): Url =
-    url.addPathPart(a.path)
+  def /[A: TraversablePathParts](a: A): Url = {
+    url.addPathParts(a)
+  }
 
   /**
     * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
@@ -27,6 +36,12 @@ class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
   def ?[A: QueryKeyValue](a: A): Url =
     url.addParam(a.queryKey, a.queryValue)
 
+  /**
+    * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
+    * Query String parameter will be rendered without a value e.g. `?param` as opposed to `?param=value`
+    * @param a Value which provides the key and the value for query parameter
+    * @return A new Uri with the new Query String parameter
+    */
   def ?[A: QueryKey, B: QueryValue](a: A, b: B): Url =
     url.addParam(a.queryKey, b.queryValue)
 
@@ -92,13 +107,7 @@ class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
     * @return A new Uri with this fragment
     */
   def `#`[A: Fragment](a: A): Url =
-    url.withFragment(a.fragment)
-
-  def withParams[A: TraversableParams](params: A): Url =
-    url.addParamsOptionValues(params.toSeq)
-
-  def withParams[A: QueryKeyValue](param1: A, param2: A, params: A*): Url =
-    withParams((Seq(param1, param2) ++ params).toList)
+    url.withFragment(a)
 
   /**
     * Operator precedence in Scala will mean that our DSL will not always be executed left to right.

@@ -38,17 +38,18 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
   "Foo" should "render correctly as path part" in {
     final case class Foo(a: String, b: Int)
     object Foo {
-      implicit val pathPart: PathPart[Foo] = (foo: Foo) => s"${foo.a}/${foo.b}"
+      implicit val pathPart: TraversablePathParts[Foo] =
+        TraversablePathParts.product
     }
 
-    val uri = "/uris-in-scala.html" / Foo(a = "user", b = 1)
-    uri.toString should equal("/uris-in-scala.html/user/1")
+    val uri = "http://example.com" / Foo(a = "user", b = 1)
+    uri.toString should equal("http://example.com/user/1")
   }
 
   "Foo" should "render correctly as fragment" in {
     final case class Foo(a: String, b: Int)
     object Foo {
-      implicit val pathPart: Fragment[Foo] = (foo: Foo) => s"${foo.a}-${foo.b}"
+      implicit val pathPart: Fragment[Foo] = (foo: Foo) => Some(s"${foo.a}-${foo.b}")
     }
 
     val uri = "/uris-in-scala.html" `#` Foo(a = "user", b = 1)
@@ -58,11 +59,7 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
   "Foo" should "render correctly as query parameters" in {
     final case class Foo(a: String)
     object Foo {
-      implicit val fooQueryKeyValue: QueryKeyValue[Foo] = new QueryKeyValue[Foo] {
-        override def queryKey(a: Foo): String = "foo"
-
-        override def queryValue(a: Foo): Option[String] = Option(a.a)
-      }
+      implicit val fooQueryKeyValue: QueryKeyValue[Foo] = QueryKeyValue(_ => "foo", foo => Option(foo.a))
     }
 
     val uri = "/uris-in-scala.html" ? Foo("foo_value")
@@ -76,7 +73,7 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
       implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
     }
 
-    val uri = "/uris-in-scala.html" withParams Foo(a = 1, b = "bar")
+    val uri = "/uris-in-scala.html" addParams Foo(a = 1, b = "bar")
     uri.toString should equal("/uris-in-scala.html?a=1&b=bar")
   }
 
@@ -93,7 +90,7 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
       implicit val traversableParams: TraversableParams[Bar] = TraversableParams.product
     }
 
-    val uri = "/uris-in-scala.html" withParams Bar(c = 2, foo = Foo(a = 1, b = "bar"))
+    val uri = "/uris-in-scala.html" addParams Bar(c = 2, foo = Foo(a = 1, b = "bar"))
     uri.toString should equal("/uris-in-scala.html?c=2&a=1&b=bar")
   }
 
@@ -104,15 +101,15 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
       implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
     }
 
-    val uriWithB = "/uris-in-scala.html" withParams Foo(a = 1, b = Some("bar"))
-    val uriWithoutB = "/uris-in-scala.html" withParams Foo(a = 1, b = None)
+    val uriWithB = "/uris-in-scala.html" addParams Foo(a = 1, b = Some("bar"))
+    val uriWithoutB = "/uris-in-scala.html" addParams Foo(a = 1, b = None)
     uriWithB.toString should equal("/uris-in-scala.html?a=1&b=bar")
     uriWithoutB.toString should equal("/uris-in-scala.html?a=1&b")
 
     {
       implicit val config: UriConfig = UriConfig(renderQuery = ExcludeNones)
-      val uriWithBexludingNones = "/uris-in-scala.html" withParams Foo(a = 1, b = Some("bar"))
-      val uriWithoutBexludingNones = "/uris-in-scala.html" withParams Foo(a = 1, b = None)
+      val uriWithBexludingNones = "/uris-in-scala.html" addParams Foo(a = 1, b = Some("bar"))
+      val uriWithoutBexludingNones = "/uris-in-scala.html" addParams Foo(a = 1, b = None)
       uriWithBexludingNones.toString should equal("/uris-in-scala.html?a=1&b=bar")
       uriWithoutBexludingNones.toString should equal("/uris-in-scala.html?a=1")
     }

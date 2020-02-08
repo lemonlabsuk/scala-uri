@@ -1,5 +1,7 @@
 package io.lemonlabs.uri
 
+import cats.implicits._
+import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.inet._
 import io.lemonlabs.uri.parsing.UrlParser
@@ -8,9 +10,28 @@ import scala.annotation.tailrec
 import scala.collection.immutable
 import scala.util.Try
 
-sealed trait Host extends PublicSuffixSupport {
+sealed trait Host {
+  def conf: UriConfig
   def value: String
   override def toString: String = value
+
+  /**
+    * Returns the longest public suffix for the host in this URI. Examples include:
+    *  `com`   for `www.example.com`
+    *  `co.uk` for `www.example.co.uk`
+    *
+    * @return the longest public suffix for the host in this URI
+    */
+  def publicSuffix: Option[String]
+
+  /**
+    * Returns all longest public suffixes for the host in this URI. Examples include:
+    *  `com` for `www.example.com`
+    *  `co.uk` and `uk` for `www.example.co.uk`
+    *
+    * @return all public suffixes for the host in this URI
+    */
+  def publicSuffixes: Vector[String]
 
   /**
     * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
@@ -81,9 +102,35 @@ object Host {
 
   def unapply(host: Host): Option[String] =
     Some(host.toString)
+
+  implicit val eqHost: Eq[Host] = Eq.fromUniversalEquals
+  implicit val showHost: Show[Host] = Show.fromToString
+  implicit val orderHost: Order[Host] = Order.by(_.value)
 }
 
-final case class DomainName(value: String) extends Host with PublicSuffixSupportImpl with PunycodeSupport {
+final case class DomainName(value: String)(implicit val conf: UriConfig = UriConfig.default)
+    extends Host
+    with PunycodeSupport {
+  /**
+    * Returns the longest public suffix for the host in this URI. Examples include:
+    *  `com`   for `www.example.com`
+    *  `co.uk` for `www.example.co.uk`
+    *
+    * @return the longest public suffix for the host in this URI
+    */
+  def publicSuffix: Option[String] =
+    PublicSuffixTrie.publicSuffixTrie.longestMatch(value.reverse).map(_.reverse)
+
+  /**
+    * Returns all longest public suffixes for the host in this URI. Examples include:
+    *  `com` for `www.example.com`
+    *  `co.uk` and `uk` for `www.example.co.uk`
+    *
+    * @return all public suffixes for the host in this URI
+    */
+  def publicSuffixes: Vector[String] =
+    PublicSuffixTrie.publicSuffixTrie.matches(value.reverse).map(_.reverse)
+
   /**
     * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
     *         operation of <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
@@ -183,9 +230,15 @@ object DomainName {
     parseTry(s).get
 
   def empty: DomainName = DomainName("")
+
+  implicit val eqDomainName: Eq[DomainName] = Eq.fromUniversalEquals
+  implicit val showDomainName: Show[DomainName] = Show.fromToString
+  implicit val orderDomainName: Order[DomainName] = Order.by(_.value)
 }
 
-final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte) extends Host {
+final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte)(implicit val conf: UriConfig =
+                                                                                UriConfig.default)
+    extends Host {
   private def uByteToInt(b: Byte): Int = b & 0xff
 
   def octet1Int: Int = uByteToInt(octet1)
@@ -223,6 +276,10 @@ object IpV4 {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): IpV4 =
     parseTry(s).get
+
+  implicit val eqIpV4: Eq[IpV4] = Eq.fromUniversalEquals
+  implicit val showIpV4: Show[IpV4] = Show.fromToString
+  implicit val orderIpV4: Order[IpV4] = Order.by(_.octets)
 }
 
 final case class IpV6(piece1: Char,
@@ -232,7 +289,7 @@ final case class IpV6(piece1: Char,
                       piece5: Char,
                       piece6: Char,
                       piece7: Char,
-                      piece8: Char)
+                      piece8: Char)(implicit val conf: UriConfig = UriConfig.default)
     extends Host {
   def piece1Int: Int = piece1.toInt
   def piece2Int: Int = piece2.toInt
@@ -358,4 +415,8 @@ object IpV6 {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): IpV6 =
     parseTry(s).get
+
+  implicit val eqIpV6: Eq[IpV6] = Eq.fromUniversalEquals
+  implicit val showIpV6: Show[IpV6] = Show.fromToString
+  implicit val orderIpV6: Order[IpV6] = Order.by(_.pieces)
 }

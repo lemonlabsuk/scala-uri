@@ -78,7 +78,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _authority: Rule1[Authority] = rule {
-    "//" ~ (optional(_user_info) ~ _host_in_authority ~ optional(_port)) ~> extractAuthority
+    (optional(_user_info) ~ _host_in_authority ~ optional(_port)) ~> extractAuthority
   }
 
   def _path_segment: Rule1[String] = rule {
@@ -127,15 +127,42 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _abs_url: Rule1[AbsoluteUrl] = rule {
-    _scheme ~ ":" ~ _authority ~ _path_for_authority ~ _maybe_query_string ~ optional(_fragment) ~> extractAbsoluteUrl
+    _scheme ~ "://" ~ _authority ~ _path_for_authority ~ _maybe_query_string ~ optional(_fragment) ~> extractAbsoluteUrl
   }
 
   def _url_without_authority: Rule1[UrlWithoutAuthority] = rule {
+    _data_url | _simple_url_without_authority
+  }
+
+  def _simple_url_without_authority: Rule1[SimpleUrlWithoutAuthority] = rule {
     _scheme ~ ":" ~ _path ~ _maybe_query_string ~ optional(_fragment) ~> extractUrlWithoutAuthority
   }
 
+  def _media_type_param: Rule1[(String, String)] = rule {
+    capture(zeroOrMore(noneOf(";,="))) ~ "=" ~ capture(zeroOrMore(noneOf(";,"))) ~ optional(";") ~> extractMediaTypeParam
+  }
+
+  /*
+   * https://tools.ietf.org/html/rfc1341
+   */
+  def _media_type: Rule1[MediaType] = rule {
+    capture(zeroOrMore(noneOf(";,"))) ~ optional(";") ~ zeroOrMore(_media_type_param) ~> extractMediaType
+  }
+
+  def _data_url_base64: Rule1[DataUrl] = rule {
+    "data:" ~ _media_type ~ "base64," ~ capture(zeroOrMore(ANY)) ~> extractBase64DataUrl
+  }
+
+  def _data_url_percent_encoded: Rule1[DataUrl] = rule {
+    "data:" ~ _media_type ~ "," ~ capture(zeroOrMore(ANY)) ~> extractPercentEncodedDataUrl
+  }
+
+  def _data_url: Rule1[DataUrl] = rule {
+    _data_url_base64 | _data_url_percent_encoded
+  }
+
   def _protocol_rel_url: Rule1[ProtocolRelativeUrl] = rule {
-    _authority ~ _path_for_authority ~ _maybe_query_string ~ optional(_fragment) ~> extractProtocolRelativeUrl
+    "//" ~ _authority ~ _path_for_authority ~ _maybe_query_string ~ optional(_fragment) ~> extractProtocolRelativeUrl
   }
 
   def _rel_url: Rule1[RelativeUrl] = rule {
@@ -161,7 +188,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   val extractRelativeUrl = (path: UrlPath, qs: QueryString, f: Option[String]) => RelativeUrl(path, qs, f)
 
   val extractUrlWithoutAuthority = (scheme: String, path: UrlPath, qs: QueryString, f: Option[String]) =>
-    UrlWithoutAuthority(scheme, path, qs, f)
+    SimpleUrlWithoutAuthority(scheme, path, qs, f)
 
   val extractInt = (num: String) => num.toInt
 
@@ -186,10 +213,9 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   val extractDomainName = (domainName: String) => DomainName(domainName)
 
   val extractUserInfo = (user: String, pass: Option[String]) =>
-    UserInfo(Some(pathDecoder.decode(user)), pass.map(pathDecoder.decode))
+    UserInfo(pathDecoder.decode(user), pass.map(pathDecoder.decode))
 
-  val extractAuthority = (userInfo: Option[UserInfo], host: Host, port: Option[Int]) =>
-    Authority(userInfo.getOrElse(UserInfo.empty), host, port)
+  val extractAuthority = (userInfo: Option[UserInfo], host: Host, port: Option[Int]) => Authority(userInfo, host, port)
 
   val extractFragment = (x: String) => fragmentDecoder.decode(x)
 
@@ -209,6 +235,16 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
       UrlPath.empty
     else
       RootlessPath(pp.toVector)
+
+  val extractMediaTypeParam = (k: String, v: String) => k -> v
+
+  val extractMediaType = (value: String, params: immutable.Seq[(String, String)]) => {
+    MediaType(if (value.isEmpty) None else Some(value), params.toVector)
+  }
+
+  val extractBase64DataUrl = (mediaType: MediaType, data: String) => DataUrl.fromBase64(mediaType, data)
+
+  val extractPercentEncodedDataUrl = (mediaType: MediaType, data: String) => DataUrl.fromPercentEncoded(mediaType, data)
 
   val extractTuple = (k: String, v: String) => k -> Some(v)
 
@@ -242,6 +278,12 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
 
   def parseUrlWithoutAuthority(): Try[UrlWithoutAuthority] =
     mapParseError(rule(_url_without_authority ~ EOI).run(), "Url")
+
+  def parseSimpleUrlWithoutAuthority(): Try[SimpleUrlWithoutAuthority] =
+    mapParseError(rule(_simple_url_without_authority ~ EOI).run(), "Url")
+
+  def parseDataUrl(): Try[DataUrl] =
+    mapParseError(rule(_data_url ~ EOI).run(), "Data Url")
 
   def parseAbsoluteUrl(): Try[AbsoluteUrl] =
     mapParseError(rule(_abs_url ~ EOI).run(), "Url")
@@ -288,10 +330,19 @@ object UrlParser {
     UrlParser(s).parseHost()
 
   def parseUserInfo(s: String)(implicit config: UriConfig = UriConfig.default): Try[UserInfo] =
-    UrlParser(s).parseUserInfo()
+    UrlParser(s + "@").parseUserInfo()
 
   def parseUrlWithoutAuthority(s: String)(implicit config: UriConfig = UriConfig.default): Try[UrlWithoutAuthority] =
     UrlParser(s).parseUrlWithoutAuthority()
+
+  def parseSimpleUrlWithoutAuthority(
+      s: String
+  )(implicit config: UriConfig = UriConfig.default): Try[SimpleUrlWithoutAuthority] =
+    UrlParser(s).parseSimpleUrlWithoutAuthority()
+
+  // Data URLs may be formatted with newlines, so strip them
+  def parseDataUrl(s: String)(implicit config: UriConfig = UriConfig.default): Try[DataUrl] =
+    UrlParser(s.replace("\n", "")).parseDataUrl()
 
   def parseAbsoluteUrl(s: String)(implicit config: UriConfig = UriConfig.default): Try[AbsoluteUrl] =
     UrlParser(s).parseAbsoluteUrl()

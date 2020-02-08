@@ -1,5 +1,7 @@
 package io.lemonlabs.uri.typesafe
 
+import cats.Contravariant
+import cats.syntax.contravariant._
 import shapeless._
 import shapeless.labelled._
 import shapeless.ops.coproduct.Reify
@@ -12,15 +14,27 @@ import scala.language.implicitConversions
   def queryKey(a: A): String
 }
 
-object QueryKey extends QueryKeyInstance
+object QueryKey extends QueryKeyInstances
 
-sealed trait QueryKeyInstance {
+sealed trait QueryKeyInstances1 {
+  implicit val contravariant: Contravariant[QueryKey] = new Contravariant[QueryKey] {
+    def contramap[A, B](fa: QueryKey[A])(f: B => A): QueryKey[B] = (b: B) => fa.queryKey(f(b))
+  }
+}
+
+sealed trait QueryKeyInstances extends QueryKeyInstances1 {
   implicit val stringQueryKey: QueryKey[String] = a => a
+  implicit final val booleanQueryValue: QueryKey[Boolean] = stringQueryKey.contramap(_.toString)
+  implicit final val charQueryValue: QueryKey[Char] = stringQueryKey.contramap(_.toString)
+  implicit final val intQueryValue: QueryKey[Int] = stringQueryKey.contramap(_.toString)
+  implicit final val longQueryValue: QueryKey[Long] = stringQueryKey.contramap(_.toString)
+  implicit final val floatQueryValue: QueryKey[Float] = stringQueryKey.contramap(_.toString)
+  implicit final val doubleQueryValue: QueryKey[Double] = stringQueryKey.contramap(_.toString)
+  implicit final val uuidQueryValue: QueryKey[java.util.UUID] = stringQueryKey.contramap(_.toString)
 }
 
 @typeclass trait QueryValue[-A] { self =>
   def queryValue(a: A): Option[String]
-  def contramap[B](f: B => A): QueryValue[B] = (b: B) => self.queryValue(f(b))
 }
 
 object QueryValue extends QueryValueInstances {
@@ -34,7 +48,13 @@ object QueryValue extends QueryValueInstances {
   }
 }
 
-sealed trait QueryValueInstances1 {
+sealed trait QueryValueInstances2 {
+  implicit val contravariant: Contravariant[QueryValue] = new Contravariant[QueryValue] {
+    def contramap[A, B](fa: QueryValue[A])(f: B => A): QueryValue[B] = (b: B) => fa.queryValue(f(b))
+  }
+}
+
+sealed trait QueryValueInstances1 extends QueryValueInstances2 {
   implicit final val stringQueryValue: QueryValue[String] = Option(_)
   implicit final val booleanQueryValue: QueryValue[Boolean] = stringQueryValue.contramap(_.toString)
   implicit final val charQueryValue: QueryValue[Char] = stringQueryValue.contramap(_.toString)
@@ -54,44 +74,40 @@ sealed trait QueryValueInstances extends QueryValueInstances1 {
   def queryKey(a: A): String
 
   def queryValue(a: A): Option[String]
+
+  def queryKeyValue(a: A): (String, Option[String]) =
+    queryKey(a) -> queryValue(a)
 }
 
-object QueryKeyValue extends QueryKeyValueInstances
-
-sealed trait QueryKeyValueInstances {
-  implicit def tuple2QueryKeyValue[K: QueryKey, V: QueryValue]: QueryKeyValue[(K, V)] =
-    new QueryKeyValue[(K, V)] {
-      def queryKey(a: (K, V)): String = QueryKey[K].queryKey(a._1)
-
-      def queryValue(a: (K, V)): Option[String] = QueryValue[V].queryValue(a._2)
+object QueryKeyValue extends QueryKeyValueInstances {
+  def apply[T, K: QueryKey, V: QueryValue](toKey: T => K, toValue: T => V): QueryKeyValue[T] =
+    new QueryKeyValue[T] {
+      def queryKey(a: T): String = QueryKey[K].queryKey(toKey(a))
+      def queryValue(a: T): Option[String] = QueryValue[V].queryValue(toValue(a))
     }
 }
 
-sealed trait TraversableParamsInstances {
-  implicit def seqTraversableParams[A](implicit tc: QueryKeyValue[A]): TraversableParams[Seq[A]] =
-    (ax: Seq[A]) => ax.map((a: A) => tc.queryKey(a) -> tc.queryValue(a))
-
-  implicit def listTraversableParams[A](implicit tc: QueryKeyValue[A]): TraversableParams[List[A]] =
-    (ax: List[A]) => ax.map((a: A) => tc.queryKey(a) -> tc.queryValue(a))
-
-  implicit def traversableParams[K, V](implicit tck: QueryKey[K], tcv: QueryValue[V]): TraversableParams[Map[K, V]] =
-    (ax: Map[K, V]) => ax.map { case (k, v) => tck.queryKey(k) -> tcv.queryValue(v) }.toSeq
+sealed trait QueryKeyValueInstances {
+  implicit def tuple2QueryKeyValue[K: QueryKey, V: QueryValue]: QueryKeyValue[(K, V)] =
+    QueryKeyValue(_._1, _._2)
 }
 
 @typeclass trait TraversableParams[A] {
   def toSeq(a: A): Seq[(String, Option[String])]
+  def toVector(a: A): Vector[(String, Option[String])] =
+    toSeq(a).toVector
 }
 
 object TraversableParams extends TraversableParamsInstances {
   implicit def field[K <: Symbol, V](implicit K: Witness.Aux[K], V: QueryValue[V]): TraversableParams[FieldType[K, V]] =
-    (a: FieldType[K, V]) => Seq(K.value.name -> V.queryValue(a))
+    (a: FieldType[K, V]) => List(K.value.name -> V.queryValue(a))
 
   implicit def sub[K <: Symbol, V](implicit K: Witness.Aux[K],
                                    V: TraversableParams[V]): TraversableParams[FieldType[K, V]] =
     (a: FieldType[K, V]) => V.toSeq(a)
 
   implicit val hnil: TraversableParams[HNil] =
-    (_: HNil) => Seq.empty
+    (_: HNil) => List.empty
 
   implicit def hcons[H, T <: HList](implicit H: TraversableParams[H],
                                     T: TraversableParams[T]): TraversableParams[H :: T] =
@@ -99,4 +115,30 @@ object TraversableParams extends TraversableParamsInstances {
 
   def product[A, R <: HList](implicit gen: LabelledGeneric.Aux[A, R], R: TraversableParams[R]): TraversableParams[A] =
     (a: A) => R.toSeq(gen.to(a))
+}
+
+sealed trait TraversableParamsInstances1 {
+  implicit val contravariant: Contravariant[TraversableParams] = new Contravariant[TraversableParams] {
+    override def contramap[A, B](fa: TraversableParams[A])(f: B => A): TraversableParams[B] = b => fa.toSeq(f(b))
+  }
+}
+
+sealed trait TraversableParamsInstances extends TraversableParamsInstances1 {
+  implicit def iterableTraversableParams[A](implicit tc: QueryKeyValue[A]): TraversableParams[Iterable[A]] =
+    (ax: Iterable[A]) => ax.map((a: A) => tc.queryKey(a) -> tc.queryValue(a)).toSeq
+
+  implicit def seqTraversableParams[A](implicit tc: QueryKeyValue[A]): TraversableParams[Seq[A]] =
+    (ax: Seq[A]) => ax.map((a: A) => tc.queryKey(a) -> tc.queryValue(a))
+
+  implicit def listTraversableParams[A](implicit tc: QueryKeyValue[A]): TraversableParams[List[A]] =
+    (ax: List[A]) => ax.map((a: A) => tc.queryKey(a) -> tc.queryValue(a))
+
+  implicit def singleTraversableParams[A](implicit tc: QueryKeyValue[A]): TraversableParams[A] =
+    (a: A) => Seq(tc.queryKey(a) -> tc.queryValue(a))
+
+  implicit def vectorTraversableParams[A](implicit tc: QueryKeyValue[A]): TraversableParams[Vector[A]] =
+    (ax: Vector[A]) => ax.map((a: A) => tc.queryKey(a) -> tc.queryValue(a))
+
+  implicit def mapTraversableParams[K, V](implicit tck: QueryKey[K], tcv: QueryValue[V]): TraversableParams[Map[K, V]] =
+    (ax: Map[K, V]) => ax.map { case (k, v) => tck.queryKey(k) -> tcv.queryValue(v) }.toSeq
 }

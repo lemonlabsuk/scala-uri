@@ -1,7 +1,27 @@
 package io.lemonlabs.uri
 
+import java.util.Base64
+
+import cats.implicits._
+import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UriParser, UrlParser, UrnParser}
+import io.lemonlabs.uri.typesafe.{
+  Fragment,
+  PathPart,
+  QueryKey,
+  QueryKeyValue,
+  QueryValue,
+  TraversableParams,
+  TraversablePathParts
+}
+import io.lemonlabs.uri.typesafe.TraversableParams.ops._
+import io.lemonlabs.uri.typesafe.QueryKeyValue.ops._
+import io.lemonlabs.uri.typesafe.QueryValue.ops._
+import io.lemonlabs.uri.typesafe.QueryKey.ops._
+import io.lemonlabs.uri.typesafe.PathPart.ops._
+import io.lemonlabs.uri.typesafe.TraversablePathParts.ops._
+import io.lemonlabs.uri.typesafe.Fragment.ops._
 
 import scala.util.Try
 
@@ -84,6 +104,12 @@ object Uri {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Uri =
     parseTry(s).get
+
+  import cats.implicits._
+
+  implicit val eqUri: Eq[Uri] = Eq.fromUniversalEquals
+  implicit val showUri: Show[Uri] = Show.fromToString
+  implicit val orderUri: Order[Uri] = Order.by(_.toString())
 }
 
 /**
@@ -194,16 +220,7 @@ sealed trait Url extends Uri {
     * @param fragment the new fragment to set
     * @return a new Url with the specified fragment
     */
-  def withFragment(fragment: String): Self =
-    withFragment(Some(fragment))
-
-  /**
-    * Copies this Url but with the fragment set as the given value.
-    *
-    * @param fragment the new fragment to set
-    * @return a new Url with the specified fragment
-    */
-  def withFragment(fragment: Option[String]): Self
+  def withFragment[T: Fragment](fragment: T): Self
 
   /**
     * Copies this Url but with the path set as the given value.
@@ -212,6 +229,15 @@ sealed trait Url extends Uri {
     * @return a new Url with the specified path
     */
   def withPath(path: UrlPath): Self
+
+  /**
+    * Copies this Url but with the path set as the given value.
+    *
+    * @param parts the parts that make up the new path
+    * @return a new Url with the specified path
+    */
+  def withPathParts[P: TraversablePathParts](parts: P): Self =
+    withPath(UrlPath(parts.toSeq))
 
   /**
     * Copies this Url but with the query set as the given value.
@@ -223,27 +249,24 @@ sealed trait Url extends Uri {
 
   /**
     * Replaces the all existing Query String parameters with a new set of query params
-    *
-    * Pairs with values, such as ("k", Some("v")), represent query params with values, i.e ?k=v
-    * Pairs without values, such as ("k", None), represent query params without values, i.e ?k
     */
-  def withQueryStringOptionValues(params: (String, Option[String])*): Self =
-    withQueryString(QueryString(params.toVector))
+  def withQueryString[T: TraversableParams](params: T): Self =
+    withQueryString(QueryString.fromTraversable(params))
 
   /**
     * Replaces the all existing Query String parameters with a new set of query params
     */
-  def withQueryString(params: (String, String)*): Self =
-    withQueryString(QueryString.fromTraversable(params))
+  def withQueryString[KV: QueryKeyValue](first: KV, second: KV, params: KV*): Self =
+    withQueryString(QueryString.fromTraversable(Seq(first, second) ++ params))
 
-  def addPathPart(part: String): Self =
+  def addPathPart[P: PathPart](part: P): Self =
     withPath(path.addPart(part))
 
-  def addPathParts(parts: Iterable[String]): Self =
+  def addPathParts[P: TraversablePathParts](parts: P): Self =
     withPath(path.addParts(parts))
 
-  def addPathParts(parts: String*): Self =
-    withPath(path.addParts(parts))
+  def addPathParts[P: PathPart](first: P, second: P, parts: P*): Self =
+    withPath(path.addParts(first, second, parts: _*))
 
   /**
     * Adds a new Query String parameter key-value pair.
@@ -253,91 +276,47 @@ sealed trait Url extends Uri {
     * By default, pairs without values, i.e `None`, represent query params without values, i.e `?param`
     * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     *
-    * @param name name of the parameter
-    * @param value value for the parameter
+    * @param a value that provides a name/value pair for the parameter. Can be a Tuple of any basic value
+    *          types or a custom type if you provide a `QueryKeyValue` type-class
     * @return A new Url with the new Query String parameter
     */
-  def addParam(name: String, value: Option[String]): Self =
-    withQueryString(query.addParam(name, value))
+  def addParam[A: QueryKeyValue](a: A): Url =
+    withQueryString(query.addParam(a))
 
   /**
     * Adds a new Query String parameter key-value pair.
     *
-    * @param name name of the parameter
-    * @param value value for the parameter
-    * @return A new Url with the new Query String parameter
-    */
-  def addParam(name: String, value: String): Self =
-    withQueryString(query.addParam(name, value))
-
-  /**
-    * Adds a new Query String parameter key-value pair.
+    * Pairs with values, such as `Some("value")`, represent query params with values, i.e `?param=value`
     *
-    * @param kv name-value pair for the query parameter to be added
-    * @return A new Url with the new Query String parameter
-    */
-  def addParam(kv: (String, String)): Self =
-    withQueryString(query.addParam(kv))
-
-  /**
-    * Adds a new Query String parameter key-value pair.
-    *
-    * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    *
-    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
+    * By default, pairs without values, i.e `None`, represent query params without values, i.e `?param`
     * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
     *
-    * @param kv name-value pair for the query parameter to be added
+    * @param k value that provides a name pair for the parameter. Can be a any basic value type or a
+    *          custom type if you provide a `QueryKey` type-class
+    * @param v value that provides a value for the parameter. Can be a any basic value type or a
+    *          custom type if you provide a `QueryValue` type-class
     * @return A new Url with the new Query String parameter
     */
-  def addParamOptionValue(kv: (String, Option[String])): Self =
-    withQueryString(query.addParamOptionValue(kv))
+  def addParam[K: QueryKey, V: QueryValue](k: K, v: V): Url =
+    withQueryString(query.addParam(k, v))
 
   /**
     * Adds all the specified key-value pairs as parameters to the query
     *
-    * @param kvs A list of key-value pairs to add as query parameters
+    * @param params A list of key-value pairs to add as query parameters
     * @return A new Url with the new Query String parameters
     */
-  def addParams(kvs: (String, String)*): Self =
-    withQueryString(query.addParams(kvs: _*))
+  def addParams[A: TraversableParams](params: A): Self =
+    withQueryString(query.addParams(params))
 
   /**
     * Adds all the specified key-value pairs as parameters to the query
     *
-    * @param kvs A list of key-value pairs to add as query parameters
+    * @param params A list of key-value pairs to add as query parameters
     * @return A new Url with the new Query String parameters
     */
-  def addParams(kvs: Iterable[(String, String)]): Self =
-    withQueryString(query.addParams(kvs))
-
-  /**
-    * Adds all the specified key-value pairs as parameters to the query
-    *
-    * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    *
-    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
-    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
-    *
-    * @param kvs A list of key-value pairs to add as query parameters
-    * @return A new Url with the new Query String parameters
-    */
-  def addParamsOptionValues(kvs: Iterable[(String, Option[String])]): Self =
-    withQueryString(query.addParamsOptionValues(kvs))
-
-  /**
-    * Adds all the specified key-value pairs as parameters to the query
-    *
-    * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
-    *
-    * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
-    * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
-    *
-    * @param kvs A list of key-value pairs to add as query parameters
-    * @return A new Url with the new Query String parameters
-    */
-  def addParamsOptionValues(kvs: (String, Option[String])*): Self =
-    withQueryString(query.addParamsOptionValues(kvs: _*))
+  def addParams[KV: QueryKeyValue](first: KV, second: KV, params: KV*): Self =
+    withQueryString(query.addParams(first, second, params: _*))
 
   /**
     * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
@@ -352,18 +331,7 @@ sealed trait Url extends Uri {
     * @param v value to replace with
     * @return A new Uri with the result of the replace
     */
-  def replaceParams(k: String, v: Option[String]): Self =
-    withQueryString(query.replaceAll(k, v))
-
-  /**
-    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
-    * with the specified value.
-    *
-    * @param k Key for the Query String parameter(s) to replace
-    * @param v value to replace with
-    * @return A new Uri with the result of the replace
-    */
-  def replaceParams(k: String, v: String): Self =
+  def replaceParams[K: QueryKey, V: QueryValue](k: K, v: V): Self =
     withQueryString(query.replaceAll(k, v))
 
   /**
@@ -371,23 +339,25 @@ sealed trait Url extends Uri {
     * @param k Key for the Query String parameter(s) to remove
     * @return
     */
-  def removeParams(k: String): Self =
+  def removeParams[K: QueryKey](k: K): Self =
     withQueryString(query.removeAll(k))
+
+  /**
+    * Removes all Query String parameters with a name in the specified list
+    * @param first Name of a Query String parameter to remove
+    * @param second Name of another Query String parameter to remove
+    * @param rest Name of more Query String parameter(s) to remove
+    * @return
+    */
+  def removeParams[K: QueryKey](first: K, second: K, rest: K*): Self =
+    withQueryString(query.removeAll(first, second, rest: _*))
 
   /**
     * Removes all Query String parameters with a name in the specified list
     * @param k Names of Query String parameter(s) to remove
     * @return
     */
-  def removeParams(k: String*): Self =
-    withQueryString(query.removeAll(k))
-
-  /**
-    * Removes all Query String parameters with a name in the specified list
-    * @param k Names of Query String parameter(s) to remove
-    * @return
-    */
-  def removeParams(k: Iterable[String]): Self =
+  def removeParams[K: QueryKey](k: Iterable[K]): Self =
     withQueryString(query.removeAll(k))
 
   /**
@@ -405,7 +375,7 @@ sealed trait Url extends Uri {
     * @param f A function that returns a new Parameter when applied to each Parameter
     * @return
     */
-  def mapQuery(f: PartialFunction[(String, Option[String]), (String, Option[String])]): Self =
+  def mapQuery[KV: QueryKeyValue](f: PartialFunction[(String, Option[String]), KV]): Self =
     withQueryString(query.map(f))
 
   /**
@@ -416,7 +386,7 @@ sealed trait Url extends Uri {
     * @param f A function that returns a new Parameter when applied to each Parameter
     * @return
     */
-  def collectQuery(f: PartialFunction[(String, Option[String]), (String, Option[String])]): Self =
+  def collectQuery[KV: QueryKeyValue](f: PartialFunction[(String, Option[String]), KV]): Self =
     withQueryString(query.collect(f))
 
   /**
@@ -425,7 +395,7 @@ sealed trait Url extends Uri {
     * @param f A function that returns a collection of Parameters when applied to each parameter
     * @return
     */
-  def flatMapQuery(f: ((String, Option[String])) => Iterable[(String, Option[String])]): Self =
+  def flatMapQuery[A: TraversableParams](f: ((String, Option[String])) => A): Self =
     withQueryString(query.flatMap(f))
 
   /**
@@ -434,7 +404,7 @@ sealed trait Url extends Uri {
     * @param f A function that returns a new Parameter name when applied to each Parameter name
     * @return
     */
-  def mapQueryNames(f: String => String): Self =
+  def mapQueryNames[K: QueryKey](f: String => K): Self =
     withQueryString(query.mapNames(f))
 
   /**
@@ -443,7 +413,7 @@ sealed trait Url extends Uri {
     * @param f A function that returns a new Parameter value when applied to each Parameter value
     * @return
     */
-  def mapQueryValues(f: String => String): Self =
+  def mapQueryValues[V: QueryValue](f: String => V): Self =
     withQueryString(query.mapValues(f))
 
   /**
@@ -517,6 +487,12 @@ sealed trait Url extends Uri {
     */
   def toStringPunycode: String =
     toString(config)
+
+  protected def queryToString(config: UriConfig): String =
+    query.toString(config) match {
+      case "" => ""
+      case s  => "?" + s
+    }
 }
 
 object Url {
@@ -532,7 +508,8 @@ object Url {
     val frag = Option(fragment)
     def authority = {
       val portOpt = if (port > 0) Some(port) else None
-      Authority(UserInfo(Option(user), Option(password)), Host.parse(host), portOpt)
+      val userInfo = Option(user).map(u => UserInfo(u, Option(password)))
+      Authority(userInfo, Host.parse(host), portOpt)
     }
 
     (scheme, host) match {
@@ -554,6 +531,10 @@ object Url {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Url] =
     UrlParser.parseUrl(s.toString)
+
+  implicit val eqUrl: Eq[Url] = Eq.fromUniversalEquals
+  implicit val showUrl: Show[Url] = Show.fromToString
+  implicit val orderUrl: Order[Url] = Order.by(_.toString())
 }
 
 /**
@@ -606,14 +587,14 @@ final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option
   def withPath(path: UrlPath): RelativeUrl =
     copy(path = path)
 
-  def withFragment(fragment: Option[String]): RelativeUrl =
-    copy(fragment = fragment)
+  def withFragment[T: Fragment](fragment: T): RelativeUrl =
+    copy(fragment = fragment.fragment)
 
   def withQueryString(query: QueryString): RelativeUrl =
     copy(query = query)
 
   private[uri] def toString(c: UriConfig): String =
-    path.toString(c) + query.toString(c) + fragmentToString(c)
+    path.toString(c) + queryToString(c) + fragmentToString(c)
 }
 
 object RelativeUrl {
@@ -628,6 +609,12 @@ object RelativeUrl {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[RelativeUrl] =
     UrlParser.parseRelativeUrl(s.toString)
+
+  implicit val eqRelUrl: Eq[RelativeUrl] = Eq.fromUniversalEquals
+  implicit val showRelUrl: Show[RelativeUrl] = Show.fromToString
+  implicit val orderRelUrl: Order[RelativeUrl] = Order.by { url =>
+    (url.path, url.query, url.fragment)
+  }
 }
 
 /**
@@ -647,7 +634,7 @@ sealed trait UrlWithAuthority extends Url {
   def hostOption: Option[Host] = Some(host)
 
   def port: Option[Int] = authority.port
-  def userInfo: UserInfo = authority.userInfo
+  def userInfo: Option[UserInfo] = authority.userInfo
   def user: Option[String] = authority.user
   def password: Option[String] = authority.password
 
@@ -661,8 +648,7 @@ sealed trait UrlWithAuthority extends Url {
     * @return a new Url with the specified user
     */
   def withUser(user: String): Self = {
-    val newUserInfo = userInfo.copy(user = Some(user))
-    withAuthority(authority.copy(userInfo = newUserInfo))
+    withAuthority(authority.copy(userInfo = Some(UserInfo(user, password))))
   }
 
   /**
@@ -672,8 +658,7 @@ sealed trait UrlWithAuthority extends Url {
     * @return a new Url with the specified password
     */
   def withPassword(password: String): Self = {
-    val newUserInfo = userInfo.copy(password = Some(password))
-    withAuthority(authority.copy(userInfo = newUserInfo))
+    withAuthority(authority.copy(userInfo = Some(UserInfo(user.getOrElse(""), password))))
   }
 
   /**
@@ -768,6 +753,10 @@ object UrlWithAuthority {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrlWithAuthority] =
     UrlParser.parseUrlWithAuthority(s.toString)
+
+  implicit val eqUrlWithAuthority: Eq[UrlWithAuthority] = Eq.fromUniversalEquals
+  implicit val showUrlWithAuthority: Show[UrlWithAuthority] = Show.fromToString
+  implicit val orderUrlWithAuthority: Order[UrlWithAuthority] = Order.by(_.toString())
 }
 
 /**
@@ -791,8 +780,8 @@ final case class ProtocolRelativeUrl(authority: Authority,
   def withAuthority(authority: Authority): ProtocolRelativeUrl =
     copy(authority = authority)
 
-  def withFragment(fragment: Option[String]): ProtocolRelativeUrl =
-    copy(fragment = fragment)
+  def withFragment[T: Fragment](fragment: T): ProtocolRelativeUrl =
+    copy(fragment = fragment.fragment)
 
   /**
     * Copies this Url but with the path set as the given value.
@@ -810,7 +799,7 @@ final case class ProtocolRelativeUrl(authority: Authority,
     copy(query = query)
 
   private[uri] def toString(c: UriConfig, hostToString: Host => String): String =
-    "//" + authority.toString(c, hostToString) + path.toString(c) + query.toString(c) + fragmentToString(c)
+    "//" + authority.toString(c, hostToString) + path.toString(c) + queryToString(c) + fragmentToString(c)
 }
 
 object ProtocolRelativeUrl {
@@ -822,6 +811,12 @@ object ProtocolRelativeUrl {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[ProtocolRelativeUrl] =
     UrlParser.parseProtocolRelativeUrl(s.toString)
+
+  implicit val eqProtocolRelUrl: Eq[ProtocolRelativeUrl] = Eq.fromUniversalEquals
+  implicit val showProtocolRelUrl: Show[ProtocolRelativeUrl] = Show.fromToString
+  implicit val orderProtocolRelUrl: Order[ProtocolRelativeUrl] = Order.by { url =>
+    (url.authority, url.path, url.query, url.fragment)
+  }
 }
 
 /**
@@ -846,8 +841,8 @@ final case class AbsoluteUrl(scheme: String,
   def withAuthority(authority: Authority): AbsoluteUrl =
     copy(authority = authority)
 
-  def withFragment(fragment: Option[String]): AbsoluteUrl =
-    copy(fragment = fragment)
+  def withFragment[T: Fragment](fragment: T): AbsoluteUrl =
+    copy(fragment = fragment.fragment)
 
   /**
     * Copies this Url but with the path set as the given value.
@@ -865,7 +860,7 @@ final case class AbsoluteUrl(scheme: String,
     copy(query = query)
 
   private[uri] def toString(c: UriConfig, hostToString: Host => String): String =
-    scheme + "://" + authority.toString(c, hostToString) + path.toString(c) + query.toString(c) + fragmentToString(c)
+    scheme + "://" + authority.toString(c, hostToString) + path.toString(c) + queryToString(c) + fragmentToString(c)
 }
 
 object AbsoluteUrl {
@@ -877,21 +872,24 @@ object AbsoluteUrl {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[AbsoluteUrl] =
     UrlParser.parseAbsoluteUrl(s.toString)
+
+  implicit val eqAbsUrl: Eq[AbsoluteUrl] = Eq.fromUniversalEquals
+  implicit val showAbsUrl: Show[AbsoluteUrl] = Show.fromToString
+  implicit val orderAbsUrl: Order[AbsoluteUrl] = Order.by { url =>
+    (url.scheme, url.authority, url.path, url.query, url.fragment)
+  }
 }
 
 /**
   * Represents URLs that do not have an authority, for example: `mailto:example@example.com`
   */
-final case class UrlWithoutAuthority(scheme: String, path: UrlPath, query: QueryString, fragment: Option[String])(
-    implicit val config: UriConfig = UriConfig.default
-) extends Url {
-  type Self = UrlWithoutAuthority
-  type SelfWithScheme = UrlWithoutAuthority
+sealed trait UrlWithoutAuthority extends Url {
+  type Self <: UrlWithoutAuthority
+  type SelfWithScheme <: UrlWithoutAuthority
   type SelfWithAuthority = AbsoluteUrl
 
-  def self: UrlWithoutAuthority = this
+  def scheme: String
 
-  def schemeOption: Option[String] = Some(scheme)
   def hostOption: Option[Host] = None
   def port: Option[Int] = None
   def user: Option[String] = None
@@ -903,8 +901,44 @@ final case class UrlWithoutAuthority(scheme: String, path: UrlPath, query: Query
   def subdomains: Vector[String] = Vector.empty
   def shortestSubdomain: Option[String] = None
   def longestSubdomain: Option[String] = None
+}
 
-  def withScheme(scheme: String): UrlWithoutAuthority =
+object UrlWithoutAuthority {
+  def apply(scheme: String, path: UrlPath, query: QueryString, fragment: Option[String])(
+      implicit config: UriConfig = UriConfig.default
+  ): UrlWithoutAuthority =
+    SimpleUrlWithoutAuthority(scheme, path, query, fragment)(config)
+
+  def unapply(url: UrlWithoutAuthority): Option[(String, UrlPath, QueryString, Option[String])] =
+    Some((url.scheme, url.path, url.query, url.fragment))
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlWithoutAuthority =
+    parseTry(s).get
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[UrlWithoutAuthority] =
+    parseTry(s).toOption
+
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrlWithoutAuthority] =
+    UrlParser.parseUrlWithoutAuthority(s.toString)
+
+  implicit val eqUrlWithoutAuthority: Eq[UrlWithoutAuthority] = Eq.fromUniversalEquals
+  implicit val showUrlWithoutAuthority: Show[UrlWithoutAuthority] = Show.fromToString
+  implicit val orderUrlWithoutAuthority: Order[UrlWithoutAuthority] = Order.by { url =>
+    (url.scheme, url.path, url.query, url.fragment)
+  }
+}
+
+final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query: QueryString, fragment: Option[String])(
+    implicit val config: UriConfig = UriConfig.default
+) extends UrlWithoutAuthority {
+  type Self = SimpleUrlWithoutAuthority
+  type SelfWithScheme = SimpleUrlWithoutAuthority
+
+  def self: SimpleUrlWithoutAuthority = this
+
+  def schemeOption: Option[String] = Some(scheme)
+
+  def withScheme(scheme: String): SimpleUrlWithoutAuthority =
     copy(scheme = scheme)
 
   /**
@@ -922,7 +956,7 @@ final case class UrlWithoutAuthority(scheme: String, path: UrlPath, query: Query
     * @param path the new path to set
     * @return a new Url with the specified path
     */
-  def withPath(path: UrlPath): UrlWithoutAuthority =
+  def withPath(path: UrlPath): SimpleUrlWithoutAuthority =
     copy(path = path)
 
   /**
@@ -937,25 +971,136 @@ final case class UrlWithoutAuthority(scheme: String, path: UrlPath, query: Query
   def withAuthority(authority: Authority): AbsoluteUrl =
     AbsoluteUrl(scheme, authority, path.toAbsoluteOrEmpty, query, fragment)
 
-  def withFragment(fragment: Option[String]): UrlWithoutAuthority =
-    copy(fragment = fragment)
+  def withFragment[T: Fragment](fragment: T): SimpleUrlWithoutAuthority =
+    copy(fragment = fragment.fragment)
 
-  def withQueryString(query: QueryString): UrlWithoutAuthority =
+  def withQueryString(query: QueryString): SimpleUrlWithoutAuthority =
     copy(query = query)
 
   private[uri] def toString(c: UriConfig): String =
-    scheme + ":" + path.toString(c) + query.toString(c) + fragmentToString(c)
+    scheme + ":" + path.toString(c) + queryToString(c) + fragmentToString(c)
 }
 
-object UrlWithoutAuthority {
-  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlWithoutAuthority =
+object SimpleUrlWithoutAuthority {
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): SimpleUrlWithoutAuthority =
     parseTry(s).get
 
-  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[UrlWithoutAuthority] =
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[SimpleUrlWithoutAuthority] =
     parseTry(s).toOption
 
-  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[UrlWithoutAuthority] =
-    UrlParser.parseUrlWithoutAuthority(s.toString)
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[SimpleUrlWithoutAuthority] =
+    UrlParser.parseSimpleUrlWithoutAuthority(s.toString)
+
+  implicit val eqSimpleUrlWithoutAuthority: Eq[SimpleUrlWithoutAuthority] = Eq.fromUniversalEquals
+  implicit val showSimpleUrlWithoutAuthority: Show[SimpleUrlWithoutAuthority] = Show.fromToString
+  implicit val orderSimpleUrlWithoutAuthority: Order[SimpleUrlWithoutAuthority] = Order.by { url =>
+    (url.scheme, url.path, url.query, url.fragment)
+  }
+}
+
+/**
+  * Represents URLs with the data scheme, for example: `data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678`
+  */
+final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte])(implicit val config: UriConfig =
+                                                                                     UriConfig.default)
+    extends UrlWithoutAuthority {
+  type Self = DataUrl
+  type SelfWithScheme = UrlWithoutAuthority
+
+  def self: DataUrl = this
+
+  val scheme = "data"
+  def schemeOption: Option[String] = Some(scheme)
+
+  def query: QueryString = QueryString.empty
+  def fragment: Option[String] = None
+  def path: UrlPath = RootlessPath.fromParts(pathString(config.withNoEncoding))
+
+  /**
+    * @return The data from this data URL using the charset provided by the URL's mediatype
+    */
+  def dataAsString: String =
+    new String(data, mediaType.charset)
+
+  protected def pathString(c: UriConfig): String = {
+    val base64Str = if (base64) ";base64" else ""
+    val dataStr =
+      if (base64) {
+        val b64Encoded = Base64.getEncoder.encodeToString(data)
+        c.pathEncoder.encode(b64Encoded, mediaType.charset)
+      } else {
+        c.pathEncoder.encode(data, mediaType.charset)
+      }
+    mediaType.toString + base64Str + "," + dataStr
+  }
+
+  def withScheme(scheme: String): UrlWithoutAuthority =
+    if (scheme.equalsIgnoreCase("data"))
+      this
+    else
+      SimpleUrlWithoutAuthority(scheme, path, query, fragment)
+
+  /**
+    * Copies this Url but with the host set as the given value.
+    *
+    * @param host the new host to set
+    * @return a new Url with the specified host
+    */
+  def withHost(host: Host): AbsoluteUrl =
+    AbsoluteUrl(scheme, Authority(host), path.toAbsoluteOrEmpty, query, fragment)
+
+  /**
+    * Copies this Url but with the path set as the given value.
+    *
+    * @param path the new path to set
+    * @return a new Url with the specified path
+    */
+  def withPath(path: UrlPath): DataUrl =
+    DataUrl.parse(scheme + ":" + path.toString())
+
+  /**
+    * Copies this Url but with the port set as the given value.
+    *
+    * @param port the new port to set
+    * @return a new Url with the specified port
+    */
+  def withPort(port: Int): AbsoluteUrl =
+    AbsoluteUrl(scheme, Authority(host = "", port), path.toAbsoluteOrEmpty, query, fragment)
+
+  def withAuthority(authority: Authority): AbsoluteUrl =
+    AbsoluteUrl(scheme, authority, path.toAbsoluteOrEmpty, query, fragment)
+
+  def withFragment[T: Fragment](fragment: T): DataUrl =
+    this
+
+  def withQueryString(query: QueryString): DataUrl =
+    this
+
+  private[uri] def toString(c: UriConfig): String =
+    scheme + ":" + pathString(c)
+}
+
+object DataUrl {
+  def fromBase64(mediaType: MediaType, data: String)(implicit config: UriConfig = UriConfig.default): DataUrl = {
+    val base64Data = config.pathDecoder.decodeBytes(data, mediaType.charset)
+    DataUrl(mediaType, base64 = true, Base64.getDecoder.decode(base64Data))
+  }
+
+  def fromPercentEncoded(mediaType: MediaType, data: String)(implicit config: UriConfig = UriConfig.default): DataUrl =
+    DataUrl(mediaType, base64 = false, config.pathDecoder.decodeBytes(data, mediaType.charset))
+
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): DataUrl =
+    parseTry(s).get
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[DataUrl] =
+    parseTry(s).toOption
+
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[DataUrl] =
+    UrlParser.parseDataUrl(s.toString)
+
+  implicit val eqDataUrl: Eq[DataUrl] = Eq.fromUniversalEquals
+  implicit val showDataUrl: Show[DataUrl] = Show.fromToString
+  implicit val orderDataUrl: Order[DataUrl] = Order.by(_.toString())
 }
 
 /**
@@ -984,7 +1129,7 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
     * @return a new Uri with the specified scheme
     */
   def withScheme(scheme: String): UrlWithoutAuthority =
-    UrlWithoutAuthority(scheme, path.toUrlPath, QueryString.empty, fragment = None)
+    UrlWithoutAuthority(scheme, path.toUrlPath.toRootless, QueryString.empty, fragment = None)
 
   def toUrl: Url = throw new UriConversionException("Urn cannot be converted to Url")
   def toUrn: Urn = this
@@ -1005,4 +1150,8 @@ object Urn {
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Urn] =
     UrnParser.parseUrn(s.toString)
+
+  implicit val eqUrn: Eq[Urn] = Eq.fromUniversalEquals
+  implicit val showUrn: Show[Urn] = Show.fromToString
+  implicit val orderUrn: Order[Urn] = Order.by(_.path)
 }

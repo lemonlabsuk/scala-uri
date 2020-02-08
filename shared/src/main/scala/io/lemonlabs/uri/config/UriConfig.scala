@@ -1,8 +1,8 @@
 package io.lemonlabs.uri.config
 
-import io.lemonlabs.uri.encoding.{NoopEncoder, PercentEncoder, UriEncoder}
 import io.lemonlabs.uri.decoding.{PercentDecoder, UriDecoder}
-import PercentEncoder._
+import io.lemonlabs.uri.encoding.PercentEncoder._
+import io.lemonlabs.uri.encoding.{NoopEncoder, PercentEncoder, UriEncoder}
 
 case class UriConfig(userInfoEncoder: UriEncoder,
                      pathEncoder: UriEncoder,

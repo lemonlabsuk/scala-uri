@@ -112,4 +112,10 @@ class EncodingTests extends AnyFlatSpec with Matchers {
     val url = Url.parse("http://example.com/?control=\u0019\u007F")
     url.toString should equal("http://example.com/?control=%19%7F")
   }
+
+  "Percent Encoded forward slashes in the path" should "be preserved" in {
+    Url.parse("/%2F/").toString() should equal("/%2F/")
+    val builtUrl = Url.parse("http://example.com").addPathPart("1/2")
+    builtUrl.toString() should equal("http://example.com/1%2F2")
+  }
 }

@@ -123,6 +123,17 @@ lazy val scalaUri =
     .settings(publishingSettings)
     .settings(mimaSettings)
 
+lazy val docs = project
+  .in(file("scala0-uri-docs"))
+  .settings(
+    // README.md has examples with expected compiler warnings (deprecated code, exhaustive matches)
+    // Turn off these warnings to keep this noise down
+    // We can remove this if the following is implemented https://github.com/scalameta/mdoc/issues/286
+    scalacOptions := Seq("--no-warnings")
+  )
+  .dependsOn(scalaUri.jvm)
+  .enablePlugins(MdocPlugin)
+
 lazy val updatePublicSuffixes =
   taskKey[Unit]("Updates the public suffix Trie at io.lemonlabs.uri.internet.PublicSuffixes")
 

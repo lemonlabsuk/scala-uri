@@ -59,7 +59,7 @@ val scalaUriSettings = Seq(
     "org.parboiled" %%% "parboiled"  % "2.1.8",
     "com.chuusai"   %%% "shapeless"  % "2.3.3",
     "org.typelevel" %%% "simulacrum" % "1.0.0" % Provided,
-    "org.typelevel" %%% "cats-core"  % "2.0.0"
+    "org.typelevel" %%% "cats-core"  % "2.0.0" % Optional
   ),
   libraryDependencies ++= paradisePlugin.value,
   pomPostProcess := { node =>

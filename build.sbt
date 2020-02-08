@@ -28,7 +28,7 @@ val sharedSettings = Seq(
     "org.scalatest"     %%% "scalatest"       % "3.1.0"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14" % "3.1.0.1" % Test,
     "org.scalacheck"    %%% "scalacheck"      % "1.14.1"  % Test,
-    "org.typelevel"     %%% "cats-laws"       % "2.0.0"   % Test
+    "org.typelevel"     %%% "cats-laws"       % "2.1.0"   % Test
   ),
   scalacOptions := Seq(
     "-unchecked",
@@ -59,7 +59,7 @@ val scalaUriSettings = Seq(
     "org.parboiled" %%% "parboiled"  % "2.1.8",
     "com.chuusai"   %%% "shapeless"  % "2.3.3",
     "org.typelevel" %%% "simulacrum" % "1.0.0" % Provided,
-    "org.typelevel" %%% "cats-core"  % "2.0.0"
+    "org.typelevel" %%% "cats-core"  % "2.1.0"
   ),
   libraryDependencies ++= paradisePlugin.value,
   pomPostProcess := { node =>

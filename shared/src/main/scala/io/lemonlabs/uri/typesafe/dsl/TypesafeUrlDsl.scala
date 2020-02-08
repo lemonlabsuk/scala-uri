@@ -18,6 +18,7 @@ import io.lemonlabs.uri.typesafe.{
 }
 
 class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
+
   /**
     * Appends path parts to the path of this URI
     * @param a The path part

@@ -8,4 +8,4 @@ addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.0.1")
 
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.6.4")
 
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.3.0")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.3.1")

@@ -111,6 +111,7 @@ object Host {
 final case class DomainName(value: String)(implicit val conf: UriConfig = UriConfig.default)
     extends Host
     with PunycodeSupport {
+
   /**
     * Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`

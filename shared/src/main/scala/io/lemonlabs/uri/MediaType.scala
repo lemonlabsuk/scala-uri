@@ -4,6 +4,7 @@ import cats.implicits._
 import cats.{Eq, Order, Show}
 
 case class MediaType(rawValue: Option[String], parameters: Vector[(String, String)]) {
+
   /**
     * @return the value of this mediatype. Defaults to text/plain as per RFC2397 section 2
     */

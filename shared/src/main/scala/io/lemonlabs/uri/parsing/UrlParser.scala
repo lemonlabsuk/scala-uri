@@ -82,7 +82,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _authority: Rule1[Authority] = rule {
-    (optional(_user_info) ~ _host_in_authority(_host_end) ~ optional(_port)) ~> extractAuthority
+    (optional(_user_info) ~ _host_in_authority ~ optional(_port)) ~> extractAuthority
   }
 
   def _path_segment: Rule1[String] = rule {

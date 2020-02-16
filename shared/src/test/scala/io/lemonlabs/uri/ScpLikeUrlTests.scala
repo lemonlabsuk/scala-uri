@@ -68,6 +68,24 @@ class ScpLikeUrlTests extends AnyFlatSpec with Matchers {
     httpUri.toString() should equal("http://user@my.long.host.co.uk/path")
   }
 
+  it should "change host" in {
+    val uri = ScpLikeUrl.parse("user@my.long.host.co.uk:path")
+    val uri2 = uri.withHost(DomainName("another.host.com"))
+    uri2.toString() should equal("user@another.host.com:path")
+  }
+
+  it should "change path" in {
+    val uri = ScpLikeUrl.parse("user@my.long.host.co.uk:path")
+    val uri2 = uri.withPath(AbsolutePath.fromParts("a", "b", "c"))
+    uri2.toString() should equal("user@my.long.host.co.uk:/a/b/c")
+  }
+
+  it should "noop withQuery/withFragment" in {
+    val uri = ScpLikeUrl.parse("user@my.long.host.co.uk:path")
+    uri.withQueryString("a" -> "b") should equal(uri)
+    uri.withFragment("abc") should equal(uri)
+  }
+
   it should "not have a scheme, port, password, querystring or fragment" in {
     val uri = ScpLikeUrl.parse("user@my.long.host.co.uk:path")
     uri.schemeOption should equal(None)
@@ -75,5 +93,10 @@ class ScpLikeUrlTests extends AnyFlatSpec with Matchers {
     uri.password should equal(None)
     uri.query should equal(QueryString.empty)
     uri.fragment should equal(None)
+  }
+
+  it should "fail to parse bad URL" in {
+    val uri = ScpLikeUrl.parseOption("index.html")
+    uri should equal(None)
   }
 }

@@ -61,12 +61,16 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
     *
     * The host in the URL `http://1.2.3.4.blah/` should be DomainName(1.2.3.4.blah), not IPv4(1.2.3.4)
     */
-  def _ip_in_url_end: Rule0 = rule {
-    &(anyOf(_host_end) | EOI)
+  def _ip_in_url_end: Rule0 = _ip_in_url_end(_host_end)
+
+  def _ip_in_url_end(hostEndChars: String): Rule0 = rule {
+    &(anyOf(hostEndChars) | EOI)
   }
 
-  def _host_in_authority: Rule1[Host] = rule {
-    (_ip_v4 ~ _ip_in_url_end) | _ip_v6 | _domain_name
+  def _host_in_authority: Rule1[Host] = _host_in_authority(_host_end)
+
+  def _host_in_authority(hostEndChars: String): Rule1[Host] = rule {
+    (_ip_v4 ~ _ip_in_url_end(hostEndChars)) | _ip_v6 | _domain_name
   }
 
   def _user_info: Rule1[UserInfo] = rule {
@@ -78,7 +82,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _authority: Rule1[Authority] = rule {
-    (optional(_user_info) ~ _host_in_authority ~ optional(_port)) ~> extractAuthority
+    (optional(_user_info) ~ _host_in_authority(_host_end) ~ optional(_port)) ~> extractAuthority
   }
 
   def _path_segment: Rule1[String] = rule {
@@ -177,6 +181,15 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
     _abs_url | _protocol_rel_url | _url_without_authority | _rel_url
   }
 
+  def _scp_like_user: Rule1[Option[String]] = rule {
+    optional(capture(zeroOrMore(noneOf("@"))) ~ "@")
+  }
+
+  // From `man scp`: [user@]host:[path]
+  def _scp_like_url: Rule1[ScpLikeUrl] = rule {
+    _scp_like_user ~ _host_in_authority(hostEndChars = ":") ~ ":" ~ _path ~> extractScpLikeUrl
+  }
+
   val extractAbsoluteUrl =
     (scheme: String, authority: Authority, path: AbsoluteOrEmptyPath, qs: QueryString, f: Option[String]) =>
       AbsoluteUrl(scheme, authority, path, qs, f)
@@ -250,6 +263,8 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
 
   val extractTok = (k: String) => k -> None
 
+  val extractScpLikeUrl = (user: Option[String], host: Host, path: UrlPath) => ScpLikeUrl(user, host, path)
+
   def pathDecoder = conf.pathDecoder
   def queryDecoder = conf.queryDecoder
   def fragmentDecoder = conf.fragmentDecoder
@@ -284,6 +299,9 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
 
   def parseDataUrl(): Try[DataUrl] =
     mapParseError(rule(_data_url ~ EOI).run(), "Data Url")
+
+  def parseScpLikeUrl(): Try[ScpLikeUrl] =
+    mapParseError(rule(_scp_like_url ~ EOI).run(), "scp-like Url")
 
   def parseAbsoluteUrl(): Try[AbsoluteUrl] =
     mapParseError(rule(_abs_url ~ EOI).run(), "Url")
@@ -343,6 +361,9 @@ object UrlParser {
   // Data URLs may be formatted with newlines, so strip them
   def parseDataUrl(s: String)(implicit config: UriConfig = UriConfig.default): Try[DataUrl] =
     UrlParser(s.replace("\n", "")).parseDataUrl()
+
+  def parseScpLikeUrl(s: String)(implicit config: UriConfig = UriConfig.default): Try[ScpLikeUrl] =
+    UrlParser(s).parseScpLikeUrl()
 
   def parseAbsoluteUrl(s: String)(implicit config: UriConfig = UriConfig.default): Try[AbsoluteUrl] =
     UrlParser(s).parseAbsoluteUrl()

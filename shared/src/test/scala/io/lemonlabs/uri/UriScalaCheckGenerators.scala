@@ -46,6 +46,17 @@ trait UriScalaCheckGenerators {
       Gen.listOfN(length, charGen).map(_.mkString)
     }
 
+  private val userOrPass: Gen[String] = strGen(
+    Gen.frequency(
+      (50, unreservedChar),
+      (1, percentEncodedChar),
+      (1, subDelimChar)
+    ),
+    max = 15
+  )
+  private val maybeUserOrPass: Gen[Option[String]] =
+    Gen.oneOf(const(None), some(userOrPass))
+
   // format: off
   private val randScheme: Gen[String] = Gen.oneOf(
     "aaa", "aaas", "about", "acap", "acct", "acr", "adiumxtra", "afp", "afs", "aim", "apt", "attachment", "aw",
@@ -99,17 +110,12 @@ trait UriScalaCheckGenerators {
 
   implicit val randHost: Arbitrary[Host] =
     Arbitrary(Gen.oneOf(randDomainName.arbitrary, randIpV4.arbitrary, randIpV6.arbitrary))
-
+  
   implicit val randUserInfo:  Arbitrary[UserInfo] =  {
-    val userOrPass = strGen(Gen.frequency(
-                              (50, unreservedChar),
-                              (1, percentEncodedChar),
-                              (1, subDelimChar)
-                            ),
-                            max = 15)
+    
     val gen = for {
       user <- userOrPass
-      pass <- Gen.frequency(9 -> const(None), 1 -> some(userOrPass))
+      pass <- maybeUserOrPass
     } yield UserInfo(user, pass)
     Arbitrary(gen)
   }
@@ -211,6 +217,9 @@ trait UriScalaCheckGenerators {
     ))
   }
 
+  implicit val randScpLikeUrl: Arbitrary[ScpLikeUrl] =
+    Arbitrary(Gen.zip(maybeUserOrPass, randHost.arbitrary, randUrlPath.arbitrary).map((ScpLikeUrl.apply _).tupled))
+  
   implicit val randSimpleUrlWithoutAuthority: Arbitrary[SimpleUrlWithoutAuthority] =
     Arbitrary(Gen.zip(randScheme, randUrlPath.arbitrary, randQueryString.arbitrary, randFragment).map((SimpleUrlWithoutAuthority.apply _).tupled))
 

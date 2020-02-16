@@ -199,6 +199,7 @@ uri match {
     case ProtocolRelativeUrl(authority, path, query, fragment) => // Matches ProtocolRelativeUrl
     case UrlWithoutAuthority(scheme, path, query, fragment) => // Matches UrlWithoutAuthorityUrl
     case DataUrl(mediaType, base64, data) => // Matches DataUrl
+    case ScpLikeUrl(user, host, path) => // Matches ScpLikeUrl
 }
 ```
 
@@ -662,6 +663,19 @@ dataUrl.mediaType.parameters // This is Vector("charset" -> "UTF-8", "page" -> "
 dataUrl.base64 // This is false
 
 dataUrl.dataAsString // This is "the data:1234,5678"
+```
+
+## git/scp style URLs 
+
+git/scp style URLs can be parsed like so:
+
+```scala mdoc:reset
+import io.lemonlabs.uri.ScpLikeUrl
+
+val url = ScpLikeUrl.parse("git@github.com:lemonlabsuk/scala-uri.git")
+url.user // This is Some("git")
+url.host.toString // This is "github.com"
+url.path.toString // This is "lemonlabsuk/scala-uri.git"
 ```
 
 ## URL builder DSL

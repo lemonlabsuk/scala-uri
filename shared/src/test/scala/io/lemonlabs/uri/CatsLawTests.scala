@@ -44,6 +44,7 @@ class CatsLawTests extends AnyFunSuite with Checkers with UriScalaCheckGenerator
   checkAll("UrlWithoutAuthority.OrderTests", OrderTests[UrlWithoutAuthority].order)
   checkAll("SimpleUrlWithoutAuthority.OrderTests", OrderTests[SimpleUrlWithoutAuthority].order)
   checkAll("DataUrl.OrderTests", OrderTests[DataUrl].order)
+  checkAll("ScpLikeUrl.OrderTests", OrderTests[ScpLikeUrl].order)
   checkAll("Urn.OrderTests", OrderTests[Urn].order)
   checkAll("Authority.OrderTests", OrderTests[Authority].order)
   checkAll("UserInfo.OrderTests", OrderTests[UserInfo].order)

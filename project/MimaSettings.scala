@@ -19,7 +19,8 @@ object MimaSettings {
   val mimaSettings = MimaPlugin.mimaDefaultSettings ++ Seq(
     mimaPreviousArtifacts := {
       if (VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("<=2.13")))
-        previousVersions.map { organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _ } else
+        previousVersions.map { organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _ }
+      else
         Set.empty
     },
     mimaBinaryIssueFilters ++= {

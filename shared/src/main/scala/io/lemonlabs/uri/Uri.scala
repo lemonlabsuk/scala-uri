@@ -760,7 +760,7 @@ object UrlWithAuthority {
 }
 
 /**
-  * Represents absolute URLs, for example: `//example.com`
+  * Represents protocol relative URLs, for example: `//example.com`
   */
 final case class ProtocolRelativeUrl(authority: Authority,
                                      path: AbsoluteOrEmptyPath,
@@ -881,7 +881,8 @@ object AbsoluteUrl {
 }
 
 /**
-  * Represents URLs that do not have an authority, for example: `mailto:example@example.com`
+  * Represents URLs that do not have an authority, for example:
+  * `mailto:example@example.com` and `data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678`
   */
 sealed trait UrlWithoutAuthority extends Url {
   type Self <: UrlWithoutAuthority
@@ -928,6 +929,9 @@ object UrlWithoutAuthority {
   }
 }
 
+/**
+  * Represents URLs that do not have an authority, for example: `mailto:example@example.com`
+  */
 final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query: QueryString, fragment: Option[String])(
     implicit val config: UriConfig = UriConfig.default
 ) extends UrlWithoutAuthority {
@@ -1101,6 +1105,87 @@ object DataUrl {
   implicit val eqDataUrl: Eq[DataUrl] = Eq.fromUniversalEquals
   implicit val showDataUrl: Show[DataUrl] = Show.fromToString
   implicit val orderDataUrl: Order[DataUrl] = Order.by(_.toString())
+}
+
+/**
+  * Represents scp-like URLs, for example: `git@github.com:lemonlabsuk/scala-uri.git`
+  *
+  * From the `scp` manpage: [user@]host:[path]
+  */
+final case class ScpLikeUrl(override val user: Option[String], override val host: Host, path: UrlPath)(
+    implicit val config: UriConfig = UriConfig.default
+) extends UrlWithAuthority {
+  type Self = ScpLikeUrl
+  type SelfWithScheme = AbsoluteUrl
+  def self: ScpLikeUrl = this
+
+  override def userInfo: Option[UserInfo] = user.map(UserInfo.apply)
+  def authority: Authority = Authority(userInfo, host, port = None)
+  def query: QueryString = QueryString.empty
+  def fragment: Option[String] = None
+
+  /**
+    * Copies this Url but with the authority set as the given value.
+    *
+    * @param authority the authority host to set
+    * @return a new Url with the specified authority
+    */
+  def withAuthority(authority: Authority): ScpLikeUrl = copy(host = authority.host)
+
+  /**
+    * Copies this Url but with the fragment set as the given value.
+    *
+    * @param fragment the new fragment to set
+    * @return a new Url with the specified fragment
+    */
+  def withFragment[T: Fragment](fragment: T): ScpLikeUrl = this
+
+  /**
+    * Copies this Url but with the path set as the given value.
+    *
+    * @param path the new path to set
+    * @return a new Url with the specified path
+    */
+  def withPath(path: UrlPath): ScpLikeUrl = copy(path = path)
+
+  /**
+    * Copies this Url but with the query set as the given value.
+    *
+    * @param query the new QueryString to set
+    * @return a new Url with the specified query
+    */
+  def withQueryString(query: QueryString): ScpLikeUrl = this
+
+  def schemeOption: Option[String] = None
+
+  /**
+    * Copies this Uri but with the scheme set as the given value.
+    *
+    * @param scheme the new scheme to set
+    * @return a new Uri with the specified scheme
+    */
+  def withScheme(scheme: String): AbsoluteUrl =
+    AbsoluteUrl(scheme, authority, path.toAbsoluteOrEmpty, QueryString.empty, None)
+
+  private[uri] def toString(c: UriConfig, hostToString: Host => String): String = {
+    // Don't do percent encoding. Can't find any reference to it being
+    user.fold("")(_ + "@") + hostToString(host) + ":" + path.toString(config.withNoEncoding)
+  }
+}
+
+object ScpLikeUrl {
+  def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): ScpLikeUrl =
+    parseTry(s).get
+
+  def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[ScpLikeUrl] =
+    parseTry(s).toOption
+
+  def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[ScpLikeUrl] =
+    UrlParser.parseScpLikeUrl(s.toString)
+
+  implicit val eqScpLikeUrl: Eq[ScpLikeUrl] = Eq.fromUniversalEquals
+  implicit val showScpLikeUrl: Show[ScpLikeUrl] = Show.fromToString
+  implicit val orderScpLikeUrl: Order[ScpLikeUrl] = Order.by(_.toString())
 }
 
 /**

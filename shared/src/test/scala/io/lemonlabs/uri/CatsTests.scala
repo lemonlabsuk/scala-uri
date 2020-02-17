@@ -73,6 +73,13 @@ class CatsTests extends AnyFlatSpec with Matchers {
     (uri =!= uri2) should equal(true)
   }
 
+  it should "be supported for ScpLikeUrl" in new CatsTestCase {
+    val uri = ScpLikeUrl.parse("root@host:/root/file.tar.gz")
+    val uri2 = ScpLikeUrl.parse("root@host:/root/file2.tar.gz")
+
+    (uri =!= uri2) should equal(true)
+  }
+
   it should "be supported for Urn" in new CatsTestCase {
     val uri = Urn.parse("urn:cats:1")
     val uri2 = Urn.parse("urn:cats:2")

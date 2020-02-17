@@ -278,6 +278,8 @@ object IpV4 {
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): IpV4 =
     parseTry(s).get
 
+  def localhost: IpV4 = IpV4(127, 0, 0, 1)
+
   implicit val eqIpV4: Eq[IpV4] = Eq.fromUniversalEquals
   implicit val showIpV4: Show[IpV4] = Show.fromToString
   implicit val orderIpV4: Order[IpV4] = Order.by(_.octets)
@@ -416,6 +418,8 @@ object IpV6 {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): IpV6 =
     parseTry(s).get
+
+  def localhost: IpV6 = IpV6(0, 0, 0, 0, 0, 0, 0, 1)
 
   implicit val eqIpV6: Eq[IpV6] = Eq.fromUniversalEquals
   implicit val showIpV6: Show[IpV6] = Show.fromToString

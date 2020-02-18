@@ -9,7 +9,7 @@ import scala.collection.immutable
 import scala.util.{Failure, Try}
 
 class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
-  val _host_end = ":/?#"
+  val _host_end = ":/?# \t\r\n"
 
   def _int(maxLength: Int): Rule1[Int] = rule {
     capture((1 to maxLength).times(Digit)) ~> extractInt
@@ -74,7 +74,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   }
 
   def _user_info: Rule1[UserInfo] = rule {
-    capture(zeroOrMore(noneOf(":/?[]@"))) ~ optional(":" ~ capture(zeroOrMore(noneOf("@")))) ~ "@" ~> extractUserInfo
+    capture(zeroOrMore(noneOf(":/?[]@ \t\r\n"))) ~ optional(":" ~ capture(zeroOrMore(noneOf("@")))) ~ "@" ~> extractUserInfo
   }
 
   def _port: Rule1[Int] = rule {

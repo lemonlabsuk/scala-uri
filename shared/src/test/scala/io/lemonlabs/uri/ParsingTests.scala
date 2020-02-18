@@ -4,8 +4,6 @@ import io.lemonlabs.uri.parsing.UriParsingException
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.util.Success
-
 class ParsingTests extends AnyFlatSpec with Matchers {
   "Parsing an absolute URI" should "result in a valid Uri object" in {
     val url = Url.parse("http://theon.github.com/uris-in-scala.html")
@@ -22,6 +20,14 @@ class ParsingTests extends AnyFlatSpec with Matchers {
   it should "result in a Some Option" in {
     val url = Url.parseOption("http://theon.github.com/uris-in-scala.html")
     url.isDefined should equal(true)
+  }
+
+  it should "not allow whitespace in the user" in {
+    Seq(" " -> " ", "\n" -> "\\n", "\t" -> "\\t", "\r" -> "\\r").foreach {
+      case (ch, chToString) =>
+        val e = the[UriParsingException] thrownBy AbsoluteUrl.parse(s"https://user${ch}name:password@www.example.com")
+        e.getMessage should startWith(s"Invalid Url could not be parsed. Invalid input '$chToString'")
+    }
   }
 
   "Parsing a null URI" should "result in a None" in {

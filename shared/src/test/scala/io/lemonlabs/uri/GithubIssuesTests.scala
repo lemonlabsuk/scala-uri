@@ -3,6 +3,7 @@ package io.lemonlabs.uri
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding.{PercentDecoder, UriDecodeException}
 import io.lemonlabs.uri.encoding.NoopEncoder
+import io.lemonlabs.uri.parsing.UriParsingException
 import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -49,5 +50,13 @@ class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
     )
     val url = Url.parse("http://example.com/path%20with%20space")
     url.toString should equal("http://example.com/path%20with%20space")
+  }
+
+  "Github Issue #98" should "not allow spaces in hosts" in {
+    Seq(" " -> " ", "\n" -> "\\n", "\t" -> "\\t", "\r" -> "\\r").foreach {
+      case (ch, chToString) =>
+        val e = the[UriParsingException] thrownBy AbsoluteUrl.parse(s"https://www.goog${ch}le.com?q=i+am+invalid")
+        e.getMessage should startWith(s"Invalid Url could not be parsed. Invalid input '$chToString'")
+    }
   }
 }

@@ -22,6 +22,7 @@
  * Support for [URNs](#parse-a-urn)
  * Support for [mailto](#mailto) URLs
  * Support for [data](#data-urls) URLs as defined in [RFC2397](https://tools.ietf.org/html/rfc2397)
+ * Support for [git](#gitscp-style-urls) scp-like URLs 
  * Support for [Scala.js](#scalajs-support)
  * Support for [cats](#cats-support)
  * No dependencies on existing web frameworks
@@ -678,6 +679,19 @@ url.host.toString // This is "github.com"
 url.path.toString // This is "lemonlabsuk/scala-uri.git"
 ```
 
+Note that `ScpLikeUrl.parse`, should only be used for git URLs with scp-like syntax (with a `:`
+between the host and path). For all other git URLs, `AbsoluteUrl.parse` or `Url.parse` should 
+be used:
+
+```scala mdoc:reset
+import io.lemonlabs.uri.AbsoluteUrl
+
+val gitUrl    = AbsoluteUrl.parse("git://github.com/lemonlabsuk/scala-uri.git")
+val gitSshUrl = AbsoluteUrl.parse("git+ssh://git@github.com/lemonlabsuk/scala-uri.git")
+val sshUrl    = AbsoluteUrl.parse("ssh://git@github.com/lemonlabsuk/scala-uri.git")
+val httpsUrl  = AbsoluteUrl.parse("https://github.com/lemonlabsuk/scala-uri.git")
+```
+
 ## URL builder DSL
 
 **Note:** *This DSL is now deprecated. Please use the [Typesafe URL builder DSL](#typesafe-url-builder-dsl)*
@@ -799,7 +813,7 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 
 scala-uri provides type class instances of `cats.Eq`, `cats.Show` and `cats.Order` for:
 `Uri `, `Url`, `RelativeUrl`, `UrlWithAuthority`, `ProtocolRelativeUrl`, `AbsoluteUrl`, 
-`UrlWithoutAuthority`, `SimpleUrlWithoutAuthority`, `DataUrl`, `Urn`, `Authority`, `UserInfo`, 
+`UrlWithoutAuthority`, `SimpleUrlWithoutAuthority`, `DataUrl`, `ScpLikeUrl`, `Urn`, `Authority`, `UserInfo`, 
 `Host`, `DomainName`, `IpV4`, `IpV6`, `MediaType`, `Path`, `UrlPath`, `AbsoluteOrEmptyPath`, 
 `RootlessPath`, `AbsolutePath`, `UrnPath`, `QueryString`
 

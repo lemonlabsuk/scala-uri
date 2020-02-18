@@ -17542,7 +17542,10 @@ package io.lemonlabs.uri.inet
           )
           ,'f' -> Trie(
             Map('.' -> Trie(
-            Map('*' -> Trie(
+            Map('e' -> Trie(
+            Map('m' -> Trie(
+            Map('a' -> Trie(
+            Map('n' -> Trie(
             Map()
             , wordEnd = true
           )
@@ -17551,6 +17554,119 @@ package io.lemonlabs.uri.inet
           )
           )
             
+          )
+          )
+            
+          )
+          ,'t' -> Trie(
+            Map('e' -> Trie(
+            Map('n' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'m' -> Trie(
+            Map('o' -> Trie(
+            Map('c' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'v' -> Trie(
+            Map('o' -> Trie(
+            Map('g' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'g' -> Trie(
+            Map('r' -> Trie(
+            Map('o' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'l' -> Trie(
+            Map('i' -> Trie(
+            Map('m' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'c' -> Trie(
+            Map('a' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          ,'o' -> Trie(
+            Map('f' -> Trie(
+            Map('n' -> Trie(
+            Map('i' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'r' -> Trie(
+            Map('p' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'z' -> Trie(
+            Map('i' -> Trie(
+            Map('b' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            , wordEnd = true
           )
           ,'b' -> Trie(
             Map('.' -> Trie(

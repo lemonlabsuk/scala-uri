@@ -129,7 +129,7 @@ lazy val docs = project
     // README.md has examples with expected compiler warnings (deprecated code, exhaustive matches)
     // Turn off these warnings to keep this noise down
     // We can remove this if the following is implemented https://github.com/scalameta/mdoc/issues/286
-    scalacOptions := Seq("--no-warnings"),
+    scalacOptions   := Seq("--no-warnings"),
     skip in publish := true,
     publishArtifact := false
   )

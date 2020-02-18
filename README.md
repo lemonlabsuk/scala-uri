@@ -30,12 +30,12 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "2.0.0"
+"io.lemonlabs" %% "scala-uri" % "2.1.0"
 ```
 
 ## Migration Guides
 
- * [2.0.0+](#1xx-to-2xx)
+ * [2.1.0+](#1xx-to-2xx)
  * [1.5.0+](#1xx-to-15x)
  * [1.0.0+](#05x-to-1xx)
  * [Older versions](#04x-to-05x)
@@ -830,7 +830,7 @@ The type class instances exist in the companion objects for these types.
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "2.0.0"
+"io.lemonlabs" %% "scala-uri" % "2.1.0"
 ```
 
 For maven users you should use (for 2.13.x):
@@ -839,7 +839,7 @@ For maven users you should use (for 2.13.x):
 <dependency>
     <groupId>io.lemonlabs</groupId>
     <artifactId>scala-uri_2.13</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 

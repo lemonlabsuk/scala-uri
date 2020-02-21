@@ -5,6 +5,9 @@
 [![Slack](https://lemonlabs.io/slack/badge.svg)](https://lemonlabs.io/slack)
 [![Maven Central](https://img.shields.io/maven-central/v/io.lemonlabs/scala-uri_2.13/2)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](#scalajs-support)
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/lemonlabsuk/scala-uri.svg)](http://isitmaintained.com/project/lemonlabsuk/scala-uri "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/lemonlabsuk/scala-uri.svg)](http://isitmaintained.com/project/lemonlabsuk/scala-uri "Percentage of issues still open")
+
 [![Cats Friendly Badge](https://typelevel.org/cats/img/cats-badge-tiny.png)](#cats-support) 
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:

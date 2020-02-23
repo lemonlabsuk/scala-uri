@@ -26,7 +26,7 @@ val sharedSettings = Seq(
     compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.6.0" cross CrossVersion.full),
     "com.github.ghik"   % "silencer-lib"      % "1.6.0"   % Provided cross CrossVersion.full,
     "org.scalatest"     %%% "scalatest"       % "3.1.1"   % Test,
-    "org.scalatestplus" %%% "scalacheck-1-14" % "3.1.0.1" % Test,
+    "org.scalatestplus" %%% "scalacheck-1-14" % "3.1.1.1" % Test,
     "org.scalacheck"    %%% "scalacheck"      % "1.14.3"  % Test,
     "org.typelevel"     %%% "cats-laws"       % "2.1.0"   % Test
   ),

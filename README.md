@@ -576,7 +576,7 @@ uri.apexDomain // This returns Some("google.co.uk")
 **Note:** *To use it spray-json dependency is required*
 
 ```scala
-"io.spray" %% "spray-json" % "1.3.4"
+"io.spray" %% "spray-json" % "1.3.5"
 ```
 
 `scala-uri` uses the list of public suffixes from [publicsuffix.org](https://publicsuffix.org) to allow you to identify

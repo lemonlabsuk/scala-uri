@@ -20,6 +20,9 @@ matrix:
 
 sudo: false # Enable new travis container-based infrastructure
 
+before_script:
+  - nvm install 10 # nodejs < 10 fails finding URL class
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 

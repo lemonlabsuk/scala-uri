@@ -49,7 +49,7 @@ val sharedSettings = Seq(
   ),
   parallelExecution in Test := false,
   scalafmtOnCompile         := true,
-  coverageExcludedPackages  := "io.lemonlabs.uri.inet.PublicSuffixTrie.*"
+  coverageExcludedPackages  := "(io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
 )
 
 val scalaUriSettings = Seq(

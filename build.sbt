@@ -49,7 +49,7 @@ val sharedSettings = Seq(
   ),
   parallelExecution in Test := false,
   scalafmtOnCompile         := true,
-  coverageExcludedPackages  := "io.lemonlabs.uri.inet.PublicSuffixTrie.*"
+  coverageExcludedPackages  := "(io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
 )
 
 val scalaUriSettings = Seq(
@@ -122,6 +122,9 @@ lazy val scalaUri =
     .settings(scalaUriSettings)
     .settings(publishingSettings)
     .settings(mimaSettings)
+    .jsSettings(
+      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0"
+    )
 
 lazy val docs = project
   .in(file("scala0-uri-docs"))

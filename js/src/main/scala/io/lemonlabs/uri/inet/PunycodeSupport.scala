@@ -1,8 +1,10 @@
 package io.lemonlabs.uri.inet
 
-import io.lemonlabs.uri.NotImplementedForScalaJsError
+import org.scalajs.dom.experimental.URL
 
 trait PunycodeSupport {
-  def toPunycode(host: String): String =
-    throw NotImplementedForScalaJsError
+  def toPunycode(host: String): String = {
+    // the URL class IDN formats and escapes the host
+    new URL(s"http://$host").host
+  }
 }

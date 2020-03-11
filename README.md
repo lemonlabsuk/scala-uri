@@ -608,8 +608,6 @@ These methods return `None` and `Vector.empty`, respectively for URLs without a 
 
 ## Punycode
 
-**Note:** *Currently not supported for Scala.js*
-
 See [RFC 3490](http://www.ietf.org/rfc/rfc3490.txt)
 
 ```scala mdoc:reset

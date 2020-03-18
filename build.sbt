@@ -10,7 +10,6 @@ import com.typesafe.tools.mima.core.{
   ReversedMissingMethodProblem
 }
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPreviousArtifacts, mimaReportBinaryIssues}
-import com.typesafe.tools.mima.plugin.MimaPlugin
 
 name                            := "scala-uri root"
 scalaVersion in ThisBuild       := "2.13.1"
@@ -167,6 +166,10 @@ lazy val scalaUri =
     .settings(mimaSettings)
     .jsSettings(
       libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0"
+    )
+    .jsSettings(
+      //scalac-scoverage-plugin Scala.js 1.0 is not yet released.
+      coverageEnabled := false
     )
 
 lazy val docs = project

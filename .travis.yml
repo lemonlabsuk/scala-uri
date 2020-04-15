@@ -1,7 +1,7 @@
 --- 
 language: scala
 script: >
- sbt $COVERAGE ++$TRAVIS_SCALA_VERSION testPublicSuffixes check mdoc coverage test coverageReport &&
+ sbt $COVERAGE ++$TRAVIS_SCALA_VERSION testPublicSuffixes check mdoc coverage $PROJECT/test coverageReport &&
  cd target &&
  git clone https://github.com/lemonlabsuk/scala-uri-demo.git &&
  cd scala-uri-demo &&
@@ -11,14 +11,20 @@ script: >
 jdk:
   - openjdk8
 
-matrix:
+jobs:
   include:
-    - scala: 2.13.1
-      env: COVERAGE=coverageOff
-    - scala: 2.12.10
-      env: COVERAGE=coverageOn
-
-sudo: false # Enable new travis container-based infrastructure
+    - scala: [2.13.1]
+      env: COVERAGE=coverageOff PROJECT=scalaUriJVM
+    - scala: [2.13.1]
+      env: COVERAGE=coverageOff PROJECT=scalaUriJS SCALAJS_VERSION=0.6.32
+    - scala: [2.13.1]
+      env: COVERAGE=coverageOff PROJECT=scalaUriJS SCALAJS_VERSION=1.0.1
+    - scala: [2.12.10]
+      env: COVERAGE=coverageOn PROJECT=scalaUriJVM
+    - scala: [2.12.10]
+      env: COVERAGE=coverageOff PROJECT=scalaUriJS SCALAJS_VERSION=0.6.32
+    - scala: [2.12.10]
+      env: COVERAGE=coverageOff PROJECT=scalaUriJS SCALAJS_VERSION=1.0.1
 
 before_script:
   - nvm install 10 # nodejs < 10 fails finding URL class

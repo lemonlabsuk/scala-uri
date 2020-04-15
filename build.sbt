@@ -2,7 +2,6 @@ import sbt.Keys.libraryDependencies
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 import scala.xml.transform.{RewriteRule, RuleTransformer}
-
 import com.typesafe.tools.mima.core.{
   DirectMissingMethodProblem,
   MissingClassProblem,
@@ -10,7 +9,6 @@ import com.typesafe.tools.mima.core.{
   ReversedMissingMethodProblem
 }
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPreviousArtifacts, mimaReportBinaryIssues}
-import com.typesafe.tools.mima.plugin.MimaPlugin
 
 name                            := "scala-uri root"
 scalaVersion in ThisBuild       := "2.13.1"
@@ -64,7 +62,12 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    "org.parboiled" %%% "parboiled"  % "2.1.8",
+    VersionNumber(scalaJSVersion) match {
+      case v if v.matchesSemVer(SemanticSelector("<1.0.0")) =>
+        "org.parboiled" %%% "parboiled" % "2.1.8"
+      case _ =>
+        "org.parboiled" %%% "parboiled" % "2.2.0"
+    },
     "com.chuusai"   %%% "shapeless"  % "2.3.3",
     "org.typelevel" %%% "simulacrum" % "1.0.0" % Provided,
     "org.typelevel" %%% "cats-core"  % "2.1.1"
@@ -168,9 +171,13 @@ lazy val scalaUri =
     .jsSettings(
       libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0"
     )
+    .jsSettings(
+      //scalac-scoverage-plugin Scala.js 1.0 is not yet released.
+      coverageEnabled := false
+    )
 
 lazy val docs = project
-  .in(file("scala0-uri-docs"))
+  .in(file("scala-uri-docs"))
   .settings(
     // README.md has examples with expected compiler warnings (deprecated code, exhaustive matches)
     // Turn off these warnings to keep this noise down

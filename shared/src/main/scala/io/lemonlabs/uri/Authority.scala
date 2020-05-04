@@ -7,8 +7,8 @@ import io.lemonlabs.uri.parsing.UrlParser
 
 import scala.util.Try
 
-case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
-    implicit config: UriConfig = UriConfig.default
+case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(implicit
+    config: UriConfig = UriConfig.default
 ) {
   def user: Option[String] = userInfo.map(_.user)
   def password: Option[String] = userInfo.flatMap(_.password)
@@ -121,8 +121,8 @@ object Authority {
   }
 }
 
-case class UserInfo(user: String, password: Option[String])(
-    implicit config: UriConfig = UriConfig.default
+case class UserInfo(user: String, password: Option[String])(implicit
+    config: UriConfig = UriConfig.default
 ) {
   private[uri] def toString(c: UriConfig): String = {
     val userStrEncoded = c.userInfoEncoder.encode(user, c.charset)

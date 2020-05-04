@@ -17,7 +17,8 @@ package object dsl {
 
   implicit def pathPartToUrlDsl[A: PathPart](a: A): TypesafeUrlDsl = new TypesafeUrlDsl(a.path)
 
-  implicit def queryParamToUriDsl[A](a: A)(implicit c: UriConfig = UriConfig.default,
-                                           tc: QueryKeyValue[A]): TypesafeUrlDsl =
+  implicit def queryParamToUriDsl[A](
+      a: A
+  )(implicit c: UriConfig = UriConfig.default, tc: QueryKeyValue[A]): TypesafeUrlDsl =
     new TypesafeUrlDsl(RelativeUrl.empty.addParam(tc.queryKey(a), tc.queryValue(a)))
 }

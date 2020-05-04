@@ -13,7 +13,8 @@ case class UriConfig(userInfoEncoder: UriEncoder,
                      queryDecoder: UriDecoder,
                      fragmentDecoder: UriDecoder,
                      charset: String,
-                     renderQuery: RenderQuery) {
+                     renderQuery: RenderQuery
+) {
   def withNoEncoding = copy(pathEncoder = NoopEncoder, queryEncoder = NoopEncoder, fragmentEncoder = NoopEncoder)
 }
 
@@ -40,6 +41,7 @@ object UriConfig {
   def apply(encoder: UriEncoder = PercentEncoder(),
             decoder: UriDecoder = PercentDecoder,
             charset: String = "UTF-8",
-            renderQuery: RenderQuery = RenderQuery.default): UriConfig =
+            renderQuery: RenderQuery = RenderQuery.default
+  ): UriConfig =
     UriConfig(encoder, encoder, encoder, encoder, decoder, decoder, decoder, decoder, charset, renderQuery)
 }

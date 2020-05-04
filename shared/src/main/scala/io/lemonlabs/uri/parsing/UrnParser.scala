@@ -10,21 +10,25 @@ import scala.util.{Failure, Try}
 class UrnParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
   def _empty: Rule0 = MATCH
 
-  def _nid: Rule1[String] = rule {
-    capture(zeroOrMore(AlphaNum | '-'))
-  }
+  def _nid: Rule1[String] =
+    rule {
+      capture(zeroOrMore(AlphaNum | '-'))
+    }
 
-  def _nss: Rule1[String] = rule {
-    capture(_p_char ~ zeroOrMore(_p_char | '/'))
-  }
+  def _nss: Rule1[String] =
+    rule {
+      capture(_p_char ~ zeroOrMore(_p_char | '/'))
+    }
 
-  def _urn_path: Rule1[UrnPath] = rule {
-    _nid ~ ":" ~ _nss ~> extractUrnPath
-  }
+  def _urn_path: Rule1[UrnPath] =
+    rule {
+      _nid ~ ":" ~ _nss ~> extractUrnPath
+    }
 
-  def _urn: Rule1[Urn] = rule {
-    "urn:" ~ _urn_path ~> extractUrn
-  }
+  def _urn: Rule1[Urn] =
+    rule {
+      "urn:" ~ _urn_path ~> extractUrn
+    }
 
   val extractUrnPath = (nid: String, nss: String) => {
     if (nid.length < 2)

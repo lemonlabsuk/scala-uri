@@ -461,21 +461,24 @@ sealed trait Url extends Uri {
   private[uri] def fragmentToString(c: UriConfig): String =
     fragment.map(f => "#" + c.fragmentEncoder.encode(f, c.charset)).getOrElse("")
 
-  def toAbsoluteUrl: AbsoluteUrl = this match {
-    case a: AbsoluteUrl => a
-    case _              => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to AbsoluteUrl")
-  }
+  def toAbsoluteUrl: AbsoluteUrl =
+    this match {
+      case a: AbsoluteUrl => a
+      case _              => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to AbsoluteUrl")
+    }
 
-  def toRelativeUrl: RelativeUrl = this match {
-    case r: RelativeUrl => r
-    case _              => RelativeUrl(path, query, fragment)
-  }
+  def toRelativeUrl: RelativeUrl =
+    this match {
+      case r: RelativeUrl => r
+      case _              => RelativeUrl(path, query, fragment)
+    }
 
-  def toProtocolRelativeUrl: ProtocolRelativeUrl = this match {
-    case p: ProtocolRelativeUrl => p
-    case a: AbsoluteUrl         => ProtocolRelativeUrl(a.authority, a.path, a.query, a.fragment)
-    case _                      => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to ProtocolRelativeUrl")
-  }
+  def toProtocolRelativeUrl: ProtocolRelativeUrl =
+    this match {
+      case p: ProtocolRelativeUrl => p
+      case a: AbsoluteUrl         => ProtocolRelativeUrl(a.authority, a.path, a.query, a.fragment)
+      case _                      => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to ProtocolRelativeUrl")
+    }
 
   def toUrl: Url = this
   def toUrn: Urn = throw new UriConversionException(getClass.getSimpleName + " cannot be converted to Urn")
@@ -503,7 +506,8 @@ object Url {
             port: Int = -1,
             path: String = "",
             query: QueryString = QueryString.empty,
-            fragment: String = null)(implicit config: UriConfig = UriConfig.default): Url = {
+            fragment: String = null
+  )(implicit config: UriConfig = UriConfig.default): Url = {
     val urlPath = UrlPath.parse(path)
     val frag = Option(fragment)
     def authority = {
@@ -545,8 +549,8 @@ object Url {
   *  -  Rootless Relative
   *    (with dot segment): `../index.html?a=b`
   */
-final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option[String])(
-    implicit val config: UriConfig = UriConfig.default
+final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option[String])(implicit
+    val config: UriConfig = UriConfig.default
 ) extends Url {
   type Self = RelativeUrl
   type SelfWithAuthority = ProtocolRelativeUrl
@@ -765,7 +769,8 @@ object UrlWithAuthority {
 final case class ProtocolRelativeUrl(authority: Authority,
                                      path: AbsoluteOrEmptyPath,
                                      query: QueryString,
-                                     fragment: Option[String])(implicit val config: UriConfig = UriConfig.default)
+                                     fragment: Option[String]
+)(implicit val config: UriConfig = UriConfig.default)
     extends UrlWithAuthority {
   type Self = ProtocolRelativeUrl
   type SelfWithScheme = AbsoluteUrl
@@ -826,7 +831,8 @@ final case class AbsoluteUrl(scheme: String,
                              authority: Authority,
                              path: AbsoluteOrEmptyPath,
                              query: QueryString,
-                             fragment: Option[String])(implicit val config: UriConfig = UriConfig.default)
+                             fragment: Option[String]
+)(implicit val config: UriConfig = UriConfig.default)
     extends UrlWithAuthority {
   type Self = AbsoluteUrl
   type SelfWithScheme = AbsoluteUrl
@@ -905,8 +911,8 @@ sealed trait UrlWithoutAuthority extends Url {
 }
 
 object UrlWithoutAuthority {
-  def apply(scheme: String, path: UrlPath, query: QueryString, fragment: Option[String])(
-      implicit config: UriConfig = UriConfig.default
+  def apply(scheme: String, path: UrlPath, query: QueryString, fragment: Option[String])(implicit
+      config: UriConfig = UriConfig.default
   ): UrlWithoutAuthority =
     SimpleUrlWithoutAuthority(scheme, path, query, fragment)(config)
 
@@ -1005,9 +1011,9 @@ object SimpleUrlWithoutAuthority {
 /**
   * Represents URLs with the data scheme, for example: `data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678`
   */
-final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte])(implicit val config: UriConfig =
-                                                                                     UriConfig.default)
-    extends UrlWithoutAuthority {
+final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte])(implicit
+    val config: UriConfig = UriConfig.default
+) extends UrlWithoutAuthority {
   type Self = DataUrl
   type SelfWithScheme = UrlWithoutAuthority
 
@@ -1112,8 +1118,8 @@ object DataUrl {
   *
   * From the `scp` manpage: [user@]host:[path]
   */
-final case class ScpLikeUrl(override val user: Option[String], override val host: Host, path: UrlPath)(
-    implicit val config: UriConfig = UriConfig.default
+final case class ScpLikeUrl(override val user: Option[String], override val host: Host, path: UrlPath)(implicit
+    val config: UriConfig = UriConfig.default
 ) extends UrlWithAuthority {
   type Self = ScpLikeUrl
   type SelfWithScheme = AbsoluteUrl

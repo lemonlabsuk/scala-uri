@@ -14,19 +14,21 @@ case class Trie(children: Map[Char, Trie], wordEnd: Boolean = false) {
     @tailrec def collectMatches(previous: String,
                                 stillToGo: List[Char],
                                 current: Trie,
-                                matches: Vector[String]): Vector[String] = stillToGo match {
-      case Nil =>
-        matches
-      case x :: xs =>
-        current.next(x) match {
-          case None =>
-            matches
-          case Some(next) =>
-            val newPrevious = previous + x
-            val newMatches = if (next.wordEnd && xs.headOption.contains('.')) newPrevious +: matches else matches
-            collectMatches(newPrevious, xs, next, newMatches)
-        }
-    }
+                                matches: Vector[String]
+    ): Vector[String] =
+      stillToGo match {
+        case Nil =>
+          matches
+        case x :: xs =>
+          current.next(x) match {
+            case None =>
+              matches
+            case Some(next) =>
+              val newPrevious = previous + x
+              val newMatches = if (next.wordEnd && xs.headOption.contains('.')) newPrevious +: matches else matches
+              collectMatches(newPrevious, xs, next, newMatches)
+          }
+      }
     collectMatches("", s.toCharArray.toList, this, Vector.empty)
   }
 

@@ -75,13 +75,15 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def addParams[P: TraversableParams](kvs: P): QueryString =
     QueryString(params ++ kvs.toSeq)
 
-  def params(key: String): Vector[Option[String]] = params.collect {
-    case (k, v) if k == key => v
-  }
+  def params(key: String): Vector[Option[String]] =
+    params.collect {
+      case (k, v) if k == key => v
+    }
 
-  def param(key: String): Option[String] = params.collectFirst {
-    case (k, Some(v)) if k == key => v
-  }
+  def param(key: String): Option[String] =
+    params.collectFirst {
+      case (k, Some(v)) if k == key => v
+    }
 
   /**
     * Transforms the Query String by applying the specified PartialFunction to each Query String Parameter
@@ -259,8 +261,8 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
 }
 
 object QueryString {
-  def fromPairs[KV: QueryKeyValue](first: KV, kv: KV*)(
-      implicit config: UriConfig = UriConfig.default
+  def fromPairs[KV: QueryKeyValue](first: KV, kv: KV*)(implicit
+      config: UriConfig = UriConfig.default
   ): QueryString =
     fromTraversable(first +: kv)
 

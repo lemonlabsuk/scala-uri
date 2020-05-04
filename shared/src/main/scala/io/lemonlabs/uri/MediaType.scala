@@ -26,19 +26,21 @@ case class MediaType(rawValue: Option[String], parameters: Vector[(String, Strin
     * @return The type for this mediatype. For example, will return `application`
     *         for the mediatype `application/ld+json`
     */
-  def typ = typeDelimiterIndex match {
-    case -1    => value
-    case index => value.slice(0, index)
-  }
+  def typ =
+    typeDelimiterIndex match {
+      case -1    => value
+      case index => value.slice(0, index)
+    }
 
   /**
     * @return The subtype for this mediatype. For example, will return `ld`
     *         for the mediatype `application/ld+json`. Returns empty string if there is no subtype.
     */
-  def subTyp = typeDelimiterIndex match {
-    case -1    => ""
-    case index => value.slice(index + 1, suffixDelimiterIndex)
-  }
+  def subTyp =
+    typeDelimiterIndex match {
+      case -1    => ""
+      case index => value.slice(index + 1, suffixDelimiterIndex)
+    }
 
   /**
     * @return The suffix for this mediatype. For example, will return `json`
@@ -49,9 +51,10 @@ case class MediaType(rawValue: Option[String], parameters: Vector[(String, Strin
     value.substring(index)
   }
 
-  def rawCharset: Option[String] = parameters.collectFirst {
-    case (k, v) if quotedStringEquals(k, "charset") => v
-  }
+  def rawCharset: Option[String] =
+    parameters.collectFirst {
+      case (k, v) if quotedStringEquals(k, "charset") => v
+    }
 
   private def quotedStringEquals(s: String, matches: String): Boolean =
     s.equalsIgnoreCase(matches) || s.equalsIgnoreCase("\"" + matches + "\"")

@@ -4,10 +4,11 @@ import scala.io.{Codec, Source}
 
 object UpdatePublicSuffixTrie {
   object Trie {
-    def apply(prefix: List[Char]): Trie = prefix match {
-      case Nil     => Trie(Map.empty, wordEnd = true)
-      case x :: xs => Trie(Map(x -> Trie(xs)), wordEnd = false)
-    }
+    def apply(prefix: List[Char]): Trie =
+      prefix match {
+        case Nil     => Trie(Map.empty, wordEnd = true)
+        case x :: xs => Trie(Map(x -> Trie(xs)), wordEnd = false)
+      }
 
     def empty = Trie(Map.empty, wordEnd = false)
   }
@@ -18,16 +19,17 @@ object UpdatePublicSuffixTrie {
     def next(ch: Char): Option[Trie] =
       children.get(ch)
 
-    def insert(value: List[Char]): Trie = value match {
-      case Nil => copy(wordEnd = true)
-      case x :: xs =>
-        next(x) match {
-          case None =>
-            this + (x -> Trie(xs))
-          case Some(child) =>
-            this + (x -> child.insert(xs))
-        }
-    }
+    def insert(value: List[Char]): Trie =
+      value match {
+        case Nil => copy(wordEnd = true)
+        case x :: xs =>
+          next(x) match {
+            case None =>
+              this + (x -> Trie(xs))
+            case Some(child) =>
+              this + (x -> child.insert(xs))
+          }
+      }
 
     def size: Int = children.size + children.values.map(_.size).sum
 

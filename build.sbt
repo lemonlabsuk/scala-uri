@@ -30,7 +30,7 @@ val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
     compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.6.0" cross CrossVersion.full),
-    "com.github.ghik"   % "silencer-lib"      % "1.6.0"   % Provided cross CrossVersion.full,
+    "com.github.ghik"     % "silencer-lib"    % "1.6.0"   % Provided cross CrossVersion.full,
     "org.scalatest"     %%% "scalatest"       % "3.1.1"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14" % "3.1.1.1" % Test,
     "org.scalacheck"    %%% "scalacheck"      % "1.14.3"  % Test,
@@ -75,14 +75,15 @@ val scalaUriSettings = Seq(
   libraryDependencies ++= paradisePlugin.value,
   pomPostProcess := { node =>
     new RuleTransformer(new RewriteRule {
-      override def transform(node: xml.Node): Seq[xml.Node] = node match {
-        case e: xml.Elem
-            if e.label == "dependency" &&
-              e.child.exists(child => child.label == "groupId" && child.text == "org.typelevel") &&
-              e.child.exists(child => child.label == "artifactId" && child.text.startsWith("simulacrum_")) =>
-          Nil
-        case _ => Seq(node)
-      }
+      override def transform(node: xml.Node): Seq[xml.Node] =
+        node match {
+          case e: xml.Elem
+              if e.label == "dependency" &&
+                e.child.exists(child => child.label == "groupId" && child.text == "org.typelevel") &&
+                e.child.exists(child => child.label == "artifactId" && child.text.startsWith("simulacrum_")) =>
+            Nil
+          case _ => Seq(node)
+        }
     }).transform(node).head
   }
 )

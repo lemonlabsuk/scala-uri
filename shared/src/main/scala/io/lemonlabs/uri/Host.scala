@@ -169,12 +169,13 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     *
     * @return the second largest subdomain for this host
     */
-  def subdomain: Option[String] = longestSubdomain flatMap { ls =>
-    ls.lastIndexOf('.') match {
-      case -1 => None
-      case i  => Some(ls.substring(0, i))
+  def subdomain: Option[String] =
+    longestSubdomain flatMap { ls =>
+      ls.lastIndexOf('.') match {
+        case -1 => None
+        case i  => Some(ls.substring(0, i))
+      }
     }
-  }
 
   /**
     * Returns all subdomains for this host.
@@ -237,9 +238,9 @@ object DomainName {
   implicit val orderDomainName: Order[DomainName] = Order.by(_.value)
 }
 
-final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte)(implicit val conf: UriConfig =
-                                                                                UriConfig.default)
-    extends Host {
+final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte)(implicit
+    val conf: UriConfig = UriConfig.default
+) extends Host {
   private def uByteToInt(b: Byte): Int = b & 0xff
 
   def octet1Int: Int = uByteToInt(octet1)
@@ -292,7 +293,8 @@ final case class IpV6(piece1: Char,
                       piece5: Char,
                       piece6: Char,
                       piece7: Char,
-                      piece8: Char)(implicit val conf: UriConfig = UriConfig.default)
+                      piece8: Char
+)(implicit val conf: UriConfig = UriConfig.default)
     extends Host {
   def piece1Int: Int = piece1.toInt
   def piece2Int: Int = piece2.toInt
@@ -339,11 +341,12 @@ final case class IpV6(piece1: Char,
   def shortestSubdomain: Option[String] = None
   def longestSubdomain: Option[String] = None
 
-  def value: String = elidedStartAndEnd() match {
-    case (-1, -1) => toStringNonNormalised
-    case (start, end) =>
-      "[" + hexPieces.take(start).mkString(":") + "::" + hexPieces.drop(end).mkString(":") + "]"
-  }
+  def value: String =
+    elidedStartAndEnd() match {
+      case (-1, -1) => toStringNonNormalised
+      case (start, end) =>
+        "[" + hexPieces.take(start).mkString(":") + "::" + hexPieces.drop(end).mkString(":") + "]"
+    }
 
   def toStringNonNormalised: String = hexPieces.mkString("[", ":", "]")
 }
@@ -356,7 +359,8 @@ object IpV6 {
             piece5: Int,
             piece6: Int,
             piece7: Int,
-            piece8: Int): IpV6 = {
+            piece8: Int
+  ): IpV6 = {
     require(
       piece1 >= 0 && piece2 >= 0 && piece3 >= 0 && piece4 >= 0 &&
         piece5 >= 0 && piece6 >= 0 && piece7 >= 0 && piece8 >= 0,
@@ -386,7 +390,8 @@ object IpV6 {
             piece5: String,
             piece6: String,
             piece7: String,
-            piece8: String): IpV6 = {
+            piece8: String
+  ): IpV6 = {
     def hexToInt(hex: String) = Integer.parseInt(hex, 16)
     IpV6(
       hexToInt(piece1),

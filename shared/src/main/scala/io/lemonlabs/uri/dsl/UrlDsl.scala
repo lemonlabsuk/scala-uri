@@ -13,10 +13,11 @@ import io.lemonlabs.uri.parsing.UrlParser
 class UrlDsl(val url: Url) extends AnyVal {
   import url.config
 
-  private def anyToQueryValue(any: Any): Option[String] = any match {
-    case v: Option[_] => v.map(_.toString)
-    case _            => Some(any.toString)
-  }
+  private def anyToQueryValue(any: Any): Option[String] =
+    any match {
+      case v: Option[_] => v.map(_.toString)
+      case _            => Some(any.toString)
+    }
 
   /**
     * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
@@ -67,10 +68,11 @@ class UrlDsl(val url: Url) extends AnyVal {
     "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
     "2.0.0"
   )
-  def &&(kv: (String, Any)): Url = kv match {
-    case (k, None) => url
-    case (k, v)    => &(k, v)
-  }
+  def &&(kv: (String, Any)): Url =
+    kv match {
+      case (k, None) => url
+      case (k, v)    => &(k, v)
+    }
 
   /**
     * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this

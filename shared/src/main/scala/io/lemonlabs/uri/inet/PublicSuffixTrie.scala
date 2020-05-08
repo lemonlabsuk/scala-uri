@@ -1,7 +1,7 @@
 package io.lemonlabs.uri.inet
 
 	object PublicSuffixTrie { lazy val publicSuffixTrie = Trie(
-            Map('்' -> _bcd.t,'ם' -> _5dd.t,'e' -> _65.t,'л' -> _43b.t,'販' -> _8ca9.t,'团' -> _56e2.t,'s' -> _73.t,'拿' -> _62ff.t,'्' -> _94d.t,'业' -> _4e1a.t,'你' -> _4f60.t,'б' -> _431.t,'x' -> _78.t,'品' -> _54c1.t,'物' -> _7269.t,'و' -> _648.t,'山' -> _5c71.t,'府' -> _5e9c.t,'站' -> _7ad9.t,'闻' -> _95fb.t,'ತ' -> _ca4.t,'ب' -> _628.t,'籍' -> _7c4d.t,'益' -> _76ca.t,'尚' -> _5c1a.t,'线' -> _7ebf.t,'n' -> _6e.t,'ม' -> _e21.t,'动' -> _52a8.t,'な' -> _306a.t,'ン' -> _30f3.t,'ة' -> _629.t,'锡' -> _9521.t,'ତ' -> _b24.t,'行' -> _884c.t,'j' -> _6a.t,'y' -> _79.t,'ट' -> _91f.t,'а' -> _430.t,'歌' -> _6b4c.t,'t' -> _74.t,'拉' -> _62c9.t,'u' -> _75.t,'ド' -> _30c9.t,'逊' -> _900a.t,'f' -> _66.t,'ਤ' -> _a24.t,'表' -> _8868.t,'科' -> _79d1.t,'息' -> _606f.t,'络' -> _7edc.t,'ق' -> _642.t,'ย' -> _e22.t,'a' -> _61.t,'ා' -> _dcf.t,'з' -> _437.t,'न' -> _928.t,'网' -> _7f51.t,'ア' -> _30a2.t,'国' -> _56fd.t,'с' -> _441.t,'س' -> _633.t,'ત' -> _aa4.t,'յ' -> _575.t,'m' -> _6d.t,'넷' -> _b137.t,'к' -> _43a.t,'址' -> _5740.t,'г' -> _433.t,'浦' -> _6d66.t,'門' -> _9580.t,'i' -> _69.t,'博' -> _535a.t,'ე' -> _10d4.t,'υ' -> _3c5.t,'湾' -> _6e7e.t,'看' -> _770b.t,'界' -> _754c.t,'港' -> _6e2f.t,'通' -> _901a.t,'v' -> _76.t,'ം' -> _d02.t,'聘' -> _8058.t,'ф' -> _444.t,'т' -> _442.t,'厅' -> _5385.t,'灣' -> _7063.t,'q' -> _71.t,'东' -> _4e1c.t,'宝' -> _5b9d.t,'ك' -> _643.t,'乐' -> _4e50.t,'b' -> _62.t,'店' -> _5e97.t,'构' -> _6784.t,'标' -> _6807.t,'и' -> _438.t,'g' -> _67.t,'ۃ' -> _6c3.t,'里' -> _91cc.t,'车' -> _8f66.t,'ா' -> _bbe.t,'國' -> _570b.t,'l' -> _6c.t,'亚' -> _4e9a.t,'म' -> _92e.t,'ை' -> _bc8.t,'城' -> _57ce.t,'ю' -> _44e.t,'д' -> _434.t,'p' -> _70.t,'卦' -> _5366.t,'電' -> _96fb.t,'م' -> _645.t,'康' -> _5eb7.t,'司' -> _53f8.t,'н' -> _43d.t,'ত' -> _9a4.t,'ル' -> _30eb.t,'ム' -> _30e0.t,'ر' -> _631.t,'м' -> _43c.t,'c' -> _63.t,'善' -> _5584.t,'h' -> _68.t,'ا' -> _627.t,'국' -> _ad6d.t,'r' -> _72.t,'w' -> _77.t,'్' -> _c4d.t,'ه' -> _647.t,'া' -> _9be.t,'坡' -> _5761.t,'ت' -> _62a.t,'ع' -> _639.t,'教' -> _6559.t,'k' -> _6b.t,'성' -> _c131.t,'戏' -> _620f.t,'컴' -> _cef4.t,'机' -> _673a.t,'त' -> _924.t,'λ' -> _3bb.t,'ي' -> _64a.t,'门' -> _95e8.t,'务' -> _52a1.t,'信' -> _4fe1.t,'o' -> _6f.t,'ن' -> _646.t,'z' -> _7a.t,'ト' -> _30c8.t,'р' -> _440.t,'d' -> _64.t)
+            Map('்' -> _bcd.t,'ם' -> _5dd.t,'e' -> _65.t,'л' -> _43b.t,'販' -> _8ca9.t,'团' -> _56e2.t,'s' -> _73.t,'拿' -> _62ff.t,'्' -> _94d.t,'业' -> _4e1a.t,'你' -> _4f60.t,'б' -> _431.t,'x' -> _78.t,'品' -> _54c1.t,'物' -> _7269.t,'و' -> _648.t,'山' -> _5c71.t,'府' -> _5e9c.t,'站' -> _7ad9.t,'闻' -> _95fb.t,'ತ' -> _ca4.t,'ب' -> _628.t,'籍' -> _7c4d.t,'益' -> _76ca.t,'尚' -> _5c1a.t,'线' -> _7ebf.t,'n' -> _6e.t,'ม' -> _e21.t,'动' -> _52a8.t,'な' -> _306a.t,'ン' -> _30f3.t,'ة' -> _629.t,'锡' -> _9521.t,'ତ' -> _b24.t,'j' -> _6a.t,'y' -> _79.t,'ट' -> _91f.t,'а' -> _430.t,'歌' -> _6b4c.t,'t' -> _74.t,'拉' -> _62c9.t,'u' -> _75.t,'ド' -> _30c9.t,'逊' -> _900a.t,'f' -> _66.t,'ਤ' -> _a24.t,'表' -> _8868.t,'科' -> _79d1.t,'息' -> _606f.t,'络' -> _7edc.t,'ق' -> _642.t,'ย' -> _e22.t,'a' -> _61.t,'ා' -> _dcf.t,'з' -> _437.t,'न' -> _928.t,'网' -> _7f51.t,'ア' -> _30a2.t,'国' -> _56fd.t,'с' -> _441.t,'س' -> _633.t,'ત' -> _aa4.t,'յ' -> _575.t,'m' -> _6d.t,'넷' -> _b137.t,'к' -> _43a.t,'址' -> _5740.t,'г' -> _433.t,'浦' -> _6d66.t,'門' -> _9580.t,'i' -> _69.t,'博' -> _535a.t,'ე' -> _10d4.t,'υ' -> _3c5.t,'湾' -> _6e7e.t,'看' -> _770b.t,'界' -> _754c.t,'港' -> _6e2f.t,'通' -> _901a.t,'v' -> _76.t,'ം' -> _d02.t,'聘' -> _8058.t,'ф' -> _444.t,'т' -> _442.t,'厅' -> _5385.t,'灣' -> _7063.t,'q' -> _71.t,'东' -> _4e1c.t,'宝' -> _5b9d.t,'ك' -> _643.t,'乐' -> _4e50.t,'b' -> _62.t,'店' -> _5e97.t,'构' -> _6784.t,'标' -> _6807.t,'и' -> _438.t,'g' -> _67.t,'ۃ' -> _6c3.t,'里' -> _91cc.t,'车' -> _8f66.t,'ா' -> _bbe.t,'國' -> _570b.t,'l' -> _6c.t,'亚' -> _4e9a.t,'म' -> _92e.t,'ை' -> _bc8.t,'城' -> _57ce.t,'ю' -> _44e.t,'д' -> _434.t,'p' -> _70.t,'卦' -> _5366.t,'電' -> _96fb.t,'م' -> _645.t,'康' -> _5eb7.t,'司' -> _53f8.t,'н' -> _43d.t,'ত' -> _9a4.t,'ル' -> _30eb.t,'ム' -> _30e0.t,'ر' -> _631.t,'м' -> _43c.t,'c' -> _63.t,'善' -> _5584.t,'h' -> _68.t,'ا' -> _627.t,'국' -> _ad6d.t,'r' -> _72.t,'w' -> _77.t,'్' -> _c4d.t,'ه' -> _647.t,'া' -> _9be.t,'坡' -> _5761.t,'ت' -> _62a.t,'ع' -> _639.t,'教' -> _6559.t,'k' -> _6b.t,'성' -> _c131.t,'戏' -> _620f.t,'컴' -> _cef4.t,'机' -> _673a.t,'त' -> _924.t,'λ' -> _3bb.t,'ي' -> _64a.t,'门' -> _95e8.t,'务' -> _52a1.t,'信' -> _4fe1.t,'o' -> _6f.t,'ن' -> _646.t,'z' -> _7a.t,'ト' -> _30c8.t,'р' -> _440.t,'d' -> _64.t)
             
           )
           }
@@ -1463,6 +1463,58 @@ package io.lemonlabs.uri.inet
           )
             
           )
+          ,'r' -> Trie(
+            Map('e' -> Trie(
+            Map('t' -> Trie(
+            Map('n' -> Trie(
+            Map('i' -> Trie(
+            Map('m' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'s' -> Trie(
+            Map('p' -> Trie(
+            Map('v' -> Trie(
+            Map('t' -> Trie(
+            Map('s' -> Trie(
+            Map('a' -> Trie(
+            Map('f' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
           )
             
           )
@@ -2713,12 +2765,32 @@ package io.lemonlabs.uri.inet
           )
             
           )
+          ,'u' -> Trie(
+            Map('o' -> Trie(
+            Map('c' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
           )
             
           )
           ,'o' -> Trie(
             Map('c' -> Trie(
+            Map('k' -> Trie(
+            Map('u' -> Trie(
             Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
             , wordEnd = true
           )
           ,'t' -> Trie(
@@ -4277,7 +4349,31 @@ package io.lemonlabs.uri.inet
             
           )
           ,'.' -> Trie(
+            Map('t' -> Trie(
             Map('s' -> Trie(
+            Map('a' -> Trie(
+            Map('f' -> Trie(
+            Map('y' -> Trie(
+            Map('m' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'s' -> Trie(
             Map('l' -> Trie(
             Map('o' -> Trie(
             Map('o' -> Trie(
@@ -4822,7 +4918,43 @@ package io.lemonlabs.uri.inet
           ,'o' -> Trie(
             Map('t' -> Trie(
             Map('s' -> Trie(
+            Map('.' -> Trie(
+            Map('e' -> Trie(
+            Map('r' -> Trie(
+            Map('a' -> Trie(
+            Map('w' -> Trie(
+            Map('p' -> Trie(
+            Map('o' -> Trie(
+            Map('h' -> Trie(
+            Map('s' -> Trie(
             Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
             , wordEnd = true
           )
           )
@@ -6569,6 +6701,26 @@ package io.lemonlabs.uri.inet
           )
           )
             
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'l' -> Trie(
+            Map('u' -> Trie(
+            Map('h' -> Trie(
+            Map('c' -> Trie(
+            Map('s' -> Trie(
+            Map()
+            , wordEnd = true
           )
           )
             
@@ -8876,6 +9028,30 @@ package io.lemonlabs.uri.inet
           )
             , wordEnd = true
           )
+          ,'o' -> Trie(
+            Map('h' -> Trie(
+            Map('p' -> Trie(
+            Map('a' -> Trie(
+            Map('r' -> Trie(
+            Map('g' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
           )
             
           )
@@ -10122,19 +10298,7 @@ package io.lemonlabs.uri.inet
           )
           ,'r' -> Trie(
             Map('.' -> Trie(
-            Map('2' -> Trie(
-            Map('1' -> Trie(
-            Map('k' -> Trie(
-            Map()
-            , wordEnd = true
-          )
-          )
-            
-          )
-          )
-            
-          )
-          ,'c' -> Trie(
+            Map('c' -> Trie(
             Map('c' -> Trie(
             Map()
             , wordEnd = true
@@ -10393,6 +10557,34 @@ package io.lemonlabs.uri.inet
             Map('n' -> Trie(
             Map()
             , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'r' -> Trie(
+            Map('e' -> Trie(
+            Map('t' -> Trie(
+            Map('t' -> Trie(
+            Map('a' -> Trie(
+            Map('l' -> Trie(
+            Map('p' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
           )
           )
             
@@ -13410,14 +13602,6 @@ package io.lemonlabs.uri.inet
           ,'d' -> Trie(
             Map('e' -> Trie(
             Map('f' -> Trie(
-            Map()
-            , wordEnd = true
-          )
-          )
-            
-          )
-          ,'a' -> Trie(
-            Map('n' -> Trie(
             Map()
             , wordEnd = true
           )
@@ -17339,16 +17523,6 @@ package io.lemonlabs.uri.inet
           )
           )
             
-          )
-          )
-            
-          )
-          }
-
-	private object _884c { def t = Trie(
-            Map('工' -> Trie(
-            Map()
-            , wordEnd = true
           )
           )
             
@@ -22805,6 +22979,38 @@ package io.lemonlabs.uri.inet
           )
             
           )
+          ,'0' -> Trie(
+            Map('0' -> Trie(
+            Map('0' -> Trie(
+            Map('2' -> Trie(
+            Map('c' -> Trie(
+            Map('i' -> Trie(
+            Map('l' -> Trie(
+            Map('c' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
           ,'c' -> Trie(
             Map('i' -> Trie(
             Map('m' -> Trie(
@@ -24116,7 +24322,39 @@ package io.lemonlabs.uri.inet
           )
           ,'h' -> Trie(
             Map('.' -> Trie(
+            Map('e' -> Trie(
+            Map('t' -> Trie(
+            Map('i' -> Trie(
             Map('s' -> Trie(
+            Map('e' -> Trie(
+            Map('e' -> Trie(
+            Map('r' -> Trie(
+            Map('f' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'s' -> Trie(
             Map('s' -> Trie(
             Map('e' -> Trie(
             Map('c' -> Trie(
@@ -24157,16 +24395,11 @@ package io.lemonlabs.uri.inet
           )
             
           )
-          )
-            
-          )
-          ,'e' -> Trie(
+          ,'p' -> Trie(
+            Map('v' -> Trie(
             Map('t' -> Trie(
-            Map('i' -> Trie(
             Map('s' -> Trie(
-            Map('e' -> Trie(
-            Map('e' -> Trie(
-            Map('r' -> Trie(
+            Map('a' -> Trie(
             Map('f' -> Trie(
             Map()
             , wordEnd = true
@@ -24189,15 +24422,12 @@ package io.lemonlabs.uri.inet
           )
             
           )
-          )
-            
-          )
-          ,'d' -> Trie(
-            Map('u' -> Trie(
-            Map('o' -> Trie(
-            Map('l' -> Trie(
-            Map('c' -> Trie(
-            Map('p' -> Trie(
+          ,'t' -> Trie(
+            Map('s' -> Trie(
+            Map('a' -> Trie(
+            Map('f' -> Trie(
+            Map('y' -> Trie(
+            Map('m' -> Trie(
             Map()
             , wordEnd = true
           )
@@ -24222,6 +24452,30 @@ package io.lemonlabs.uri.inet
             Map('h' -> Trie(
             Map()
             , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'d' -> Trie(
+            Map('u' -> Trie(
+            Map('o' -> Trie(
+            Map('l' -> Trie(
+            Map('c' -> Trie(
+            Map('p' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
           )
           )
             
@@ -24521,34 +24775,6 @@ package io.lemonlabs.uri.inet
           ,'m' -> Trie(
             Map()
             , wordEnd = true
-          )
-          ,'r' -> Trie(
-            Map('p' -> Trie(
-            Map('a' -> Trie(
-            Map('t' -> Trie(
-            Map('s' -> Trie(
-            Map('i' -> Trie(
-            Map('v' -> Trie(
-            Map()
-            , wordEnd = true
-          )
-          )
-            
-          )
-          )
-            
-          )
-          )
-            
-          )
-          )
-            
-          )
-          )
-            
-          )
-          )
-            
           )
           )
             , wordEnd = true
@@ -25222,7 +25448,23 @@ package io.lemonlabs.uri.inet
           )
           ,'c' -> Trie(
             Map('a' -> Trie(
+            Map('.' -> Trie(
+            Map('h' -> Trie(
+            Map('t' -> Trie(
+            Map('s' -> Trie(
             Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
             , wordEnd = true
           )
           )
@@ -63906,6 +64148,26 @@ package io.lemonlabs.uri.inet
           )
             
           )
+          ,'b' -> Trie(
+            Map('a' -> Trie(
+            Map('f' -> Trie(
+            Map('n' -> Trie(
+            Map('o' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
           )
             
           )
@@ -64667,7 +64929,11 @@ package io.lemonlabs.uri.inet
           }
 
 	private object _6d_6f_63_2e_62 { def t = Trie(
-            Map('e' -> Trie(
+            Map('g' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          ,'e' -> Trie(
             Map('w' -> Trie(
             Map('o' -> Trie(
             Map('t' -> Trie(
@@ -64723,15 +64989,19 @@ package io.lemonlabs.uri.inet
           )
             
           )
-          ,'u' -> Trie(
-            Map('h' -> Trie(
+          ,'d' -> Trie(
             Map('n' -> Trie(
-            Map('n' -> Trie(
+            Map('e' -> Trie(
+            Map('v' -> Trie(
+            Map('a' -> Trie(
+            Map('r' -> Trie(
             Map('y' -> Trie(
-            Map('l' -> Trie(
-            Map('f' -> Trie(
+            Map('m' -> Trie(
             Map()
             , wordEnd = true
+          )
+          )
+            
           )
           )
             
@@ -64765,42 +65035,6 @@ package io.lemonlabs.uri.inet
           )
           )
             
-          )
-          )
-            
-          )
-          )
-            
-          )
-          )
-            
-          )
-          )
-            
-          )
-          )
-            
-          )
-          )
-            
-          )
-          )
-            
-          )
-          ,'g' -> Trie(
-            Map()
-            , wordEnd = true
-          )
-          ,'d' -> Trie(
-            Map('n' -> Trie(
-            Map('e' -> Trie(
-            Map('v' -> Trie(
-            Map('a' -> Trie(
-            Map('r' -> Trie(
-            Map('y' -> Trie(
-            Map('m' -> Trie(
-            Map()
-            , wordEnd = true
           )
           )
             
@@ -65777,6 +66011,38 @@ package io.lemonlabs.uri.inet
           )
           )
             , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'-' -> Trie(
+            Map('r' -> Trie(
+            Map('e' -> Trie(
+            Map('t' -> Trie(
+            Map('t' -> Trie(
+            Map('a' -> Trie(
+            Map('l' -> Trie(
+            Map('p' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
           )
           )
             
@@ -69159,6 +69425,54 @@ package io.lemonlabs.uri.inet
           )
             
           )
+          ,'-' -> Trie(
+            Map('n' -> Trie(
+            Map('o' -> Trie(
+            Map('i' -> Trie(
+            Map('t' -> Trie(
+            Map('a' -> Trie(
+            Map('t' -> Trie(
+            Map('s' -> Trie(
+            Map('y' -> Trie(
+            Map('a' -> Trie(
+            Map('l' -> Trie(
+            Map('p' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
           ,'v' -> Trie(
             Map('e' -> Trie(
             Map('d' -> Trie(
@@ -71566,7 +71880,15 @@ package io.lemonlabs.uri.inet
           )
           ,'v' -> Trie(
             Map('r' -> Trie(
-            Map('e' -> Trie(
+            Map('u' -> Trie(
+            Map('c' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          ,'e' -> Trie(
             Map('s' -> Trie(
             Map('i' -> Trie(
             Map()
@@ -71611,6 +71933,50 @@ package io.lemonlabs.uri.inet
             Map('*' -> Trie(
             Map()
             , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'p' -> Trie(
+            Map('p' -> Trie(
+            Map('a' -> Trie(
+            Map('-' -> Trie(
+            Map('r' -> Trie(
+            Map('e' -> Trie(
+            Map('t' -> Trie(
+            Map('t' -> Trie(
+            Map('a' -> Trie(
+            Map('l' -> Trie(
+            Map('p' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
           )
           )
             
@@ -72118,6 +72484,10 @@ package io.lemonlabs.uri.inet
           ,'m' -> Trie(
             Map('o' -> Trie(
             Map('c' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          ,'n' -> Trie(
             Map()
             , wordEnd = true
           )
@@ -74673,6 +75043,54 @@ package io.lemonlabs.uri.inet
           )
             
           )
+          ,'l' -> Trie(
+            Map('e' -> Trie(
+            Map('n' -> Trie(
+            Map('a' -> Trie(
+            Map('p' -> Trie(
+            Map('.' -> Trie(
+            Map('n' -> Trie(
+            Map('o' -> Trie(
+            Map('m' -> Trie(
+            Map('e' -> Trie(
+            Map('a' -> Trie(
+            Map('d' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
           ,'o' -> Trie(
             Map('c' -> Trie(
             Map()
@@ -74982,6 +75400,22 @@ package io.lemonlabs.uri.inet
             Map('h' -> Trie(
             Map()
             , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'l' -> Trie(
+            Map('o' -> Trie(
+            Map('o' -> Trie(
+            Map('t' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
           )
           )
             
@@ -78177,6 +78611,14 @@ package io.lemonlabs.uri.inet
           )
           )
             
+          )
+          )
+            
+          )
+          ,'m' -> Trie(
+            Map('w' -> Trie(
+            Map()
+            , wordEnd = true
           )
           )
             
@@ -83944,7 +84386,47 @@ package io.lemonlabs.uri.inet
 
 	private object _6c_63 { def t = Trie(
             Map('.' -> Trie(
-            Map('t' -> Trie(
+            Map('s' -> Trie(
+            Map('a' -> Trie(
+            Map('m' -> Trie(
+            Map('e' -> Trie(
+            Map('d' -> Trie(
+            Map('n' -> Trie(
+            Map('e' -> Trie(
+            Map('r' -> Trie(
+            Map('p' -> Trie(
+            Map('a' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          ,'t' -> Trie(
             Map('o' -> Trie(
             Map('p' -> Trie(
             Map('s' -> Trie(
@@ -120330,6 +120812,34 @@ package io.lemonlabs.uri.inet
           )
             
           )
+          ,'y' -> Trie(
+            Map('f' -> Trie(
+            Map('i' -> Trie(
+            Map('l' -> Trie(
+            Map('t' -> Trie(
+            Map('e' -> Trie(
+            Map('n' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
           ,'t' -> Trie(
             Map('x' -> Trie(
             Map('e' -> Trie(
@@ -130377,6 +130887,22 @@ package io.lemonlabs.uri.inet
           )
             
           )
+          ,'n' -> Trie(
+            Map('n' -> Trie(
+            Map('o' -> Trie(
+            Map('c' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
           ,'y' -> Trie(
             Map('s' -> Trie(
             Map('r' -> Trie(
@@ -130837,6 +131363,22 @@ package io.lemonlabs.uri.inet
           )
           )
             , wordEnd = true
+          )
+          ,'r' -> Trie(
+            Map('p' -> Trie(
+            Map('o' -> Trie(
+            Map('c' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
           )
           )
             
@@ -145458,6 +146000,62 @@ package io.lemonlabs.uri.inet
           )
             
           )
+          ,'d' -> Trie(
+            Map('o' -> Trie(
+            Map('n' -> Trie(
+            Map('p' -> Trie(
+            Map('p' -> Trie(
+            Map('a' -> Trie(
+            Map('d' -> Trie(
+            Map('.' -> Trie(
+            Map('s' -> Trie(
+            Map('n' -> Trie(
+            Map('d' -> Trie(
+            Map('n' -> Trie(
+            Map('y' -> Trie(
+            Map('d' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
+          )
+            
+          )
           )
             
           )
@@ -146575,8 +147173,16 @@ package io.lemonlabs.uri.inet
             Map('u' -> Trie(
             Map('z' -> Trie(
             Map('a' -> Trie(
+            Map('.' -> Trie(
+            Map('*' -> Trie(
             Map()
             , wordEnd = true
+          )
+          )
+            
+          )
+          )
+            
           )
           )
             
@@ -149625,18 +150231,6 @@ package io.lemonlabs.uri.inet
           )
             
           )
-          ,'e' -> Trie(
-            Map('r' -> Trie(
-            Map('f' -> Trie(
-            Map()
-            , wordEnd = true
-          )
-          )
-            
-          )
-          )
-            
-          )
           )
             
           )
@@ -152659,6 +153253,10 @@ package io.lemonlabs.uri.inet
           ,'m' -> Trie(
             Map('o' -> Trie(
             Map('c' -> Trie(
+            Map()
+            , wordEnd = true
+          )
+          ,'n' -> Trie(
             Map()
             , wordEnd = true
           )

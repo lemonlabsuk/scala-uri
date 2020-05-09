@@ -16,7 +16,8 @@ case class Trie(children: Map[Char, Trie], wordEnd: Boolean = false) {
     @tailrec def collectMatches(previous: String,
                                 stillToGo: List[Char],
                                 current: Trie,
-                                matches: Vector[String]): Vector[String] =
+                                matches: Vector[String]
+    ): Vector[String] =
       stillToGo match {
         case Nil =>
           matches

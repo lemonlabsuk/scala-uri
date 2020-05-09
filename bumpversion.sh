@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 sbt updatePublicSuffixes
-git add shared/src/main/scala/io/lemonlabs/uri/inet/PublicSuffixTrie.scala
+git add shared/src/main/scala/io/lemonlabs/uri/inet/PublicSuffixes.scala
 git commit -m"Update public suffixes"
 
 echo "Running SBT to determine current version. Please wait..."

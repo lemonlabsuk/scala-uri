@@ -2,12 +2,12 @@ package io.lemonlabs.uri.inet
 
 import scala.annotation.tailrec
 
-@deprecated("scala-uri no longer uses a Trie for public suffixes. This object will be removed")
+@deprecated("scala-uri no longer uses a Trie for public suffixes. This object will be removed", "2.2.2")
 object Trie {
   val Empty = Trie(Map.empty)
 }
 
-@deprecated("scala-uri no longer uses a Trie for public suffixes. This class will be removed")
+@deprecated("scala-uri no longer uses a Trie for public suffixes. This class will be removed", "2.2.2")
 case class Trie(children: Map[Char, Trie], wordEnd: Boolean = false) {
   def next(c: Char): Option[Trie] =
     children.get(c)
@@ -16,8 +16,7 @@ case class Trie(children: Map[Char, Trie], wordEnd: Boolean = false) {
     @tailrec def collectMatches(previous: String,
                                 stillToGo: List[Char],
                                 current: Trie,
-                                matches: Vector[String]
-    ): Vector[String] =
+                                matches: Vector[String]): Vector[String] =
       stillToGo match {
         case Nil =>
           matches

@@ -119,18 +119,43 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     *
     * @return the longest public suffix for the host in this URI
     */
-  def publicSuffix: Option[String] =
-    PublicSuffixTrie.publicSuffixTrie.longestMatch(value.reverse).map(_.reverse)
+  def publicSuffix: Option[String] = {
+    @scala.annotation.tailrec
+    def findLongest(remaining: String): Option[String] = {
+      if (PublicSuffixes.set.contains(remaining)) {
+        Some(remaining)
+      } else {
+        val i = remaining.indexOf('.')
+        if (i == -1)
+          None
+        else
+          findLongest(remaining.substring(i + 1))
+      }
+    }
+    findLongest(value)
+  }
 
   /**
-    * Returns all longest public suffixes for the host in this URI. Examples include:
+    * Returns all public suffixes for the host in this URI. Examples include:
     *  `com` for `www.example.com`
     *  `co.uk` and `uk` for `www.example.co.uk`
     *
     * @return all public suffixes for the host in this URI
     */
-  def publicSuffixes: Vector[String] =
-    PublicSuffixTrie.publicSuffixTrie.matches(value.reverse).map(_.reverse)
+  def publicSuffixes: Vector[String] = {
+    @scala.annotation.tailrec
+    def findAll(remaining: String, matches: Vector[String]): Vector[String] = {
+      val newMatches =
+        if (PublicSuffixes.set.contains(remaining)) matches :+ remaining
+        else matches
+      val i = remaining.indexOf('.')
+      if (i == -1)
+        newMatches
+      else
+        findAll(remaining.substring(i + 1), newMatches)
+    }
+    findAll(value, Vector.empty)
+  }
 
   /**
     * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII

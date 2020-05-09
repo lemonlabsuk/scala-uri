@@ -55,7 +55,7 @@ val sharedSettings = Seq(
   ),
   parallelExecution in Test := false,
   scalafmtOnCompile         := true,
-  coverageExcludedPackages  := "(io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
+  coverageExcludedPackages  := "(io.lemonlabs.uri.inet.Trie.*|io.lemonlabs.uri.inet.PublicSuffixes.*|io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
 )
 
 val scalaUriSettings = Seq(
@@ -191,16 +191,9 @@ lazy val docs = project
   .enablePlugins(MdocPlugin)
 
 lazy val updatePublicSuffixes =
-  taskKey[Unit]("Updates the public suffix Trie at io.lemonlabs.uri.internet.PublicSuffixes")
+  taskKey[Unit]("Updates the public suffix Set at io.lemonlabs.uri.internet.PublicSuffixes")
 
-updatePublicSuffixes := UpdatePublicSuffixTrie.generate()
-
-lazy val testPublicSuffixes =
-  taskKey[Unit](
-    "Makes a small public suffix Trie at io.lemonlabs.uri.internet.PublicSuffixes which can be use to run the tests and can be instrumented without exceeding JVM class size limits"
-  )
-
-testPublicSuffixes := UpdatePublicSuffixTrie.generateTestVersion()
+updatePublicSuffixes := UpdatePublicSuffixes.generate()
 
 addCommandAlias("check", ";scalafmtCheckAll;scalafmtSbtCheck")
 addCommandAlias("fmt", ";scalafmtAll;scalafmtSbt")

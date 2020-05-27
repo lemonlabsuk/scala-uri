@@ -18,13 +18,13 @@ jobs:
     - scala: [2.13.1]
       env: PROJECT=scalaUriJS SCALAJS_VERSION=0.6.32 COVERAGE=coverageOff
     - scala: [2.13.1]
-      env: PROJECT=scalaUriJS SCALAJS_VERSION=1.0.1 COVERAGE=coverageOff
+      env: PROJECT=scalaUriJS SCALAJS_VERSION=1.1.0 COVERAGE=coverageOff
     - scala: [2.12.10]
       env: PROJECT=scalaUriJVM COVERAGE=coverageOn
     - scala: [2.12.10]
       env: PROJECT=scalaUriJS SCALAJS_VERSION=0.6.32 COVERAGE=coverageOff
     - scala: [2.12.10]
-      env: PROJECT=scalaUriJS SCALAJS_VERSION=1.0.1 COVERAGE=coverageOff
+      env: PROJECT=scalaUriJS SCALAJS_VERSION=1.1.0 COVERAGE=coverageOff
 
 before_script:
   - nvm install 10 # nodejs < 10 fails finding URL class

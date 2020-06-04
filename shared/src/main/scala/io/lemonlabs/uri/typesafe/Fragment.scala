@@ -4,13 +4,58 @@ import cats.Contravariant
 import simulacrum.typeclass
 
 import scala.language.implicitConversions
+import scala.annotation.implicitNotFound
 
-@typeclass trait Fragment[A] { self =>
+@implicitNotFound("Could not find an instance of Fragment for ${A}")
+@typeclass trait Fragment[A] extends Serializable { self =>
   def fragment(a: A): Option[String]
   def contramap[B](f: B => A): Fragment[B] = (b: B) => self.fragment(f(b))
 }
 
-object Fragment extends FragmentInstances
+object Fragment extends FragmentInstances {
+  /* ======================================================================== */
+  /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
+  /* ======================================================================== */
+
+  /**
+    * Summon an instance of [[Fragment]] for `A`.
+    */
+  @inline def apply[A](implicit instance: Fragment[A]): Fragment[A] = instance
+
+  object ops {
+    implicit def toAllFragmentOps[A](target: A)(implicit tc: Fragment[A]): AllOps[A] {
+      type TypeClassType = Fragment[A]
+    } =
+      new AllOps[A] {
+        type TypeClassType = Fragment[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  trait Ops[A] extends Serializable {
+    type TypeClassType <: Fragment[A]
+    def self: A
+    val typeClassInstance: TypeClassType
+    def fragment: Option[String] = typeClassInstance.fragment(self)
+  }
+  trait AllOps[A] extends Ops[A]
+  trait ToFragmentOps extends Serializable {
+    implicit def toFragmentOps[A](target: A)(implicit tc: Fragment[A]): Ops[A] {
+      type TypeClassType = Fragment[A]
+    } =
+      new Ops[A] {
+        type TypeClassType = Fragment[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  object nonInheritedOps extends ToFragmentOps
+
+  /* ======================================================================== */
+  /* END OF SIMULACRUM-MANAGED CODE                                           */
+  /* ======================================================================== */
+
+}
 
 sealed trait FragmentInstances2 {
   implicit val contravariant: Contravariant[Fragment] = new Contravariant[Fragment] {

@@ -15,26 +15,20 @@ scalaVersion in ThisBuild       := "2.13.2"
 crossScalaVersions in ThisBuild := Seq("2.12.11", scalaVersion.value)
 skip in publish                 := true // Do not publish the root project
 
-lazy val paradisePlugin = Def.setting {
-  VersionNumber(scalaVersion.value) match {
-    case v if v.matchesSemVer(SemanticSelector("<2.13.0-M4")) =>
-      Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.patch))
-    case _ =>
-      // if scala 2.13.0-M4 or later, macro annotations merged into scala-reflect
-      // https://github.com/scala/scala/pull/6606
-      Nil
-  }
-}
+val simulacrumScalafixVersion = "0.5.0"
+scalafixDependencies in ThisBuild += "org.typelevel" %% "simulacrum-scalafix" % simulacrumScalafixVersion
 
 val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
     compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.6.0" cross CrossVersion.full),
-    "com.github.ghik"     % "silencer-lib"    % "1.6.0"   % Provided cross CrossVersion.full,
-    "org.scalatest"     %%% "scalatest"       % "3.1.2"   % Test,
-    "org.scalatestplus" %%% "scalacheck-1-14" % "3.1.2.0" % Test,
-    "org.scalacheck"    %%% "scalacheck"      % "1.14.3"  % Test,
-    "org.typelevel"     %%% "cats-laws"       % "2.1.1"   % Test
+    "com.github.ghik" % "silencer-lib" % "1.6.0" % Provided cross CrossVersion.full,
+    // pinned to 0.1.0 for temporary cross build support
+    "org.typelevel"     %%% "simulacrum-scalafix-annotations" % "0.1.0", // simulacrumScalafixVersion,
+    "org.scalatest"     %%% "scalatest"                       % "3.1.2"   % Test,
+    "org.scalatestplus" %%% "scalacheck-1-14"                 % "3.1.2.0" % Test,
+    "org.scalacheck"    %%% "scalacheck"                      % "1.14.3"  % Test,
+    "org.typelevel"     %%% "cats-laws"                       % "2.1.1"   % Test
   ),
   scalacOptions := Seq(
     "-unchecked",
@@ -53,6 +47,8 @@ val sharedSettings = Seq(
       case _                                                => Nil
     }
   ),
+  addCompilerPlugin(scalafixSemanticdb),
+  scalacOptions ++= Seq(s"-P:semanticdb:targetroot:${baseDirectory.value}/target/.semanticdb", "-Yrangepos"),
   parallelExecution in Test := false,
   scalafmtOnCompile         := true,
   coverageExcludedPackages  := "(io.lemonlabs.uri.inet.Trie.*|io.lemonlabs.uri.inet.PublicSuffixes.*|io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
@@ -68,24 +64,9 @@ val scalaUriSettings = Seq(
       case _ =>
         "org.parboiled" %%% "parboiled" % "2.2.0"
     },
-    "com.chuusai"   %%% "shapeless"  % "2.3.3",
-    "org.typelevel" %%% "simulacrum" % "1.0.0" % Provided,
-    "org.typelevel" %%% "cats-core"  % "2.1.1"
-  ),
-  libraryDependencies ++= paradisePlugin.value,
-  pomPostProcess := { node =>
-    new RuleTransformer(new RewriteRule {
-      override def transform(node: xml.Node): Seq[xml.Node] =
-        node match {
-          case e: xml.Elem
-              if e.label == "dependency" &&
-                e.child.exists(child => child.label == "groupId" && child.text == "org.typelevel") &&
-                e.child.exists(child => child.label == "artifactId" && child.text.startsWith("simulacrum_")) =>
-            Nil
-          case _ => Seq(node)
-        }
-    }).transform(node).head
-  }
+    "com.chuusai"   %%% "shapeless" % "2.3.3",
+    "org.typelevel" %%% "cats-core" % "2.1.1"
+  )
 )
 
 val publishingSettings = Seq(

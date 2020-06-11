@@ -13,17 +13,17 @@ jdk:
 
 jobs:
   include:
-    - scala: [2.13.1]
+    - scala: [2.13.2]
       env: PROJECT=scalaUriJVM COVERAGE=coverageOff
-    - scala: [2.13.1]
+    - scala: [2.13.2]
       env: PROJECT=scalaUriJS SCALAJS_VERSION=0.6.32 COVERAGE=coverageOff
-    - scala: [2.13.1]
+    - scala: [2.13.2]
       env: PROJECT=scalaUriJS SCALAJS_VERSION=1.1.0 COVERAGE=coverageOff
-    - scala: [2.12.10]
+    - scala: [2.12.11]
       env: PROJECT=scalaUriJVM COVERAGE=coverageOn
-    - scala: [2.12.10]
+    - scala: [2.12.11]
       env: PROJECT=scalaUriJS SCALAJS_VERSION=0.6.32 COVERAGE=coverageOff
-    - scala: [2.12.10]
+    - scala: [2.12.11]
       env: PROJECT=scalaUriJS SCALAJS_VERSION=1.1.0 COVERAGE=coverageOff
 
 before_script:

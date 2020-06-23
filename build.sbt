@@ -21,8 +21,8 @@ scalafixDependencies in ThisBuild += "org.typelevel" %% "simulacrum-scalafix" % 
 val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.6.0" cross CrossVersion.full),
-    "com.github.ghik" % "silencer-lib" % "1.6.0" % Provided cross CrossVersion.full,
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.0" cross CrossVersion.full),
+    "com.github.ghik" % "silencer-lib" % "1.7.0" cross CrossVersion.full,
     // pinned to 0.1.0 for temporary cross build support
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % "0.1.0", // simulacrumScalafixVersion,
     "org.scalatest"     %%% "scalatest"                       % "3.1.2"   % Test,
@@ -54,6 +54,14 @@ val sharedSettings = Seq(
   coverageExcludedPackages  := "(io.lemonlabs.uri.inet.Trie.*|io.lemonlabs.uri.inet.PublicSuffixes.*|io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
 )
 
+def removePomDependency(groupId: String, artifactIdPrefix: String): PartialFunction[xml.Node, Seq[xml.Node]] = {
+  case e: xml.Elem
+      if e.label == "dependency" &&
+        e.child.exists(child => child.label == "groupId" && child.text == groupId) &&
+        e.child.exists(child => child.label == "artifactId" && child.text.startsWith(artifactIdPrefix)) =>
+    Nil
+}
+
 val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
@@ -66,7 +74,18 @@ val scalaUriSettings = Seq(
     },
     "com.chuusai"   %%% "shapeless" % "2.3.3",
     "org.typelevel" %%% "cats-core" % "2.1.1"
-  )
+  ),
+  pomPostProcess := { node =>
+    new RuleTransformer(new RewriteRule {
+      override def transform(node: xml.Node): Seq[xml.Node] = {
+        val removeUnneededPomDeps =
+          removePomDependency(groupId = "org.typelevel", artifactIdPrefix = "simulacrum") orElse
+            removePomDependency(groupId = "com.github.ghik", artifactIdPrefix = "silencer-lib")
+
+        removeUnneededPomDeps.applyOrElse(node, (_: xml.Node) => Seq(node))
+      }
+    }).transform(node).head
+  }
 )
 
 val publishingSettings = Seq(

@@ -9,12 +9,57 @@ import shapeless.ops.hlist.ToList
 import simulacrum.typeclass
 
 import scala.language.implicitConversions
+import scala.annotation.implicitNotFound
 
-@typeclass trait QueryKey[A] {
+@implicitNotFound("Could not find an instance of QueryKey for ${A}")
+@typeclass trait QueryKey[A] extends Serializable {
   def queryKey(a: A): String
 }
 
-object QueryKey extends QueryKeyInstances
+object QueryKey extends QueryKeyInstances {
+  /* ======================================================================== */
+  /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
+  /* ======================================================================== */
+
+  /**
+    * Summon an instance of [[QueryKey]] for `A`.
+    */
+  @inline def apply[A](implicit instance: QueryKey[A]): QueryKey[A] = instance
+
+  object ops {
+    implicit def toAllQueryKeyOps[A](target: A)(implicit tc: QueryKey[A]): AllOps[A] {
+      type TypeClassType = QueryKey[A]
+    } =
+      new AllOps[A] {
+        type TypeClassType = QueryKey[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  trait Ops[A] extends Serializable {
+    type TypeClassType <: QueryKey[A]
+    def self: A
+    val typeClassInstance: TypeClassType
+    def queryKey: String = typeClassInstance.queryKey(self)
+  }
+  trait AllOps[A] extends Ops[A]
+  trait ToQueryKeyOps extends Serializable {
+    implicit def toQueryKeyOps[A](target: A)(implicit tc: QueryKey[A]): Ops[A] {
+      type TypeClassType = QueryKey[A]
+    } =
+      new Ops[A] {
+        type TypeClassType = QueryKey[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  object nonInheritedOps extends ToQueryKeyOps
+
+  /* ======================================================================== */
+  /* END OF SIMULACRUM-MANAGED CODE                                           */
+  /* ======================================================================== */
+
+}
 
 sealed trait QueryKeyInstances1 {
   implicit val contravariant: Contravariant[QueryKey] = new Contravariant[QueryKey] {
@@ -33,7 +78,8 @@ sealed trait QueryKeyInstances extends QueryKeyInstances1 {
   implicit final val uuidQueryValue: QueryKey[java.util.UUID] = stringQueryKey.contramap(_.toString)
 }
 
-@typeclass trait QueryValue[-A] { self =>
+@implicitNotFound("Could not find an instance of QueryValue for ${A}")
+@typeclass trait QueryValue[-A] extends Serializable { self =>
   def queryValue(a: A): Option[String]
 }
 
@@ -46,6 +92,49 @@ object QueryValue extends QueryValueInstances {
     )(implicit gen: Generic.Aux[A, C], reify: Reify.Aux[C, R], toList: ToList[R, A]): QueryValue[A] =
       a => toList(reify()).iterator.map(x => x -> key(x)).toMap.get(a)
   }
+
+  /* ======================================================================== */
+  /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
+  /* ======================================================================== */
+
+  /**
+    * Summon an instance of [[QueryValue]] for `A`.
+    */
+  @inline def apply[A](implicit instance: QueryValue[A]): QueryValue[A] = instance
+
+  object ops {
+    implicit def toAllQueryValueOps[A](target: A)(implicit tc: QueryValue[A]): AllOps[A] {
+      type TypeClassType = QueryValue[A]
+    } =
+      new AllOps[A] {
+        type TypeClassType = QueryValue[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  trait Ops[A] extends Serializable {
+    type TypeClassType <: QueryValue[A]
+    def self: A
+    val typeClassInstance: TypeClassType
+    def queryValue: Option[String] = typeClassInstance.queryValue(self)
+  }
+  trait AllOps[A] extends Ops[A]
+  trait ToQueryValueOps extends Serializable {
+    implicit def toQueryValueOps[A](target: A)(implicit tc: QueryValue[A]): Ops[A] {
+      type TypeClassType = QueryValue[A]
+    } =
+      new Ops[A] {
+        type TypeClassType = QueryValue[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  object nonInheritedOps extends ToQueryValueOps
+
+  /* ======================================================================== */
+  /* END OF SIMULACRUM-MANAGED CODE                                           */
+  /* ======================================================================== */
+
 }
 
 sealed trait QueryValueInstances2 {
@@ -70,7 +159,8 @@ sealed trait QueryValueInstances extends QueryValueInstances1 {
   implicit final def optionQueryValue[A: QueryValue]: QueryValue[Option[A]] = _.flatMap(QueryValue[A].queryValue)
 }
 
-@typeclass trait QueryKeyValue[A] {
+@implicitNotFound("Could not find an instance of QueryKeyValue for ${A}")
+@typeclass trait QueryKeyValue[A] extends Serializable {
   def queryKey(a: A): String
 
   def queryValue(a: A): Option[String]
@@ -85,6 +175,51 @@ object QueryKeyValue extends QueryKeyValueInstances {
       def queryKey(a: T): String = QueryKey[K].queryKey(toKey(a))
       def queryValue(a: T): Option[String] = QueryValue[V].queryValue(toValue(a))
     }
+
+  /* ======================================================================== */
+  /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
+  /* ======================================================================== */
+
+  /**
+    * Summon an instance of [[QueryKeyValue]] for `A`.
+    */
+  @inline def apply[A](implicit instance: QueryKeyValue[A]): QueryKeyValue[A] = instance
+
+  object ops {
+    implicit def toAllQueryKeyValueOps[A](target: A)(implicit tc: QueryKeyValue[A]): AllOps[A] {
+      type TypeClassType = QueryKeyValue[A]
+    } =
+      new AllOps[A] {
+        type TypeClassType = QueryKeyValue[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  trait Ops[A] extends Serializable {
+    type TypeClassType <: QueryKeyValue[A]
+    def self: A
+    val typeClassInstance: TypeClassType
+    def queryKey: String = typeClassInstance.queryKey(self)
+    def queryValue: Option[String] = typeClassInstance.queryValue(self)
+    def queryKeyValue: (String, Option[String]) = typeClassInstance.queryKeyValue(self)
+  }
+  trait AllOps[A] extends Ops[A]
+  trait ToQueryKeyValueOps extends Serializable {
+    implicit def toQueryKeyValueOps[A](target: A)(implicit tc: QueryKeyValue[A]): Ops[A] {
+      type TypeClassType = QueryKeyValue[A]
+    } =
+      new Ops[A] {
+        type TypeClassType = QueryKeyValue[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  object nonInheritedOps extends ToQueryKeyValueOps
+
+  /* ======================================================================== */
+  /* END OF SIMULACRUM-MANAGED CODE                                           */
+  /* ======================================================================== */
+
 }
 
 sealed trait QueryKeyValueInstances {
@@ -92,7 +227,8 @@ sealed trait QueryKeyValueInstances {
     QueryKeyValue(_._1, _._2)
 }
 
-@typeclass trait TraversableParams[A] {
+@implicitNotFound("Could not find an instance of TraversableParams for ${A}")
+@typeclass trait TraversableParams[A] extends Serializable {
   def toSeq(a: A): Seq[(String, Option[String])]
   def toVector(a: A): Vector[(String, Option[String])] =
     toSeq(a).toVector
@@ -119,6 +255,50 @@ object TraversableParams extends TraversableParamsInstances {
 
   def product[A, R <: HList](implicit gen: LabelledGeneric.Aux[A, R], R: TraversableParams[R]): TraversableParams[A] =
     (a: A) => R.toSeq(gen.to(a))
+
+  /* ======================================================================== */
+  /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
+  /* ======================================================================== */
+
+  /**
+    * Summon an instance of [[TraversableParams]] for `A`.
+    */
+  @inline def apply[A](implicit instance: TraversableParams[A]): TraversableParams[A] = instance
+
+  object ops {
+    implicit def toAllTraversableParamsOps[A](target: A)(implicit tc: TraversableParams[A]): AllOps[A] {
+      type TypeClassType = TraversableParams[A]
+    } =
+      new AllOps[A] {
+        type TypeClassType = TraversableParams[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  trait Ops[A] extends Serializable {
+    type TypeClassType <: TraversableParams[A]
+    def self: A
+    val typeClassInstance: TypeClassType
+    def toSeq: Seq[(String, Option[String])] = typeClassInstance.toSeq(self)
+    def toVector: Vector[(String, Option[String])] = typeClassInstance.toVector(self)
+  }
+  trait AllOps[A] extends Ops[A]
+  trait ToTraversableParamsOps extends Serializable {
+    implicit def toTraversableParamsOps[A](target: A)(implicit tc: TraversableParams[A]): Ops[A] {
+      type TypeClassType = TraversableParams[A]
+    } =
+      new Ops[A] {
+        type TypeClassType = TraversableParams[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  object nonInheritedOps extends ToTraversableParamsOps
+
+  /* ======================================================================== */
+  /* END OF SIMULACRUM-MANAGED CODE                                           */
+  /* ======================================================================== */
+
 }
 
 sealed trait TraversableParamsInstances1 {

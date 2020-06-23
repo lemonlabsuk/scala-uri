@@ -9,13 +9,59 @@ import shapeless.labelled._
 import simulacrum.typeclass
 
 import scala.language.implicitConversions
+import scala.annotation.implicitNotFound
 
-@typeclass trait PathPart[-A] {
+@implicitNotFound("Could not find an instance of PathPart for ${A}")
+@typeclass trait PathPart[-A] extends Serializable {
   def path(a: A): String
   def splitPath(a: A): Seq[String] = path(a).split('/').toSeq
 }
 
-object PathPart extends PathPartInstances
+object PathPart extends PathPartInstances {
+  /* ======================================================================== */
+  /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
+  /* ======================================================================== */
+
+  /**
+    * Summon an instance of [[PathPart]] for `A`.
+    */
+  @inline def apply[A](implicit instance: PathPart[A]): PathPart[A] = instance
+
+  object ops {
+    implicit def toAllPathPartOps[A](target: A)(implicit tc: PathPart[A]): AllOps[A] {
+      type TypeClassType = PathPart[A]
+    } =
+      new AllOps[A] {
+        type TypeClassType = PathPart[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  trait Ops[A] extends Serializable {
+    type TypeClassType <: PathPart[A]
+    def self: A
+    val typeClassInstance: TypeClassType
+    def path: String = typeClassInstance.path(self)
+    def splitPath: Seq[String] = typeClassInstance.splitPath(self)
+  }
+  trait AllOps[A] extends Ops[A]
+  trait ToPathPartOps extends Serializable {
+    implicit def toPathPartOps[A](target: A)(implicit tc: PathPart[A]): Ops[A] {
+      type TypeClassType = PathPart[A]
+    } =
+      new Ops[A] {
+        type TypeClassType = PathPart[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  object nonInheritedOps extends ToPathPartOps
+
+  /* ======================================================================== */
+  /* END OF SIMULACRUM-MANAGED CODE                                           */
+  /* ======================================================================== */
+
+}
 
 sealed trait PathPartInstances2 {
   implicit val contravariant: Contravariant[PathPart] = new Contravariant[PathPart] {
@@ -55,7 +101,8 @@ sealed trait TraversablePathPartsInstances {
     (ax: List[A]) => ax.flatMap(tc.splitPath)
 }
 
-@typeclass trait TraversablePathParts[A] {
+@implicitNotFound("Could not find an instance of TraversablePathParts for ${A}")
+@typeclass trait TraversablePathParts[A] extends Serializable {
   def toSeq(a: A): Seq[String]
   def toVector(a: A): Vector[String] =
     toSeq(a).toVector
@@ -85,4 +132,48 @@ object TraversablePathParts extends TraversablePathPartsInstances {
 
   def product[A, R <: HList](implicit gen: Generic.Aux[A, R], R: TraversablePathParts[R]): TraversablePathParts[A] =
     (a: A) => R.toSeq(gen.to(a))
+
+  /* ======================================================================== */
+  /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
+  /* ======================================================================== */
+
+  /**
+    * Summon an instance of [[TraversablePathParts]] for `A`.
+    */
+  @inline def apply[A](implicit instance: TraversablePathParts[A]): TraversablePathParts[A] = instance
+
+  object ops {
+    implicit def toAllTraversablePathPartsOps[A](target: A)(implicit tc: TraversablePathParts[A]): AllOps[A] {
+      type TypeClassType = TraversablePathParts[A]
+    } =
+      new AllOps[A] {
+        type TypeClassType = TraversablePathParts[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  trait Ops[A] extends Serializable {
+    type TypeClassType <: TraversablePathParts[A]
+    def self: A
+    val typeClassInstance: TypeClassType
+    def toSeq: Seq[String] = typeClassInstance.toSeq(self)
+    def toVector: Vector[String] = typeClassInstance.toVector(self)
+  }
+  trait AllOps[A] extends Ops[A]
+  trait ToTraversablePathPartsOps extends Serializable {
+    implicit def toTraversablePathPartsOps[A](target: A)(implicit tc: TraversablePathParts[A]): Ops[A] {
+      type TypeClassType = TraversablePathParts[A]
+    } =
+      new Ops[A] {
+        type TypeClassType = TraversablePathParts[A]
+        val self: A = target
+        val typeClassInstance: TypeClassType = tc
+      }
+  }
+  object nonInheritedOps extends ToTraversablePathPartsOps
+
+  /* ======================================================================== */
+  /* END OF SIMULACRUM-MANAGED CODE                                           */
+  /* ======================================================================== */
+
 }

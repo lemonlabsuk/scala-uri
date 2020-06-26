@@ -4,7 +4,7 @@
 [![codecov.io](http://codecov.io/github/lemonlabsuk/scala-uri/coverage.svg?branch=master)](https://codecov.io/gh/lemonlabsuk/scala-uri/branch/master)
 [![Slack](https://lemonlabs.io/slack/badge.svg)](https://lemonlabs.io/slack)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)
-[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](#scalajs-support)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.0.0.svg)](#scalajs-support)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/lemonlabsuk/scala-uri.svg)](http://isitmaintained.com/project/lemonlabsuk/scala-uri "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/lemonlabsuk/scala-uri.svg)](http://isitmaintained.com/project/lemonlabsuk/scala-uri "Percentage of issues still open")
 
@@ -822,11 +822,12 @@ The type class instances exist in the companion objects for these types.
 
 ## Including scala-uri your project
 
-`scala-uri` `2.x.x` is currently built with support for Scala `2.13.x`, Scala `2.12.x` and Scala.js `0.6.17+` 
+`scala-uri` `2.x.x` is currently built with support for Scala `2.13.x`, Scala `2.12.x` and Scala.js `1.1.0+` 
 
  * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
  * For `2.9.x` support use `scala-uri` `0.3.6` from branch [`0.3.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.3.x)
+ * For Scala.js `0.6.17+` support, use `scala-uri` `2.2.3`
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 

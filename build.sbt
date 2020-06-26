@@ -66,12 +66,7 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    VersionNumber(scalaJSVersion) match {
-      case v if v.matchesSemVer(SemanticSelector("<1.0.0")) =>
-        "org.parboiled" %%% "parboiled" % "2.1.8"
-      case _ =>
-        "org.parboiled" %%% "parboiled" % "2.2.0"
-    },
+    "org.parboiled" %%% "parboiled" % "2.2.0",
     "com.chuusai"   %%% "shapeless" % "2.3.3",
     "org.typelevel" %%% "cats-core" % "2.1.1"
   ),

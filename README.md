@@ -33,12 +33,12 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "2.2.3"
+"io.lemonlabs" %% "scala-uri" % "2.2.4"
 ```
 
 ## Migration Guides
 
- * [2.2.3+](#1xx-to-2xx)
+ * [2.2.4+](#1xx-to-2xx)
  * [1.5.0+](#1xx-to-15x)
  * [1.0.0+](#05x-to-1xx)
  * [Older versions](#04x-to-05x)
@@ -827,12 +827,12 @@ The type class instances exist in the companion objects for these types.
  * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
  * For `2.9.x` support use `scala-uri` `0.3.6` from branch [`0.3.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.3.x)
- * For Scala.js `0.6.17+` support, use `scala-uri` `2.2.3`
+ * For Scala.js `0.6.17+` support, use `scala-uri` `2.2.4`
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "2.2.3"
+"io.lemonlabs" %% "scala-uri" % "2.2.4"
 ```
 
 For maven users you should use (for 2.13.x):
@@ -841,7 +841,7 @@ For maven users you should use (for 2.13.x):
 <dependency>
     <groupId>io.lemonlabs</groupId>
     <artifactId>scala-uri_2.13</artifactId>
-    <version>2.2.3</version>
+    <version>2.2.4</version>
 </dependency>
 ```
 

@@ -38,7 +38,7 @@ To include it in your SBT project from maven central:
 
 ## Migration Guides
 
- * [2.2.4+](#1xx-to-2xx)
+ * [2.0.0+](#1xx-to-2xx)
  * [1.5.0+](#1xx-to-15x)
  * [1.0.0+](#05x-to-1xx)
  * [Older versions](#04x-to-05x)

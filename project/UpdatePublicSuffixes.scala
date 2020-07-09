@@ -24,7 +24,7 @@ object UpdatePublicSuffixes {
     val (wildcards, suffixes) = others.partition(_.contains("*"))
     val (wildcardPrefixes, otherWildcards) = wildcards.partition(_.startsWith("*"))
 
-    if(otherWildcards.nonEmpty) {
+    if (otherWildcards.nonEmpty) {
       println("We have non-prefix wildcards! We need to implement this!!!")
       println(otherWildcards)
       sys.exit(1)

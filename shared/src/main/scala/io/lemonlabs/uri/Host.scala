@@ -112,6 +112,17 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     extends Host
     with PunycodeSupport {
 
+  private def isValidPublicSuffix(suffix: String): Boolean =
+    if (PublicSuffixes.set.contains(suffix)) { true }
+    else if (PublicSuffixes.exceptions.contains(suffix)) { false }
+    else {
+      val dotIndex = suffix.indexOf('.')
+      if (dotIndex < 1) { false }
+      else {
+        PublicSuffixes.wildcardPrefixes.contains(suffix.substring(dotIndex + 1))
+      }
+    }
+
   /**
     * Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`
@@ -122,7 +133,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
   def publicSuffix: Option[String] = {
     @scala.annotation.tailrec
     def findLongest(remaining: String): Option[String] = {
-      if (PublicSuffixes.set.contains(remaining)) {
+      if (isValidPublicSuffix(remaining)) {
         Some(remaining)
       } else {
         val i = remaining.indexOf('.')
@@ -146,7 +157,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     @scala.annotation.tailrec
     def findAll(remaining: String, matches: Vector[String]): Vector[String] = {
       val newMatches =
-        if (PublicSuffixes.set.contains(remaining)) matches :+ remaining
+        if (isValidPublicSuffix(remaining)) matches :+ remaining
         else matches
       val i = remaining.indexOf('.')
       if (i == -1)

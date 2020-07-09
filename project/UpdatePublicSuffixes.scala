@@ -14,11 +14,21 @@ object UpdatePublicSuffixes {
   def generate(suffixLines: List[String]): Unit = {
     implicit val enc: Codec = Codec.UTF8
 
-    val suffixes = for {
+    val allSuffixes = for {
       line <- suffixLines
       trimLine = line.trim
       if !trimLine.startsWith("//") && !trimLine.isEmpty
     } yield trimLine
+
+    val (exceptions, others) = allSuffixes.partition(_.startsWith("!"))
+    val (wildcards, suffixes) = others.partition(_.contains("*"))
+    val (wildcardPrefixes, otherWildcards) = wildcards.partition(_.startsWith("*"))
+
+    if(otherWildcards.nonEmpty) {
+      println("We have non-prefix wildcards! We need to implement this!!!")
+      println(otherWildcards)
+      sys.exit(1)
+    }
 
     val groups = suffixes.grouped(methodLength).zipWithIndex.map(_.swap).toMap
 
@@ -26,6 +36,15 @@ object UpdatePublicSuffixes {
     p.println("package io.lemonlabs.uri.inet")
     p.println("")
     p.println("object PublicSuffixes {")
+
+    p.println("  lazy val exceptions = Set(")
+    p.println(exceptions.map(_.tail).map(e => s"""    "$e"""").mkString(",\n"))
+    p.println("  )\n")
+
+    p.println("  lazy val wildcardPrefixes = Set(")
+    p.println(wildcardPrefixes.map(_.drop(2)).map(w => s"""    "$w"""").mkString(",\n"))
+    p.println("  )\n")
+
     p.println("  lazy val set = " + groups.keys.map(i => s"publicSuffixes$i").mkString(" ++ "))
     groups.foreach {
       case (index, group) =>

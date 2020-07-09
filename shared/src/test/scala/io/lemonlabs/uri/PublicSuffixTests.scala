@@ -17,6 +17,20 @@ class PublicSuffixTests extends AnyFlatSpec with Matchers {
     uri.publicSuffix should equal(Some("com"))
   }
 
+  it should "return wildcard public suffixes" in {
+    // *.bd from public suffix list Should match com.bd
+    // Github issue #179
+    Url.parse("http://www.bar.com.bd").publicSuffix should equal(Some("com.bd"))
+  }
+
+  it should "not return wildcard exception public suffixes" in {
+    // *.ck from public suffix list should not match www.ck because it is an exception
+    Url.parse("http://www.bar.www.ck").publicSuffix should equal(None)
+
+    // However other suffixes should match *.ck
+    Url.parse("http://www.bar.www1.ck").publicSuffix should equal(Some("www1.ck"))
+  }
+
   "Uri publicSuffixes method" should "match the all public suffixes" in {
     val uri = Url.parse("http://www.google.co.uk/blah")
     uri.publicSuffixes should equal(Vector("co.uk", "uk"))

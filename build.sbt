@@ -21,8 +21,8 @@ scalafixDependencies in ThisBuild += "org.typelevel" %% "simulacrum-scalafix" % 
 val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.0" cross CrossVersion.full),
-    "com.github.ghik"     % "silencer-lib"                    % "1.7.0" cross CrossVersion.full,
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.1" cross CrossVersion.full),
+    "com.github.ghik"     % "silencer-lib"                    % "1.7.1" cross CrossVersion.full,
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % "0.5.0",
     "org.scalatest"     %%% "scalatest"                       % "3.2.0"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14"                 % "3.2.0.0" % Test,

@@ -164,7 +164,7 @@ lazy val scalaUri =
     .settings(publishingSettings)
     .settings(mimaSettings)
     .jsSettings(
-      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0"
+      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0"
     )
     .jsSettings(
       //scalac-scoverage-plugin Scala.js 1.0 is not yet released.

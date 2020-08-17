@@ -59,4 +59,11 @@ class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
         e.getMessage should startWith(s"Invalid Url could not be parsed. Invalid input '$chToString'")
     }
   }
+
+  "Github Issue #192" should "not allow forward slashes in passwords unless percent encoded" in {
+    val url = Url.parse("http://example.com:123/@path:")
+    url.hostOption should equal(Some(DomainName("example.com")))
+    url.port should equal(Some(123))
+    url.path.toString() should equal("/@path:")
+  }
 }

@@ -250,7 +250,7 @@ val host = Host.parse("lemonlabs.io")
 ```scala mdoc:reset
 import io.lemonlabs.uri.{IpV4, IpV6}
 
-val ipv4 = IpV4.parse("13.32.2.5.142")
+val ipv4 = IpV4.parse("13.32.214.142")
 val ipv6 = IpV6.parse("[1:2:3:4:5:6:7:8]")
 ```
 

@@ -69,6 +69,9 @@ val protocolRelativeUrl = ProtocolRelativeUrl.parse("//www.scala-lang.org")
 val dataUrl = DataUrl.parse("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D")
 ```
 
+**Note:** scala-uri only supports parsing port numbers less than `Int.MaxValue`, deviating from RFC3986 which does
+not impose a limit
+
 ## Parse a URN
 
 ```scala mdoc:reset
@@ -80,7 +83,7 @@ urn.nid // This is "isbn"
 urn.nss // This is "0981531687"
 ```
 
-## Parse a URIs
+## Parse a URI
 
 You can use `Uri.parse` to parse URNs as well as URLs. `Url.parse` and `Urn.parse` are preferable as they return
 a more specific return type

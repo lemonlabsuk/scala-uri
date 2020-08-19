@@ -41,9 +41,19 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
       '[' ~ 8.times(_ip_v6_hex_piece).separatedBy(':') ~ ']' ~> extractFullIpv6
     }
 
+  private def _full_ip_v6_ls32_ip_v4: Rule1[IpV6] =
+    rule {
+      '[' ~ 6.times(_ip_v6_hex_piece).separatedBy(':') ~ ':' ~ _ip_v4 ~ ']' ~> extractFullIpv6Ls32Ipv4
+    }
+
   def _ip_v6_hex_pieces: Rule1[immutable.Seq[String]] =
     rule {
       zeroOrMore(_ip_v6_hex_piece).separatedBy(':')
+    }
+
+  private def _ip_v6_hex_pieces_ending_colon: Rule1[immutable.Seq[String]] =
+    rule {
+      zeroOrMore(_ip_v6_hex_piece ~ ':')
     }
 
   def _ip_v6_with_eluded: Rule1[IpV6] =
@@ -51,9 +61,14 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
       '[' ~ _ip_v6_hex_pieces ~ "::" ~ _ip_v6_hex_pieces ~ ']' ~> extractIpv6WithEluded
     }
 
+  private def _ip_v6_ls32_ip_v4_with_elided: Rule1[IpV6] =
+    rule {
+      '[' ~ _ip_v6_hex_pieces ~ "::" ~ _ip_v6_hex_pieces_ending_colon ~ _ip_v4 ~ ']' ~> extractIpv6Ls32Ipv4WithElided
+    }
+
   def _ip_v6: Rule1[IpV6] =
     rule {
-      _full_ip_v6 | _ip_v6_with_eluded
+      _full_ip_v6 | _ip_v6_with_eluded | _full_ip_v6_ls32_ip_v4 | _ip_v6_ls32_ip_v4_with_elided
     }
 
   def _domain_name: Rule1[DomainName] =
@@ -255,6 +270,23 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   val extractIpv4 = (a: Int, b: Int, c: Int, d: Int) => IpV4(a, b, c, d)
 
   val extractFullIpv6 = (pieces: immutable.Seq[String]) => IpV6.fromHexPieces(pieces)
+
+  private val extractFullIpv6Ls32Ipv4 = (pieces: immutable.Seq[String], ipV4: IpV4) =>
+    IpV6.fromHexPiecesAndIpV4(pieces, ipV4)
+
+  private val extractIpv6Ls32Ipv4WithElided =
+    (beforeElided: immutable.Seq[String], afterElided: immutable.Seq[String], ipV4: IpV4) => {
+      val elidedPieces = 6 - beforeElided.size - afterElided.size
+      if (elidedPieces < 1) {
+        throw new UriParsingException(
+          "IPv6 has too many pieces. When the least-significant 32bits are an IPv4, there must be either exactly six leading hex pieces or fewer than six hex pieces with a '::'"
+        )
+      }
+      IpV6.fromHexPiecesAndIpV4(
+        beforeElided ++ Vector.fill(elidedPieces)("0") ++ afterElided,
+        ipV4
+      )
+    }
 
   val extractIpv6WithEluded = (beforeEluded: immutable.Seq[String], afterEluded: immutable.Seq[String]) => {
     val elidedPieces = 8 - beforeEluded.size - afterEluded.size

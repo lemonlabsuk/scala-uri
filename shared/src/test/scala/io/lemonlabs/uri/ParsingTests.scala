@@ -162,6 +162,28 @@ class ParsingTests extends AnyFlatSpec with Matchers {
     Url.parseOption(tooManySegs) should equal(None)
   }
 
+  it should "parse a IPv6 with a least-significant 32bits IPv4 ending with a ::" in {
+    val url = Url.parse("http://[1::255.255.255.255]:9000")
+    url.hostOption should equal(Some(IpV6("1", "0", "0", "0", "0", "0", "ffff", "ffff")))
+  }
+
+  it should "parse a IPv6 with a least-significant 32bits IPv4 and a :: in the middle" in {
+    val url = Url.parse("http://[1::2:3:127.0.0.1]:9000")
+    url.hostOption should equal(Some(IpV6("1", "0", "0", "0", "2", "3", "7f00", "1")))
+  }
+
+  it should "parse a IPv6 with a least-significant 32bits IPv4 and a starting ::" in {
+    val url = Url.parse("http://[::fefe:fefe:8.8.8.8]:9000")
+    url.hostOption should equal(Some(IpV6("0", "0", "0", "0", "fefe", "fefe", "808", "808")))
+  }
+
+  it should "parse a IPv6 with a least-significant 32bits IPv4 and a :::" in {
+    val e = the[UriParsingException] thrownBy Url.parse("http://[fefe:fefe:::8.8.8.8]:9000")
+    e.getMessage should startWith(
+      "Invalid URL could not be parsed. Invalid input ':'"
+    )
+  }
+
   "Parsing a url with relative scheme" should "result in a Uri with None for scheme" in {
     val url = Url.parse("//theon.github.com/uris-in-scala.html")
     url.schemeOption should equal(None)

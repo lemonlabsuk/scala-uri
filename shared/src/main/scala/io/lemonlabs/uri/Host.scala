@@ -287,6 +287,12 @@ final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte)(im
   def octets: Vector[Byte] = Vector(octet1, octet2, octet3, octet4)
   def octetsInt: Vector[Int] = Vector(octet1Int, octet2Int, octet3Int, octet4Int)
 
+  def toIpV6Pieces: (Char, Char) = {
+    val piece1 = (octet1Int << 8) + octet2Int
+    val piece2 = (octet3Int << 8) + octet4Int
+    (piece1.toChar, piece2.toChar)
+  }
+
   def value: String = s"$octet1Int.$octet2Int.$octet3Int.$octet4Int"
 
   def apexDomain: Option[String] = None
@@ -419,6 +425,8 @@ object IpV6 {
     )
   }
 
+  private def hexToInt(hex: String) = Integer.parseInt(hex, 16)
+
   def apply(piece1: String,
             piece2: String,
             piece3: String,
@@ -428,7 +436,6 @@ object IpV6 {
             piece7: String,
             piece8: String
   ): IpV6 = {
-    def hexToInt(hex: String) = Integer.parseInt(hex, 16)
     IpV6(
       hexToInt(piece1),
       hexToInt(piece2),
@@ -441,6 +448,27 @@ object IpV6 {
     )
   }
 
+  def apply(piece1: String,
+            piece2: String,
+            piece3: String,
+            piece4: String,
+            piece5: String,
+            piece6: String,
+            piece78: IpV4
+  ): IpV6 = {
+    val (piece7, piece8) = piece78.toIpV6Pieces
+    IpV6(
+      hexToInt(piece1),
+      hexToInt(piece2),
+      hexToInt(piece3),
+      hexToInt(piece4),
+      hexToInt(piece5),
+      hexToInt(piece6),
+      piece7,
+      piece8
+    )
+  }
+
   def fromIntPieces(pieces: immutable.Seq[Int]): IpV6 = {
     require(pieces.length == 8, "IPv6 must be made up of eight pieces")
     IpV6(pieces(0), pieces(1), pieces(2), pieces(3), pieces(4), pieces(5), pieces(6), pieces(7))
@@ -449,6 +477,11 @@ object IpV6 {
   def fromHexPieces(pieces: immutable.Seq[String]): IpV6 = {
     require(pieces.length == 8, "IPv6 must be made up of eight pieces")
     IpV6(pieces(0), pieces(1), pieces(2), pieces(3), pieces(4), pieces(5), pieces(6), pieces(7))
+  }
+
+  def fromHexPiecesAndIpV4(pieces: immutable.Seq[String], ls32: IpV4): IpV6 = {
+    require(pieces.length == 6, "IPv6 must be made up of six pieces when least-significant 32bits are an IPv4")
+    IpV6(pieces(0), pieces(1), pieces(2), pieces(3), pieces(4), pieces(5), ls32)
   }
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[IpV6] =

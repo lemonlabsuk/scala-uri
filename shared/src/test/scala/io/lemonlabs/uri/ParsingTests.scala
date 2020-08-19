@@ -151,11 +151,11 @@ class ParsingTests extends AnyFlatSpec with Matchers {
     Url.parseOption(nineSegIp) should equal(None)
   }
 
-  it should "NOT parse IPv6 with more than 6 segments and a ::" in {
-    val tooManySegs = "http://[1:2:3::4:5:6:7]:9000"
+  it should "NOT parse IPv6 with more than 7 segments and a ::" in {
+    val tooManySegs = "http://[1:2:3::4:5:6:7:8]:9000"
     val e = the[UriParsingException] thrownBy Url.parse(tooManySegs)
     e.getMessage should equal(
-      "IPv6 has too many pieces. Must be either exactly eight hex pieces or fewer than six hex pieces with a '::'"
+      "IPv6 has too many pieces. Must be either exactly eight hex pieces or fewer than eight hex pieces with a '::'"
     )
 
     Url.parseTry(tooManySegs).isFailure should equal(true)

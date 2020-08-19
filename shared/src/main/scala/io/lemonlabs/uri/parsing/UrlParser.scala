@@ -257,14 +257,14 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   val extractFullIpv6 = (pieces: immutable.Seq[String]) => IpV6.fromHexPieces(pieces)
 
   val extractIpv6WithEluded = (beforeEluded: immutable.Seq[String], afterEluded: immutable.Seq[String]) => {
-    val eladedPieces = 8 - beforeEluded.size - afterEluded.size
-    if (eladedPieces < 2) {
+    val elidedPieces = 8 - beforeEluded.size - afterEluded.size
+    if (elidedPieces < 1) {
       throw new UriParsingException(
-        "IPv6 has too many pieces. Must be either exactly eight hex pieces or fewer than six hex pieces with a '::'"
+        "IPv6 has too many pieces. Must be either exactly eight hex pieces or fewer than eight hex pieces with a '::'"
       )
     }
     IpV6.fromHexPieces(
-      beforeEluded ++ Vector.fill(eladedPieces)("0") ++ afterEluded
+      beforeEluded ++ Vector.fill(elidedPieces)("0") ++ afterEluded
     )
   }
 

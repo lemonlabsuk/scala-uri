@@ -66,4 +66,9 @@ class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
     url.port should equal(Some(123))
     url.path.toString() should equal("/@path:")
   }
+
+  "Github Issue #195" should "parse a seven segment elided IPv6" in {
+    val url = Url.parse("https://[E873:4eC5:eBc9:9e97:6BcE:998C:95AD::]/")
+    url.hostOption should equal(Some(IpV6("e873", "4ec5", "ebc9", "9e97", "6bce", "998c", "95ad", "0")))
+  }
 }

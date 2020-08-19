@@ -347,7 +347,7 @@ final case class IpV6(piece1: Char,
   private def hex(c: Char): String = Integer.toHexString(c.toInt)
 
   /**
-    * Finds the longest runs of two or more zeros in this IPv6
+    * Finds the longest run of two or more zeros in this IPv6
     * Returns the start and end index of the run
     * Returns (-1, -1) if there is no run
     */

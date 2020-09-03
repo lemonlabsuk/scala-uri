@@ -1,6 +1,4 @@
 package io.lemonlabs.uri
-
-import cats.implicits._
 import cats.{Eq, Order, Show}
 
 case class MediaType(rawValue: Option[String], parameters: Vector[(String, String)]) {

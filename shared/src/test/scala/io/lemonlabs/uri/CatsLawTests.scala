@@ -4,7 +4,6 @@ import cats.kernel.laws.discipline.OrderTests
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.Checkers
 import org.typelevel.discipline.Laws
-import cats.implicits._
 import cats.Eq
 import cats.laws.discipline.eq._
 import cats.laws.discipline.{ContravariantTests, ExhaustiveCheck}

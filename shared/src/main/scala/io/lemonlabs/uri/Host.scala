@@ -1,6 +1,4 @@
 package io.lemonlabs.uri
-
-import cats.implicits._
 import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.inet._

@@ -5,7 +5,6 @@ import java.util.Base64
 import cats.Show
 import io.lemonlabs.uri.encoding.PercentEncoder
 import org.scalacheck.{Arbitrary, Cogen, Gen}
-import cats.implicits._
 import io.lemonlabs.uri.typesafe.{Fragment, PathPart, QueryKey, QueryValue, TraversableParams}
 import org.scalacheck.Gen.{const, some}
 

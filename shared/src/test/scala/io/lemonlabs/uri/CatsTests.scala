@@ -2,7 +2,6 @@ package io.lemonlabs.uri
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import cats.implicits._
 import cats.kernel.Comparison
 
 class CatsTests extends AnyFlatSpec with Matchers {

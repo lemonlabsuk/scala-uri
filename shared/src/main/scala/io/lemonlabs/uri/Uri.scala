@@ -1,8 +1,6 @@
 package io.lemonlabs.uri
 
 import java.util.Base64
-
-import cats.implicits._
 import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UriParser, UrlParser, UrnParser}
@@ -103,8 +101,6 @@ object Uri {
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Uri =
     parseTry(s).get
-
-  import cats.implicits._
 
   implicit val eqUri: Eq[Uri] = Eq.fromUniversalEquals
   implicit val showUri: Show[Uri] = Show.fromToString

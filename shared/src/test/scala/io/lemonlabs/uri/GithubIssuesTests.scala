@@ -78,6 +78,6 @@ class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
   }
 
   "Github Issue #204" should "parse a domain name host with IPv4 prefix" in {
-    Host.parse("1.2.3.4.blah")
+    Host.parse("1.2.3.4.blah") should equal(DomainName("1.2.3.4.blah"))
   }
 }

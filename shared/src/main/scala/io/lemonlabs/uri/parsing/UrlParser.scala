@@ -77,9 +77,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
     }
 
   def _host: Rule1[Host] =
-    rule {
-      _ip_v4 | _ip_v6 | _domain_name
-    }
+    _host_in_authority("")
 
   /**
     * To ensure that hosts that begin with an IP but have further leading characters are not matched as IPs,

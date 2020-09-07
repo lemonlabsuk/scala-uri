@@ -830,7 +830,8 @@ The type class instances exist in the companion objects for these types.
  * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
  * For `2.9.x` support use `scala-uri` `0.3.6` from branch [`0.3.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.3.x)
- * For Scala.js `0.6.17+` support, use `scala-uri` `2.3.1`
+ * For Scala.js `1.x.x` support, use `scala-uri` `2.3.1`
+ * For Scala.js `0.6.x` support, use `scala-uri` `2.2.3`
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 

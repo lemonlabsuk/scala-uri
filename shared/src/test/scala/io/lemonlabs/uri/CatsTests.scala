@@ -1,6 +1,7 @@
 package io.lemonlabs.uri
 
 import org.scalatest.flatspec.AnyFlatSpec
+import cats.implicits._
 import org.scalatest.matchers.should.Matchers
 import cats.kernel.Comparison
 

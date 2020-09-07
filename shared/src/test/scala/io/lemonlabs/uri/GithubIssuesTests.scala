@@ -76,4 +76,8 @@ class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
     val url = Url.parse("https://[E873:4eC5:eBc9:9e97:6BcE:998C:95AD::]/")
     url.hostOption should equal(Some(IpV6("e873", "4ec5", "ebc9", "9e97", "6bce", "998c", "95ad", "0")))
   }
+
+  "Github Issue #204" should "parse a domain name host with IPv4 prefix" in {
+    Host.parse("1.2.3.4.blah")
+  }
 }

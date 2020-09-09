@@ -46,10 +46,9 @@ object UpdatePublicSuffixes {
     p.println("  )\n")
 
     p.println("  lazy val set = " + groups.keys.map(i => s"publicSuffixes$i").mkString(" ++ "))
-    groups.foreach {
-      case (index, group) =>
-        val setArgs = group.map(suffix => s"""      "$suffix"""").mkString(",\n")
-        p.println(s"  private def publicSuffixes$index =\n    Set(\n" + setArgs + "\n    )")
+    groups.foreach { case (index, group) =>
+      val setArgs = group.map(suffix => s"""      "$suffix"""").mkString(",\n")
+      p.println(s"  private def publicSuffixes$index =\n    Set(\n" + setArgs + "\n    )")
     }
     p.println("}")
     p.close()

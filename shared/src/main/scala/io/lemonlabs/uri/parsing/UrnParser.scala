@@ -43,10 +43,9 @@ class UrnParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   val extractUrn = (urnPath: UrnPath) => Urn(urnPath)
 
   private[uri] def mapParseError[T](t: Try[T], name: => String): Try[T] =
-    t.recoverWith {
-      case pe @ ParseError(_, _, _) =>
-        val detail = pe.format(input)
-        Failure(new UriParsingException(s"Invalid $name could not be parsed. $detail"))
+    t.recoverWith { case pe @ ParseError(_, _, _) =>
+      val detail = pe.format(input)
+      Failure(new UriParsingException(s"Invalid $name could not be parsed. $detail"))
     }
 
   def parseUrnPath(): Try[UrnPath] =

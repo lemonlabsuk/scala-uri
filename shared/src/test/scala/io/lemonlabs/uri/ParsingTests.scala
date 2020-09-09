@@ -23,10 +23,9 @@ class ParsingTests extends AnyFlatSpec with Matchers {
   }
 
   it should "not allow whitespace in the user" in {
-    Seq(" " -> " ", "\n" -> "\\n", "\t" -> "\\t", "\r" -> "\\r").foreach {
-      case (ch, chToString) =>
-        val e = the[UriParsingException] thrownBy AbsoluteUrl.parse(s"https://user${ch}name:password@www.example.com")
-        e.getMessage should startWith(s"Invalid Url could not be parsed. Invalid input '$chToString'")
+    Seq(" " -> " ", "\n" -> "\\n", "\t" -> "\\t", "\r" -> "\\r").foreach { case (ch, chToString) =>
+      val e = the[UriParsingException] thrownBy AbsoluteUrl.parse(s"https://user${ch}name:password@www.example.com")
+      e.getMessage should startWith(s"Invalid Url could not be parsed. Invalid input '$chToString'")
     }
   }
 

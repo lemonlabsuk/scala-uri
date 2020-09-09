@@ -345,10 +345,9 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   def fragmentDecoder = conf.fragmentDecoder
 
   private[uri] def mapParseError[T](t: Try[T], name: => String): Try[T] =
-    t.recoverWith {
-      case pe @ ParseError(_, _, _) =>
-        val detail = pe.format(input)
-        Failure(new UriParsingException(s"Invalid $name could not be parsed. $detail"))
+    t.recoverWith { case pe @ ParseError(_, _, _) =>
+      val detail = pe.format(input)
+      Failure(new UriParsingException(s"Invalid $name could not be parsed. $detail"))
     }
 
   def parseIpV6(): Try[IpV6] =

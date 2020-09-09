@@ -124,8 +124,8 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @return
     */
   def mapNames[K: QueryKey](f: String => K): QueryString =
-    QueryString(params.map {
-      case (n, v) => (f(n).queryKey, v)
+    QueryString(params.map { case (n, v) =>
+      (f(n).queryKey, v)
     })
 
   /**
@@ -135,8 +135,8 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @return
     */
   def mapValues[V: QueryValue](f: String => V): QueryString =
-    QueryString(params.map {
-      case (n, v) => (n, v.flatMap(f.andThen(_.queryValue)))
+    QueryString(params.map { case (n, v) =>
+      (n, v.flatMap(f.andThen(_.queryValue)))
     })
 
   /**
@@ -155,8 +155,8 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @return
     */
   def filterNames(f: String => Boolean): QueryString =
-    QueryString(params.filter {
-      case (n, _) => f(n)
+    QueryString(params.filter { case (n, _) =>
+      f(n)
     })
 
   /**
@@ -178,8 +178,8 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @return
     */
   def filterOptionValues(f: Option[String] => Boolean): QueryString =
-    QueryString(params.filter {
-      case (_, v) => f(v)
+    QueryString(params.filter { case (_, v) =>
+      f(v)
     })
 
   /**
@@ -231,11 +231,11 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     val enc = c.queryEncoder
     val charset = c.charset
 
-    val someToString: ParamToString = {
-      case (k, Some(v)) => enc.encode(k, charset) + "=" + enc.encode(v, charset)
+    val someToString: ParamToString = { case (k, Some(v)) =>
+      enc.encode(k, charset) + "=" + enc.encode(v, charset)
     }
-    val paramToString: ParamToString = someToString orElse {
-      case (k, None) => enc.encode(k, charset)
+    val paramToString: ParamToString = someToString orElse { case (k, None) =>
+      enc.encode(k, charset)
     }
 
     val paramsAsString = c.renderQuery match {

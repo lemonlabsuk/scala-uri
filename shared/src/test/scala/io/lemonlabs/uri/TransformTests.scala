@@ -78,6 +78,12 @@ class TransformTests extends AnyWordSpec with Matchers {
       val uri2 = uri.filterQueryValues(_ == "false")
       uri2.toString should equal("/test?param_3=false")
     }
+
+    "filter query param option values" in {
+      val query = QueryString.parse("param_1=hello&param_2=goodbye&param_3=false&param_4")
+      val query2 = query.filterOptionValues(!_.contains("false"))
+      query2.toString should equal("param_1=hello&param_2=goodbye&param_4")
+    }
   }
 
   "collectQuery" should {

@@ -21,8 +21,7 @@ object QueryKey extends QueryKeyInstances {
   /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
   /* ======================================================================== */
 
-  /**
-    * Summon an instance of [[QueryKey]] for `A`.
+  /** Summon an instance of [[QueryKey]] for `A`.
     */
   @inline def apply[A](implicit instance: QueryKey[A]): QueryKey[A] = instance
 
@@ -97,8 +96,7 @@ object QueryValue extends QueryValueInstances {
   /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
   /* ======================================================================== */
 
-  /**
-    * Summon an instance of [[QueryValue]] for `A`.
+  /** Summon an instance of [[QueryValue]] for `A`.
     */
   @inline def apply[A](implicit instance: QueryValue[A]): QueryValue[A] = instance
 
@@ -180,8 +178,7 @@ object QueryKeyValue extends QueryKeyValueInstances {
   /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
   /* ======================================================================== */
 
-  /**
-    * Summon an instance of [[QueryKeyValue]] for `A`.
+  /** Summon an instance of [[QueryKeyValue]] for `A`.
     */
   @inline def apply[A](implicit instance: QueryKeyValue[A]): QueryKeyValue[A] = instance
 
@@ -260,8 +257,7 @@ object TraversableParams extends TraversableParamsInstances {
   /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
   /* ======================================================================== */
 
-  /**
-    * Summon an instance of [[TraversableParams]] for `A`.
+  /** Summon an instance of [[TraversableParams]] for `A`.
     */
   @inline def apply[A](implicit instance: TraversableParams[A]): TraversableParams[A] = instance
 

@@ -32,8 +32,7 @@ object UriConfig {
     renderQuery = RenderQuery.default
   )
 
-  /**
-    * Probably more than you need to percent encode. Wherever possible try to use a tighter Set of characters
+  /** Probably more than you need to percent encode. Wherever possible try to use a tighter Set of characters
     * to encode depending on your use case
     */
   val conservative = UriConfig(PercentEncoder(), PercentDecoder)

@@ -13,8 +13,7 @@ sealed trait Host {
   def value: String
   override def toString: String = value
 
-  /**
-    * Returns the longest public suffix for the host in this URI. Examples include:
+  /** Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`
     *  `co.uk` for `www.example.co.uk`
     *
@@ -22,8 +21,7 @@ sealed trait Host {
     */
   def publicSuffix: Option[String]
 
-  /**
-    * Returns all longest public suffixes for the host in this URI. Examples include:
+  /** Returns all longest public suffixes for the host in this URI. Examples include:
     *  `com` for `www.example.com`
     *  `co.uk` and `uk` for `www.example.co.uk`
     *
@@ -31,14 +29,12 @@ sealed trait Host {
     */
   def publicSuffixes: Vector[String]
 
-  /**
-    * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
+  /** @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
     *         operation of <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
     */
   def toStringPunycode: String = value
 
-  /**
-    * Returns the apex domain for this Host.
+  /** Returns the apex domain for this Host.
     *
     * The apex domain is constructed from the public suffix prepended with the immediately preceding
     * dot segment.
@@ -51,8 +47,7 @@ sealed trait Host {
     */
   def apexDomain: Option[String]
 
-  /**
-    * Returns the second largest subdomain for this URL's host.
+  /** Returns the second largest subdomain for this URL's host.
     *
     * E.g. for http://a.b.c.example.com returns a.b.c
     *
@@ -63,24 +58,21 @@ sealed trait Host {
     */
   def subdomain: Option[String]
 
-  /**
-    * Returns all subdomains for this URL's host.
+  /** Returns all subdomains for this URL's host.
     * E.g. for http://a.b.c.example.com returns a, a.b, a.b.c and a.b.c.example
     *
     * @return all subdomains for this URL's host
     */
   def subdomains: Vector[String]
 
-  /**
-    * Returns the shortest subdomain for this URL's host.
+  /** Returns the shortest subdomain for this URL's host.
     * E.g. for http://a.b.c.example.com returns a
     *
     * @return the shortest subdomain for this URL's host
     */
   def shortestSubdomain: Option[String]
 
-  /**
-    * Returns the longest subdomain for this URL's host.
+  /** Returns the longest subdomain for this URL's host.
     * E.g. for http://a.b.c.example.com returns a.b.c.example
     *
     * @return the longest subdomain for this URL's host
@@ -121,8 +113,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
       }
     }
 
-  /**
-    * Returns the longest public suffix for the host in this URI. Examples include:
+  /** Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`
     *  `co.uk` for `www.example.co.uk`
     *
@@ -144,8 +135,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     findLongest(value)
   }
 
-  /**
-    * Returns all public suffixes for the host in this URI. Examples include:
+  /** Returns all public suffixes for the host in this URI. Examples include:
     *  `com` for `www.example.com`
     *  `co.uk` and `uk` for `www.example.co.uk`
     *
@@ -166,15 +156,13 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     findAll(value, Vector.empty)
   }
 
-  /**
-    * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
+  /** @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
     *         operation of <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
     */
   override def toStringPunycode: String =
     toPunycode(value)
 
-  /**
-    * Returns the apex domain for this Host.
+  /** Returns the apex domain for this Host.
     *
     * The apex domain is constructed from the public suffix prepended with the immediately preceding
     * dot segment.
@@ -193,8 +181,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
       else value.substring(apexDomainStart + 1)
     }
 
-  /**
-    * Returns the second largest subdomain in this host.
+  /** Returns the second largest subdomain in this host.
     *
     * E.g. for http://a.b.c.example.com returns a.b.c
     *
@@ -211,8 +198,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
       }
     }
 
-  /**
-    * Returns all subdomains for this host.
+  /** Returns all subdomains for this host.
     * E.g. for http://a.b.c.example.com returns a, a.b, a.b.c and a.b.c.example
     *
     * @return all subdomains for this host
@@ -231,8 +217,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
     longestSubdomain.map(concatHostParts).getOrElse(Vector.empty)
   }
 
-  /**
-    * Returns the shortest subdomain for this host.
+  /** Returns the shortest subdomain for this host.
     * E.g. for http://a.b.c.example.com returns a
     *
     * @return the shortest subdomain for this host
@@ -240,8 +225,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
   def shortestSubdomain: Option[String] =
     longestSubdomain.map(_.takeWhile(_ != '.'))
 
-  /**
-    * Returns the longest subdomain for this host.
+  /** Returns the longest subdomain for this host.
     * E.g. for http://a.b.c.example.com returns a.b.c.example
     *
     * @return the longest subdomain for this host
@@ -350,8 +334,7 @@ final case class IpV6(piece1: Char,
 
   private def hex(c: Char): String = Integer.toHexString(c.toInt)
 
-  /**
-    * Finds the longest run of two or more zeros in this IPv6
+  /** Finds the longest run of two or more zeros in this IPv6
     * Returns the start and end index of the run
     * Returns (-1, -1) if there is no run
     */

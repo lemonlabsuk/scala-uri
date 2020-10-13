@@ -1,7 +1,6 @@
 package io.lemonlabs.uri.encoding
 
-/**
-  * Date: 28/08/2013
+/** Date: 28/08/2013
   * Time: 21:07
   */
 case class EncodeCharAs(ch: Char, as: String) extends UriEncoder {

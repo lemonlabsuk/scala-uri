@@ -15,8 +15,7 @@ class DataUrlTests extends AnyFlatSpec with Matchers {
     dataUrl.fragment should equal(None)
   }
 
-  /**
-    * From Section 4 Examples in https://tools.ietf.org/html/rfc2397
+  /** From Section 4 Examples in https://tools.ietf.org/html/rfc2397
     */
   "Missing mediatype" should "default to text/plain;charset=US-ASCII" in {
     val dataUrl = DataUrl.parse("data:,A%20brief%20note")
@@ -42,8 +41,7 @@ class DataUrlTests extends AnyFlatSpec with Matchers {
     dataUrl.mediaType.charset should equal("UTF-8")
   }
 
-  /**
-    * From https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+  /** From https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
     */
   "Base64 encoded data" should "be percent decoded" in {
     val dataUrl = DataUrl.parse("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D")
@@ -58,8 +56,7 @@ class DataUrlTests extends AnyFlatSpec with Matchers {
     dataUrl.toString() should equal("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D")
   }
 
-  /**
-    * From https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+  /** From https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
     */
   "Percent Encoded data" should "be decoded and encoded by default" in {
     val dataUrl = DataUrl.parse("data:text/html,%3Ch1%3EHello%2C%20World!%3C%2Fh1%3E")
@@ -67,8 +64,7 @@ class DataUrlTests extends AnyFlatSpec with Matchers {
     dataUrl.toString() should equal("data:text/html,%3Ch1%3EHello,%20World!%3C%2Fh1%3E")
   }
 
-  /**
-    * From https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+  /** From https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
     */
   "Url.parse" should "return a DataUrl" in {
     val dataUrl = Url.parse("data:,Hello%2C%20World!")
@@ -78,8 +74,7 @@ class DataUrlTests extends AnyFlatSpec with Matchers {
     dataUrl.path.toString() should equal(",Hello,%20World!")
   }
 
-  /**
-    * From https://en.wikipedia.org/wiki/Data_URI_scheme#Syntax
+  /** From https://en.wikipedia.org/wiki/Data_URI_scheme#Syntax
     */
   "MediaType" should "return type, subtype and suffix" in {
     val dataUrl = DataUrl.parse("data:text/vnd-example+xyz;foo=bar;base64,R0lGODdh")

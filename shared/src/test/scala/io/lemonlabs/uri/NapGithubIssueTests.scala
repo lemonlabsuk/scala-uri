@@ -7,8 +7,7 @@ import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-/**
-  * Test Suite to ensure that bugs raised by awesome github peeps NEVER come back
+/** Test Suite to ensure that bugs raised by awesome github peeps NEVER come back
   *
   * These bugs were raised at the old github page https://github.com/net-a-porter/scala-uri/issues
   */

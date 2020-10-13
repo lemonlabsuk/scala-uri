@@ -17,8 +17,7 @@ object Fragment extends FragmentInstances {
   /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
   /* ======================================================================== */
 
-  /**
-    * Summon an instance of [[Fragment]] for `A`.
+  /** Summon an instance of [[Fragment]] for `A`.
     */
   @inline def apply[A](implicit instance: Fragment[A]): Fragment[A] = instance
 

@@ -11,8 +11,7 @@ case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
   def user: Option[String] = userInfo.map(_.user)
   def password: Option[String] = userInfo.flatMap(_.password)
 
-  /**
-    * Returns the longest public suffix for the host in this URI. Examples include:
+  /** Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`
     *  `co.uk` for `www.example.co.uk`
     *
@@ -21,8 +20,7 @@ case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
   def publicSuffix: Option[String] =
     host.publicSuffix
 
-  /**
-    * Returns all longest public suffixes for the host in this URI. Examples include:
+  /** Returns all longest public suffixes for the host in this URI. Examples include:
     *  `com` for `www.example.com`
     *  `co.uk` and `uk` for `www.example.co.uk`
     *
@@ -31,8 +29,7 @@ case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
   def publicSuffixes: Vector[String] =
     host.publicSuffixes
 
-  /**
-    * Returns the second largest subdomain for this URL's host.
+  /** Returns the second largest subdomain for this URL's host.
     *
     * E.g. for http://a.b.c.example.com returns a.b.c
     *
@@ -44,8 +41,7 @@ case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
   def subdomain: Option[String] =
     host.subdomain
 
-  /**
-    * Returns all subdomains for this URL's host.
+  /** Returns all subdomains for this URL's host.
     * E.g. for http://a.b.c.example.com returns a, a.b, a.b.c and a.b.c.example
     *
     * @return all subdomains for this URL's host
@@ -53,8 +49,7 @@ case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
   def subdomains: Vector[String] =
     host.subdomains
 
-  /**
-    * Returns the shortest subdomain for this URL's host.
+  /** Returns the shortest subdomain for this URL's host.
     * E.g. for http://a.b.c.example.com returns a
     *
     * @return the shortest subdomain for this URL's host
@@ -62,8 +57,7 @@ case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
   def shortestSubdomain: Option[String] =
     host.shortestSubdomain
 
-  /**
-    * Returns the longest subdomain for this URL's host.
+  /** Returns the longest subdomain for this URL's host.
     * E.g. for http://a.b.c.example.com returns a.b.c.example
     *
     * @return the longest subdomain for this URL's host
@@ -76,8 +70,7 @@ case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
     userInfoStr + hostToString(host) + port.map(":" + _).getOrElse("")
   }
 
-  /**
-    * @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
+  /** @return the domain name in ASCII Compatible Encoding (ACE), as defined by the ToASCII
     *         operation of <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
     */
   def toStringPunycode: String =

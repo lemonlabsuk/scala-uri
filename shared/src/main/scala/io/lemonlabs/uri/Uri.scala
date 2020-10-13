@@ -23,8 +23,7 @@ import io.lemonlabs.uri.typesafe.Fragment.ops._
 
 import scala.util.Try
 
-/**
-  * Represents a URI. See [[https://www.ietf.org/rfc/rfc3986 RFC 3986]]
+/** Represents a URI. See [[https://www.ietf.org/rfc/rfc3986 RFC 3986]]
   *
   * Can either be a URL or a URN
   *
@@ -51,8 +50,7 @@ sealed trait Uri extends Product with Serializable {
   def schemeOption: Option[String]
   def path: Path
 
-  /**
-    * Copies this Uri but with the scheme set as the given value.
+  /** Copies this Uri but with the scheme set as the given value.
     *
     * @param scheme the new scheme to set
     * @return a new Uri with the specified scheme
@@ -62,8 +60,7 @@ sealed trait Uri extends Product with Serializable {
   def toUrl: Url
   def toUrn: Urn
 
-  /**
-    * Converts to a `java.net.URI`
+  /** Converts to a `java.net.URI`
     *
     * This involves a `toString` and `URI.parse` because the specific `java.net.URI`
     * constructors do not deal properly with encoded elements
@@ -73,8 +70,7 @@ sealed trait Uri extends Product with Serializable {
   def toJavaURI: java.net.URI =
     new java.net.URI(toString(config))
 
-  /**
-    * Returns the path with no encoders taking place (e.g. non ASCII characters will not be percent encoded)
+  /** Returns the path with no encoders taking place (e.g. non ASCII characters will not be percent encoded)
     * @return String containing the raw path for this Uri
     */
   def toStringRaw: String =
@@ -107,8 +103,7 @@ object Uri {
   implicit val orderUri: Order[Uri] = Order.by(_.toString())
 }
 
-/**
-  * Represents a URL, which will be one of these forms:
+/** Represents a URL, which will be one of these forms:
   *
   *  -           Absolute: `http://example.com`
   *  -  Protocol Relative: `//example.com`
@@ -133,8 +128,7 @@ sealed trait Url extends Uri {
   def query: QueryString
   def fragment: Option[String]
 
-  /**
-    * Returns the longest public suffix for the host in this URI. Examples include:
+  /** Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`
     *  `co.uk` for `www.example.co.uk`
     *
@@ -142,8 +136,7 @@ sealed trait Url extends Uri {
     */
   def publicSuffix: Option[String]
 
-  /**
-    * Returns all longest public suffixes for the host in this URI. Examples include:
+  /** Returns all longest public suffixes for the host in this URI. Examples include:
     *  `com` for `www.example.com`
     *  `co.uk` and `uk` for `www.example.co.uk`
     *
@@ -151,8 +144,7 @@ sealed trait Url extends Uri {
     */
   def publicSuffixes: Vector[String]
 
-  /**
-    * Returns the second largest subdomain for this URL's host.
+  /** Returns the second largest subdomain for this URL's host.
     *
     * E.g. for http://a.b.c.example.com returns a.b.c
     *
@@ -163,45 +155,39 @@ sealed trait Url extends Uri {
     */
   def subdomain: Option[String]
 
-  /**
-    * Returns all subdomains for this URL's host.
+  /** Returns all subdomains for this URL's host.
     * E.g. for http://a.b.c.example.com returns a, a.b, a.b.c and a.b.c.example
     * @return all subdomains for this URL's host
     */
   def subdomains: Vector[String]
 
-  /**
-    * Returns the shortest subdomain for this URL's host.
+  /** Returns the shortest subdomain for this URL's host.
     * E.g. for http://a.b.c.example.com returns a
     * @return the shortest subdomain for this URL's host
     */
   def shortestSubdomain: Option[String]
 
-  /**
-    * Returns the longest subdomain for this URL's host.
+  /** Returns the longest subdomain for this URL's host.
     * E.g. for http://a.b.c.example.com returns a.b.c.example
     * @return the longest subdomain for this URL's host
     */
   def longestSubdomain: Option[String]
 
-  /**
-    * Copies this Url but with the authority set as the given value.
+  /** Copies this Url but with the authority set as the given value.
     *
     * @param authority the authority host to set
     * @return a new Url with the specified authority
     */
   def withAuthority(authority: Authority): SelfWithAuthority
 
-  /**
-    * Copies this Url but with the host set as the given value.
+  /** Copies this Url but with the host set as the given value.
     *
     * @param host the new host to set
     * @return a new Url with the specified host
     */
   def withHost(host: Host): SelfWithAuthority
 
-  /**
-    * Copies this Url but with the host set as the given value.
+  /** Copies this Url but with the host set as the given value.
     *
     * @param host the new host to set
     * @return a new Url with the specified host
@@ -209,24 +195,21 @@ sealed trait Url extends Uri {
   def withHost(host: String): SelfWithAuthority =
     withHost(Host.parse(host))
 
-  /**
-    * Copies this Url but with the fragment set as the given value.
+  /** Copies this Url but with the fragment set as the given value.
     *
     * @param fragment the new fragment to set
     * @return a new Url with the specified fragment
     */
   def withFragment[T: Fragment](fragment: T): Self
 
-  /**
-    * Copies this Url but with the path set as the given value.
+  /** Copies this Url but with the path set as the given value.
     *
     * @param path the new path to set
     * @return a new Url with the specified path
     */
   def withPath(path: UrlPath): Self
 
-  /**
-    * Copies this Url but with the path set as the given value.
+  /** Copies this Url but with the path set as the given value.
     *
     * @param parts the parts that make up the new path
     * @return a new Url with the specified path
@@ -234,22 +217,19 @@ sealed trait Url extends Uri {
   def withPathParts[P: TraversablePathParts](parts: P): Self =
     withPath(UrlPath(parts.toSeq))
 
-  /**
-    * Copies this Url but with the query set as the given value.
+  /** Copies this Url but with the query set as the given value.
     *
     * @param query the new QueryString to set
     * @return a new Url with the specified query
     */
   def withQueryString(query: QueryString): Self
 
-  /**
-    * Replaces the all existing Query String parameters with a new set of query params
+  /** Replaces the all existing Query String parameters with a new set of query params
     */
   def withQueryString[T: TraversableParams](params: T): Self =
     withQueryString(QueryString.fromTraversable(params))
 
-  /**
-    * Replaces the all existing Query String parameters with a new set of query params
+  /** Replaces the all existing Query String parameters with a new set of query params
     */
   def withQueryString[KV: QueryKeyValue](first: KV, second: KV, params: KV*): Self =
     withQueryString(QueryString.fromTraversable(Seq(first, second) ++ params))
@@ -263,8 +243,7 @@ sealed trait Url extends Uri {
   def addPathParts[P: PathPart](first: P, second: P, parts: P*): Self =
     withPath(path.addParts(first, second, parts: _*))
 
-  /**
-    * Adds a new Query String parameter key-value pair.
+  /** Adds a new Query String parameter key-value pair.
     *
     * Pairs with values, such as `Some("value")`, represent query params with values, i.e `?param=value`
     *
@@ -278,8 +257,7 @@ sealed trait Url extends Uri {
   def addParam[A: QueryKeyValue](a: A): Url =
     withQueryString(query.addParam(a))
 
-  /**
-    * Adds a new Query String parameter key-value pair.
+  /** Adds a new Query String parameter key-value pair.
     *
     * Pairs with values, such as `Some("value")`, represent query params with values, i.e `?param=value`
     *
@@ -295,8 +273,7 @@ sealed trait Url extends Uri {
   def addParam[K: QueryKey, V: QueryValue](k: K, v: V): Url =
     withQueryString(query.addParam(k, v))
 
-  /**
-    * Adds all the specified key-value pairs as parameters to the query
+  /** Adds all the specified key-value pairs as parameters to the query
     *
     * @param params A list of key-value pairs to add as query parameters
     * @return A new Url with the new Query String parameters
@@ -304,8 +281,7 @@ sealed trait Url extends Uri {
   def addParams[A: TraversableParams](params: A): Self =
     withQueryString(query.addParams(params))
 
-  /**
-    * Adds all the specified key-value pairs as parameters to the query
+  /** Adds all the specified key-value pairs as parameters to the query
     *
     * @param params A list of key-value pairs to add as query parameters
     * @return A new Url with the new Query String parameters
@@ -313,8 +289,7 @@ sealed trait Url extends Uri {
   def addParams[KV: QueryKeyValue](first: KV, second: KV, params: KV*): Self =
     withQueryString(query.addParams(first, second, params: _*))
 
-  /**
-    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
+  /** Replaces the all existing Query String parameters with the specified key with a single Query String parameter
     * with the specified value.
     *
     * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
@@ -329,16 +304,14 @@ sealed trait Url extends Uri {
   def replaceParams[K: QueryKey, V: QueryValue](k: K, v: V): Self =
     withQueryString(query.replaceAll(k, v))
 
-  /**
-    * Removes all Query String parameters with the specified key
+  /** Removes all Query String parameters with the specified key
     * @param k Key for the Query String parameter(s) to remove
     * @return
     */
   def removeParams[K: QueryKey](k: K): Self =
     withQueryString(query.removeAll(k))
 
-  /**
-    * Removes all Query String parameters with a name in the specified list
+  /** Removes all Query String parameters with a name in the specified list
     * @param first Name of a Query String parameter to remove
     * @param second Name of another Query String parameter to remove
     * @param rest Name of more Query String parameter(s) to remove
@@ -347,23 +320,20 @@ sealed trait Url extends Uri {
   def removeParams[K: QueryKey](first: K, second: K, rest: K*): Self =
     withQueryString(query.removeAll(first, second, rest: _*))
 
-  /**
-    * Removes all Query String parameters with a name in the specified list
+  /** Removes all Query String parameters with a name in the specified list
     * @param k Names of Query String parameter(s) to remove
     * @return
     */
   def removeParams[K: QueryKey](k: Iterable[K]): Self =
     withQueryString(query.removeAll(k))
 
-  /**
-    * Removes all Query String parameters
+  /** Removes all Query String parameters
     * @return
     */
   def removeQueryString(): Self =
     withQueryString(QueryString.empty)
 
-  /**
-    * Transforms the Query String by applying the specified PartialFunction to each Query String Parameter
+  /** Transforms the Query String by applying the specified PartialFunction to each Query String Parameter
     *
     * Parameters not defined in the PartialFunction will be left as-is.
     *
@@ -373,8 +343,7 @@ sealed trait Url extends Uri {
   def mapQuery[KV: QueryKeyValue](f: PartialFunction[(String, Option[String]), KV]): Self =
     withQueryString(query.map(f))
 
-  /**
-    * Transforms the Query String by applying the specified PartialFunction to each Query String Parameter
+  /** Transforms the Query String by applying the specified PartialFunction to each Query String Parameter
     *
     * Parameters not defined in the PartialFunction will be removed.
     *
@@ -384,8 +353,7 @@ sealed trait Url extends Uri {
   def collectQuery[KV: QueryKeyValue](f: PartialFunction[(String, Option[String]), KV]): Self =
     withQueryString(query.collect(f))
 
-  /**
-    * Transforms the Query String by applying the specified Function to each Query String Parameter
+  /** Transforms the Query String by applying the specified Function to each Query String Parameter
     *
     * @param f A function that returns a collection of Parameters when applied to each parameter
     * @return
@@ -393,8 +361,7 @@ sealed trait Url extends Uri {
   def flatMapQuery[A: TraversableParams](f: ((String, Option[String])) => A): Self =
     withQueryString(query.flatMap(f))
 
-  /**
-    * Transforms the Query String by applying the specified Function to each Query String Parameter name
+  /** Transforms the Query String by applying the specified Function to each Query String Parameter name
     *
     * @param f A function that returns a new Parameter name when applied to each Parameter name
     * @return
@@ -402,8 +369,7 @@ sealed trait Url extends Uri {
   def mapQueryNames[K: QueryKey](f: String => K): Self =
     withQueryString(query.mapNames(f))
 
-  /**
-    * Transforms the Query String by applying the specified Function to each Query String Parameter value
+  /** Transforms the Query String by applying the specified Function to each Query String Parameter value
     *
     * @param f A function that returns a new Parameter value when applied to each Parameter value
     * @return
@@ -411,8 +377,7 @@ sealed trait Url extends Uri {
   def mapQueryValues[V: QueryValue](f: String => V): Self =
     withQueryString(query.mapValues(f))
 
-  /**
-    * Removes any Query String Parameters that return false when applied to the given Function
+  /** Removes any Query String Parameters that return false when applied to the given Function
     *
     * @param f
     * @return
@@ -420,8 +385,7 @@ sealed trait Url extends Uri {
   def filterQuery(f: ((String, Option[String])) => Boolean): Self =
     withQueryString(query.filter(f))
 
-  /**
-    * Removes any Query String Parameters that return false when their name is applied to the given Function
+  /** Removes any Query String Parameters that return false when their name is applied to the given Function
     *
     * @param f
     * @return
@@ -429,8 +393,7 @@ sealed trait Url extends Uri {
   def filterQueryNames(f: String => Boolean): Self =
     withQueryString(query.filterNames(f))
 
-  /**
-    * Returns the apex domain for this URL.
+  /** Returns the apex domain for this URL.
     *
     * The apex domain is constructed from the public suffix for this URL's host prepended with the
     * immediately preceding dot segment.
@@ -444,8 +407,7 @@ sealed trait Url extends Uri {
   def apexDomain: Option[String] =
     hostOption.flatMap(_.apexDomain)
 
-  /**
-    * Removes any Query String Parameters that return false when their value is applied to the given Function
+  /** Removes any Query String Parameters that return false when their value is applied to the given Function
     *
     * @param f
     * @return
@@ -478,8 +440,7 @@ sealed trait Url extends Uri {
   def toUrl: Url = this
   def toUrn: Urn = throw new UriConversionException(getClass.getSimpleName + " cannot be converted to Urn")
 
-  /**
-    * @return the URL as a String. If the URI has a domain name for a host, any unicode characters will be
+  /** @return the URL as a String. If the URI has a domain name for a host, any unicode characters will be
     *         returned in ASCII Compatible Encoding (ACE), as defined by the ToASCII operation of
     *         <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
     */
@@ -536,8 +497,7 @@ object Url {
   implicit val orderUrl: Order[Url] = Order.by(_.toString())
 }
 
-/**
-  * Represents Relative URLs which do not contain an authority. Examples include:
+/** Represents Relative URLs which do not contain an authority. Examples include:
   *
   *  -      Root Relative: `/index.html?a=b`
   *  -  Rootless Relative: `index.html?a=b`
@@ -577,8 +537,7 @@ final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option
   def withHost(host: Host): ProtocolRelativeUrl =
     withAuthority(Authority(host))
 
-  /**
-    * Copies this Url but with the path set as the given value.
+  /** Copies this Url but with the path set as the given value.
     *
     * @param path the new path to set
     * @return a new Url with the specified path
@@ -616,8 +575,7 @@ object RelativeUrl {
   }
 }
 
-/**
-  * Represents absolute URLs with an authority (i.e. URLs with a host), examples include:
+/** Represents absolute URLs with an authority (i.e. URLs with a host), examples include:
   *
   *  -          Absolute URL: `http://example.com`
   *  - Protocol Relative URL: `//example.com`
@@ -640,8 +598,7 @@ sealed trait UrlWithAuthority extends Url {
   def withHost(host: Host): Self =
     withAuthority(authority.copy(host = host))
 
-  /**
-    * Copies this Url but with the user set as the given value.
+  /** Copies this Url but with the user set as the given value.
     *
     * @param user the new user to set
     * @return a new Url with the specified user
@@ -650,8 +607,7 @@ sealed trait UrlWithAuthority extends Url {
     withAuthority(authority.copy(userInfo = Some(UserInfo(user, password))))
   }
 
-  /**
-    * Copies this Url but with the password set as the given value.
+  /** Copies this Url but with the password set as the given value.
     *
     * @param password the new password to set
     * @return a new Url with the specified password
@@ -660,8 +616,7 @@ sealed trait UrlWithAuthority extends Url {
     withAuthority(authority.copy(userInfo = Some(UserInfo(user.getOrElse(""), password))))
   }
 
-  /**
-    * Copies this Url but with the port set as the given value.
+  /** Copies this Url but with the port set as the given value.
     *
     * @param port the new port to set
     * @return a new Url with the specified port
@@ -669,8 +624,7 @@ sealed trait UrlWithAuthority extends Url {
   def withPort(port: Int): Self =
     withAuthority(authority.copy(port = Some(port)))
 
-  /**
-    * Returns the longest public suffix for the host in this URI. Examples include:
+  /** Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`
     *  `co.uk` for `www.example.co.uk`
     *
@@ -679,8 +633,7 @@ sealed trait UrlWithAuthority extends Url {
   def publicSuffix: Option[String] =
     authority.publicSuffix
 
-  /**
-    * Returns all longest public suffixes for the host in this URI. Examples include:
+  /** Returns all longest public suffixes for the host in this URI. Examples include:
     *  `com` for `www.example.com`
     *  `co.uk` and `uk` for `www.example.co.uk`
     *
@@ -689,8 +642,7 @@ sealed trait UrlWithAuthority extends Url {
   def publicSuffixes: Vector[String] =
     authority.publicSuffixes
 
-  /**
-    * Returns the second largest subdomain for this URL's host.
+  /** Returns the second largest subdomain for this URL's host.
     *
     * E.g. for http://a.b.c.example.com returns a.b.c
     *
@@ -702,32 +654,28 @@ sealed trait UrlWithAuthority extends Url {
   def subdomain: Option[String] =
     authority.subdomain
 
-  /**
-    * Returns all subdomains for this URL's host.
+  /** Returns all subdomains for this URL's host.
     * E.g. for http://a.b.c.example.com returns a, a.b, a.b.c and a.b.c.example
     * @return all subdomains for this URL's host
     */
   def subdomains: Vector[String] =
     authority.subdomains
 
-  /**
-    * Returns the shortest subdomain for this URL's host.
+  /** Returns the shortest subdomain for this URL's host.
     * E.g. for http://a.b.c.example.com returns a
     * @return the shortest subdomain for this URL's host
     */
   def shortestSubdomain: Option[String] =
     authority.shortestSubdomain
 
-  /**
-    * Returns the longest subdomain for this URL's host.
+  /** Returns the longest subdomain for this URL's host.
     * E.g. for http://a.b.c.example.com returns a.b.c.example
     * @return the longest subdomain for this URL's host
     */
   def longestSubdomain: Option[String] =
     authority.longestSubdomain
 
-  /**
-    * @return the URL as a String. If the URI has a domain name for a host, any unicode characters will be
+  /** @return the URL as a String. If the URI has a domain name for a host, any unicode characters will be
     *         returned in ASCII Compatible Encoding (ACE), as defined by the ToASCII operation of
     *         <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
     */
@@ -758,8 +706,7 @@ object UrlWithAuthority {
   implicit val orderUrlWithAuthority: Order[UrlWithAuthority] = Order.by(_.toString())
 }
 
-/**
-  * Represents protocol relative URLs, for example: `//example.com`
+/** Represents protocol relative URLs, for example: `//example.com`
   */
 final case class ProtocolRelativeUrl(authority: Authority,
                                      path: AbsoluteOrEmptyPath,
@@ -783,8 +730,7 @@ final case class ProtocolRelativeUrl(authority: Authority,
   def withFragment[T: Fragment](fragment: T): ProtocolRelativeUrl =
     copy(fragment = fragment.fragment)
 
-  /**
-    * Copies this Url but with the path set as the given value.
+  /** Copies this Url but with the path set as the given value.
     *
     * If the specified path is non empty *and* doesn't have a leading slash, one will be added, as per RFC 3986:
     * When authority is present, the path must either be empty or begin with a slash ("/") character.
@@ -819,8 +765,7 @@ object ProtocolRelativeUrl {
   }
 }
 
-/**
-  * Represents absolute URLs, for example: `http://example.com`
+/** Represents absolute URLs, for example: `http://example.com`
   */
 final case class AbsoluteUrl(scheme: String,
                              authority: Authority,
@@ -845,8 +790,7 @@ final case class AbsoluteUrl(scheme: String,
   def withFragment[T: Fragment](fragment: T): AbsoluteUrl =
     copy(fragment = fragment.fragment)
 
-  /**
-    * Copies this Url but with the path set as the given value.
+  /** Copies this Url but with the path set as the given value.
     *
     * If the specified path is non empty *and* doesn't have a leading slash, one will be added, as per RFC 3986:
     * When authority is present, the path must either be empty or begin with a slash ("/") character.
@@ -881,8 +825,7 @@ object AbsoluteUrl {
   }
 }
 
-/**
-  * Represents URLs that do not have an authority, for example:
+/** Represents URLs that do not have an authority, for example:
   * `mailto:example@example.com` and `data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678`
   */
 sealed trait UrlWithoutAuthority extends Url {
@@ -930,8 +873,7 @@ object UrlWithoutAuthority {
   }
 }
 
-/**
-  * Represents URLs that do not have an authority, for example: `mailto:example@example.com`
+/** Represents URLs that do not have an authority, for example: `mailto:example@example.com`
   */
 final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query: QueryString, fragment: Option[String])(
     implicit val config: UriConfig = UriConfig.default
@@ -946,8 +888,7 @@ final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query:
   def withScheme(scheme: String): SimpleUrlWithoutAuthority =
     copy(scheme = scheme)
 
-  /**
-    * Copies this Url but with the host set as the given value.
+  /** Copies this Url but with the host set as the given value.
     *
     * @param host the new host to set
     * @return a new Url with the specified host
@@ -955,8 +896,7 @@ final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query:
   def withHost(host: Host): AbsoluteUrl =
     AbsoluteUrl(scheme, Authority(host), path.toAbsoluteOrEmpty, query, fragment)
 
-  /**
-    * Copies this Url but with the path set as the given value.
+  /** Copies this Url but with the path set as the given value.
     *
     * @param path the new path to set
     * @return a new Url with the specified path
@@ -964,8 +904,7 @@ final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query:
   def withPath(path: UrlPath): SimpleUrlWithoutAuthority =
     copy(path = path)
 
-  /**
-    * Copies this Url but with the port set as the given value.
+  /** Copies this Url but with the port set as the given value.
     *
     * @param port the new port to set
     * @return a new Url with the specified port
@@ -1003,8 +942,7 @@ object SimpleUrlWithoutAuthority {
   }
 }
 
-/**
-  * Represents URLs with the data scheme, for example: `data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678`
+/** Represents URLs with the data scheme, for example: `data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678`
   */
 final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte])(implicit
     val config: UriConfig = UriConfig.default
@@ -1021,8 +959,7 @@ final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte
   def fragment: Option[String] = None
   def path: UrlPath = RootlessPath.fromParts(pathString(config.withNoEncoding))
 
-  /**
-    * @return The data from this data URL using the charset provided by the URL's mediatype
+  /** @return The data from this data URL using the charset provided by the URL's mediatype
     */
   def dataAsString: String =
     new String(data, mediaType.charset)
@@ -1045,8 +982,7 @@ final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte
     else
       SimpleUrlWithoutAuthority(scheme, path, query, fragment)
 
-  /**
-    * Copies this Url but with the host set as the given value.
+  /** Copies this Url but with the host set as the given value.
     *
     * @param host the new host to set
     * @return a new Url with the specified host
@@ -1054,8 +990,7 @@ final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte
   def withHost(host: Host): AbsoluteUrl =
     AbsoluteUrl(scheme, Authority(host), path.toAbsoluteOrEmpty, query, fragment)
 
-  /**
-    * Copies this Url but with the path set as the given value.
+  /** Copies this Url but with the path set as the given value.
     *
     * @param path the new path to set
     * @return a new Url with the specified path
@@ -1063,8 +998,7 @@ final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte
   def withPath(path: UrlPath): DataUrl =
     DataUrl.parse(scheme + ":" + path.toString())
 
-  /**
-    * Copies this Url but with the port set as the given value.
+  /** Copies this Url but with the port set as the given value.
     *
     * @param port the new port to set
     * @return a new Url with the specified port
@@ -1108,8 +1042,7 @@ object DataUrl {
   implicit val orderDataUrl: Order[DataUrl] = Order.by(_.toString())
 }
 
-/**
-  * Represents scp-like URLs, for example: `git@github.com:lemonlabsuk/scala-uri.git`
+/** Represents scp-like URLs, for example: `git@github.com:lemonlabsuk/scala-uri.git`
   *
   * From the `scp` manpage: [user@]host:[path]
   */
@@ -1125,32 +1058,28 @@ final case class ScpLikeUrl(override val user: Option[String], override val host
   def query: QueryString = QueryString.empty
   def fragment: Option[String] = None
 
-  /**
-    * Copies this Url but with the authority set as the given value.
+  /** Copies this Url but with the authority set as the given value.
     *
     * @param authority the authority host to set
     * @return a new Url with the specified authority
     */
   def withAuthority(authority: Authority): ScpLikeUrl = copy(host = authority.host)
 
-  /**
-    * Copies this Url but with the fragment set as the given value.
+  /** Copies this Url but with the fragment set as the given value.
     *
     * @param fragment the new fragment to set
     * @return a new Url with the specified fragment
     */
   def withFragment[T: Fragment](fragment: T): ScpLikeUrl = this
 
-  /**
-    * Copies this Url but with the path set as the given value.
+  /** Copies this Url but with the path set as the given value.
     *
     * @param path the new path to set
     * @return a new Url with the specified path
     */
   def withPath(path: UrlPath): ScpLikeUrl = copy(path = path)
 
-  /**
-    * Copies this Url but with the query set as the given value.
+  /** Copies this Url but with the query set as the given value.
     *
     * @param query the new QueryString to set
     * @return a new Url with the specified query
@@ -1159,8 +1088,7 @@ final case class ScpLikeUrl(override val user: Option[String], override val host
 
   def schemeOption: Option[String] = None
 
-  /**
-    * Copies this Uri but with the scheme set as the given value.
+  /** Copies this Uri but with the scheme set as the given value.
     *
     * @param scheme the new scheme to set
     * @return a new Uri with the specified scheme
@@ -1189,8 +1117,7 @@ object ScpLikeUrl {
   implicit val orderScpLikeUrl: Order[ScpLikeUrl] = Order.by(_.toString())
 }
 
-/**
-  * Represents a URN. See [[https://www.ietf.org/rfc/rfc2141 RFC 2141]]
+/** Represents a URN. See [[https://www.ietf.org/rfc/rfc2141 RFC 2141]]
   * and [[https://tools.ietf.org/html/rfc8141 RFC 8141]]
   *
   * URNs will be in the form `urn:nid:nss`
@@ -1207,8 +1134,7 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
   def nss: String = path.nss
   def nid: String = path.nid
 
-  /**
-    * Converts this URN into a URL with the given scheme.
+  /** Converts this URN into a URL with the given scheme.
     * The NID and NSS will be made path segments of the URL.
     *
     * @param scheme the new scheme to set

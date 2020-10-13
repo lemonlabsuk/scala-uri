@@ -79,8 +79,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   def _host: Rule1[Host] =
     _host_in_authority("")
 
-  /**
-    * To ensure that hosts that begin with an IP but have further leading characters are not matched as IPs,
+  /** To ensure that hosts that begin with an IP but have further leading characters are not matched as IPs,
     * we need to anchor the tail end to a character that signals the end of the host. E.g.
     *
     * The host in the URL `http://1.2.3.4.blah/` should be DomainName(1.2.3.4.blah), not IPv4(1.2.3.4)
@@ -121,8 +120,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
       capture(zeroOrMore(!anyOf("/?#") ~ ANY)) ~> extractPathPart
     }
 
-  /**
-    * A sequence of path parts that MUST start with a slash
+  /** A sequence of path parts that MUST start with a slash
     *
     * If a URI contains an authority component, then the path component must either be empty
     * or begin with a slash ("/") character.
@@ -132,8 +130,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
       zeroOrMore("/" ~ _path_segment) ~> extractAbsOrEmptyPath
     }
 
-  /**
-    * A sequence of path parts optionally starting with a slash
+  /** A sequence of path parts optionally starting with a slash
     */
   def _path: Rule1[UrlPath] =
     rule {

@@ -22,8 +22,7 @@ object PathPart extends PathPartInstances {
   /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
   /* ======================================================================== */
 
-  /**
-    * Summon an instance of [[PathPart]] for `A`.
+  /** Summon an instance of [[PathPart]] for `A`.
     */
   @inline def apply[A](implicit instance: PathPart[A]): PathPart[A] = instance
 
@@ -137,8 +136,7 @@ object TraversablePathParts extends TraversablePathPartsInstances {
   /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
   /* ======================================================================== */
 
-  /**
-    * Summon an instance of [[TraversablePathParts]] for `A`.
+  /** Summon an instance of [[TraversablePathParts]] for `A`.
     */
   @inline def apply[A](implicit instance: TraversablePathParts[A]): TraversablePathParts[A] = instance
 

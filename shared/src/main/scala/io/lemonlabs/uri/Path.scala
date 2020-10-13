@@ -17,8 +17,7 @@ sealed trait Path extends Product with Serializable {
   def isEmpty: Boolean
   def nonEmpty: Boolean = !isEmpty
 
-  /**
-    * Returns the path with no encoders taking place (e.g. non ASCII characters will not be percent encoded)
+  /** Returns the path with no encoders taking place (e.g. non ASCII characters will not be percent encoded)
     * @return String containing the raw path for this Uri
     */
   def toStringRaw: String =
@@ -67,8 +66,7 @@ sealed trait UrlPath extends Path {
   def addParts[P: PathPart](first: P, second: P, otherParts: P*): UrlPath =
     addParts((Vector(first, second) ++ otherParts).map(_.path))
 
-  /**
-    * Returns the encoded path. By default non ASCII characters in the path are percent encoded.
+  /** Returns the encoded path. By default non ASCII characters in the path are percent encoded.
     * @return String containing the path for this Uri
     */
   private[uri] def toString(c: UriConfig): String = {
@@ -95,8 +93,7 @@ object UrlPath {
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): UrlPath =
     parseTry(s).get
 
-  /**
-    * Unlike `UrlPath.parse`, this method treats the supplied String as a raw path and does not
+  /** Unlike `UrlPath.parse`, this method treats the supplied String as a raw path and does not
     * require reserved characters to be PercentEncoded
     */
   def fromRaw(s: String)(implicit config: UriConfig = UriConfig.default): UrlPath = {
@@ -113,8 +110,7 @@ object UrlPath {
   implicit val orderUrlPath: Order[UrlPath] = Order.by(_.toString())
 }
 
-/**
-  * This trait has two subclasses; `AbsolutePath` and `EmptyPath`.
+/** This trait has two subclasses; `AbsolutePath` and `EmptyPath`.
   * This encompasses the paths allowed to be used in URLs that have an Authority. As per RFC 3986:
   *
   *   When authority is present, the path must either be empty or begin with a slash ("/") character.
@@ -169,8 +165,7 @@ final case class RootlessPath(parts: Vector[String])(implicit val config: UriCon
   def withParts(otherParts: Iterable[String]): UrlPath =
     RootlessPath(otherParts.toVector)
 
-  /**
-    * Returns true if this path is empty (i.e. calling `toString` will return an empty String)
+  /** Returns true if this path is empty (i.e. calling `toString` will return an empty String)
     */
   def isEmpty: Boolean =
     parts.isEmpty
@@ -185,8 +180,7 @@ object RootlessPath {
   implicit val orderRootlessPath: Order[RootlessPath] = Order.by(_.parts)
 }
 
-/**
-  * An AbsolutePath is a path that starts with a slash
+/** An AbsolutePath is a path that starts with a slash
   */
 final case class AbsolutePath(parts: Vector[String])(implicit val config: UriConfig = UriConfig.default)
     extends AbsoluteOrEmptyPath {
@@ -196,8 +190,7 @@ final case class AbsolutePath(parts: Vector[String])(implicit val config: UriCon
   def withParts(otherParts: Iterable[String]): UrlPath =
     copy(parts = otherParts.toVector)
 
-  /**
-    * Always returns false as we always have at least a leading slash
+  /** Always returns false as we always have at least a leading slash
     */
   def isEmpty: Boolean =
     false

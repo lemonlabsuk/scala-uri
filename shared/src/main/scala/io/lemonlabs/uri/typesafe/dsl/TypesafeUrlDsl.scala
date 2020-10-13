@@ -19,8 +19,7 @@ import io.lemonlabs.uri.typesafe.{
 
 class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
 
-  /**
-    * Appends path parts to the path of this URI
+  /** Appends path parts to the path of this URI
     * @param a The path part
     * @return A new Uri with these path parts appended
     */
@@ -28,8 +27,7 @@ class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
     url.addPathParts(a)
   }
 
-  /**
-    * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
+  /** Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
     * Query String parameter will be rendered without a value e.g. `?param` as opposed to `?param=value`
     * @param a Value which provides the key and the value for query parameter
     * @return A new Uri with the new Query String parameter
@@ -37,8 +35,7 @@ class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
   def ?[A: QueryKeyValue](a: A): Url =
     url.addParam(a.queryKey, a.queryValue)
 
-  /**
-    * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
+  /** Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
     * Query String parameter will be rendered without a value e.g. `?param` as opposed to `?param=value`
     * @param a Value which provides the key and the value for query parameter
     * @return A new Uri with the new Query String parameter
@@ -46,8 +43,7 @@ class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
   def ?[A: QueryKey, B: QueryValue](a: A, b: B): Url =
     url.addParam(a.queryKey, b.queryValue)
 
-  /**
-    * Adds a trailing forward slash to the path and a new Query String parameter key-value pair.
+  /** Adds a trailing forward slash to the path and a new Query String parameter key-value pair.
     * If the value for the Query String parameter is None, then this Query String parameter will
     * be rendered without a value e.g. `?param` as opposed to `?param=value`
     * @param a Value which provides the key and the value for query parameter
@@ -56,8 +52,7 @@ class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
   def /?[A: QueryKeyValue](a: A): Url =
     /("").addParam(a.queryKey, a.queryValue)
 
-  /**
-    * Adds a trailing forward slash to the path and a new Query String parameter key-value pair.
+  /** Adds a trailing forward slash to the path and a new Query String parameter key-value pair.
     * If the value for the Query String parameter is None, then this Query String parameter will
     * be rendered without a value e.g. `?param` as opposed to `?param=value`
     * @param a Value which provides the key and the value for query parameter
@@ -66,8 +61,7 @@ class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
   def /?[A: QueryKey, B: QueryValue](a: A, b: B): Url =
     /("").addParam(a.queryKey, b.queryValue)
 
-  /**
-    * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
+  /** Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
     * Query String parameter will be rendered without a value e.g. `?param` as opposed to `?param=value`
     * @param a Value which provides the key and the value for query parameter
     * @return A new Uri with the new Query String parameter
@@ -75,8 +69,7 @@ class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
   def &[A: QueryKeyValue](a: A): Url =
     url.addParam(a.queryKey, a.queryValue)
 
-  /**
-    * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
+  /** Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
     * Query String parameter will be rendered without a value e.g. `?param` as opposed to `?param=value`
     * @param a Value which provides the key and the value for query parameter
     * @return A new Uri with the new Query String parameter
@@ -84,8 +77,7 @@ class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
   def &[A: QueryKey, B: QueryValue](a: A, b: B): Url =
     url.addParam(a.queryKey, b.queryValue)
 
-  /**
-    * Maybe adds a new Query String parameter key-value pair.
+  /** Maybe adds a new Query String parameter key-value pair.
     * If the value for the Query String parameter is None, then this Query String parameter will not be added,
     * otherwise it will be added
     * @param a Value which provides the key and the value for query parameter
@@ -93,8 +85,7 @@ class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
     */
   def &&[A: QueryKeyValue](a: A): Url = a.queryValue.map(_ => &(a)).getOrElse(url)
 
-  /**
-    * Maybe adds a new Query String parameter key-value pair.
+  /** Maybe adds a new Query String parameter key-value pair.
     * If the value for the Query String parameter is None, then this Query String parameter will not be added,
     * otherwise it will be added
     * @param a Value which provides the key and the value for query parameter
@@ -102,16 +93,14 @@ class TypesafeUrlDsl private[typesafe] (val url: Url) extends AnyVal {
     */
   def &&[A: QueryKey, B: QueryValue](a: A, b: B): Url = b.queryValue.map(_ => &(a, b)).getOrElse(url)
 
-  /**
-    * Adds a fragment to the end of the uri
+  /** Adds a fragment to the end of the uri
     * @param a Value representing the fragment
     * @return A new Uri with this fragment
     */
   def `#`[A: Fragment](a: A): Url =
     url.withFragment(a)
 
-  /**
-    * Operator precedence in Scala will mean that our DSL will not always be executed left to right.
+  /** Operator precedence in Scala will mean that our DSL will not always be executed left to right.
     *
     * For the operators this DSL cares about, the order will be
     *

@@ -3,8 +3,7 @@ package io.lemonlabs.uri.dsl
 import io.lemonlabs.uri.Url
 import io.lemonlabs.uri.parsing.UrlParser
 
-/**
-  * Value class to add DSL functionality to Urls
+/** Value class to add DSL functionality to Urls
   */
 @deprecated(
   "Please migrate to the typesafe DSL in the io.lemonlabs.uri.typesafe.dsl package. See https://github.com/lemonlabsuk/scala-uri#typesafe-url-builder-dsl for more information",
@@ -19,8 +18,7 @@ class UrlDsl(val url: Url) extends AnyVal {
       case _            => Some(any.toString)
     }
 
-  /**
-    * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
+  /** Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
     * Query String parameter will be rendered without a value e.g. `?param` as opposed to `?param=value`
     * @param kv Tuple2 representing the query string parameter
     * @return A new Uri with the new Query String parameter
@@ -32,8 +30,7 @@ class UrlDsl(val url: Url) extends AnyVal {
   def ?(kv: (String, Any)): Url =
     url.addParam(kv._1, anyToQueryValue(kv._2))
 
-  /**
-    * Adds a new Query String. The specified String is parsed as a Query String param.
+  /** Adds a new Query String. The specified String is parsed as a Query String param.
     * @return A new Uri with the new Query String parameter
     */
   @deprecated(
@@ -43,8 +40,7 @@ class UrlDsl(val url: Url) extends AnyVal {
   def ?(kv: String): Url =
     url.addParam(UrlParser.parseQueryParam(kv).get)
 
-  /**
-    * Adds a trailing forward slash to the path and a new Query String parameter key-value pair.
+  /** Adds a trailing forward slash to the path and a new Query String parameter key-value pair.
     * If the value for the Query String parameter is None, then this Query String parameter will
     * be rendered without a value e.g. `?param` as opposed to `?param=value`
     * @param kv Tuple2 representing the query string parameter
@@ -57,8 +53,7 @@ class UrlDsl(val url: Url) extends AnyVal {
   def /?(kv: (String, Any)): Url =
     /("").addParam(kv._1, anyToQueryValue(kv._2))
 
-  /**
-    * Maybe adds a new Query String parameter key-value pair.
+  /** Maybe adds a new Query String parameter key-value pair.
     * If the value for the Query String parameter is None, then this Query String parameter will not be added,
     * otherwise it will be added
     * @param kv Tuple2 representing the query string parameter
@@ -74,8 +69,7 @@ class UrlDsl(val url: Url) extends AnyVal {
       case (k, v)    => &(k, v)
     }
 
-  /**
-    * Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
+  /** Adds a new Query String parameter key-value pair. If the value for the Query String parameter is None, then this
     * Query String parameter will be rendered without a value e.g. `?param` as opposed to `?param=value`
     * @param kv Tuple2 representing the query string parameter
     * @return A new Uri with the new Query String parameter
@@ -87,8 +81,7 @@ class UrlDsl(val url: Url) extends AnyVal {
   def &(kv: (String, Any)): Url =
     url.addParam(kv._1, anyToQueryValue(kv._2))
 
-  /**
-    * Adds a new Query String. The specified String is parsed as a Query String param.
+  /** Adds a new Query String. The specified String is parsed as a Query String param.
     * @return A new Uri with the new Query String parameter
     */
   @deprecated(
@@ -98,8 +91,7 @@ class UrlDsl(val url: Url) extends AnyVal {
   def &(kv: String): Url =
     ?(kv)
 
-  /**
-    * Adds all the specified key-value pairs as parameters to the query
+  /** Adds all the specified key-value pairs as parameters to the query
     *
     * @param kvs A list of key-value pairs to add as query parameters
     * @return A new Url with the new Query String parameters
@@ -111,8 +103,7 @@ class UrlDsl(val url: Url) extends AnyVal {
   def addParams(kvs: Iterable[(String, Any)]): Url =
     url.addParams(kvs.map { case (k, v) => (k, anyToQueryValue(v)) })
 
-  /**
-    * Adds a fragment to the end of the uri
+  /** Adds a fragment to the end of the uri
     * @param fragment String representing the fragment
     * @return A new Uri with this fragment
     */
@@ -123,8 +114,7 @@ class UrlDsl(val url: Url) extends AnyVal {
   def `#`(fragment: String): Url =
     url.withFragment(fragment)
 
-  /**
-    * Appends a path part to the path of this URI
+  /** Appends a path part to the path of this URI
     * @param pp The path part
     * @return A new Uri with this path part appended
     */
@@ -135,8 +125,7 @@ class UrlDsl(val url: Url) extends AnyVal {
   def /(pp: String): Url =
     url.addPathPart(pp)
 
-  /**
-    * Operator precedence in Scala will mean that our DSL will not always be executed left to right.
+  /** Operator precedence in Scala will mean that our DSL will not always be executed left to right.
     *
     * For the operators this DSL cares about, the order will be
     *

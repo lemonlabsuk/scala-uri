@@ -23,8 +23,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
       m + (k -> values)
   }
 
-  /**
-    * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
+  /** Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
     *
     * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
     * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
@@ -34,8 +33,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def addParam[K: QueryKey, V: QueryValue](k: K, v: V): QueryString =
     QueryString(params :+ (k.queryKey -> v.queryValue))
 
-  /**
-    * Adds a new Query String parameter key-value pair.
+  /** Adds a new Query String parameter key-value pair.
     *
     * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
     * Using a `UriConfig(renderQuery = ExcludeNones)`, will cause pairs with `None` values not to be rendered
@@ -45,14 +43,12 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def addParam[KV: QueryKeyValue](kv: KV): QueryString =
     QueryString(params :+ (kv.queryKey -> kv.queryValue))
 
-  /**
-    * Adds all the specified key-value pairs as parameters to the query
+  /** Adds all the specified key-value pairs as parameters to the query
     */
   def addParams(other: QueryString): QueryString =
     QueryString(params ++ other.params)
 
-  /**
-    * Adds all the specified key-value pairs as parameters to the query
+  /** Adds all the specified key-value pairs as parameters to the query
     *
     * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
     *
@@ -62,8 +58,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def addParams[KV: QueryKeyValue](first: KV, second: KV, kvs: KV*): QueryString =
     addParams(first +: second +: kvs)
 
-  /**
-    * Adds all the specified key-value pairs as parameters to the query
+  /** Adds all the specified key-value pairs as parameters to the query
     *
     * Pairs with values, such as `("param", Some("value"))`, represent query params with values, i.e `?param=value`
     *
@@ -83,8 +78,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
       case (k, Some(v)) if k == key => v
     }
 
-  /**
-    * Transforms the Query String by applying the specified PartialFunction to each Query String Parameter
+  /** Transforms the Query String by applying the specified PartialFunction to each Query String Parameter
     *
     * Parameters not defined in the PartialFunction will be left as-is.
     *
@@ -97,8 +91,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     }.toVector)
   }
 
-  /**
-    * Transforms the Query String by applying the specified PartialFunction to each Query String Parameter
+  /** Transforms the Query String by applying the specified PartialFunction to each Query String Parameter
     *
     * Parameters not defined in the PartialFunction will be removed.
     *
@@ -108,8 +101,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def collect[KV: QueryKeyValue](f: PartialFunction[(String, Option[String]), KV]): QueryString =
     QueryString(params.collect(f.andThen(_.queryKeyValue)))
 
-  /**
-    * Transforms each parameter by applying the specified Function
+  /** Transforms each parameter by applying the specified Function
     *
     * @param f A function that returns a collection of Parameters when applied to each parameter
     * @return
@@ -117,8 +109,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def flatMap[A: TraversableParams](f: ((String, Option[String])) => A): QueryString =
     QueryString(params.flatMap(f.andThen(_.toSeq)))
 
-  /**
-    * Transforms each parameter name by applying the specified Function
+  /** Transforms each parameter name by applying the specified Function
     *
     * @param f
     * @return
@@ -128,8 +119,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
       (f(n).queryKey, v)
     })
 
-  /**
-    * Transforms each parameter value by applying the specified Function
+  /** Transforms each parameter value by applying the specified Function
     *
     * @param f
     * @return
@@ -139,8 +129,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
       (n, v.flatMap(f.andThen(_.queryValue)))
     })
 
-  /**
-    * Filters out just the parameters for which the provided function holds true
+  /** Filters out just the parameters for which the provided function holds true
     *
     * @param f
     * @return
@@ -148,8 +137,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def filter(f: ((String, Option[String])) => Boolean): QueryString =
     QueryString(params.filter(f))
 
-  /**
-    * Filters out just the parameters for which the provided function holds true when applied to the parameter name
+  /** Filters out just the parameters for which the provided function holds true when applied to the parameter name
     *
     * @param f
     * @return
@@ -159,8 +147,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
       f(n)
     })
 
-  /**
-    * Filters out just the parameters for which the provided function holds true when applied to the parameter value
+  /** Filters out just the parameters for which the provided function holds true when applied to the parameter value
     *
     * @param f
     * @return
@@ -171,8 +158,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
       case _            => false
     })
 
-  /**
-    * Filters out just the parameters for which the provided function holds true when applied to the parameter value
+  /** Filters out just the parameters for which the provided function holds true when applied to the parameter value
     *
     * @param f
     * @return
@@ -182,8 +168,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
       f(v)
     })
 
-  /**
-    * Replaces the all existing Query String parameters with the specified key with a single Query String parameter
+  /** Replaces the all existing Query String parameters with the specified key with a single Query String parameter
     * with the specified value.
     *
     * If the value passed in is None, then all Query String parameters with the specified key are replaces with a
@@ -196,16 +181,14 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def replaceAll[K: QueryKey, V: QueryValue](k: K, v: V): QueryString =
     QueryString(params.filterNot(_._1 == k.queryKey) :+ (k.queryKey -> v.queryValue))
 
-  /**
-    * Removes all Query String parameters with the specified key
+  /** Removes all Query String parameters with the specified key
     * @param k Key for the Query String parameter(s) to remove
     * @return
     */
   def removeAll[K: QueryKey](k: K): QueryString =
     filterNames(_ != k.queryKey)
 
-  /**
-    * Removes all Query String parameters with a name in the specified list
+  /** Removes all Query String parameters with a name in the specified list
     * @param first Name of a Query String parameter to remove
     * @param second Name of another Query String parameter to remove
     * @param rest Names of more Query String parameter(s) to remove
@@ -214,8 +197,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def removeAll[K: QueryKey](first: K, second: K, rest: K*): QueryString =
     removeAll(Seq(first, second) ++ rest)
 
-  /**
-    * Removes all Query String parameters with a name in the specified list
+  /** Removes all Query String parameters with a name in the specified list
     * @param k Names of Query String parameter(s) to remove
     * @return
     */
@@ -247,8 +229,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     else paramsAsString.mkString("&")
   }
 
-  /**
-    * Returns the query string with no encoding taking place (e.g. non ASCII characters will not be percent encoded)
+  /** Returns the query string with no encoding taking place (e.g. non ASCII characters will not be percent encoded)
     * @return String containing the raw query string for this Uri
     */
   def toStringRaw: String =

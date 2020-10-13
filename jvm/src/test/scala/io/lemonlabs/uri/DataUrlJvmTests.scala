@@ -18,8 +18,7 @@ class DataUrlJvmTests extends AnyFlatSpec with Matchers {
     dataUrl.longestSubdomain should equal(None)
   }
 
-  /**
-    * From https://en.wikipedia.org/wiki/Data_URI_scheme#HTML
+  /** From https://en.wikipedia.org/wiki/Data_URI_scheme#HTML
     */
   "The DataUrl for a red dot PNG image" should "have the correct pixel values in Java BufferedImage" in {
     val dataUrl = DataUrl.parse(

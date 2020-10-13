@@ -3,13 +3,11 @@ import cats.{Eq, Order, Show}
 
 case class MediaType(rawValue: Option[String], parameters: Vector[(String, String)]) {
 
-  /**
-    * @return the value of this mediatype. Defaults to text/plain as per RFC2397 section 2
+  /** @return the value of this mediatype. Defaults to text/plain as per RFC2397 section 2
     */
   def value: String = rawValue.getOrElse("text/plain")
 
-  /**
-    * @return the charset for this mediatype. Defaults to US-ASCII as per RFC2397 section 2
+  /** @return the charset for this mediatype. Defaults to US-ASCII as per RFC2397 section 2
     */
   def charset: String = rawCharset.getOrElse("US-ASCII")
 
@@ -20,8 +18,7 @@ case class MediaType(rawValue: Option[String], parameters: Vector[(String, Strin
     else value.length
   }
 
-  /**
-    * @return The type for this mediatype. For example, will return `application`
+  /** @return The type for this mediatype. For example, will return `application`
     *         for the mediatype `application/ld+json`
     */
   def typ =
@@ -30,8 +27,7 @@ case class MediaType(rawValue: Option[String], parameters: Vector[(String, Strin
       case index => value.slice(0, index)
     }
 
-  /**
-    * @return The subtype for this mediatype. For example, will return `ld`
+  /** @return The subtype for this mediatype. For example, will return `ld`
     *         for the mediatype `application/ld+json`. Returns empty string if there is no subtype.
     */
   def subTyp =
@@ -40,8 +36,7 @@ case class MediaType(rawValue: Option[String], parameters: Vector[(String, Strin
       case index => value.slice(index + 1, suffixDelimiterIndex)
     }
 
-  /**
-    * @return The suffix for this mediatype. For example, will return `json`
+  /** @return The suffix for this mediatype. For example, will return `json`
     *         for the mediatype `application/ld+json`. Returns empty string if there is no suffix.
     */
   def suffix: String = {

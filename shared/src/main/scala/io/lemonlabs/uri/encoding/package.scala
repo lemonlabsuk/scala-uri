@@ -1,7 +1,6 @@
 package io.lemonlabs.uri
 
-/**
-  * Date: 28/08/2013
+/** Date: 28/08/2013
   * Time: 21:08
   */
 package object encoding {

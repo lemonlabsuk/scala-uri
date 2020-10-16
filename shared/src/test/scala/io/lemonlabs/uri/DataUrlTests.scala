@@ -1,6 +1,7 @@
 package io.lemonlabs.uri
 
 import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.decoding.{decodeCharAs, PercentDecoder}
 import io.lemonlabs.uri.encoding.PercentEncoder
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -142,5 +143,13 @@ class DataUrlTests extends AnyFlatSpec with Matchers {
     val absoluteUrl = dataUrl.withAuthority(Authority("example.com", 8080))
     absoluteUrl shouldBe an[AbsoluteUrl]
     absoluteUrl.toString() should equal("data://example.com:8080/,A%20brief%20note")
+  }
+
+  "Path decoder" should "be used to decode data" in {
+    implicit val config: UriConfig = UriConfig.default.copy(
+      pathDecoder = decodeCharAs('A', "One") + decodeCharAs('0', "6") + PercentDecoder
+    )
+    val dataUrl = DataUrl.parse("data:,A%20brief%20note")
+    dataUrl.dataAsString should equal("One&brief&note")
   }
 }

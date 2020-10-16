@@ -7,4 +7,6 @@ trait UriDecoder extends Product with Serializable {
 
   def decodeTuple(kv: (String, Option[String])) =
     decode(kv._1) -> kv._2.map(decode)
+
+  def +(other: UriDecoder) = ChainedUriDecoder(this :: other :: Nil)
 }

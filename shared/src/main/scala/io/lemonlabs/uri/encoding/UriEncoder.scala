@@ -22,5 +22,5 @@ trait UriEncoder extends Product with Serializable {
     new String(encChars, charset)
   }
 
-  def +(other: UriEncoder) = ChainedUriEncoder(other :: this :: Nil)
+  def +(other: UriEncoder) = ChainedUriEncoder(this :: other :: Nil)
 }

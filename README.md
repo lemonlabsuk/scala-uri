@@ -336,17 +336,35 @@ implicit val config = UriConfig(encoder = percentEncode ++ ('a', 'b'))
 
 ### Encoding spaces as pluses
 
-The default behaviour with scala uri, is to encode spaces as `%20`, however if you instead wish them to be encoded as the `+` symbol, then simply add the following `implicit val` to your code:
+The default behaviour with scala-uri, is to encode spaces as `+` in the querystring and as `%20` elsewhere in the URL.
+
+If you instead wish spaces to be encoded as `%20` in the query, then simply add the following `implicit val` to your code:
 
 ```scala mdoc:reset
 import io.lemonlabs.uri.Url
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.encoding._
+import io.lemonlabs.uri.encoding.PercentEncoder._
 
-implicit val config = UriConfig(encoder = percentEncode + spaceAsPlus)
+implicit val config = UriConfig.default.copy(queryEncoder = PercentEncoder())
 
-val uri = Url.parse("http://theon.github.com/uri with space")
-uri.toString // This is http://theon.github.com/uri+with+space
+val uri = Url.parse("http://theon.github.com?test=uri with space")
+uri.toString // This is http://theon.github.com?test=uri%20with%20space
+```
+
+The default behaviour with scala-uri, is to decode `+` in query string parameters to spaces and to leave it as a literal `+` elsewhere in the URL.
+
+If you instead wish `+` to be left as `+` in the query, then simply add the following `implicit val` to your code:
+
+```scala mdoc:reset
+import io.lemonlabs.uri.Url
+import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.decoding._
+
+implicit val config = UriConfig.default.copy(queryDecoder = PercentDecoder)
+
+val uri = Url.parse("http://theon.github.com?test=uri+with+plus")
+uri.query.param("test") // This is Some("uri+with+plus")
 ```
 
 ### Custom encoding
@@ -854,6 +872,13 @@ For maven users you should use (for 2.13.x):
 Contributions to `scala-uri` are always welcome. Check out the [Contributing Guidelines](https://github.com/lemonlabsuk/scala-uri/blob/master/README.md)
 
 # Migration guides
+
+## 2.x.x to 3.x.x
+
+ * *Backwards Incompatible*: The space character is now encoded to `+` instead of `%20` in query string parameters by default.   
+ * *Backwards Incompatible*: The `+` method in `io.lemonlabs.uri.encoding.UriEncoder`, now chains encoders in the opposite order to be more intuitive.
+   E.g. `a + b` will encode with encoder `a` first, followed by encoder `b`
+ 
 
 ## 1.x.x to 2.x.x
 

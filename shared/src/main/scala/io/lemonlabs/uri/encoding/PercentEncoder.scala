@@ -28,7 +28,7 @@ object PercentEncoder {
   )
 
   val QUERY_CHARS_TO_ENCODE = Set(
-    ' ', '%', '<', '>', '[', ']', '#', '{', '}', '^', '`', '|', '&', '\\', '+', '='
+    '%', '<', '>', '[', ']', '#', '{', '}', '^', '`', '|', '&', '\\', '+', '='
   )
 
   val FRAGMENT_CHARS_TO_ENCODE = Set(

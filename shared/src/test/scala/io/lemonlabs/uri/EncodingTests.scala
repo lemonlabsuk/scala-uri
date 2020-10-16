@@ -40,9 +40,10 @@ class EncodingTests extends AnyFlatSpec with Matchers {
   }
 
   "Path chars" should "be encoded as custom strings if configured" in {
-    implicit val config: UriConfig = UriConfig(encoder = encodeCharAs(' ', "_") + percentEncode)
+    implicit val config: UriConfig =
+      UriConfig(encoder = encodeCharAs(' ', "_") + encodeCharAs('e', "es") + percentEncode)
     val url = Url.parse("http://theon.github.com/uri with space")
-    url.toString should equal("http://theon.github.com/uri_with_space")
+    url.toString should equal("http://theon.github.com/uri_with_spaces")
   }
 
   "Querystring parameters" should "be percent encoded" in {

@@ -163,10 +163,11 @@ lazy val scalaUri =
     .settings(scalaUriSettings)
     .settings(publishingSettings)
     .settings(mimaSettings)
-    .jsSettings(
-      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0"
+    .jvmSettings(
+      fork in Test := true
     )
     .jsSettings(
+      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0",
       //scalac-scoverage-plugin Scala.js 1.0 is not yet released.
       coverageEnabled := false
     )

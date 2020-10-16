@@ -1,6 +1,6 @@
 package io.lemonlabs.uri
 
-import io.lemonlabs.uri.decoding.{NoopDecoder, UriDecodeException}
+import io.lemonlabs.uri.decoding.{NoopDecoder, PercentDecoder, UriDecodeException}
 import io.lemonlabs.uri.config.UriConfig
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -55,5 +55,26 @@ class DecodingTests extends AnyFlatSpec with Matchers {
     intercept[UriDecodeException] {
       Uri.parse("%")
     }
+  }
+
+  "Pluses decoded to space" should "be enabled in the query by default" in {
+    val uri = Url.parse("https://github.com/scala-uri?a+test=with+plus")
+    uri.query.param("a test") should equal(Some("with plus"))
+  }
+
+  it should "be disabled in the path by default" in {
+    val uri = Url.parse("https://github.com/scala+uri")
+    uri.path.toString() should equal("/scala+uri")
+  }
+
+  it should "allow %2B to be decoded to +" in {
+    val uri = Url.parse("https://github.com/scala-uri?a%2Btest=with%2Bplus")
+    uri.query.param("a+test") should equal(Some("with+plus"))
+  }
+
+  it should "be possible to disable in the query" in {
+    implicit val conf: UriConfig = UriConfig(decoder = PercentDecoder)
+    val uri = Url.parse("https://github.com/scala-uri?a+test=with+plus")
+    uri.query.param("a+test") should equal(Some("with+plus"))
   }
 }

@@ -5,7 +5,7 @@ git add shared/src/main/scala/io/lemonlabs/uri/inet/PublicSuffixes.scala
 git commit -m"Update public suffixes"
 
 echo "Running SBT to determine current version. Please wait..."
-VER=$(sbt 'project scalaUriJVM' 'show version' | tail -n 1 | cut -f2 -d' ')
+VER=$(sbt 'project scalaUriJVM' 'show version' | tail -n2 | head -n1 | cut -f2 -d' ')
 
 echo "Current version is $VER, what is the next version?"
 read -r NEW_VER

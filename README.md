@@ -811,7 +811,7 @@ The type class instances exist in the companion objects for these types.
 
 ## Including scala-uri your project
 
-`scala-uri` `2.x.x` is currently built with support for Scala `2.13.x`, Scala `2.12.x` and Scala.js `1.1.0+` 
+`scala-uri` `3.x.x` is currently built with support for Scala `2.13.x`, Scala `2.12.x` and Scala.js `1.1.0+` 
 
  * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)

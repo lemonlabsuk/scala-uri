@@ -254,7 +254,7 @@ sealed trait Url extends Uri {
     *          types or a custom type if you provide a `QueryKeyValue` type-class
     * @return A new Url with the new Query String parameter
     */
-  def addParam[A: QueryKeyValue](a: A): Url =
+  def addParam[A: QueryKeyValue](a: A): Self =
     withQueryString(query.addParam(a))
 
   /** Adds a new Query String parameter key-value pair.
@@ -270,7 +270,7 @@ sealed trait Url extends Uri {
     *          custom type if you provide a `QueryValue` type-class
     * @return A new Url with the new Query String parameter
     */
-  def addParam[K: QueryKey, V: QueryValue](k: K, v: V): Url =
+  def addParam[K: QueryKey, V: QueryValue](k: K, v: V): Self =
     withQueryString(query.addParam(k, v))
 
   /** Adds all the specified key-value pairs as parameters to the query

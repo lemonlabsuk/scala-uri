@@ -850,6 +850,9 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
     * `io.lemonlabs.uri.inet.PublicSuffixTrie`
     * `io.lemonlabs.uri.inet.Trie`
     * `io.lemonlabs.uri.dsl.*`
+ * *Binary Incompatibility*: `Url.addParam("key", "value")` and `Url.addParam("key" -> "value")` 
+   now has a return type `Self` rather than `Url`. 
+   E.g. `AbsoluteUrl.addParam` now has a return type of `AbsoluteUrl` and `RelativeUrl.addParam` has a return type of `RelativeUrl`
 
 ## 1.x.x to 2.x.x
 

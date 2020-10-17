@@ -2,6 +2,7 @@ package io.lemonlabs.uri
 
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding.PermissivePercentDecoder
+import io.lemonlabs.uri.encoding.PercentEncoder
 import io.lemonlabs.uri.parsing.UriParsingException
 import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
@@ -13,7 +14,7 @@ import org.scalatest.matchers.should.Matchers
   */
 class NapGithubIssueTests extends AnyFlatSpec with Matchers with OptionValues {
   "Github Issue #2" should "now be fixed. Pluses in querystrings should be encoded when using the conservative encoder" in {
-    val uri = Url.parse("http://theon.github.com/?+=+")
+    val uri = Url.parse("http://theon.github.com/").addParam("+", "+")
     uri.toString(UriConfig.conservative) should equal("http://theon.github.com/?%2B=%2B")
   }
 
@@ -113,6 +114,7 @@ class NapGithubIssueTests extends AnyFlatSpec with Matchers with OptionValues {
   }
 
   "Github Issue #65 example 2" should "now be fixed" in {
+    implicit val conf: UriConfig = UriConfig(encoder = PercentEncoder())
     val uri = Url.parse(
       "http://localhost:9000/mlb/2014/06/15/david-wrights-slump-continues-why-new-york-mets-franchise-third-baseman-must-be-gone-before-seasons-end/?utm_source=RantSports&utm_medium=HUBRecirculation&utm_term=MLBNew York MetsGrid"
     )

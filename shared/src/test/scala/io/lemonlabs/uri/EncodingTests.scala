@@ -1,6 +1,7 @@
 package io.lemonlabs.uri
 
 import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.decoding.PercentDecoder
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -33,20 +34,21 @@ class EncodingTests extends AnyFlatSpec with Matchers {
   }
 
   "URI path spaces" should "be plus encoded if configured" in {
-    implicit val config: UriConfig = UriConfig(encoder = percentEncode + spaceAsPlus)
+    implicit val config: UriConfig = UriConfig(encoder = spaceAsPlus + percentEncode)
     val url = Url.parse("http://theon.github.com/uri with space")
     url.toString should equal("http://theon.github.com/uri+with+space")
   }
 
   "Path chars" should "be encoded as custom strings if configured" in {
-    implicit val config: UriConfig = UriConfig(encoder = percentEncode + encodeCharAs(' ', "_"))
+    implicit val config: UriConfig =
+      UriConfig(encoder = encodeCharAs(' ', "_") + encodeCharAs('e', "es") + percentEncode)
     val url = Url.parse("http://theon.github.com/uri with space")
-    url.toString should equal("http://theon.github.com/uri_with_space")
+    url.toString should equal("http://theon.github.com/uri_with_spaces")
   }
 
   "Querystring parameters" should "be percent encoded" in {
-    val url = Url.parse("http://theon.github.com/uris-in-scala.html?càsh=+£50&©opyright=false")
-    url.toString should equal("http://theon.github.com/uris-in-scala.html?c%C3%A0sh=%2B%C2%A350&%C2%A9opyright=false")
+    val url = Url.parse("http://theon.github.com/uris-in-scala.html?càsh=£50&©opyright=false")
+    url.toString should equal("http://theon.github.com/uris-in-scala.html?c%C3%A0sh=%C2%A350&%C2%A9opyright=false")
   }
 
   "Querystring double quotes" should "be percent encoded when using conservative encoder" in {
@@ -117,5 +119,26 @@ class EncodingTests extends AnyFlatSpec with Matchers {
     Url.parse("/%2F/").toString() should equal("/%2F/")
     val builtUrl = Url.parse("http://example.com").addPathPart("1/2")
     builtUrl.toString() should equal("http://example.com/1%2F2")
+  }
+
+  "Spaces encoded to plus" should "be enabled in the query by default" in {
+    val uri = Url.parse("https://github.com/scala-uri").addParam("a test", "with plus")
+    uri.toString() should equal("https://github.com/scala-uri?a+test=with+plus")
+  }
+
+  it should "be disabled in the path by default" in {
+    val uri = Url.parse("https://github.com/scala-uri").addPathPart("a test")
+    uri.path.toString() should equal("/scala-uri/a%20test")
+  }
+
+  it should "encode + as %2B" in {
+    val uri = Url.parse("https://github.com/scala-uri").addParam("a+test", "with+plus")
+    uri.toString() should equal("https://github.com/scala-uri?a%2Btest=with%2Bplus")
+  }
+
+  it should "be possible to disable in the query" in {
+    implicit val conf: UriConfig = UriConfig(encoder = PercentEncoder())
+    val uri = Url.parse("https://github.com/scala-uri").addParam("a test", "with plus")
+    uri.toString() should equal("https://github.com/scala-uri?a%20test=with%20plus")
   }
 }

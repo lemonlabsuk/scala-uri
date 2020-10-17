@@ -21,13 +21,13 @@ class SerializableTests extends AnyFlatSpec with Matchers {
   }
 
   it should "uri can serializable" in {
-    val uri = Uri.parse("http://example.com/path/?key=value#flagment")
+    val uri = Uri.parse("http://example.com/path/?key=value#fragment")
 
     serializeAndDeserialize(uri) should equal(uri)
   }
 
   it should "uri can serializable, decoder = NoopDecoder" in {
-    val uri = Uri.parse("http://example.com/path/?key=value#flagment")(UriConfig(decoder = NoopDecoder))
+    val uri = Uri.parse("http://example.com/path/?key=value#fragment")(UriConfig(decoder = NoopDecoder))
 
     serializeAndDeserialize(uri) should equal(uri)
   }

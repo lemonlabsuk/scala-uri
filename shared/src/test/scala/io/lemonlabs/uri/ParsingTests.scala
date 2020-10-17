@@ -1,8 +1,10 @@
 package io.lemonlabs.uri
 
-import io.lemonlabs.uri.parsing.UriParsingException
+import io.lemonlabs.uri.parsing.{UriParsingException, UrlParser}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+
+import scala.util.Success
 
 class ParsingTests extends AnyFlatSpec with Matchers {
   "Parsing an absolute URI" should "result in a valid Uri object" in {
@@ -455,5 +457,17 @@ class ParsingTests extends AnyFlatSpec with Matchers {
   it should "parse an Option to a None" in {
     val url = DataUrl.parseOption("//example.com")
     url should equal(None)
+  }
+
+  "UrlParser.parseQueryParam" should "parse a key and value" in {
+    UrlParser.parseQueryParam("a=b") should equal(Success(("a", Some("b"))))
+  }
+
+  it should "parse a key and empty value" in {
+    UrlParser.parseQueryParam("a=") should equal(Success(("a", Some(""))))
+  }
+
+  it should "parse a key and no value" in {
+    UrlParser.parseQueryParam("a") should equal(Success(("a", None)))
   }
 }

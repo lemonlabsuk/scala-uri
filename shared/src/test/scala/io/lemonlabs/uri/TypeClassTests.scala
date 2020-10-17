@@ -172,6 +172,31 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
     uriWithoutB.toString should equal("/1/")
   }
 
+  "Vector" should "render correctly as params" in {
+    val uri = Url.parse("/path").addParams(Vector("a" -> "b", "c" -> "d"))
+    uri.toString should equal("/path?a=b&c=d")
+  }
+
+  "Iterable" should "render correctly as params" in {
+    val uri = Url.parse("/path").addParams(Iterable(true -> false))
+    uri.toString should equal("/path?true=false")
+  }
+
+  "Seq" should "render correctly as params" in {
+    val uri = Url.parse("/path").addParams(Seq("a" -> None, "b" -> Some("c")))
+    uri.toString should equal("/path?a&b=c")
+  }
+
+  "List" should "render correctly as params" in {
+    val uri = Url.parse("/path").addParams(List("a" -> "b", "c" -> "d"))
+    uri.toString should equal("/path?a=b&c=d")
+  }
+
+  "A single item" should "render correctly as params" in {
+    val uri = Url.parse("/path").addParams("num" -> 5)
+    uri.toString should equal("/path?num=5")
+  }
+
   "TraversableParams" should "derive type class for case class correctly" in {
     final case class Foo(a: Int, b: String)
 

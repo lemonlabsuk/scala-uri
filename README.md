@@ -714,38 +714,6 @@ val sshUrl    = AbsoluteUrl.parse("ssh://git@github.com/lemonlabsuk/scala-uri.gi
 val httpsUrl  = AbsoluteUrl.parse("https://github.com/lemonlabsuk/scala-uri.git")
 ```
 
-## URL builder DSL
-
-**Note:** *This DSL is now deprecated. Please use the [Typesafe URL builder DSL](#typesafe-url-builder-dsl)*
-
-By importing `io.lemonlabs.uri.dsl._`, you may use a DSL to construct URLs
-
-```scala mdoc:reset
-import io.lemonlabs.uri.dsl._
-
-// Query Strings
-
-val uri = "http://theon.github.com/scala-uri" ? ("p1" -> "one") & ("p2" -> 2) & ("p3" -> true)
-uri.toString //This is: http://theon.github.com/scala-uri?p1=one&p2=2&p3=true
-
-val uri2 = "http://theon.github.com/scala-uri" ? ("param1" -> Some("1")) & ("param2" -> None)
-uri2.toString //This is: http://theon.github.com/scala-uri?param1=1&param2
-
-val uri3 = "http://theon.github.com/scala-uri" ? "param1=1"
-uri3.toString //This is: http://theon.github.com/scala-uri?param1=1
-
-// Paths
-
-val uri4 = "http://theon.github.com" / "scala-uri"
-uri4.toString //This is: http://theon.github.com/scala-uri
-
-// Fragments
-
-val uri5 = "http://theon.github.com/scala-uri" `#` "fragments"
-uri5.toString //This is: http://theon.github.com/scala-uri#fragments
-```
-
-
 ## Typesafe URL builder DSL
 
 The version of DSL which relies on the types to render urls providing better control over
@@ -878,7 +846,10 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
  * *Backwards Incompatible*: The space character is now encoded to `+` instead of `%20` in query string parameters by default.   
  * *Backwards Incompatible*: The `+` method in `io.lemonlabs.uri.encoding.UriEncoder`, now chains encoders in the opposite order to be more intuitive.
    E.g. `a + b` will encode with encoder `a` first, followed by encoder `b`
- 
+ * *Binary Incompatibility*: The following deprecated classes have now been removed:
+    * `io.lemonlabs.uri.inet.PublicSuffixTrie`
+    * `io.lemonlabs.uri.inet.Trie`
+    * `io.lemonlabs.uri.dsl.*`
 
 ## 1.x.x to 2.x.x
 

@@ -21,8 +21,6 @@ scalafixDependencies in ThisBuild += "org.typelevel" %% "simulacrum-scalafix" % 
 val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.7.1" cross CrossVersion.full),
-    "com.github.ghik"     % "silencer-lib"                    % "1.7.1" cross CrossVersion.full,
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % "0.5.0",
     "org.scalatest"     %%% "scalatest"                       % "3.2.2"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14"                 % "3.2.2.0" % Test,
@@ -36,9 +34,7 @@ val sharedSettings = Seq(
     "utf8",
     "-feature",
     "-Xfatal-warnings",
-    "-language:higherKinds",
-    // Silence warnings for deprecated scala-uri code
-    "-P:silencer:pathFilters=.*io/lemonlabs/uri/dsl/package.scala;.*io/lemonlabs/uri/DslTests.scala;.*io/lemonlabs/uri/DslTypeTests.scala"
+    "-language:higherKinds"
   ) ++ (
     VersionNumber(scalaVersion.value) match {
       case v if v.matchesSemVer(SemanticSelector(">=2.13")) => Seq("-Ymacro-annotations")
@@ -72,11 +68,8 @@ val scalaUriSettings = Seq(
   pomPostProcess := { node =>
     new RuleTransformer(new RewriteRule {
       override def transform(node: xml.Node): Seq[xml.Node] = {
-        val removeUnneededPomDeps =
-          removePomDependency(groupId = "org.typelevel", artifactIdPrefix = "simulacrum") orElse
-            removePomDependency(groupId = "com.github.ghik", artifactIdPrefix = "silencer-lib")
-
-        removeUnneededPomDeps.applyOrElse(node, (_: xml.Node) => Seq(node))
+        removePomDependency(groupId = "org.typelevel", artifactIdPrefix = "simulacrum")
+          .applyOrElse(node, (_: xml.Node) => Seq(node))
       }
     }).transform(node).head
   }
@@ -120,7 +113,8 @@ val publishingSettings = Seq(
       </developers>
 )
 
-val previousVersions = (0 to 2).map(v => s"2.$v.0").toSet
+// val previousVersions = (0 to 2).map(v => s"2.$v.0").toSet
+val previousVersions = Set.empty[String]
 
 val mimaExcludes = Seq(
   ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*")

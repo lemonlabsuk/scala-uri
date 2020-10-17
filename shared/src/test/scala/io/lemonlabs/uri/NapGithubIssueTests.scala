@@ -28,13 +28,6 @@ class NapGithubIssueTests extends AnyFlatSpec with Matchers with OptionValues {
     uri.toString should equal("http://theon.github.com/%7B%7D?%7B%7D=%7B%7D")
   }
 
-  "Github Issue #6" should "now be fixed. No implicit Encoder val required for implicit Uri -> String conversion " in {
-    import dsl._
-    val uri = Url.parse("/blah?blah=blah")
-    val uriString: String = uri
-    uriString should equal("/blah?blah=blah")
-  }
-
   "Github Issue #7" should "now be fixed. Calling uri.toString() (with parentheses) should now behave the same as uri.toString " in {
     val uri = Url.parse("/blah?blah=blah")
     uri.toString() should equal("/blah?blah=blah")

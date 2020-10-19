@@ -6,7 +6,7 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.3.0")
 
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.0.1")
 
-addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.8.0")
+addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.8.1")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
 

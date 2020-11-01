@@ -5,6 +5,8 @@ Contributions to `scala-uri` are always welcome. Good ways to contribute include
  * Raising bugs and feature requests
  * Fixing bugs and developing new features (I will attempt to merge in pull requests ASAP)
  * Improving the performance of `scala-uri`. See the [Performance Tests](https://github.com/lemonlabsuk/scala-uri-benchmarks) project for details of how to run the `scala-uri` performance benchmarks.
+ 
+Keep your change as focused as possible. If there are multiple changes you would like to make that are not dependent upon each other, submit them as separate pull requests :pray:
 
 # Building scala-uri
 

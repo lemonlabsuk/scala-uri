@@ -21,7 +21,7 @@ scalafixDependencies in ThisBuild += "org.typelevel" %% "simulacrum-scalafix" % 
 val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
-    "org.typelevel"     %%% "simulacrum-scalafix-annotations" % "0.5.1",
+    "org.typelevel"     %%% "simulacrum-scalafix-annotations" % "0.5.3",
     "org.scalatest"     %%% "scalatest"                       % "3.2.3"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14"                 % "3.2.2.0" % Test,
     "org.scalacheck"    %%% "scalacheck"                      % "1.15.2"  % Test,

@@ -24,7 +24,7 @@ val sharedSettings = Seq(
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % "0.5.3",
     "org.scalatest"     %%% "scalatest"                       % "3.2.3"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14"                 % "3.2.2.0" % Test,
-    "org.scalacheck"    %%% "scalacheck"                      % "1.15.2"  % Test,
+    "org.scalacheck"    %%% "scalacheck"                      % "1.15.3"  % Test,
     "org.typelevel"     %%% "cats-laws"                       % "2.4.1"   % Test
   ),
   scalacOptions := Seq(

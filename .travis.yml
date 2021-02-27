@@ -13,9 +13,9 @@ jdk:
 
 jobs:
   include:
-    - scala: [2.13.2]
+    - scala: [2.13.5]
       env: PROJECT=scalaUriJVM COVERAGE=coverageOff
-    - scala: [2.13.2]
+    - scala: [2.13.5]
       env: PROJECT=scalaUriJS COVERAGE=coverageOff
     - scala: [2.12.12]
       env: PROJECT=scalaUriJVM COVERAGE=coverageOn

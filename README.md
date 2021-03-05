@@ -198,6 +198,7 @@ Replacing with a placeholder:
 
 ```scala mdoc:reset
 import io.lemonlabs.uri._
+import io.lemonlabs.uri.redact._
 
 val url = Url.parse("http://user:password@example.com?secret=123&last=yes")
 
@@ -209,6 +210,7 @@ Removing:
 
 ```scala mdoc:reset
 import io.lemonlabs.uri._
+import io.lemonlabs.uri.redact._
 
 val url = Url.parse("http://user:password@example.com?secret=123&other=true")
 

@@ -144,4 +144,95 @@ class TransformTests extends AnyWordSpec with Matchers {
       uri2.toString should equal("/test?param_1=hello&param_1=hello&param_2=goodbye&param_2=goodbye")
     }
   }
+
+  "mapUser" should {
+    "not change a relative URL" in {
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye")
+      uri.mapUser(_ + "2") should equal(uri)
+    }
+    "not change a URL without authority" in {
+      val uri = Url.parse("mailto:me@example.com")
+      uri.mapUser(_ + "2") should equal(uri)
+    }
+    "change the user in an absolute URL" in {
+      val uri = Url.parse("http://me@example.com/test").mapUser(_ + "2")
+      uri.user should equal(Some("me2"))
+      uri.toString should equal("http://me2@example.com/test")
+    }
+    "not change an absolute URL with no user-info" in {
+      val uri = Url.parse("http://example.com/test")
+      uri.mapUser(_ + "2") should equal(uri)
+    }
+  }
+
+  "mapPassword" should {
+    "not change a relative URL" in {
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye")
+      uri.mapPassword(_ + "2") should equal(uri)
+    }
+    "not change a URL without authority" in {
+      val uri = Url.parse("mailto:me@example.com")
+      uri.mapPassword(_ + "2") should equal(uri)
+    }
+    "change the password in an absolute URL" in {
+      val uri = Url.parse("http://me:password@example.com/test").mapPassword(_ + "2")
+      uri.password should equal(Some("password2"))
+      uri.toString should equal("http://me:password2@example.com/test")
+    }
+    "not change an absolute URL with no user-info" in {
+      val uri = Url.parse("http://example.com/test")
+      uri.mapPassword(_ + "2") should equal(uri)
+    }
+  }
+
+  "removeUserInfo" should {
+    "not change a relative URL" in {
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye")
+      uri.removeUserInfo() should equal(uri)
+    }
+    "not change a URL without authority" in {
+      val uri = Url.parse("mailto:me@example.com")
+      uri.removeUserInfo() should equal(uri)
+    }
+    "remove a user and password in an absolute URL" in {
+      val uri = Url.parse("http://me:password@example.com/test").removeUserInfo()
+      uri.user should equal(None)
+      uri.password should equal(None)
+      uri.toString should equal("http://example.com/test")
+    }
+    "remove a user from an absolute URL" in {
+      val uri = Url.parse("http://me@example.com/test").removeUserInfo()
+      uri.user should equal(None)
+      uri.password should equal(None)
+      uri.toString should equal("http://example.com/test")
+    }
+    "not change an absolute URL with no user-info" in {
+      val uri = Url.parse("http://example.com/test")
+      uri.removeUserInfo() should equal(uri)
+    }
+  }
+
+  "removePassword" should {
+    "not change a relative URL" in {
+      val uri = Url.parse("/test?param_1=hello&param_2=goodbye")
+      uri.removePassword() should equal(uri)
+    }
+    "not change a URL without authority" in {
+      val uri = Url.parse("mailto:me@example.com")
+      uri.removePassword() should equal(uri)
+    }
+    "remove the password in an absolute URL" in {
+      val uri = Url.parse("http://me:password@example.com/test").removePassword()
+      uri.password should equal(None)
+      uri.toString should equal("http://me@example.com/test")
+    }
+    "not change an absolute URL without a password" in {
+      val uri = Url.parse("http://me@example.com/test")
+      uri.removePassword() should equal(uri)
+    }
+    "not change an absolute URL with no user-info" in {
+      val uri = Url.parse("http://example.com/test")
+      uri.removePassword() should equal(uri)
+    }
+  }
 }

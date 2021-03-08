@@ -33,7 +33,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "3.0.0"
+"io.lemonlabs" %% "scala-uri" % "3.1.0"
 ```
 
 ## Migration Guides
@@ -188,6 +188,34 @@ import io.lemonlabs.uri.Url
 
 val relativeUrl = Url.parse("/example?a=b")
 relativeUrl.withScheme("http").withHost("www.example.com") // This is http://www.example.com/example?a=b
+```
+
+## Redacting URLs
+
+It is possible to print out redacted URLs to logs with sensitive information either removed or replaced with a placeholder
+
+Replacing with a placeholder:
+
+```scala mdoc:reset
+import io.lemonlabs.uri._
+import io.lemonlabs.uri.redact._
+
+val url = Url.parse("http://user:password@example.com?secret=123&last=yes")
+
+// This returns http://xxx:xxx@example.com?secret=xxx&last=yes
+url.toRedactedString(Redact.withPlaceholder("xxx").params("secret", "other").user().password())
+```
+
+Removing:
+
+```scala mdoc:reset
+import io.lemonlabs.uri._
+import io.lemonlabs.uri.redact._
+
+val url = Url.parse("http://user:password@example.com?secret=123&other=true")
+
+// This returns http://example.com
+url.toRedactedString(Redact.byRemoving.allParams().userInfo())
 ```
 
 ## Pattern Matching URIs
@@ -816,13 +844,13 @@ The type class instances exist in the companion objects for these types.
  * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
  * For `2.9.x` support use `scala-uri` `0.3.6` from branch [`0.3.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.3.x)
- * For Scala.js `1.x.x` support, use `scala-uri` `3.0.0`
+ * For Scala.js `1.x.x` support, use `scala-uri` `3.1.0`
  * For Scala.js `0.6.x` support, use `scala-uri` `2.2.3`
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "3.0.0"
+"io.lemonlabs" %% "scala-uri" % "3.1.0"
 ```
 
 For maven users you should use (for 2.13.x):
@@ -831,7 +859,7 @@ For maven users you should use (for 2.13.x):
 <dependency>
     <groupId>io.lemonlabs</groupId>
     <artifactId>scala-uri_2.13</artifactId>
-    <version>3.0.0</version>
+    <version>3.1.0</version>
 </dependency>
 ```
 

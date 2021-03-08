@@ -4,6 +4,7 @@ import java.util.Base64
 import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UriParser, UrlParser, UrnParser}
+import io.lemonlabs.uri.redact.Redactor
 import io.lemonlabs.uri.typesafe.{
   Fragment,
   PathPart,
@@ -175,7 +176,7 @@ sealed trait Url extends Uri {
 
   /** Copies this Url but with the authority set as the given value.
     *
-    * @param authority the authority host to set
+    * @param authority the authority to set
     * @return a new Url with the specified authority
     */
   def withAuthority(authority: Authority): SelfWithAuthority
@@ -333,6 +334,16 @@ sealed trait Url extends Uri {
   def removeQueryString(): Self =
     withQueryString(QueryString.empty)
 
+  /** Removes the user-info (both user and password) from this URL
+    * @return This URL without the user-info
+    */
+  def removeUserInfo(): Self
+
+  /** Removes any password from this URL's user-info
+    * @return This URL without the password
+    */
+  def removePassword(): Self
+
   /** Transforms the Query String by applying the specified PartialFunction to each Query String Parameter
     *
     * Parameters not defined in the PartialFunction will be left as-is.
@@ -393,6 +404,16 @@ sealed trait Url extends Uri {
   def filterQueryNames(f: String => Boolean): Self =
     withQueryString(query.filterNames(f))
 
+  /** Transforms this URL by applying the specified Function to the user if it exists
+    * @return
+    */
+  def mapUser(f: String => String): Self
+
+  /** Transforms this URL by applying the specified Function to the password if it exists
+    * @return
+    */
+  def mapPassword(f: String => String): Self
+
   /** Returns the apex domain for this URL.
     *
     * The apex domain is constructed from the public suffix for this URL's host prepended with the
@@ -452,6 +473,9 @@ sealed trait Url extends Uri {
       case "" => ""
       case s  => "?" + s
     }
+
+  def toRedactedString(redactor: Redactor)(implicit conf: UriConfig = UriConfig.default): String =
+    redactor.apply(this).toString(conf)
 }
 
 object Url {
@@ -553,6 +577,11 @@ final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option
 
   private[uri] def toString(c: UriConfig): String =
     path.toString(c) + queryToString(c) + fragmentToString(c)
+
+  def removeUserInfo(): RelativeUrl = this
+  def removePassword(): RelativeUrl = this
+  def mapUser(f: String => String): RelativeUrl = this
+  def mapPassword(f: String => String): RelativeUrl = this
 }
 
 object RelativeUrl {
@@ -623,6 +652,41 @@ sealed trait UrlWithAuthority extends Url {
     */
   def withPort(port: Int): Self =
     withAuthority(authority.copy(port = Some(port)))
+
+  def withUserInfo(ui: Option[UserInfo]): Self =
+    withAuthority(authority.copy(userInfo = ui))
+
+  /** Removes any user from this URL
+    *
+    * @return This URL without the user
+    */
+  def removeUserInfo(): Self =
+    withAuthority(authority.copy(userInfo = None))
+
+  /** Removes any password from this URL
+    *
+    * @return This URL without the password
+    */
+  def removePassword(): Self =
+    withUserInfo(userInfo.map(_.copy(password = None)))
+
+  /** Transforms this URL by applying the specified Function to the user if it exists
+    *
+    * @return
+    */
+  override def mapUser(f: String => String): Self =
+    user.fold(self) { u =>
+      withUserInfo(userInfo.map(_.copy(user = f(u))))
+    }
+
+  /** Transforms this URL by applying the specified Function to the password if it exists
+    *
+    * @return
+    */
+  override def mapPassword(f: String => String): Self =
+    password.fold(self) { p =>
+      withUserInfo(userInfo.map(_.copy(password = Some(f(p)))))
+    }
 
   /** Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`
@@ -846,6 +910,11 @@ sealed trait UrlWithoutAuthority extends Url {
   def subdomains: Vector[String] = Vector.empty
   def shortestSubdomain: Option[String] = None
   def longestSubdomain: Option[String] = None
+
+  def removeUserInfo(): Self = self
+  def removePassword(): Self = self
+  def mapUser(f: String => String): Self = self
+  def mapPassword(f: String => String): Self = self
 }
 
 object UrlWithoutAuthority {

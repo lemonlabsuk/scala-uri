@@ -22,7 +22,7 @@ val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % "0.5.4",
-    "org.scalatest"     %%% "scalatest"                       % "3.2.5"   % Test,
+    "org.scalatest"     %%% "scalatest"                       % "3.2.6"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14"                 % "3.2.2.0" % Test,
     "org.scalacheck"    %%% "scalacheck"                      % "1.15.3"  % Test,
     "org.typelevel"     %%% "cats-laws"                       % "2.4.2"   % Test
@@ -116,7 +116,8 @@ val publishingSettings = Seq(
 val previousVersions = (0 to 0).map(v => s"3.$v.0").toSet
 
 val mimaExcludes = Seq(
-  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*")
+  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*"),
+  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Url.*")
 )
 
 val mimaSettings = Seq(

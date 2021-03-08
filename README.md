@@ -190,6 +190,34 @@ val relativeUrl = Url.parse("/example?a=b")
 relativeUrl.withScheme("http").withHost("www.example.com") // This is http://www.example.com/example?a=b
 ```
 
+## Redacting URLs
+
+It is possible to print out redacted URLs to logs with sensitive information either removed or replaced with a placeholder
+
+Replacing with a placeholder:
+
+```scala mdoc:reset
+import io.lemonlabs.uri._
+import io.lemonlabs.uri.redact._
+
+val url = Url.parse("http://user:password@example.com?secret=123&last=yes")
+
+// This returns http://xxx:xxx@example.com?secret=xxx&last=yes
+url.toRedactedString(Redact.withPlaceholder("xxx").params("secret", "other").user().password())
+```
+
+Removing:
+
+```scala mdoc:reset
+import io.lemonlabs.uri._
+import io.lemonlabs.uri.redact._
+
+val url = Url.parse("http://user:password@example.com?secret=123&other=true")
+
+// This returns http://example.com
+url.toRedactedString(Redact.byRemoving.allParams().userInfo())
+```
+
 ## Pattern Matching URIs
 
 ```scala mdoc:reset

@@ -11,7 +11,7 @@ import com.typesafe.tools.mima.core.{
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPreviousArtifacts, mimaReportBinaryIssues}
 
 name                            := "scala-uri root"
-scalaVersion in ThisBuild       := "2.13.2"
+scalaVersion in ThisBuild       := "2.13.5"
 crossScalaVersions in ThisBuild := Seq("2.12.13", scalaVersion.value)
 skip in publish                 := true // Do not publish the root project
 

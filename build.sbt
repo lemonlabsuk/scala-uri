@@ -117,7 +117,8 @@ val previousVersions = (0 to 0).map(v => s"3.$v.0").toSet
 
 val mimaExcludes = Seq(
   ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*"),
-  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Url.*")
+  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Url.*"),
+  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Uri.*")
 )
 
 val mimaSettings = Seq(

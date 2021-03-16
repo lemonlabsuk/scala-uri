@@ -17,9 +17,27 @@ class CatsTests extends AnyFlatSpec with Matchers {
     (uri === uri2) should equal(true)
   }
 
+  it should "be supported for unordered query params Uri" in new CatsTestCase {
+    import Uri.unordered._
+
+    val uri = Uri.parse("https://typelevel.org/cats/?a=1&b=two")
+    val uri2: Uri = AbsoluteUrl.parse("https://typelevel.org/cats/?b=two&a=1")
+
+    (uri === uri2) should equal(true)
+  }
+
   it should "be supported for Url" in new CatsTestCase {
     val uri = Url.parse("https://typelevel.org/cats/")
     val uri2: Url = AbsoluteUrl.parse("https://typelevel.org/cats/")
+
+    (uri === uri2) should equal(true)
+  }
+
+  it should "be supported unordered query params Url" in new CatsTestCase {
+    import Url.unordered._
+
+    val uri = Url.parse("https://typelevel.org/cats/?a=1&b=two")
+    val uri2: Url = AbsoluteUrl.parse("https://typelevel.org/cats/?b=two&a=1")
 
     (uri === uri2) should equal(true)
   }
@@ -31,9 +49,27 @@ class CatsTests extends AnyFlatSpec with Matchers {
     (uri === uri2) should equal(false)
   }
 
+  it should "be supported for unordered query params RelativeUrl" in new CatsTestCase {
+    import RelativeUrl.unordered._
+
+    val uri = RelativeUrl.parse("/cats2/?b=two&a=1")
+    val uri2 = RelativeUrl.parse("/cats/?a=1&b=two")
+
+    (uri === uri2) should equal(false)
+  }
+
   it should "be supported for UrlWithAuthority" in new CatsTestCase {
     val uri = UrlWithAuthority.parse("https://typelevel.org/cats/")
     val uri2: UrlWithAuthority = AbsoluteUrl.parse("https://typelevel.org/cats/")
+
+    (uri === uri2) should equal(true)
+  }
+
+  it should "be supported for unordered query params UrlWithAuthority" in new CatsTestCase {
+    import UrlWithAuthority.unordered._
+
+    val uri = UrlWithAuthority.parse("https://typelevel.org/cats/?a=1&b=two")
+    val uri2: UrlWithAuthority = AbsoluteUrl.parse("https://typelevel.org/cats/?b=two&a=1")
 
     (uri === uri2) should equal(true)
   }
@@ -45,9 +81,27 @@ class CatsTests extends AnyFlatSpec with Matchers {
     (uri =!= uri2) should equal(true)
   }
 
+  it should "be supported for unordered query params ProtocolRelativeUrl" in new CatsTestCase {
+    import ProtocolRelativeUrl.unordered._
+
+    val uri = ProtocolRelativeUrl.parse("//typelevel.org/cats/?b=two&a=1")
+    val uri2 = ProtocolRelativeUrl.parse("//typelevel.org/cats/?a=1&b=two")
+
+    (uri =!= uri2) should equal(false)
+  }
+
   it should "be supported for AbsoluteUrl" in new CatsTestCase {
     val uri = AbsoluteUrl.parse("https://typelevel.org/cats/")
     val uri2 = AbsoluteUrl.parse("https://typelevel.org/cats/")
+
+    (uri === uri2) should equal(true)
+  }
+
+  it should "be supported for unordered query params AbsoluteUrl" in new CatsTestCase {
+    import AbsoluteUrl.unordered._
+
+    val uri = AbsoluteUrl.parse("https://typelevel.org/cats/?a=1&b=two")
+    val uri2 = AbsoluteUrl.parse("https://typelevel.org/cats/?b=two&a=1")
 
     (uri === uri2) should equal(true)
   }
@@ -59,9 +113,27 @@ class CatsTests extends AnyFlatSpec with Matchers {
     (uri === uri2) should equal(false)
   }
 
+  it should "be supported for unordered query params UrlWithoutAuthority" in new CatsTestCase {
+    import UrlWithoutAuthority.unordered._
+
+    val uri = UrlWithoutAuthority.parse("mailto:someone@somewhere.com?b=two&a=1")
+    val uri2 = UrlWithoutAuthority.parse("mailto:someoneelse@somewhereelse.com?a=1&b=two")
+
+    (uri === uri2) should equal(false)
+  }
+
   it should "be supported for SimpleUrlWithoutAuthority" in new CatsTestCase {
     val uri = SimpleUrlWithoutAuthority.parse("mailto:someone@somewhere.com")
     val uri2 = SimpleUrlWithoutAuthority.parse("mailto:someone@somewhere.com")
+
+    (uri === uri2) should equal(true)
+  }
+
+  it should "be supported for unordered query params SimpleUrlWithoutAuthority" in new CatsTestCase {
+    import SimpleUrlWithoutAuthority.unordered._
+
+    val uri = SimpleUrlWithoutAuthority.parse("mailto:someone@somewhere.com?a=1&b=two")
+    val uri2 = SimpleUrlWithoutAuthority.parse("mailto:someone@somewhere.com?b=two&a=1")
 
     (uri === uri2) should equal(true)
   }
@@ -183,6 +255,21 @@ class CatsTests extends AnyFlatSpec with Matchers {
     val qs2 = QueryString.parse("a=1&b=2")
 
     (qs === qs2) should equal(true)
+  }
+
+  it should "be supported for unordered QueryString" in new CatsTestCase {
+    val qs = QueryString.parse("a=1&b=2")
+    val qs2 = QueryString.parse("b=2&a=1")
+
+    import QueryString.unordered._
+    (qs === qs2) should equal(true)
+  }
+
+  it should "be supported for ordered QueryString" in new CatsTestCase {
+    val qs = QueryString.parse("a=1&b=2")
+    val qs2 = QueryString.parse("b=2&a=1")
+
+    (qs === qs2) should equal(false)
   }
 
   "Show" should "be supported for Uri" in {

@@ -22,6 +22,7 @@ import io.lemonlabs.uri.typesafe.PathPart.ops._
 import io.lemonlabs.uri.typesafe.TraversablePathParts.ops._
 import io.lemonlabs.uri.typesafe.Fragment.ops._
 
+import java.util
 import scala.util.Try
 
 /** Represents a URI. See [[https://www.ietf.org/rfc/rfc3986 RFC 3986]]
@@ -71,6 +72,10 @@ sealed trait Uri extends Product with Serializable {
   def toJavaURI: java.net.URI =
     new java.net.URI(toString(config))
 
+  /** Similar to `==` but ignores the ordering of any query string parameters
+    */
+  def equalsUnordered(other: Uri): Boolean
+
   /** Returns the path with no encoders taking place (e.g. non ASCII characters will not be percent encoded)
     * @return String containing the raw path for this Uri
     */
@@ -102,6 +107,11 @@ object Uri {
   implicit val eqUri: Eq[Uri] = Eq.fromUniversalEquals
   implicit val showUri: Show[Uri] = Show.fromToString
   implicit val orderUri: Order[Uri] = Order.by(_.toString())
+
+  object unordered {
+    implicit val eqUri: Eq[Uri] =
+      (x: Uri, y: Uri) => x.equalsUnordered(y)
+  }
 }
 
 /** Represents a URL, which will be one of these forms:
@@ -476,6 +486,15 @@ sealed trait Url extends Uri {
 
   def toRedactedString(redactor: Redactor)(implicit conf: UriConfig = UriConfig.default): String =
     redactor.apply(this).toString(conf)
+
+  /** Similar to `==` but ignores the ordering of any query string parameters
+    */
+  def equalsUnordered(other: Uri): Boolean = other match {
+    case otherUrl: Url =>
+      this.removeQueryString() == otherUrl.removeQueryString() && query.equalsUnordered(otherUrl.query)
+    case _ =>
+      false
+  }
 }
 
 object Url {
@@ -519,6 +538,11 @@ object Url {
   implicit val eqUrl: Eq[Url] = Eq.fromUniversalEquals
   implicit val showUrl: Show[Url] = Show.fromToString
   implicit val orderUrl: Order[Url] = Order.by(_.toString())
+
+  object unordered {
+    implicit val eqUrl: Eq[Url] =
+      (x: Url, y: Url) => x.equalsUnordered(y)
+  }
 }
 
 /** Represents Relative URLs which do not contain an authority. Examples include:
@@ -601,6 +625,11 @@ object RelativeUrl {
   implicit val showRelUrl: Show[RelativeUrl] = Show.fromToString
   implicit val orderRelUrl: Order[RelativeUrl] = Order.by { url =>
     (url.path, url.query, url.fragment)
+  }
+
+  object unordered {
+    implicit val eqRelUrl: Eq[RelativeUrl] =
+      (x: RelativeUrl, y: RelativeUrl) => x.equalsUnordered(y)
   }
 }
 
@@ -768,6 +797,11 @@ object UrlWithAuthority {
   implicit val eqUrlWithAuthority: Eq[UrlWithAuthority] = Eq.fromUniversalEquals
   implicit val showUrlWithAuthority: Show[UrlWithAuthority] = Show.fromToString
   implicit val orderUrlWithAuthority: Order[UrlWithAuthority] = Order.by(_.toString())
+
+  object unordered {
+    implicit val eqUrlWithAuthority: Eq[UrlWithAuthority] =
+      (x: UrlWithAuthority, y: UrlWithAuthority) => x.equalsUnordered(y)
+  }
 }
 
 /** Represents protocol relative URLs, for example: `//example.com`
@@ -826,6 +860,11 @@ object ProtocolRelativeUrl {
   implicit val showProtocolRelUrl: Show[ProtocolRelativeUrl] = Show.fromToString
   implicit val orderProtocolRelUrl: Order[ProtocolRelativeUrl] = Order.by { url =>
     (url.authority, url.path, url.query, url.fragment)
+  }
+
+  object unordered {
+    implicit val eqProtocolRelUrl: Eq[ProtocolRelativeUrl] =
+      (x: ProtocolRelativeUrl, y: ProtocolRelativeUrl) => x.equalsUnordered(y)
   }
 }
 
@@ -887,6 +926,11 @@ object AbsoluteUrl {
   implicit val orderAbsUrl: Order[AbsoluteUrl] = Order.by { url =>
     (url.scheme, url.authority, url.path, url.query, url.fragment)
   }
+
+  object unordered {
+    implicit val eqAbsUrl: Eq[AbsoluteUrl] =
+      (x: AbsoluteUrl, y: AbsoluteUrl) => x.equalsUnordered(y)
+  }
 }
 
 /** Represents URLs that do not have an authority, for example:
@@ -939,6 +983,11 @@ object UrlWithoutAuthority {
   implicit val showUrlWithoutAuthority: Show[UrlWithoutAuthority] = Show.fromToString
   implicit val orderUrlWithoutAuthority: Order[UrlWithoutAuthority] = Order.by { url =>
     (url.scheme, url.path, url.query, url.fragment)
+  }
+
+  object unordered {
+    implicit val eqUrlWithoutAuthority: Eq[UrlWithoutAuthority] =
+      (x: UrlWithoutAuthority, y: UrlWithoutAuthority) => x.equalsUnordered(y)
   }
 }
 
@@ -1008,6 +1057,11 @@ object SimpleUrlWithoutAuthority {
   implicit val showSimpleUrlWithoutAuthority: Show[SimpleUrlWithoutAuthority] = Show.fromToString
   implicit val orderSimpleUrlWithoutAuthority: Order[SimpleUrlWithoutAuthority] = Order.by { url =>
     (url.scheme, url.path, url.query, url.fragment)
+  }
+
+  object unordered {
+    implicit val eqSimpleUrlWithoutAuthority: Eq[SimpleUrlWithoutAuthority] =
+      (x: SimpleUrlWithoutAuthority, y: SimpleUrlWithoutAuthority) => x.equalsUnordered(y)
   }
 }
 
@@ -1086,6 +1140,23 @@ final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte
 
   private[uri] def toString(c: UriConfig): String =
     scheme + ":" + pathString(c)
+
+  override def equals(obj: Any): Boolean = obj match {
+    case other: DataUrl =>
+      other.canEqual(this) &&
+        mediaType == other.mediaType &&
+        base64 == other.base64 &&
+        util.Arrays.equals(data, other.data)
+    case _ => false
+  }
+
+  override def hashCode(): Int =
+    41 * (41 * (41 + mediaType.hashCode()) + base64.hashCode()) + util.Arrays.hashCode(data)
+
+  /** For DataUrls this method is exactly the same as `==`
+    */
+  override def equalsUnordered(other: Uri): Boolean =
+    this == other
 }
 
 object DataUrl {
@@ -1169,6 +1240,11 @@ final case class ScpLikeUrl(override val user: Option[String], override val host
     // Don't do percent encoding. Can't find any reference to it being
     user.fold("")(_ + "@") + hostToString(host) + ":" + path.toString(config.withNoEncoding)
   }
+
+  /** For ScpLikeUrls this method is exactly the same as `==`
+    */
+  override def equalsUnordered(other: Uri): Boolean =
+    this == other
 }
 
 object ScpLikeUrl {
@@ -1217,6 +1293,11 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
 
   private[uri] def toString(c: UriConfig): String =
     scheme + ":" + path.toString(c)
+
+  /** For URNs this method is exactly the same as `==`
+    */
+  def equalsUnordered(other: Uri): Boolean =
+    this == other
 }
 
 object Urn {

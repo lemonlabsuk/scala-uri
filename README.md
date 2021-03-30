@@ -33,7 +33,7 @@
 To include it in your SBT project from maven central:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "3.1.0"
+"io.lemonlabs" %% "scala-uri" % "3.2.0"
 ```
 
 ## Migration Guides
@@ -216,6 +216,62 @@ val url = Url.parse("http://user:password@example.com?secret=123&other=true")
 
 // This returns http://example.com
 url.toRedactedString(Redact.byRemoving.allParams().userInfo())
+```
+
+## Url Equality
+
+By default scala-uri only considers `Url`s equal if query parameters are in the same order:
+
+```scala mdoc:reset
+import io.lemonlabs.uri._
+
+val urlOne = Url.parse("https://example.com?a=1&b=2")
+val urlTwo = Url.parse("https://example.com?b=2&a=1")
+
+urlOne == urlTwo // this is false
+
+val urlThree = Url.parse("https://example.com?a=1&b=2")
+
+urlOne == urlThree // this is true
+```
+
+For use-cases where query parameter order is not important, the `equalsUnordered` can be used
+
+```scala mdoc
+urlOne.equalsUnordered(urlTwo) // this is true
+```
+
+When using cats for equality testing, parameter order will also be considered by default
+
+```scala mdoc
+import cats.implicits._
+
+urlOne === urlTwo   // this is false
+urlOne === urlThree // this is true
+```
+
+With cats, query parameter order can be ignored for equality checks with the following import:
+
+```scala mdoc
+import io.lemonlabs.uri.Url.unordered._
+
+urlOne === urlTwo   // this is true
+urlOne === urlThree // this is true
+```
+
+Note: depending on the type you are comparing, you will need to import a different cats `Eq` instance. 
+The following are available:
+
+```scala mdoc:reset
+import io.lemonlabs.uri.Uri.unordered._
+import io.lemonlabs.uri.Url.unordered._
+import io.lemonlabs.uri.RelativeUrl.unordered._
+import io.lemonlabs.uri.UrlWithAuthority.unordered._
+import io.lemonlabs.uri.ProtocolRelativeUrl.unordered._
+import io.lemonlabs.uri.AbsoluteUrl.unordered._
+import io.lemonlabs.uri.UrlWithoutAuthority.unordered._
+import io.lemonlabs.uri.SimpleUrlWithoutAuthority.unordered._
+import io.lemonlabs.uri.QueryString.unordered._
 ```
 
 ## Pattern Matching URIs
@@ -844,13 +900,13 @@ The type class instances exist in the companion objects for these types.
  * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
  * For `2.9.x` support use `scala-uri` `0.3.6` from branch [`0.3.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.3.x)
- * For Scala.js `1.x.x` support, use `scala-uri` `3.1.0`
+ * For Scala.js `1.x.x` support, use `scala-uri` `3.2.0`
  * For Scala.js `0.6.x` support, use `scala-uri` `2.2.3`
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "3.1.0"
+"io.lemonlabs" %% "scala-uri" % "3.2.0"
 ```
 
 For maven users you should use (for 2.13.x):
@@ -859,7 +915,7 @@ For maven users you should use (for 2.13.x):
 <dependency>
     <groupId>io.lemonlabs</groupId>
     <artifactId>scala-uri_2.13</artifactId>
-    <version>3.1.0</version>
+    <version>3.2.0</version>
 </dependency>
 ```
 

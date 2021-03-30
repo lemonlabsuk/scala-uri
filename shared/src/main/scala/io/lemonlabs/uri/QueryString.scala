@@ -229,6 +229,11 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     else paramsAsString.mkString("&")
   }
 
+  private def paramsCardinality = params.groupBy(identity)
+
+  def equalsUnordered(other: QueryString): Boolean =
+    this.paramsCardinality == other.paramsCardinality
+
   /** Returns the query string with no encoding taking place (e.g. non ASCII characters will not be percent encoded)
     * @return String containing the raw query string for this Uri
     */
@@ -263,4 +268,9 @@ object QueryString {
   implicit val eqQueryString: Eq[QueryString] = Eq.fromUniversalEquals
   implicit val showQueryString: Show[QueryString] = Show.fromToString
   implicit val orderQueryString: Order[QueryString] = Order.by(_.params)
+
+  object unordered {
+    implicit val eqQueryString: Eq[QueryString] =
+      (x: QueryString, y: QueryString) => x.equalsUnordered(y)
+  }
 }

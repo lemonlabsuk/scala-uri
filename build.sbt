@@ -62,7 +62,7 @@ val scalaUriSettings = Seq(
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled" % "2.2.1",
-    "com.chuusai"   %%% "shapeless" % "2.3.3",
+    "com.chuusai"   %%% "shapeless" % "2.3.4",
     "org.typelevel" %%% "cats-core" % "2.5.0"
   ),
   pomPostProcess := { node =>

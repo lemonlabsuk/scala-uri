@@ -1,249 +1,201 @@
 package io.lemonlabs.uri.parsing
 
+import cats.parse.Numbers.digit
+import cats.parse.Parser.{char, charIn, string, until}
+import cats.parse.Rfc5234.alpha
+import cats.syntax.contravariantSemigroupal._
 import io.lemonlabs.uri._
 import io.lemonlabs.uri.config.UriConfig
-import org.parboiled2.CharPredicate._
-import org.parboiled2._
+import cats.parse.{Numbers, Rfc5234, Parser => P, Parser0 => P0}
+import cats.syntax.foldable._
 
 import scala.collection.immutable
-import scala.util.{Failure, Try}
+import scala.util.{Failure, Success, Try}
 
-class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.default) extends Parser with UriParser {
-  val _host_end = ":/?# \t\r\n"
+class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default) extends UriParser {
+  val _host_end = charIn(":/?# \t\r\n")
 
-  def _int(maxLength: Int): Rule1[Int] =
-    rule {
-      capture((1 to maxLength).times(Digit)) ~> extractInt
-    }
+  def _int(maxLength: Int): P[Int] = {
+    digit.rep(1, maxLength).map(l => extractInt(l.mkString_("")))
+  }
 
-  def _octet: Rule1[Int] =
-    rule {
-      _int(3) ~> ((octet: Int) => test(0x00 <= octet && octet <= 0xff) ~ push(octet))
-    }
+  def _octet: P[Int] = _int(3).flatMap(((octet: Int) => P.pure(octet).filter(i => 0x00 <= i && i <= 0xff)))
 
-  def _scheme: Rule1[String] =
-    rule {
-      capture(Alpha ~ zeroOrMore(AlphaNum | anyOf("+-.")))
-    }
+  def _scheme: P[String] = {
+    (alpha ~ (alpha | charIn("+-.")).rep0).map(t => (t._1 :: t._2).mkString(""))
+  }
 
-  def _ip_v4: Rule1[IpV4] =
-    rule {
-      _octet ~ '.' ~ _octet ~ '.' ~ _octet ~ '.' ~ _octet ~> extractIpv4
-    }
+  def _ip_v4: P[IpV4] =
+    (_octet <* char('.'), _octet.<*(char('.')), _octet.<*(char('.')), _octet.<*(char('.'))).tupled.map(
+      extractIpv4.tupled
+    )
 
-  def _ip_v6_hex_piece: Rule1[String] =
-    rule {
-      capture((1 to 4).times(HexDigit))
-    }
+  def hexDigit: P[Char] = charIn("0-9a-fA-F")
+  def _ip_v6_hex_piece: P[String] = hexDigit.rep(4, 4).string
 
-  def _full_ip_v6: Rule1[IpV6] =
-    rule {
-      '[' ~ 8.times(_ip_v6_hex_piece).separatedBy(':') ~ ']' ~> extractFullIpv6
-    }
+  def _full_ip_v6: P[IpV6] =
+    _ip_v6_hex_piece.repSep(8, 8, char(':')).between(char('['), char(']')).map(nel => extractFullIpv6(nel.toList))
 
-  private def _full_ip_v6_ls32_ip_v4: Rule1[IpV6] =
-    rule {
-      '[' ~ 6.times(_ip_v6_hex_piece).separatedBy(':') ~ ':' ~ _ip_v4 ~ ']' ~> extractFullIpv6Ls32Ipv4
-    }
+  private def _full_ip_v6_ls32_ip_v4: P[IpV6] = {
+    (_ip_v6_hex_piece
+      .repSep(6, 6, char(':'))
+      .map(_.toList)
+      ~ char(':')
+      ~ _ip_v4)
+      .map { case ((l, _), ipv4) => l -> ipv4 }
+      .between(
+        char('['),
+        char(']')
+      )
+      .map(extractFullIpv6Ls32Ipv4.tupled)
+  }
 
-  def _ip_v6_hex_pieces: Rule1[immutable.Seq[String]] =
-    rule {
-      zeroOrMore(_ip_v6_hex_piece).separatedBy(':')
-    }
+  def _ip_v6_hex_pieces: P0[immutable.Seq[String]] = _ip_v6_hex_piece.repSep0(0, char(':'))
 
-  private def _ip_v6_hex_pieces_ending_colon: Rule1[immutable.Seq[String]] =
-    rule {
-      zeroOrMore(_ip_v6_hex_piece ~ ':')
-    }
+  private def _ip_v6_hex_pieces_ending_colon: P0[immutable.Seq[String]] =
+    (_ip_v6_hex_piece <* char(':')).rep0
 
-  def _ip_v6_with_eluded: Rule1[IpV6] =
-    rule {
-      '[' ~ _ip_v6_hex_pieces ~ "::" ~ _ip_v6_hex_pieces ~ ']' ~> extractIpv6WithEluded
-    }
+  def _ip_v6_with_eluded: P[IpV6] = (_ip_v6_hex_pieces ~ string("::") ~ _ip_v6_hex_pieces).with1
+    .between(char('['), char(']'))
+    .map { case ((i, _), b) => extractIpv6WithEluded(i, b) }
 
-  private def _ip_v6_ls32_ip_v4_with_elided: Rule1[IpV6] =
-    rule {
-      '[' ~ _ip_v6_hex_pieces ~ "::" ~ _ip_v6_hex_pieces_ending_colon ~ _ip_v4 ~ ']' ~> extractIpv6Ls32Ipv4WithElided
-    }
+  private def _ip_v6_ls32_ip_v4_with_elided: P[IpV6] = {
+    (_ip_v6_hex_pieces ~ string("::") ~ _ip_v6_hex_pieces_ending_colon ~ _ip_v4)
+      .map { case (((iph, _), o), v) => (iph, o, v) }
+      .with1
+      .between(
+        char('['),
+        char(']')
+      )
+      .map(
+        extractIpv6Ls32Ipv4WithElided.tupled
+      )
 
-  def _ip_v6: Rule1[IpV6] =
-    rule {
-      _full_ip_v6 | _ip_v6_with_eluded | _full_ip_v6_ls32_ip_v4 | _ip_v6_ls32_ip_v4_with_elided
-    }
+  }
 
-  def _domain_name: Rule1[DomainName] =
-    rule {
-      capture(zeroOrMore(noneOf(_host_end))) ~> extractDomainName
-    }
+  def _ip_v6: P[IpV6] = _full_ip_v6 | _ip_v6_with_eluded | _full_ip_v6_ls32_ip_v4 | _ip_v6_ls32_ip_v4_with_elided
 
-  def _host: Rule1[Host] =
-    _host_in_authority("")
+  def _domain_name: P[DomainName] = until(_host_end).map(extractDomainName)
+
+  def _host: P[Host] =
+    _host_in_authority(charIn(""))
 
   /** To ensure that hosts that begin with an IP but have further leading characters are not matched as IPs,
     * we need to anchor the tail end to a character that signals the end of the host. E.g.
     *
     * The host in the URL `http://1.2.3.4.blah/` should be DomainName(1.2.3.4.blah), not IPv4(1.2.3.4)
     */
-  def _ip_in_url_end: Rule0 = _ip_in_url_end(_host_end)
+  def _ip_in_url_end: P0[Unit] = _ip_in_url_end(_host_end)
 
-  def _ip_in_url_end(hostEndChars: String): Rule0 =
-    rule {
-      &(anyOf(hostEndChars) | EOI)
+  def _ip_in_url_end(hostEndChars: P[_]): P0[Unit] = hostEndChars.peek | P.end
+
+  def _host_in_authority: P[Host] = _host_in_authority(_host_end)
+
+  def _host_in_authority(hostEndChars: P[_]): P[Host] =
+    (_ip_v4 <* _ip_in_url_end(hostEndChars)) | _ip_v6 | _domain_name
+
+  def _user_info: P[UserInfo] = (until(charIn(":/?[]@ \t\r\n")) ~ (
+    char(':') *> until(charIn("/@"))
+  ).? <* char('@')).map(extractUserInfo.tupled)
+
+  def _port: P[Int] = char(':') *> _int(10)
+
+  def _authority: P[Authority] =
+    (_user_info.?.with1 ~ _host_in_authority ~ _port.?).map { case ((ui, hia), port) =>
+      extractAuthority(ui, hia, port)
     }
 
-  def _host_in_authority: Rule1[Host] = _host_in_authority(_host_end)
-
-  def _host_in_authority(hostEndChars: String): Rule1[Host] =
-    rule {
-      (_ip_v4 ~ _ip_in_url_end(hostEndChars)) | _ip_v6 | _domain_name
-    }
-
-  def _user_info: Rule1[UserInfo] =
-    rule {
-      capture(zeroOrMore(noneOf(":/?[]@ \t\r\n"))) ~ optional(
-        ":" ~ capture(zeroOrMore(noneOf("/@")))
-      ) ~ "@" ~> extractUserInfo
-    }
-
-  def _port: Rule1[Int] =
-    rule {
-      ":" ~ _int(10)
-    }
-
-  def _authority: Rule1[Authority] =
-    rule {
-      (optional(_user_info) ~ _host_in_authority ~ optional(_port)) ~> extractAuthority
-    }
-
-  def _path_segment: Rule1[String] =
-    rule {
-      capture(zeroOrMore(!anyOf("/?#") ~ ANY)) ~> extractPathPart
-    }
+  def _path_segment: P[String] = (until(charIn("/?#")) <* P.charsWhile(_ => true)).map(extractPathPart)
 
   /** A sequence of path parts that MUST start with a slash
     *
     * If a URI contains an authority component, then the path component must either be empty
     * or begin with a slash ("/") character.
     */
-  def _path_for_authority: Rule1[AbsoluteOrEmptyPath] =
-    rule {
-      zeroOrMore("/" ~ _path_segment) ~> extractAbsOrEmptyPath
-    }
+  def _path_for_authority: P[AbsoluteOrEmptyPath] = char('/') *> _path_segment.rep0.map(extractAbsOrEmptyPath)
 
   /** A sequence of path parts optionally starting with a slash
     */
-  def _path: Rule1[UrlPath] =
-    rule {
-      capture(optional("/")) ~ zeroOrMore(_path_segment).separatedBy("/") ~> extractRelPath
+  def _path: P[UrlPath] =
+    (string("/").string.?.with1 ~ _path_segment.repSep(char('/')).map(_.toList))
+      .map(extractRelPath.tupled)
+
+  def _query_param: P[(String, Some[String])] =
+    ((until(charIn("=&#")) <* char('=')) ~ until(charIn("&#"))).map(extractTuple.tupled)
+
+  def _query_tok: P[(String, None.type)] = until(charIn("=&#")).map(extractTok)
+
+  def _query_param_or_tok: P[(String, Option[String])] = _query_param | _query_tok
+
+  def _query_string: P0[QueryString] = char('?') *> _query_param_or_tok.repSep0(char('&')).map(extractQueryString)
+
+  def _maybe_query_string: P0[QueryString] = _query_string | P.pure(QueryString.empty)
+
+  def _fragment: P[String] = char('#') *> P.charsWhile(_ => true).map(extractFragment)
+
+  def _abs_url: P[AbsoluteUrl] =
+    ((_scheme <* string("://")) ~ _authority ~ _path_for_authority ~ _maybe_query_string ~ _fragment.?)
+      .map { case ((((scheme, authority), p4a), qs), frag) => extractAbsoluteUrl(scheme, authority, p4a, qs, frag) }
+
+  def _url_without_authority: P[UrlWithoutAuthority] = {
+    _data_url | _simple_url_without_authority
+  }
+
+  def _simple_url_without_authority: P[SimpleUrlWithoutAuthority] =
+    ((_scheme <* string(":")) ~ _path ~ _maybe_query_string ~ _fragment.?).map { case (((scheme, path), qs), frag) =>
+      extractUrlWithoutAuthority(scheme, path, qs, frag)
     }
 
-  def _query_param: Rule1[(String, Some[String])] =
-    rule {
-      capture(zeroOrMore(!anyOf("=&#") ~ ANY)) ~ "=" ~ capture(zeroOrMore(!anyOf("&#") ~ ANY)) ~> extractTuple
-    }
-
-  def _query_tok: Rule1[(String, None.type)] =
-    rule {
-      capture(zeroOrMore(!anyOf("=&#") ~ ANY)) ~> extractTok
-    }
-
-  def _query_param_or_tok: Rule1[(String, Option[String])] =
-    rule {
-      _query_param | _query_tok
-    }
-
-  def _query_string: Rule1[QueryString] =
-    rule {
-      "?" ~ zeroOrMore(_query_param_or_tok).separatedBy("&") ~> extractQueryString
-    }
-
-  def _maybe_query_string: Rule1[QueryString] =
-    rule {
-      _query_string | push(QueryString.empty)
-    }
-
-  def _fragment: Rule1[String] =
-    rule {
-      "#" ~ capture(zeroOrMore(ANY)) ~> extractFragment
-    }
-
-  def _abs_url: Rule1[AbsoluteUrl] =
-    rule {
-      _scheme ~ "://" ~ _authority ~ _path_for_authority ~ _maybe_query_string ~ optional(
-        _fragment
-      ) ~> extractAbsoluteUrl
-    }
-
-  def _url_without_authority: Rule1[UrlWithoutAuthority] =
-    rule {
-      _data_url | _simple_url_without_authority
-    }
-
-  def _simple_url_without_authority: Rule1[SimpleUrlWithoutAuthority] =
-    rule {
-      _scheme ~ ":" ~ _path ~ _maybe_query_string ~ optional(_fragment) ~> extractUrlWithoutAuthority
-    }
-
-  def _media_type_param: Rule1[(String, String)] =
-    rule {
-      capture(zeroOrMore(noneOf(";,="))) ~ "=" ~ capture(zeroOrMore(noneOf(";,"))) ~ optional(
-        ";"
-      ) ~> extractMediaTypeParam
-    }
+  def _media_type_param: P[(String, String)] =
+    ((until(charIn(";,=")) <* string("=")) ~ (until(charIn(";,")) <* char(';').?))
+      .map(extractMediaTypeParam.tupled)
 
   /*
    * https://tools.ietf.org/html/rfc1341
    */
-  def _media_type: Rule1[MediaType] =
-    rule {
-      capture(zeroOrMore(noneOf(";,"))) ~ optional(";") ~ zeroOrMore(_media_type_param) ~> extractMediaType
+  def _media_type: P[MediaType] = {
+    (until(charIn(";,")).<*(char(';').?) ~ _media_type_param.rep0).map(extractMediaType.tupled)
+  }
+
+  def _data_url_base64: P[DataUrl] = {
+    (string("data:") *> _media_type.<*(string("base64,")) ~ P.charsWhile(_ => true))
+      .map(extractBase64DataUrl.tupled)
+  }
+
+  def _data_url_percent_encoded: P[DataUrl] = {
+    (string("data:") *> (_media_type <* string(",")) ~ P.charsWhile(_ => true))
+      .map(extractPercentEncodedDataUrl.tupled)
+  }
+
+  def _data_url: P[DataUrl] = {
+    _data_url_base64 | _data_url_percent_encoded
+  }
+
+  def _protocol_rel_url: P[ProtocolRelativeUrl] =
+    ((string("//") *> _authority) ~ _path_for_authority ~ _maybe_query_string ~ _fragment.?).map {
+      case (((auth, p4a), qs), frag) => extractProtocolRelativeUrl(auth, p4a, qs, frag)
     }
 
-  def _data_url_base64: Rule1[DataUrl] =
-    rule {
-      "data:" ~ _media_type ~ "base64," ~ capture(zeroOrMore(ANY)) ~> extractBase64DataUrl
-    }
+  def _rel_url: P[RelativeUrl] = (_path ~ _maybe_query_string ~ _fragment.?).map { case ((path, qs), frag) =>
+    extractRelativeUrl(path, qs, frag)
+  }
 
-  def _data_url_percent_encoded: Rule1[DataUrl] =
-    rule {
-      "data:" ~ _media_type ~ "," ~ capture(zeroOrMore(ANY)) ~> extractPercentEncodedDataUrl
-    }
+  def _url_with_authority: P[UrlWithAuthority] = {
+    _abs_url | _protocol_rel_url
+  }
 
-  def _data_url: Rule1[DataUrl] =
-    rule {
-      _data_url_base64 | _data_url_percent_encoded
-    }
+  def _url: P[Url] = {
+    _abs_url | _protocol_rel_url | _url_without_authority | _rel_url
+  }
 
-  def _protocol_rel_url: Rule1[ProtocolRelativeUrl] =
-    rule {
-      "//" ~ _authority ~ _path_for_authority ~ _maybe_query_string ~ optional(_fragment) ~> extractProtocolRelativeUrl
-    }
-
-  def _rel_url: Rule1[RelativeUrl] =
-    rule {
-      _path ~ _maybe_query_string ~ optional(_fragment) ~> extractRelativeUrl
-    }
-
-  def _url_with_authority: Rule1[UrlWithAuthority] =
-    rule {
-      _abs_url | _protocol_rel_url
-    }
-
-  def _url: Rule1[Url] =
-    rule {
-      _abs_url | _protocol_rel_url | _url_without_authority | _rel_url
-    }
-
-  def _scp_like_user: Rule1[Option[String]] =
-    rule {
-      optional(capture(zeroOrMore(noneOf("@"))) ~ "@")
-    }
+  def _scp_like_user: P0[Option[String]] = {
+    (until(char('@')) <* string("@")).?
+  }
 
   // From `man scp`: [user@]host:[path]
-  def _scp_like_url: Rule1[ScpLikeUrl] =
-    rule {
-      _scp_like_user ~ _host_in_authority(hostEndChars = ":") ~ ":" ~ _path ~> extractScpLikeUrl
-    }
+  def _scp_like_url: P[ScpLikeUrl] =
+    (_scp_like_user.with1 ~ _host_in_authority(hostEndChars = char(':')) ~ (string(":") *> _path))
+      .map { case ((slu, host), path) => extractScpLikeUrl(slu, host, path) }
 
   val extractAbsoluteUrl =
     (scheme: String, authority: Authority, path: AbsoluteOrEmptyPath, qs: QueryString, f: Option[String]) =>
@@ -262,7 +214,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
 
   val extractHexToInt = (num: String) => Integer.parseInt(num, 16)
 
-  val extractIpv4 = (a: Int, b: Int, c: Int, d: Int) => IpV4(a, b, c, d)
+  val extractIpv4: (Int, Int, Int, Int) => IpV4 = { case (a: Int, b: Int, c: Int, d: Int) => IpV4(a, b, c, d) }
 
   val extractFullIpv6 = (pieces: immutable.Seq[String]) => IpV6.fromHexPieces(pieces)
 
@@ -313,7 +265,7 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
     if (pp.isEmpty) EmptyPath
     else AbsolutePath(pp.toVector)
 
-  val extractRelPath = (maybeSlash: String, pp: immutable.Seq[String]) =>
+  val extractRelPath = (maybeSlash: Option[String], pp: List[String]) =>
     if (maybeSlash.nonEmpty)
       AbsolutePath(pp.toVector)
     else if (pp == Seq(""))
@@ -341,65 +293,70 @@ class UrlParser(val input: ParserInput)(implicit conf: UriConfig = UriConfig.def
   def queryDecoder = conf.queryDecoder
   def fragmentDecoder = conf.fragmentDecoder
 
-  private[uri] def mapParseError[T](t: Try[T], name: => String): Try[T] =
-    t.recoverWith { case pe @ ParseError(_, _, _) =>
-      val detail = pe.format(input)
-      Failure(new UriParsingException(s"Invalid $name could not be parsed. $detail"))
+  private[uri] def mapParseError[T](t: Either[P.Error, T], name: => String): Try[T] =
+    t match {
+      case Right(parsed) => Success(parsed)
+      case Left(pe: P.Error) =>
+        val detail = pe.toString
+
+        Failure(new UriParsingException(s"""Invalid $name could not be parsed. Error is occurring here "${input.take(
+          pe.failedAtOffset
+        )}" * "${input.drop(pe.failedAtOffset)}\nExpected: ${pe.expected}"""))
     }
 
   def parseIpV6(): Try[IpV6] =
-    mapParseError(rule(_ip_v6 ~ EOI).run(), "IPv6")
+    mapParseError((_ip_v6 <* P.end).parseAll(input), "IPv6")
 
   def parseIpV4(): Try[IpV4] =
-    mapParseError(rule(_ip_v4 ~ EOI).run(), "IPv4")
+    mapParseError((_ip_v4 <* P.end).parseAll(input), "IPv4")
 
   def parseDomainName(): Try[DomainName] =
-    mapParseError(rule(_domain_name ~ EOI).run(), "Domain Name")
+    mapParseError((_domain_name <* P.end).parseAll(input), "Domain Name")
 
   def parseHost(): Try[Host] =
-    mapParseError(rule(_host ~ EOI).run(), "Host")
+    mapParseError((_host <* P.end).parseAll(input), "Host")
 
   def parseUserInfo(): Try[UserInfo] =
-    mapParseError(rule(_user_info ~ EOI).run(), "User Info")
+    mapParseError((_user_info <* P.end).parseAll(input), "User Info")
 
   def parseUrlWithoutAuthority(): Try[UrlWithoutAuthority] =
-    mapParseError(rule(_url_without_authority ~ EOI).run(), "Url")
+    mapParseError((_url_without_authority <* P.end).parseAll(input), "Url")
 
   def parseSimpleUrlWithoutAuthority(): Try[SimpleUrlWithoutAuthority] =
-    mapParseError(rule(_simple_url_without_authority ~ EOI).run(), "Url")
+    mapParseError((_simple_url_without_authority <* P.end).parseAll(input), "Url")
 
   def parseDataUrl(): Try[DataUrl] =
-    mapParseError(rule(_data_url ~ EOI).run(), "Data Url")
+    mapParseError((_data_url <* P.end).parseAll(input), "Data Url")
 
   def parseScpLikeUrl(): Try[ScpLikeUrl] =
-    mapParseError(rule(_scp_like_url ~ EOI).run(), "scp-like Url")
+    mapParseError((_scp_like_url <* P.end).parseAll(input), "scp-like Url")
 
   def parseAbsoluteUrl(): Try[AbsoluteUrl] =
-    mapParseError(rule(_abs_url ~ EOI).run(), "Url")
+    mapParseError((_abs_url <* P.end).parseAll(input), "Url")
 
   def parseProtocolRelativeUrl(): Try[ProtocolRelativeUrl] =
-    mapParseError(rule(_protocol_rel_url ~ EOI).run(), "Url")
+    mapParseError((_protocol_rel_url <* P.end).parseAll(input), "Url")
 
   def parseUrlWithAuthority(): Try[UrlWithAuthority] =
-    mapParseError(rule(_url_with_authority ~ EOI).run(), "Url")
+    mapParseError((_url_with_authority <* P.end).parseAll(input), "Url")
 
   def parseRelativeUrl(): Try[RelativeUrl] =
-    mapParseError(rule(_rel_url ~ EOI).run(), "Url")
+    mapParseError((_rel_url <* P.end).parseAll(input), "Url")
 
   def parsePath(): Try[UrlPath] =
-    mapParseError(rule(_path ~ EOI).run(), "Path")
+    mapParseError((_path <* P.end).parseAll(input), "Path")
 
   def parseAuthority(): Try[Authority] =
-    mapParseError(rule(_authority ~ EOI).run(), "Authority")
+    mapParseError((_authority <* P.end).parseAll(input), "Authority")
 
   def parseUrl(): Try[Url] =
-    mapParseError(rule(_url ~ EOI).run(), "URL")
+    mapParseError((_url <* P.end).parseAll(input), "URL")
 
   def parseQuery(): Try[QueryString] =
-    mapParseError(rule(_query_string ~ EOI).run(), "Query String")
+    mapParseError((_query_string <* P.end).parseAll(input), "Query String")
 
   def parseQueryParam(): Try[(String, Option[String])] =
-    mapParseError(rule(_query_param_or_tok ~ EOI).run(), "Query Parameter")
+    mapParseError((_query_param_or_tok <* P.end).parseAll(input), "Query Parameter")
 }
 
 object UrlParser {

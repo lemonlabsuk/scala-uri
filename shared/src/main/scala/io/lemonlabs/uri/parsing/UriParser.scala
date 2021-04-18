@@ -4,6 +4,7 @@ import io.lemonlabs.uri.Uri
 import io.lemonlabs.uri.config.UriConfig
 import org.parboiled2.CharPredicate
 import org.parboiled2.CharPredicate.{AlphaNum, HexDigit}
+import cats.parse.{Parser0, Parser => P, Numbers}
 
 import scala.util.Try
 

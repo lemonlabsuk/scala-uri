@@ -7,6 +7,11 @@ import org.scalatest.matchers.should.Matchers
 import scala.util.Success
 
 class ParsingTests extends AnyFlatSpec with Matchers {
+  "Parsing an absolute URI without path" should "result in a valid Uri object" in {
+    val url = UrlParser("theon.github.com").parseAuthority().get
+    url.toStringPunycode should equal("theon.github.com")
+  }
+
   "Parsing an absolute URI" should "result in a valid Uri object" in {
     val url = Url.parse("http://theon.github.com/uris-in-scala.html")
     url.schemeOption should equal(Some("http"))
@@ -331,7 +336,7 @@ class ParsingTests extends AnyFlatSpec with Matchers {
   }
 
   "A URL with userinfo" should "parse as an URL" in {
-    val url = Url.parse("http://:@www.example.com")
+    val url = new UrlParser("http://:@www.example.com").parseAbsoluteUrl().get
     url.toUrl.toAbsoluteUrl.userInfo should equal(Some(UserInfo("", Some(""))))
   }
 
@@ -342,7 +347,7 @@ class ParsingTests extends AnyFlatSpec with Matchers {
   }
 
   "Url.parse" should "provide paramMap as a Map of String to Vector of String" in {
-    val parsed = Url.parse("/?a=b&a=c&d=&e&f&f=g")
+    val parsed = new UrlParser("/?a=b&a=c&d=&e&f&f=g").parseRelativeUrl().get
 
     parsed.query.paramMap should be(
       Map(
@@ -364,8 +369,20 @@ class ParsingTests extends AnyFlatSpec with Matchers {
     parsed should equal(QueryString.fromPairs("a" -> "b", "c" -> "d"))
   }
 
+  "simple" should "parse a path" in {
+    val mailto = new UrlParser("/foo/bla/blub").parsePath().get
+    mailto.parts should equal(Vector("foo", "bla", "blub"))
+  }
+  it should "parse a path containing only a slash" in {
+    val mailto = new UrlParser("/").parsePath().get
+    mailto.parts should equal(Vector())
+  }
+  it should "parse a relative path containing dots" in {
+    val mailto = new UrlParser("./../a").parsePath().get
+    mailto.parts should equal(Vector(".", "..", "a"))
+  }
   "mailto scheme" should "parse email address as the path" in {
-    val mailto = Url.parse("mailto:java-net@java.sun.com")
+    val mailto = new UrlParser("mailto:java-net@java.sun.com").parseSimpleUrlWithoutAuthority().get
     mailto.schemeOption should equal(Some("mailto"))
     mailto.path.toString() should equal("java-net@java.sun.com")
   }

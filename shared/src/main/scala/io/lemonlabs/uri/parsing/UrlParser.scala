@@ -1,7 +1,7 @@
 package io.lemonlabs.uri.parsing
 
 import cats.parse.Numbers.digit
-import cats.parse.Parser.{char, charIn, string, until}
+import cats.parse.Parser.{char, charIn, string, until, until0, Expectation}
 import cats.parse.Rfc5234.alpha
 import cats.syntax.contravariantSemigroupal._
 import io.lemonlabs.uri._
@@ -87,74 +87,95 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
     */
   def _ip_in_url_end: P0[Unit] = _ip_in_url_end(_host_end)
 
-  def _ip_in_url_end(hostEndChars: P[_]): P0[Unit] = hostEndChars.peek | P.end
+  def _ip_in_url_end(hostEndChars: P[_]): P0[Unit] = (hostEndChars.peek | P.end).withContext("ip_in_url_end")
 
   def _host_in_authority: P[Host] = _host_in_authority(_host_end)
 
   def _host_in_authority(hostEndChars: P[_]): P[Host] =
-    (_ip_v4 <* _ip_in_url_end(hostEndChars)) | _ip_v6 | _domain_name
+    ((_ip_v4 <* _ip_in_url_end(hostEndChars)).backtrack | _ip_v6.backtrack | _domain_name)
+      .withContext("host_in_authority")
 
-  def _user_info: P[UserInfo] = (until(charIn(":/?[]@ \t\r\n")) ~ (
-    char(':') *> until(charIn("/@"))
-  ).? <* char('@')).map(extractUserInfo.tupled)
+  def _user_info: P[UserInfo] = {
+    val userAndPass: P0[(String, Option[String])] = until0(charIn(":/?[]@ \t\r\n")) ~ (
+      char(':') *> until0(charIn("/@"))
+    ).?
+    (userAndPass.with1 <* char('@')).map(extractUserInfo.tupled).withContext("user_info")
+  }
 
-  def _port: P[Int] = char(':') *> _int(10)
+  def _port: P[Int] = (char(':') *> _int(10)).withContext("port")
 
   def _authority: P[Authority] =
-    (_user_info.?.with1 ~ _host_in_authority ~ _port.?).map { case ((ui, hia), port) =>
-      extractAuthority(ui, hia, port)
-    }
+    (_user_info.backtrack.?.with1 ~ _host_in_authority ~ _port.?)
+      .map { case ((ui, hia), port) =>
+        extractAuthority(ui, hia, port)
+      }
+      .withContext("authority")
 
-  def _path_segment: P[String] = (until(charIn("/?#")) <* P.charsWhile(_ => true)).map(extractPathPart)
+  def _path_segment: P[String] = until(charIn("/?#")).map(extractPathPart).withContext("path_segment")
 
   /** A sequence of path parts that MUST start with a slash
     *
     * If a URI contains an authority component, then the path component must either be empty
     * or begin with a slash ("/") character.
     */
-  def _path_for_authority: P[AbsoluteOrEmptyPath] = char('/') *> _path_segment.rep0.map(extractAbsOrEmptyPath)
+  def _path_for_authority: P0[AbsoluteOrEmptyPath] =
+    char('/').? *> _path_segment.rep0.map(extractAbsOrEmptyPath).withContext("path_for_authority")
 
   /** A sequence of path parts optionally starting with a slash
     */
-  def _path: P[UrlPath] =
-    (string("/").string.?.with1 ~ _path_segment.repSep(char('/')).map(_.toList))
+  def _path: P0[UrlPath] =
+    (string("/").string.? ~ _path_segment.repSep0(char('/')).map(_.toList))
       .map(extractRelPath.tupled)
+      .withContext("path")
 
+  def _nonempty_path: P[UrlPath] =
+    ((char('/').string.?.with1 ~ _path_segment.repSep(char('/')).map(_.toList))
+      .map(extractRelPath.tupled)
+      // TODO: Is this necessary?
+      .backtrack | char('/').as(UrlPath.empty)).withContext("nonempty_path")
   def _query_param: P[(String, Some[String])] =
-    ((until(charIn("=&#")) <* char('=')) ~ until(charIn("&#"))).map(extractTuple.tupled)
+    ((until(charIn("=&#")) <* char('=')) ~ until0(charIn("&#"))).map(extractTuple.tupled).withContext("query_param")
 
-  def _query_tok: P[(String, None.type)] = until(charIn("=&#")).map(extractTok)
+  def _query_tok: P[(String, None.type)] = until(charIn("=&#")).map(extractTok).withContext("query_tok")
 
-  def _query_param_or_tok: P[(String, Option[String])] = _query_param | _query_tok
+  def _query_param_or_tok: P[(String, Option[String])] =
+    (_query_param.backtrack | _query_tok).withContext("query_param_or_tok")
 
-  def _query_string: P0[QueryString] = char('?') *> _query_param_or_tok.repSep0(char('&')).map(extractQueryString)
+  def _query_string: P0[QueryString] =
+    char('?') *> _query_param_or_tok.repSep0(char('&')).map(extractQueryString).withContext("query_string")
 
   def _maybe_query_string: P0[QueryString] = _query_string | P.pure(QueryString.empty)
 
-  def _fragment: P[String] = char('#') *> P.charsWhile(_ => true).map(extractFragment)
+  def _fragment: P[String] = char('#') *> P.anyChar.rep0.string.map(extractFragment).withContext("fragment")
 
   def _abs_url: P[AbsoluteUrl] =
     ((_scheme <* string("://")) ~ _authority ~ _path_for_authority ~ _maybe_query_string ~ _fragment.?)
       .map { case ((((scheme, authority), p4a), qs), frag) => extractAbsoluteUrl(scheme, authority, p4a, qs, frag) }
+      .withContext("abs_url")
 
   def _url_without_authority: P[UrlWithoutAuthority] = {
-    _data_url | _simple_url_without_authority
+    (_data_url | _simple_url_without_authority).withContext("url_without_authority")
   }
 
   def _simple_url_without_authority: P[SimpleUrlWithoutAuthority] =
-    ((_scheme <* string(":")) ~ _path ~ _maybe_query_string ~ _fragment.?).map { case (((scheme, path), qs), frag) =>
-      extractUrlWithoutAuthority(scheme, path, qs, frag)
-    }
+    ((_scheme <* string(":")) ~ _path ~ _maybe_query_string ~ _fragment.?)
+      .map { case (((scheme, path), qs), frag) =>
+        extractUrlWithoutAuthority(scheme, path, qs, frag)
+      }
+      .withContext("simple_url_without_authority")
 
   def _media_type_param: P[(String, String)] =
     ((until(charIn(";,=")) <* string("=")) ~ (until(charIn(";,")) <* char(';').?))
       .map(extractMediaTypeParam.tupled)
+      .withContext("media_type_param")
 
   /*
    * https://tools.ietf.org/html/rfc1341
    */
   def _media_type: P[MediaType] = {
-    (until(charIn(";,")).<*(char(';').?) ~ _media_type_param.rep0).map(extractMediaType.tupled)
+    (until(charIn(";,")).<*(char(';').?) ~ _media_type_param.rep0)
+      .map(extractMediaType.tupled)
+      .withContext("media_type")
   }
 
   def _data_url_base64: P[DataUrl] = {
@@ -168,25 +189,28 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
   }
 
   def _data_url: P[DataUrl] = {
-    _data_url_base64 | _data_url_percent_encoded
+    (_data_url_base64 | _data_url_percent_encoded).withContext("data_url")
   }
 
   def _protocol_rel_url: P[ProtocolRelativeUrl] =
-    ((string("//") *> _authority) ~ _path_for_authority ~ _maybe_query_string ~ _fragment.?).map {
-      case (((auth, p4a), qs), frag) => extractProtocolRelativeUrl(auth, p4a, qs, frag)
-    }
+    ((string("//") *> _authority) ~ _path_for_authority ~ _maybe_query_string ~ _fragment.?)
+      .map { case (((auth, p4a), qs), frag) =>
+        extractProtocolRelativeUrl(auth, p4a, qs, frag)
+      }
+      .withContext("protocol_rel_url")
 
-  def _rel_url: P[RelativeUrl] = (_path ~ _maybe_query_string ~ _fragment.?).map { case ((path, qs), frag) =>
-    extractRelativeUrl(path, qs, frag)
-  }
+  def _rel_url: P[RelativeUrl] = (_nonempty_path ~ _maybe_query_string ~ _fragment.?)
+    .map { case ((path, qs), frag) =>
+      extractRelativeUrl(path, qs, frag)
+    }
+    .withContext("rel_url")
 
   def _url_with_authority: P[UrlWithAuthority] = {
-    _abs_url | _protocol_rel_url
+    (_abs_url | _protocol_rel_url).withContext("url_with_authority")
   }
 
-  def _url: P[Url] = {
-    _abs_url | _protocol_rel_url | _url_without_authority | _rel_url
-  }
+  def _url: P[Url] =
+    (_abs_url.backtrack | _protocol_rel_url.backtrack | _url_without_authority.backtrack | _rel_url).withContext("url")
 
   def _scp_like_user: P0[Option[String]] = {
     (until(char('@')) <* string("@")).?
@@ -293,15 +317,30 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
   def queryDecoder = conf.queryDecoder
   def fragmentDecoder = conf.fragmentDecoder
 
+  def formatExpectation(e: Expectation): String = e match {
+    case e @ Expectation.OneOfStr(offset, strs) => e.toString
+    case Expectation.InRange(offset, lower, upper) =>
+      s"Character $offset in ASCII range '$lower' (${lower.toInt}) - '$upper' (${upper.toInt})"
+    case e @ Expectation.StartOfString(offset)              => e.toString
+    case e @ Expectation.EndOfString(offset, length)        => e.toString
+    case e @ Expectation.Length(offset, expected, actual)   => e.toString
+    case e @ Expectation.ExpectedFailureAt(offset, matched) => e.toString
+    case e @ Expectation.Fail(offset)                       => e.toString
+    case e @ Expectation.FailWith(offset, message)          => e.toString
+    case e @ Expectation.WithContext(contextStr, expectation) =>
+      s"In $contextStr: ${formatExpectation(expectation)}"
+  }
   private[uri] def mapParseError[T](t: Either[P.Error, T], name: => String): Try[T] =
     t match {
       case Right(parsed) => Success(parsed)
       case Left(pe: P.Error) =>
-        val detail = pe.toString
+        val detail = pe.expected
+          .map(formatExpectation)
+          .mkString_(", ")
 
-        Failure(new UriParsingException(s"""Invalid $name could not be parsed. Error is occurring here "${input.take(
+        Failure(new UriParsingException(s"""Invalid $name could not be parsed. Error is occurring here ${input.take(
           pe.failedAtOffset
-        )}" * "${input.drop(pe.failedAtOffset)}\nExpected: ${pe.expected}"""))
+        )}░${input.drop(pe.failedAtOffset)}\nExpected: ${detail}"""))
     }
 
   def parseIpV6(): Try[IpV6] =
@@ -312,6 +351,9 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
 
   def parseDomainName(): Try[DomainName] =
     mapParseError((_domain_name <* P.end).parseAll(input), "Domain Name")
+
+  def parseHostInAuthority(): Try[Host] =
+    mapParseError((_host_in_authority <* P.end).parseAll(input), "Host in Authority")
 
   def parseHost(): Try[Host] =
     mapParseError((_host <* P.end).parseAll(input), "Host")

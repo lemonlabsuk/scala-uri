@@ -1,7 +1,7 @@
 package io.lemonlabs.uri.parsing
 
 import cats.parse.Numbers.digit
-import cats.parse.Parser.{char, charIn, string, until, until0, Expectation}
+import cats.parse.Parser.{char, charIn, pure, string, until, until0, Expectation}
 import cats.parse.Rfc5234.alpha
 import cats.syntax.contravariantSemigroupal._
 import io.lemonlabs.uri._
@@ -22,19 +22,25 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
   def _octet: P[Int] = _int(3).flatMap(((octet: Int) => P.pure(octet).filter(i => 0x00 <= i && i <= 0xff)))
 
   def _scheme: P[String] = {
-    (alpha ~ (alpha | charIn("+-.")).rep0).map(t => (t._1 :: t._2).mkString(""))
+    (alpha ~ (alpha | charIn("+-.")).rep0).map(t => (t._1 :: t._2).mkString("")).withContext("scheme")
   }
 
   def _ip_v4: P[IpV4] =
-    (_octet <* char('.'), _octet.<*(char('.')), _octet.<*(char('.')), _octet.<*(char('.'))).tupled.map(
-      extractIpv4.tupled
-    )
+    (_octet <* char('.'), _octet.<*(char('.')), _octet.<*(char('.')), _octet.<*(char('.'))).tupled
+      .map(
+        extractIpv4.tupled
+      )
+      .withContext("ip_v4")
 
   def hexDigit: P[Char] = charIn("0-9a-fA-F")
   def _ip_v6_hex_piece: P[String] = hexDigit.rep(4, 4).string
 
   def _full_ip_v6: P[IpV6] =
-    _ip_v6_hex_piece.repSep(8, 8, char(':')).between(char('['), char(']')).map(nel => extractFullIpv6(nel.toList))
+    _ip_v6_hex_piece
+      .repSep(8, 8, char(':'))
+      .between(char('['), char(']'))
+      .map(nel => extractFullIpv6(nel.toList))
+      .withContext("full_ip_v6")
 
   private def _full_ip_v6_ls32_ip_v4: P[IpV6] = {
     (_ip_v6_hex_piece
@@ -73,12 +79,13 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
 
   }
 
-  def _ip_v6: P[IpV6] = _full_ip_v6 | _ip_v6_with_eluded | _full_ip_v6_ls32_ip_v4 | _ip_v6_ls32_ip_v4_with_elided
+  def _ip_v6: P[IpV6] =
+    (_full_ip_v6 | _ip_v6_with_eluded | _full_ip_v6_ls32_ip_v4 | _ip_v6_ls32_ip_v4_with_elided).withContext("ip_v6")
 
-  def _domain_name: P[DomainName] = until(_host_end).map(extractDomainName)
+  def _domain_name: P[DomainName] = until(_host_end).map(extractDomainName).withContext("domain_name")
 
   def _host: P[Host] =
-    _host_in_authority(charIn(""))
+    _host_in_authority(charIn("")).withContext("host")
 
   /** To ensure that hosts that begin with an IP but have further leading characters are not matched as IPs,
     * we need to anchor the tail end to a character that signals the end of the host. E.g.
@@ -111,7 +118,7 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
       }
       .withContext("authority")
 
-  def _path_segment: P[String] = until(charIn("/?#")).map(extractPathPart).withContext("path_segment")
+  def _path_segment: P0[String] = until0(charIn("/?#")).map(extractPathPart).withContext("path_segment")
 
   /** A sequence of path parts that MUST start with a slash
     *
@@ -119,12 +126,12 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
     * or begin with a slash ("/") character.
     */
   def _path_for_authority: P0[AbsoluteOrEmptyPath] =
-    char('/').? *> _path_segment.rep0.map(extractAbsOrEmptyPath).withContext("path_for_authority")
+    (char('/') *> _path_segment).rep0.map(extractAbsOrEmptyPath).withContext("path_for_authority")
 
   /** A sequence of path parts optionally starting with a slash
     */
   def _path: P0[UrlPath] =
-    (string("/").string.? ~ _path_segment.repSep0(char('/')).map(_.toList))
+    (char('/').string.? ~ _path_segment.repSep0(char('/')).map(_.toList))
       .map(extractRelPath.tupled)
       .withContext("path")
 
@@ -149,7 +156,9 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
   def _fragment: P[String] = char('#') *> P.anyChar.rep0.string.map(extractFragment).withContext("fragment")
 
   def _abs_url: P[AbsoluteUrl] =
-    ((_scheme <* string("://")) ~ _authority ~ _path_for_authority ~ _maybe_query_string ~ _fragment.?)
+    ((_scheme <* string("://")).withContext("scheme://") ~ _authority.backtrack.orElse(
+      pure(Authority(DomainName.empty))
+    ) ~ _path_for_authority ~ _maybe_query_string ~ _fragment.?)
       .map { case ((((scheme, authority), p4a), qs), frag) => extractAbsoluteUrl(scheme, authority, p4a, qs, frag) }
       .withContext("abs_url")
 
@@ -210,7 +219,8 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
   }
 
   def _url: P[Url] =
-    (_abs_url.backtrack | _protocol_rel_url.backtrack | _url_without_authority.backtrack | _rel_url).withContext("url")
+    (_abs_url /* TODO .backtrack*/ | _protocol_rel_url.backtrack | _url_without_authority.backtrack | _rel_url)
+      .withContext("url")
 
   def _scp_like_user: P0[Option[String]] = {
     (until(char('@')) <* string("@")).?

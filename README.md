@@ -8,8 +8,6 @@
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/lemonlabsuk/scala-uri.svg)](http://isitmaintained.com/project/lemonlabsuk/scala-uri "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/lemonlabsuk/scala-uri.svg)](http://isitmaintained.com/project/lemonlabsuk/scala-uri "Percentage of issues still open")
 
-[![Cats Friendly Badge](https://typelevel.org/cats/img/cats-badge-tiny.png)](#cats-support) 
-
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
  * A [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt) compliant [parser](#parsing) to parse URLs and URNs from Strings

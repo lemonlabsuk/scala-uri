@@ -22,10 +22,10 @@ val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % "0.5.4",
-    "org.scalatest"     %%% "scalatest"                       % "3.2.6"   % Test,
+    "org.scalatest"     %%% "scalatest"                       % "3.2.8"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14"                 % "3.2.2.0" % Test,
     "org.scalacheck"    %%% "scalacheck"                      % "1.15.3"  % Test,
-    "org.typelevel"     %%% "cats-laws"                       % "2.4.2"   % Test
+    "org.typelevel"     %%% "cats-laws"                       % "2.6.0"   % Test
   ),
   scalacOptions := Seq(
     "-unchecked",
@@ -61,9 +61,9 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    "org.parboiled" %%% "parboiled" % "2.2.1",
-    "com.chuusai"   %%% "shapeless" % "2.3.3",
-    "org.typelevel" %%% "cats-core" % "2.4.2"
+    "org.parboiled" %%% "parboiled" % "2.3.0",
+    "com.chuusai"   %%% "shapeless" % "2.3.4",
+    "org.typelevel" %%% "cats-core" % "2.6.0"
   ),
   pomPostProcess := { node =>
     new RuleTransformer(new RewriteRule {
@@ -117,7 +117,8 @@ val previousVersions = (0 to 0).map(v => s"3.$v.0").toSet
 
 val mimaExcludes = Seq(
   ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*"),
-  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Url.*")
+  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Url.*"),
+  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Uri.*")
 )
 
 val mimaSettings = Seq(

@@ -1,11 +1,23 @@
 --- 
 language: scala
+
+install:
+  - |
+    # From: https://eed3si9n.com/sbt-1.4.9
+    # Remove this when https://github.com/travis-ci/travis-build/pull/1980 is fixed
+    export SBT_LAUNCHER=1.4.9
+    export SBT_OPTS="-Dfile.encoding=UTF-8"
+    curl -L --silent "https://github.com/sbt/sbt/releases/download/v$SBT_LAUNCHER/sbt-$SBT_LAUNCHER.tgz" > $HOME/sbt.tgz
+    tar zxf $HOME/sbt.tgz -C $HOME
+    sudo rm /usr/local/bin/sbt
+    sudo ln -s $HOME/sbt/bin/sbt /usr/local/bin/sbt
+
 script: >
  sbt $COVERAGE ++$TRAVIS_SCALA_VERSION check mdoc coverage $PROJECT/test coverageReport &&
  cd target &&
  git clone https://github.com/lemonlabsuk/scala-uri-demo.git &&
  cd scala-uri-demo &&
- sbt -Dscala.ver=$TRAVIS_SCALA_VERSION -Dscala.uri.ver=3.1.0 test &&
+ sbt -Dscala.ver=$TRAVIS_SCALA_VERSION -Dscala.uri.ver=3.2.0 test &&
  cd "$TRAVIS_BUILD_DIR"
 
 jdk:

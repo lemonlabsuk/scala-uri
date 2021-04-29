@@ -10,18 +10,18 @@ import com.typesafe.tools.mima.core.{
 }
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPreviousArtifacts, mimaReportBinaryIssues}
 
-name                            := "scala-uri root"
-scalaVersion in ThisBuild       := "2.13.5"
-crossScalaVersions in ThisBuild := Seq("2.12.13", scalaVersion.value)
-skip in publish                 := true // Do not publish the root project
+name                           := "scala-uri root"
+ThisBuild / scalaVersion       := "2.13.5"
+ThisBuild / crossScalaVersions := Seq("2.12.13", scalaVersion.value)
+publish / skip                 := true // Do not publish the root project
 
-val simulacrumScalafixVersion = "0.5.0"
-scalafixDependencies in ThisBuild += "org.typelevel" %% "simulacrum-scalafix" % simulacrumScalafixVersion
+val simulacrumScalafixVersion = "0.5.4"
+ThisBuild / scalafixDependencies += "org.typelevel" %% "simulacrum-scalafix" % simulacrumScalafixVersion
 
 val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
-    "org.typelevel"     %%% "simulacrum-scalafix-annotations" % "0.5.4",
+    "org.typelevel"     %%% "simulacrum-scalafix-annotations" % simulacrumScalafixVersion,
     "org.scalatest"     %%% "scalatest"                       % "3.2.8"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14"                 % "3.2.2.0" % Test,
     "org.scalacheck"    %%% "scalacheck"                      % "1.15.3"  % Test,
@@ -44,9 +44,9 @@ val sharedSettings = Seq(
   ),
   addCompilerPlugin(scalafixSemanticdb),
   scalacOptions ++= Seq(s"-P:semanticdb:targetroot:${baseDirectory.value}/target/.semanticdb", "-Yrangepos"),
-  parallelExecution in Test := false,
-  scalafmtOnCompile         := true,
-  coverageExcludedPackages  := "(io.lemonlabs.uri.inet.Trie.*|io.lemonlabs.uri.inet.PublicSuffixes.*|io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
+  Test / parallelExecution := false,
+  scalafmtOnCompile        := true,
+  coverageExcludedPackages := "(io.lemonlabs.uri.inet.Trie.*|io.lemonlabs.uri.inet.PublicSuffixes.*|io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
 )
 
 def removePomDependency(groupId: String, artifactIdPrefix: String): PartialFunction[xml.Node, Seq[xml.Node]] = {
@@ -76,9 +76,9 @@ val scalaUriSettings = Seq(
 )
 
 val publishingSettings = Seq(
-  publishMavenStyle       := true,
-  skip in publish         := false,
-  publishArtifact in Test := false,
+  publishMavenStyle      := true,
+  publish / skip         := false,
+  Test / publishArtifact := false,
   pomIncludeRepository := { _ =>
     false
   },
@@ -155,12 +155,10 @@ lazy val scalaUri =
     .settings(publishingSettings)
     .settings(mimaSettings)
     .jvmSettings(
-      fork in Test := true
+      Test / fork := true
     )
     .jsSettings(
-      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0",
-      //scalac-scoverage-plugin Scala.js 1.0 is not yet released.
-      coverageEnabled := false
+      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0"
     )
 
 lazy val docs = project
@@ -170,7 +168,7 @@ lazy val docs = project
     // Turn off these warnings to keep this noise down
     // We can remove this if the following is implemented https://github.com/scalameta/mdoc/issues/286
     scalacOptions   := Seq("--no-warnings"),
-    skip in publish := true,
+    publish / skip  := true,
     publishArtifact := false
   )
   .dependsOn(scalaUri.jvm)

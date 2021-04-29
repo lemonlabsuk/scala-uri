@@ -12,7 +12,7 @@ import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPrev
 
 name                            := "scala-uri root"
 scalaVersion in ThisBuild       := "2.13.5"
-crossScalaVersions in ThisBuild := Seq("2.12.12", scalaVersion.value)
+crossScalaVersions in ThisBuild := Seq("2.12.13", scalaVersion.value)
 skip in publish                 := true // Do not publish the root project
 
 val simulacrumScalafixVersion = "0.5.0"
@@ -61,7 +61,7 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    "org.parboiled" %%% "parboiled" % "2.2.1",
+    "org.parboiled" %%% "parboiled" % "2.3.0",
     "com.chuusai"   %%% "shapeless" % "2.3.4",
     "org.typelevel" %%% "cats-core" % "2.6.0"
   ),

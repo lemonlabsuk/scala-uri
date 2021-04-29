@@ -1,14 +1,12 @@
 # scala-uri
 
-[![Build Status](https://travis-ci.org/lemonlabsuk/scala-uri.svg?branch=master)](https://travis-ci.org/lemonlabsuk/scala-uri)
+[![Build Status](https://api.travis-ci.org/lemonlabsuk/scala-uri.svg?branch=master)](https://travis-ci.org/lemonlabsuk/scala-uri)
 [![codecov.io](http://codecov.io/github/lemonlabsuk/scala-uri/coverage.svg?branch=master)](https://codecov.io/gh/lemonlabsuk/scala-uri/branch/master)
 [![Slack](https://lemonlabs.io/slack/badge.svg)](https://lemonlabs.io/slack)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.0.0.svg)](#scalajs-support)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/lemonlabsuk/scala-uri.svg)](http://isitmaintained.com/project/lemonlabsuk/scala-uri "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/lemonlabsuk/scala-uri.svg)](http://isitmaintained.com/project/lemonlabsuk/scala-uri "Percentage of issues still open")
-
-[![Cats Friendly Badge](https://typelevel.org/cats/img/cats-badge-tiny.png)](#cats-support) 
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 

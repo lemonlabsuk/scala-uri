@@ -17,7 +17,7 @@ object UpdatePublicSuffixes {
     val allSuffixes = for {
       line <- suffixLines
       trimLine = line.trim
-      if !trimLine.startsWith("//") && !trimLine.isEmpty
+      if !trimLine.startsWith("//") && trimLine.nonEmpty
     } yield trimLine
 
     val (exceptions, others) = allSuffixes.partition(_.startsWith("!"))

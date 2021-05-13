@@ -25,7 +25,7 @@ val sharedSettings = Seq(
     "org.scalatest"     %%% "scalatest"                       % "3.2.8"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14"                 % "3.2.2.0" % Test,
     "org.scalacheck"    %%% "scalacheck"                      % "1.15.4"  % Test,
-    "org.typelevel"     %%% "cats-laws"                       % "2.6.0"   % Test
+    "org.typelevel"     %%% "cats-laws"                       % "2.6.1"   % Test
   ),
   scalacOptions := Seq(
     "-unchecked",
@@ -63,7 +63,7 @@ val scalaUriSettings = Seq(
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled" % "2.3.0",
     "com.chuusai"   %%% "shapeless" % "2.3.6",
-    "org.typelevel" %%% "cats-core" % "2.6.0"
+    "org.typelevel" %%% "cats-core" % "2.6.1"
   ),
   pomPostProcess := { node =>
     new RuleTransformer(new RewriteRule {

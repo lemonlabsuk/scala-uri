@@ -126,9 +126,10 @@ object Uri {
   */
 sealed trait Url extends Uri {
   type Self <: Url
-  type SelfWithScheme <: Url
+  type SelfWithScheme <: UrlWithScheme
   type SelfWithAuthority <: UrlWithAuthority
 
+  def authorityOption: Option[Authority]
   def hostOption: Option[Host]
   def port: Option[Int]
 
@@ -495,6 +496,39 @@ sealed trait Url extends Uri {
     case _ =>
       false
   }
+
+  /** @return this URL resolved with the given URL as the base according to section 5.2.2 Transform references of
+    * <a href="http://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a>.
+    */
+  def resolve(base: UrlWithScheme, strict: Boolean = false): UrlWithScheme = {
+    schemeOption match {
+      case Some(scheme) if strict || scheme != base.scheme =>
+        removeDotSegments.withScheme(scheme)
+      case _ if authorityOption.isDefined =>
+        removeDotSegments.withScheme(base.scheme)
+      case _ =>
+        val query = if (this.path == EmptyPath && this.query.isEmpty) base.query else this.query
+        val path = this.path match {
+          case EmptyPath =>
+            base.path
+          case _: AbsolutePath =>
+            this.path.removeDotSegments
+          // Section 5.2.3 clause 1
+          case refPath: RootlessPath if base.authorityOption.isDefined && base.path.isEmpty =>
+            AbsolutePath(refPath.parts).removeDotSegments
+          // Section 5.2.3 clause 2
+          case refPath: RootlessPath =>
+            base.path.withParts(base.path.parts.dropRight(1) ++ refPath.parts).removeDotSegments
+        }
+        base.authorityOption
+          .fold[Url](this)(withAuthority)
+          .withQueryString(query)
+          .withPath(path)
+          .withScheme(base.scheme)
+    }
+  }
+
+  private def removeDotSegments: Self = withPath(path.removeDotSegments)
 }
 
 object Url {
@@ -563,6 +597,7 @@ final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option
 
   def schemeOption: Option[String] = None
 
+  def authorityOption: Option[Authority] = None
   def hostOption: Option[Host] = None
   def port: Option[Int] = None
 
@@ -633,6 +668,13 @@ object RelativeUrl {
   }
 }
 
+sealed trait UrlWithScheme extends Url {
+  type Self <: UrlWithScheme
+  type SelfWithScheme <: UrlWithScheme
+  type SelfWithAuthority <: UrlWithAuthority with UrlWithScheme
+  def scheme: String
+}
+
 /** Represents absolute URLs with an authority (i.e. URLs with a host), examples include:
   *
   *  -          Absolute URL: `http://example.com`
@@ -640,10 +682,11 @@ object RelativeUrl {
   */
 sealed trait UrlWithAuthority extends Url {
   type Self <: UrlWithAuthority
-  type SelfWithScheme <: UrlWithAuthority
+  type SelfWithScheme <: UrlWithAuthority with UrlWithScheme
   type SelfWithAuthority = Self
 
   def authority: Authority
+  def authorityOption: Option[Authority] = Some(authority)
 
   def host: Host = authority.host
   def hostOption: Option[Host] = Some(host)
@@ -876,7 +919,8 @@ final case class AbsoluteUrl(scheme: String,
                              query: QueryString,
                              fragment: Option[String]
 )(implicit val config: UriConfig = UriConfig.default)
-    extends UrlWithAuthority {
+    extends UrlWithAuthority
+    with UrlWithScheme {
   type Self = AbsoluteUrl
   type SelfWithScheme = AbsoluteUrl
 
@@ -936,13 +980,14 @@ object AbsoluteUrl {
 /** Represents URLs that do not have an authority, for example:
   * `mailto:example@example.com` and `data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678`
   */
-sealed trait UrlWithoutAuthority extends Url {
+sealed trait UrlWithoutAuthority extends Url with UrlWithScheme {
   type Self <: UrlWithoutAuthority
   type SelfWithScheme <: UrlWithoutAuthority
   type SelfWithAuthority = AbsoluteUrl
 
   def scheme: String
 
+  def authorityOption: Option[Authority] = None
   def hostOption: Option[Host] = None
   def port: Option[Int] = None
   def user: Option[String] = None

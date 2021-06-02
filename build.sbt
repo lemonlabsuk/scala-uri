@@ -22,7 +22,7 @@ val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % simulacrumScalafixVersion,
-    "org.scalatest"     %%% "scalatest"                       % "3.2.8"   % Test,
+    "org.scalatest"     %%% "scalatest"                       % "3.2.9"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14"                 % "3.2.2.0" % Test,
     "org.scalacheck"    %%% "scalacheck"                      % "1.15.4"  % Test,
     "org.typelevel"     %%% "cats-laws"                       % "2.6.1"   % Test

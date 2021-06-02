@@ -22,10 +22,10 @@ val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % simulacrumScalafixVersion,
-    "org.scalatest"     %%% "scalatest"                       % "3.2.8"   % Test,
+    "org.scalatest"     %%% "scalatest"                       % "3.2.9"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-14"                 % "3.2.2.0" % Test,
     "org.scalacheck"    %%% "scalacheck"                      % "1.15.4"  % Test,
-    "org.typelevel"     %%% "cats-laws"                       % "2.6.0"   % Test
+    "org.typelevel"     %%% "cats-laws"                       % "2.6.1"   % Test
   ),
   scalacOptions := Seq(
     "-unchecked",
@@ -62,8 +62,8 @@ val scalaUriSettings = Seq(
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
     "org.parboiled" %%% "parboiled" % "2.3.0",
-    "com.chuusai"   %%% "shapeless" % "2.3.6",
-    "org.typelevel" %%% "cats-core" % "2.6.0"
+    "com.chuusai"   %%% "shapeless" % "2.3.7",
+    "org.typelevel" %%% "cats-core" % "2.6.1"
   ),
   pomPostProcess := { node =>
     new RuleTransformer(new RewriteRule {

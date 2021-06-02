@@ -3,10 +3,10 @@ import cats.{Eq, Order, Show}
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UrlParser, UrnParser}
 import io.lemonlabs.uri.typesafe.{PathPart, TraversablePathParts}
-
 import io.lemonlabs.uri.typesafe.PathPart.ops._
 import io.lemonlabs.uri.typesafe.TraversablePathParts.ops._
 
+import scala.annotation.tailrec
 import scala.util.Try
 
 sealed trait Path extends Product with Serializable {
@@ -73,6 +73,24 @@ sealed trait UrlPath extends Path {
     val encodedParts = parts.map(p => c.pathEncoder.encode(p, c.charset))
     encodedParts.mkString("/")
   }
+
+  /** @return this path with dot segments removed according to section 5.2.4 Remove Dot Segments of
+    *         <a href="http://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a>
+    */
+  private[uri] def removeDotSegments: UrlPath = withParts(removeDotSegments(parts, Seq.empty))
+
+  @tailrec
+  private def removeDotSegments(parts: Seq[String], acc: Seq[String]): Iterable[String] = {
+    parts match {
+      case Nil                          => acc.reverse
+      case "." +: rest if rest.isEmpty  => ("" +: acc).reverse
+      case ".." +: rest if rest.isEmpty => ("" +: acc.drop(1)).reverse
+      case "." +: rest                  => removeDotSegments(rest, acc)
+      case ".." +: rest                 => removeDotSegments(rest, acc.drop(1))
+      case part +: rest                 => removeDotSegments(rest, part +: acc)
+    }
+  }
+
 }
 
 object UrlPath {

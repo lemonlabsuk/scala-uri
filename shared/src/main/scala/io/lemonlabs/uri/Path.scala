@@ -1,5 +1,7 @@
 package io.lemonlabs.uri
 import cats.{Eq, Order, Show}
+import io.lemonlabs.uri.Path.SlashTermination
+import io.lemonlabs.uri.UrlPath.slash
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.parsing.{UrlParser, UrnParser}
 import io.lemonlabs.uri.typesafe.{PathPart, TraversablePathParts}
@@ -28,6 +30,24 @@ sealed trait Path extends Product with Serializable {
 }
 
 object Path {
+  sealed trait SlashTermination
+  object SlashTermination {
+
+    /** Remove all trailing slashes */
+    case object None extends SlashTermination
+
+    /** Ensure that an empty path is slash terminated and otherwise leave it unchanged.
+      * This corresponds to the RFC3986 URL normalization specification
+      */
+    case object EmptyPath extends SlashTermination
+
+    /** Add a trailing slash if path is empty and remove all other trailing slashes */
+    case object EmptyPathOnly extends SlashTermination
+
+    /** Ensure that all paths are slash terminated */
+    case object All extends SlashTermination
+  }
+
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Path] =
     UrlParser.parsePath(s.toString)
 
@@ -51,6 +71,7 @@ object PathParts {
 }
 
 sealed trait UrlPath extends Path {
+  type Self <: UrlPath
   def withParts(parts: Iterable[String]): UrlPath
 
   def toRootless: RootlessPath
@@ -91,12 +112,53 @@ sealed trait UrlPath extends Path {
     }
   }
 
+  /** Returns this path normalized according to
+    * <a href="http://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a>
+    */
+  def normalize(removeEmptyParts: Boolean = false,
+                slashTermination: Option[SlashTermination] = Some(SlashTermination.EmptyPath)
+  ): UrlPath = {
+    val normalized0 = removeDotSegments
+    val normalized1 = if (removeEmptyParts) normalized0.removeEmptyParts else normalized0
+    val normalized2 = slashTermination.fold(normalized1)(normalized1.slashTerminated)
+    if (normalized2.parts.isEmpty && !normalized2.isSlashTerminated) {
+      EmptyPath
+    } else {
+      normalized2
+    }
+  }
+
+  def slashTerminated(slashTermination: SlashTermination): UrlPath = slashTermination match {
+    case SlashTermination.None =>
+      if (isSlashTerminated) {
+        if (parts.length > 1) withParts(parts.dropRight(1)) else EmptyPath
+      } else this
+    case SlashTermination.EmptyPathOnly =>
+      if (isEmpty || parts == Vector("")) {
+        slash
+      } else if (isSlashTerminated) {
+        withParts(parts.dropRight(1))
+      } else this
+    case SlashTermination.EmptyPath =>
+      if (isEmpty || parts == Vector("")) slash else this
+    case SlashTermination.All =>
+      if (isEmpty || parts == Vector("")) {
+        slash
+      } else if (!isSlashTerminated) {
+        addPart("")
+      } else this
+  }
+
+  def isSlashTerminated: Boolean
+
+  def removeEmptyParts: UrlPath =
+    withParts(parts = parts.filter(_.nonEmpty))
 }
 
 object UrlPath {
   def empty: UrlPath = EmptyPath
 
-  val slash: UrlPath = AbsolutePath(Vector.empty)
+  val slash: AbsolutePath = AbsolutePath(Vector.empty)
 
   def apply(parts: Iterable[String]): UrlPath =
     if (parts.isEmpty) EmptyPath
@@ -134,6 +196,7 @@ object UrlPath {
   *   When authority is present, the path must either be empty or begin with a slash ("/") character.
   */
 sealed trait AbsoluteOrEmptyPath extends UrlPath {
+  type Self <: AbsoluteOrEmptyPath
   def toAbsoluteOrEmpty: AbsoluteOrEmptyPath =
     this
 
@@ -147,6 +210,7 @@ object AbsoluteOrEmptyPath {
 }
 
 case object EmptyPath extends AbsoluteOrEmptyPath {
+  type Self = EmptyPath.type
   def isEmpty: Boolean =
     true
 
@@ -166,10 +230,13 @@ case object EmptyPath extends AbsoluteOrEmptyPath {
     path.isEmpty
 
   override private[uri] def toString(c: UriConfig): String = ""
+
+  override def isSlashTerminated: Boolean = false
 }
 
 final case class RootlessPath(parts: Vector[String])(implicit val config: UriConfig = UriConfig.default)
     extends UrlPath {
+  type Self = RootlessPath
   def toRootless: RootlessPath =
     this
 
@@ -187,6 +254,8 @@ final case class RootlessPath(parts: Vector[String])(implicit val config: UriCon
     */
   def isEmpty: Boolean =
     parts.isEmpty
+
+  override def isSlashTerminated: Boolean = parts.lastOption.contains("")
 }
 
 object RootlessPath {
@@ -202,6 +271,7 @@ object RootlessPath {
   */
 final case class AbsolutePath(parts: Vector[String])(implicit val config: UriConfig = UriConfig.default)
     extends AbsoluteOrEmptyPath {
+  type Self = AbsolutePath
   def toAbsolute: AbsolutePath =
     this
 
@@ -215,6 +285,10 @@ final case class AbsolutePath(parts: Vector[String])(implicit val config: UriCon
 
   override private[uri] def toString(c: UriConfig): String =
     "/" + super.toString(c)
+
+  override def isSlashTerminated: Boolean =
+    parts.lastOption.fold(true)(_ == "")
+
 }
 
 object AbsolutePath {

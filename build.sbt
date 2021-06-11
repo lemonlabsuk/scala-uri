@@ -4,6 +4,7 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import com.typesafe.tools.mima.core.{
   DirectMissingMethodProblem,
+  IncompatibleResultTypeProblem,
   MissingClassProblem,
   ProblemFilters,
   ReversedMissingMethodProblem
@@ -116,9 +117,13 @@ val publishingSettings = Seq(
 val previousVersions = (0 to 0).map(v => s"3.$v.0").toSet
 
 val mimaExcludes = Seq(
+  ProblemFilters.exclude[DirectMissingMethodProblem]("io.lemonlabs.uri.config.UriConfig.*"),
+  ProblemFilters.exclude[IncompatibleResultTypeProblem]("io.lemonlabs.uri.UrlPath.slash"),
   ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*"),
+  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Host.*"),
+  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Uri.*"),
   ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Url.*"),
-  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Uri.*")
+  ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.UrlPath.*")
 )
 
 val mimaSettings = Seq(

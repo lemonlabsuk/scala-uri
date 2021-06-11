@@ -81,6 +81,17 @@ case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
 
   def toStringRaw: String =
     toString(config.withNoEncoding, _.toString)
+
+  /** Returns this authority normalized according to
+    * <a href="http://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a>
+    */
+  def normalize(removeDefaultPortFor: Option[String]): Authority = {
+    removeDefaultPortFor.flatMap(config.defaultPorts.get) match {
+      case Some(port) if this.port.contains(port) => copy(host = host.normalize, port = None)
+      case _                                      => copy(host = host.normalize)
+    }
+  }
+
 }
 
 object Authority {

@@ -38,53 +38,57 @@ class NormalizationTests extends AnyFlatSpec with Matchers {
     UrlPath(Seq("")).normalize(true) should equal(UrlPath.slash)
     UrlPath(Seq("a", "", "b")).normalize(true) should equal(AbsolutePath.fromParts("a", "b"))
     UrlPath(Seq("a", "", "b")).normalize(true) should equal(AbsolutePath.fromParts("a", "b"))
-    UrlPath(Seq("a")).normalize(true, slashTermination = Some(SlashTermination.All)) should equal(
+    UrlPath(Seq("a")).normalize(true, slashTermination = SlashTermination.AddForAll) should equal(
       AbsolutePath.fromParts("a", "")
     )
   }
 
   it should "apply slash termination policy" in {
 
-    RootlessPath.fromParts("").normalize(slashTermination = None) should equal(RootlessPath.fromParts(""))
-    RootlessPath.fromParts("").normalize(slashTermination = Some(SlashTermination.None)) should equal(EmptyPath)
-    RootlessPath.fromParts("").normalize(slashTermination = Some(SlashTermination.EmptyPath)) should equal(
+    RootlessPath.fromParts("").normalize(slashTermination = SlashTermination.Off) should equal(
+      RootlessPath.fromParts("")
+    )
+    RootlessPath.fromParts("").normalize(slashTermination = SlashTermination.RemoveForAll) should equal(EmptyPath)
+    RootlessPath.fromParts("").normalize(slashTermination = SlashTermination.AddForEmptyPath) should equal(
       UrlPath.slash
     )
-    RootlessPath.fromParts("").normalize(slashTermination = Some(SlashTermination.EmptyPathOnly)) should equal(
+    RootlessPath.fromParts("").normalize(slashTermination = SlashTermination.AddForEmptyPathRemoveOthers) should equal(
       UrlPath.slash
     )
-    RootlessPath.fromParts("").normalize(slashTermination = Some(SlashTermination.All)) should equal(UrlPath.slash)
+    RootlessPath.fromParts("").normalize(slashTermination = SlashTermination.AddForAll) should equal(UrlPath.slash)
 
-    AbsolutePath.fromParts("").normalize(slashTermination = None) should equal(AbsolutePath.fromParts(""))
-    AbsolutePath.fromParts("").normalize(slashTermination = Some(SlashTermination.None)) should equal(EmptyPath)
-    AbsolutePath.fromParts("").normalize(slashTermination = Some(SlashTermination.EmptyPath)) should equal(
+    AbsolutePath.fromParts("").normalize(slashTermination = SlashTermination.Off) should equal(
+      AbsolutePath.fromParts("")
+    )
+    AbsolutePath.fromParts("").normalize(slashTermination = SlashTermination.RemoveForAll) should equal(EmptyPath)
+    AbsolutePath.fromParts("").normalize(slashTermination = SlashTermination.AddForEmptyPath) should equal(
       UrlPath.slash
     )
-    AbsolutePath.fromParts("").normalize(slashTermination = Some(SlashTermination.EmptyPathOnly)) should equal(
+    AbsolutePath.fromParts("").normalize(slashTermination = SlashTermination.AddForEmptyPathRemoveOthers) should equal(
       UrlPath.slash
     )
-    AbsolutePath.fromParts("").normalize(slashTermination = Some(SlashTermination.All)) should equal(UrlPath.slash)
+    AbsolutePath.fromParts("").normalize(slashTermination = SlashTermination.AddForAll) should equal(UrlPath.slash)
 
-    RootlessPath.fromParts("a").normalize(slashTermination = None) should
+    RootlessPath.fromParts("a").normalize(slashTermination = SlashTermination.Off) should
       equal(RootlessPath.fromParts("a"))
-    RootlessPath.fromParts("a").normalize(slashTermination = Some(SlashTermination.None)) should
+    RootlessPath.fromParts("a").normalize(slashTermination = SlashTermination.RemoveForAll) should
       equal(RootlessPath.fromParts("a"))
-    RootlessPath.fromParts("a").normalize(slashTermination = Some(SlashTermination.EmptyPath)) should
+    RootlessPath.fromParts("a").normalize(slashTermination = SlashTermination.AddForEmptyPath) should
       equal(RootlessPath.fromParts("a"))
-    RootlessPath.fromParts("a").normalize(slashTermination = Some(SlashTermination.EmptyPathOnly)) should
+    RootlessPath.fromParts("a").normalize(slashTermination = SlashTermination.AddForEmptyPathRemoveOthers) should
       equal(RootlessPath.fromParts("a"))
-    RootlessPath.fromParts("a").normalize(slashTermination = Some(SlashTermination.All)) should
+    RootlessPath.fromParts("a").normalize(slashTermination = SlashTermination.AddForAll) should
       equal(RootlessPath.fromParts("a", ""))
 
-    AbsolutePath.fromParts("a").normalize(slashTermination = None) should
+    AbsolutePath.fromParts("a").normalize(slashTermination = SlashTermination.Off) should
       equal(AbsolutePath.fromParts("a"))
-    AbsolutePath.fromParts("a").normalize(slashTermination = Some(SlashTermination.None)) should
+    AbsolutePath.fromParts("a").normalize(slashTermination = SlashTermination.RemoveForAll) should
       equal(AbsolutePath.fromParts("a"))
-    AbsolutePath.fromParts("a").normalize(slashTermination = Some(SlashTermination.EmptyPath)) should
+    AbsolutePath.fromParts("a").normalize(slashTermination = SlashTermination.AddForEmptyPath) should
       equal(AbsolutePath.fromParts("a"))
-    AbsolutePath.fromParts("a").normalize(slashTermination = Some(SlashTermination.EmptyPathOnly)) should
+    AbsolutePath.fromParts("a").normalize(slashTermination = SlashTermination.AddForEmptyPathRemoveOthers) should
       equal(AbsolutePath.fromParts("a"))
-    AbsolutePath.fromParts("a").normalize(slashTermination = Some(SlashTermination.All)) should
+    AbsolutePath.fromParts("a").normalize(slashTermination = SlashTermination.AddForAll) should
       equal(AbsolutePath.fromParts("a", ""))
   }
 

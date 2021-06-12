@@ -545,10 +545,10 @@ sealed trait Url extends Uri {
     * @return
     */
   def normalize(removeEmptyPathParts: Boolean = false,
-                slashTermination: Option[SlashTermination] = Some(SlashTermination.EmptyPath)
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
   ): Self
 
-  def slashTerminated(slashTermination: SlashTermination = SlashTermination.All): Self =
+  def slashTerminated(slashTermination: SlashTermination = SlashTermination.AddForAll): Self =
     withPath(path.slashTerminated(slashTermination))
   def removeEmptyPathParts: Self = withPath(path.removeEmptyParts)
 
@@ -666,7 +666,7 @@ final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option
   def mapPassword(f: String => String): RelativeUrl = this
 
   def normalize(removeEmptyPathParts: Boolean = false,
-                slashTermination: Option[SlashTermination] = Some(SlashTermination.EmptyPath)
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
   ): Self =
     copy(path = path.normalize(removeEmptyPathParts, slashTermination))
 }
@@ -917,7 +917,7 @@ final case class ProtocolRelativeUrl(authority: Authority,
     "//" + authority.toString(c, hostToString) + path.toString(c) + queryToString(c) + fragmentToString(c)
 
   def normalize(removeEmptyPathParts: Boolean = false,
-                slashTermination: Option[SlashTermination] = Some(SlashTermination.EmptyPath)
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
   ): Self = {
     copy(
       authority = authority.normalize(None),
@@ -992,7 +992,7 @@ final case class AbsoluteUrl(scheme: String,
     scheme + "://" + authority.toString(c, hostToString) + path.toString(c) + queryToString(c) + fragmentToString(c)
 
   def normalize(removeEmptyPathParts: Boolean = false,
-                slashTermination: Option[SlashTermination] = Some(SlashTermination.EmptyPath)
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
   ): Self = {
     val scheme = this.scheme.toLowerCase
     copy(
@@ -1136,7 +1136,7 @@ final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query:
     scheme + ":" + path.toString(c) + queryToString(c) + fragmentToString(c)
 
   def normalize(removeEmptyPathParts: Boolean = false,
-                slashTermination: Option[SlashTermination] = Some(SlashTermination.EmptyPath)
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
   ): Self = {
     copy(
       scheme = scheme.toLowerCase,
@@ -1261,7 +1261,7 @@ final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte
     this == other
 
   def normalize(removeEmptyPathParts: Boolean = false,
-                slashTermination: Option[SlashTermination] = Some(SlashTermination.EmptyPath)
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
   ): Self = this
 }
 
@@ -1353,7 +1353,7 @@ final case class ScpLikeUrl(override val user: Option[String], override val host
     this == other
 
   def normalize(removeEmptyPathParts: Boolean = false,
-                slashTermination: Option[SlashTermination] = Some(SlashTermination.EmptyPath)
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
   ): Self =
     copy(host = host.normalize, path = path.normalize(removeEmptyPathParts, slashTermination))
 }

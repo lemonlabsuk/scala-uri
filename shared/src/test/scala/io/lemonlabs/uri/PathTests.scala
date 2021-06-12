@@ -1,6 +1,6 @@
 package io.lemonlabs.uri
 
-import io.lemonlabs.uri.Path.SlashTermination
+import io.lemonlabs.uri.Path.SlashTermination._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -22,37 +22,45 @@ class PathTests extends AnyFlatSpec with Matchers {
   }
 
   "Url.slashTerminate" should "add or remove trailing slashes in the path" in {
-    AbsoluteUrl.parse("https://a.com").slashTerminated(SlashTermination.None).toString() should
+    AbsoluteUrl.parse("https://a.com").slashTerminated(Off).toString() should
       equal("https://a.com")
-    AbsoluteUrl.parse("https://a.com").slashTerminated(SlashTermination.EmptyPath).toString() should
-      equal("https://a.com/")
-    AbsoluteUrl.parse("https://a.com").slashTerminated(SlashTermination.EmptyPathOnly).toString() should
-      equal("https://a.com/")
-    AbsoluteUrl.parse("https://a.com").slashTerminated(SlashTermination.All).toString() should
-      equal("https://a.com/")
-    AbsoluteUrl.parse("https://a.com/").slashTerminated(SlashTermination.None).toString() should
+    AbsoluteUrl.parse("https://a.com").slashTerminated(RemoveForAll).toString() should
       equal("https://a.com")
-    AbsoluteUrl.parse("https://a.com/").slashTerminated(SlashTermination.EmptyPath).toString() should
+    AbsoluteUrl.parse("https://a.com").slashTerminated(AddForEmptyPath).toString() should
       equal("https://a.com/")
-    AbsoluteUrl.parse("https://a.com/").slashTerminated(SlashTermination.EmptyPathOnly).toString() should
+    AbsoluteUrl.parse("https://a.com").slashTerminated(AddForEmptyPathRemoveOthers).toString() should
       equal("https://a.com/")
-    AbsoluteUrl.parse("https://a.com/").slashTerminated(SlashTermination.All).toString() should
+    AbsoluteUrl.parse("https://a.com").slashTerminated(AddForAll).toString() should
       equal("https://a.com/")
-    AbsoluteUrl.parse("https://a.com/b").slashTerminated(SlashTermination.None).toString() should
+    AbsoluteUrl.parse("https://a.com/").slashTerminated(Off).toString() should
+      equal("https://a.com/")
+    AbsoluteUrl.parse("https://a.com/").slashTerminated(RemoveForAll).toString() should
+      equal("https://a.com")
+    AbsoluteUrl.parse("https://a.com/").slashTerminated(AddForEmptyPath).toString() should
+      equal("https://a.com/")
+    AbsoluteUrl.parse("https://a.com/").slashTerminated(AddForEmptyPathRemoveOthers).toString() should
+      equal("https://a.com/")
+    AbsoluteUrl.parse("https://a.com/").slashTerminated(AddForAll).toString() should
+      equal("https://a.com/")
+    AbsoluteUrl.parse("https://a.com/b").slashTerminated(Off).toString() should
       equal("https://a.com/b")
-    AbsoluteUrl.parse("https://a.com/b").slashTerminated(SlashTermination.EmptyPath).toString() should
+    AbsoluteUrl.parse("https://a.com/b").slashTerminated(RemoveForAll).toString() should
       equal("https://a.com/b")
-    AbsoluteUrl.parse("https://a.com/b").slashTerminated(SlashTermination.EmptyPathOnly).toString() should
+    AbsoluteUrl.parse("https://a.com/b").slashTerminated(AddForEmptyPath).toString() should
       equal("https://a.com/b")
-    AbsoluteUrl.parse("https://a.com/b").slashTerminated(SlashTermination.All).toString() should
+    AbsoluteUrl.parse("https://a.com/b").slashTerminated(AddForEmptyPathRemoveOthers).toString() should
+      equal("https://a.com/b")
+    AbsoluteUrl.parse("https://a.com/b").slashTerminated(AddForAll).toString() should
       equal("https://a.com/b/")
-    AbsoluteUrl.parse("https://a.com/b/").slashTerminated(SlashTermination.None).toString() should
-      equal("https://a.com/b")
-    AbsoluteUrl.parse("https://a.com/b/").slashTerminated(SlashTermination.EmptyPath).toString() should
+    AbsoluteUrl.parse("https://a.com/b/").slashTerminated(Off).toString() should
       equal("https://a.com/b/")
-    AbsoluteUrl.parse("https://a.com/b/").slashTerminated(SlashTermination.EmptyPathOnly).toString() should
+    AbsoluteUrl.parse("https://a.com/b/").slashTerminated(RemoveForAll).toString() should
       equal("https://a.com/b")
-    AbsoluteUrl.parse("https://a.com/b/").slashTerminated(SlashTermination.All).toString() should
+    AbsoluteUrl.parse("https://a.com/b/").slashTerminated(AddForEmptyPath).toString() should
+      equal("https://a.com/b/")
+    AbsoluteUrl.parse("https://a.com/b/").slashTerminated(AddForEmptyPathRemoveOthers).toString() should
+      equal("https://a.com/b")
+    AbsoluteUrl.parse("https://a.com/b/").slashTerminated(AddForAll).toString() should
       equal("https://a.com/b/")
 
   }

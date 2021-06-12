@@ -117,8 +117,6 @@ val publishingSettings = Seq(
 val previousVersions = (0 to 0).map(v => s"3.$v.0").toSet
 
 val mimaExcludes = Seq(
-  ProblemFilters.exclude[DirectMissingMethodProblem]("io.lemonlabs.uri.config.UriConfig.*"),
-  ProblemFilters.exclude[IncompatibleResultTypeProblem]("io.lemonlabs.uri.UrlPath.slash"),
   ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*"),
   ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Host.*"),
   ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Uri.*"),

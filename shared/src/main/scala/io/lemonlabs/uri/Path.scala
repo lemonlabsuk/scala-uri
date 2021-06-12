@@ -162,7 +162,7 @@ sealed trait UrlPath extends Path {
 object UrlPath {
   def empty: UrlPath = EmptyPath
 
-  val slash: AbsolutePath = AbsolutePath(Vector.empty)
+  val slash: UrlPath = AbsolutePath(Vector.empty)
 
   def apply(parts: Iterable[String]): UrlPath =
     if (parts.isEmpty) EmptyPath

@@ -90,4 +90,9 @@ class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
     val normalized2 = url2.normalize(removeEmptyPathParts = true, slashTermination = RemoveForAll)
     normalized2.toString should equal("https://example.com")
   }
+
+  "Github Issue #318" should "not include private domains from the public suffix list" in {
+    Url.parse("http://475952.temp-dns.com/recipes/").subdomain should equal(Some("475952"))
+    Url.parse("https://allrecipes-01.web.app/").subdomain should equal(Some("allrecipes-01"))
+  }
 }

@@ -14,13 +14,20 @@ object UpdatePublicSuffixes {
   def generate(suffixLines: List[String]): Unit = {
     implicit val enc: Codec = Codec.UTF8
 
-    val allSuffixes = for {
-      line <- suffixLines
+    val privateDomainsStart = suffixLines.indexWhere(line => line.startsWith("//") && line.contains("===BEGIN PRIVATE DOMAINS==="))
+
+    if(privateDomainsStart <= 0 || privateDomainsStart >= suffixLines.size) {
+      println("Can't find the private domains section in the public suffix list")
+      sys.exit(1)
+    }
+
+    val publicDomainSuffixes = for {
+      line <- suffixLines.slice(0, privateDomainsStart)
       trimLine = line.trim
       if !trimLine.startsWith("//") && trimLine.nonEmpty
     } yield trimLine
 
-    val (exceptions, others) = allSuffixes.partition(_.startsWith("!"))
+    val (exceptions, others) = publicDomainSuffixes.partition(_.startsWith("!"))
     val (wildcards, suffixes) = others.partition(_.contains("*"))
     val (wildcardPrefixes, otherWildcards) = wildcards.partition(_.startsWith("*"))
 

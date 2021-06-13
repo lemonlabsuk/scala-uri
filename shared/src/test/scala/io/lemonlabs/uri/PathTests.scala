@@ -65,11 +65,11 @@ class PathTests extends AnyFlatSpec with Matchers {
 
   }
 
-  "Url.removeEmptyPathParts" should "remove empty parts in the path" in {
-    AbsoluteUrl.parse("https://a.com").removeEmptyPathParts.toString() should equal("https://a.com")
-    AbsoluteUrl.parse("https://a.com/").removeEmptyPathParts.toString() should equal("https://a.com/")
-    AbsoluteUrl.parse("https://a.com//").removeEmptyPathParts.toString() should equal("https://a.com/")
-    AbsoluteUrl.parse("https://a.com//a").removeEmptyPathParts.toString() should equal("https://a.com/a")
-    AbsoluteUrl.parse("https://a.com//a/").removeEmptyPathParts.toString() should equal("https://a.com/a")
+  "Url.removeEmptyPathParts()" should "remove empty parts in the path" in {
+    AbsoluteUrl.parse("https://a.com").removeEmptyPathParts().toString() should equal("https://a.com")
+    AbsoluteUrl.parse("https://a.com/").removeEmptyPathParts().toString() should equal("https://a.com/")
+    AbsoluteUrl.parse("https://a.com//").removeEmptyPathParts().toString() should equal("https://a.com/")
+    AbsoluteUrl.parse("https://a.com//a").removeEmptyPathParts().toString() should equal("https://a.com/a")
+    AbsoluteUrl.parse("https://a.com//a/").removeEmptyPathParts().toString() should equal("https://a.com/a")
   }
 }

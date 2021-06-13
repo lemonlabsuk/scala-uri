@@ -550,7 +550,7 @@ sealed trait Url extends Uri {
 
   def slashTerminated(slashTermination: SlashTermination = SlashTermination.AddForAll): Self =
     withPath(path.slashTerminated(slashTermination))
-  def removeEmptyPathParts: Self = withPath(path.removeEmptyParts)
+  def removeEmptyPathParts(): Self = withPath(path.removeEmptyParts)
 
 }
 

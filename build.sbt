@@ -114,7 +114,7 @@ val publishingSettings = Seq(
       </developers>
 )
 
-val previousVersions = (0 to 0).map(v => s"3.$v.0").toSet
+val previousVersions = Set(0, 4).map(v => s"3.$v.0")
 
 val mimaExcludes = Seq(
   ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*"),

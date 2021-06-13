@@ -9,6 +9,7 @@ import scala.collection.immutable
 import scala.util.Try
 
 sealed trait Host {
+  type Self <: Host
   def conf: UriConfig
   def value: String
   override def toString: String = value
@@ -78,6 +79,11 @@ sealed trait Host {
     * @return the longest subdomain for this URL's host
     */
   def longestSubdomain: Option[String]
+
+  /** Returns this host with its character case normalized according to
+    * <a href="http://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a>
+    */
+  def normalize: Self
 }
 
 object Host {
@@ -101,6 +107,7 @@ object Host {
 final case class DomainName(value: String)(implicit val conf: UriConfig = UriConfig.default)
     extends Host
     with PunycodeSupport {
+  type Self = DomainName
 
   private def isValidPublicSuffix(suffix: String): Boolean =
     if (PublicSuffixes.set.contains(suffix)) { true }
@@ -237,6 +244,11 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
       case other => Some(other)
     }
   }
+
+  /** Returns this host normalized according to
+    * <a href="http://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a>
+    */
+  def normalize: Self = this.copy(value.toLowerCase)
 }
 
 object DomainName {
@@ -259,6 +271,7 @@ object DomainName {
 final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte)(implicit
     val conf: UriConfig = UriConfig.default
 ) extends Host {
+  type Self = IpV4
   private def uByteToInt(b: Byte): Int = b & 0xff
 
   def octet1Int: Int = uByteToInt(octet1)
@@ -284,6 +297,8 @@ final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte)(im
   def subdomains: Vector[String] = Vector.empty
   def shortestSubdomain: Option[String] = None
   def longestSubdomain: Option[String] = None
+
+  def normalize: Self = this
 }
 
 object IpV4 {
@@ -320,6 +335,8 @@ final case class IpV6(piece1: Char,
                       piece8: Char
 )(implicit val conf: UriConfig = UriConfig.default)
     extends Host {
+  type Self = IpV6
+
   def piece1Int: Int = piece1.toInt
   def piece2Int: Int = piece2.toInt
   def piece3Int: Int = piece3.toInt
@@ -372,6 +389,8 @@ final case class IpV6(piece1: Char,
     }
 
   def toStringNonNormalised: String = hexPieces.mkString("[", ":", "]")
+
+  def normalize: IpV6 = this
 }
 
 object IpV6 {

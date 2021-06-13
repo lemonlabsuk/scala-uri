@@ -2,7 +2,9 @@ package io.lemonlabs.uri
 
 import java.util.Base64
 import cats.{Eq, Order, Show}
+import io.lemonlabs.uri.Path.SlashTermination
 import io.lemonlabs.uri.config.UriConfig
+import io.lemonlabs.uri.encoding.PercentEncoder
 import io.lemonlabs.uri.parsing.{UriParser, UrlParser, UrnParser}
 import io.lemonlabs.uri.redact.Redactor
 import io.lemonlabs.uri.typesafe.{
@@ -497,8 +499,8 @@ sealed trait Url extends Uri {
       false
   }
 
-  /** @return this URL resolved with the given URL as the base according to section 5.2.2 Transform references of
-    * <a href="http://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a>.
+  /** @return this URL resolved with the given URL as the base according to section 5.2.2 Transform References of
+    *         <a href="http://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a>.
     */
   def resolve(base: UrlWithScheme, strict: Boolean = false): UrlWithScheme = {
     schemeOption match {
@@ -529,6 +531,27 @@ sealed trait Url extends Uri {
   }
 
   private def removeDotSegments: Self = withPath(path.removeDotSegments)
+
+  /** @return this URL with its case normalized according to section 6.2.2.1 Section Path Normalization of
+    *         <a href="http://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a>, optionally removing empty parts of the path
+    *         and ensuring that it is or isn't terminated by a slash.
+    */
+
+  /** Normalizes this
+    *
+    * @param removeEmptyPathParts
+    * @param slashTerminated
+    * @param slashTerminatedEmptyPath
+    * @return
+    */
+  def normalize(removeEmptyPathParts: Boolean = false,
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
+  ): Self
+
+  def slashTerminated(slashTermination: SlashTermination = SlashTermination.AddForAll): Self =
+    withPath(path.slashTerminated(slashTermination))
+  def removeEmptyPathParts: Self = withPath(path.removeEmptyParts)
+
 }
 
 object Url {
@@ -641,6 +664,11 @@ final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option
   def removePassword(): RelativeUrl = this
   def mapUser(f: String => String): RelativeUrl = this
   def mapPassword(f: String => String): RelativeUrl = this
+
+  def normalize(removeEmptyPathParts: Boolean = false,
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
+  ): Self =
+    copy(path = path.normalize(removeEmptyPathParts, slashTermination))
 }
 
 object RelativeUrl {
@@ -887,6 +915,15 @@ final case class ProtocolRelativeUrl(authority: Authority,
 
   private[uri] def toString(c: UriConfig, hostToString: Host => String): String =
     "//" + authority.toString(c, hostToString) + path.toString(c) + queryToString(c) + fragmentToString(c)
+
+  def normalize(removeEmptyPathParts: Boolean = false,
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
+  ): Self = {
+    copy(
+      authority = authority.normalize(None),
+      path = path.normalize(removeEmptyPathParts, slashTermination).toAbsoluteOrEmpty
+    )
+  }
 }
 
 object ProtocolRelativeUrl {
@@ -953,6 +990,17 @@ final case class AbsoluteUrl(scheme: String,
 
   private[uri] def toString(c: UriConfig, hostToString: Host => String): String =
     scheme + "://" + authority.toString(c, hostToString) + path.toString(c) + queryToString(c) + fragmentToString(c)
+
+  def normalize(removeEmptyPathParts: Boolean = false,
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
+  ): Self = {
+    val scheme = this.scheme.toLowerCase
+    copy(
+      scheme = scheme,
+      authority = authority.normalize(Some(scheme)),
+      path = path.normalize(removeEmptyPathParts, slashTermination).toAbsoluteOrEmpty
+    )
+  }
 }
 
 object AbsoluteUrl {
@@ -1086,6 +1134,15 @@ final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query:
 
   private[uri] def toString(c: UriConfig): String =
     scheme + ":" + path.toString(c) + queryToString(c) + fragmentToString(c)
+
+  def normalize(removeEmptyPathParts: Boolean = false,
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
+  ): Self = {
+    copy(
+      scheme = scheme.toLowerCase,
+      path = path.normalize(removeEmptyPathParts, slashTermination)
+    )
+  }
 }
 
 object SimpleUrlWithoutAuthority {
@@ -1202,6 +1259,10 @@ final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte
     */
   override def equalsUnordered(other: Uri): Boolean =
     this == other
+
+  def normalize(removeEmptyPathParts: Boolean = false,
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
+  ): Self = this
 }
 
 object DataUrl {
@@ -1290,6 +1351,11 @@ final case class ScpLikeUrl(override val user: Option[String], override val host
     */
   override def equalsUnordered(other: Uri): Boolean =
     this == other
+
+  def normalize(removeEmptyPathParts: Boolean = false,
+                slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
+  ): Self =
+    copy(host = host.normalize, path = path.normalize(removeEmptyPathParts, slashTermination))
 }
 
 object ScpLikeUrl {

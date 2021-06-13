@@ -14,9 +14,10 @@ object UpdatePublicSuffixes {
   def generate(suffixLines: List[String]): Unit = {
     implicit val enc: Codec = Codec.UTF8
 
-    val privateDomainsStart = suffixLines.indexWhere(line => line.startsWith("//") && line.contains("===BEGIN PRIVATE DOMAINS==="))
+    val privateDomainsStart =
+      suffixLines.indexWhere(line => line.startsWith("//") && line.contains("===BEGIN PRIVATE DOMAINS==="))
 
-    if(privateDomainsStart <= 0 || privateDomainsStart >= suffixLines.size) {
+    if (privateDomainsStart <= 0 || privateDomainsStart >= suffixLines.size) {
       println("Can't find the private domains section in the public suffix list")
       sys.exit(1)
     }

@@ -1,5 +1,6 @@
 package io.lemonlabs.uri
 
+import io.lemonlabs.uri.Path.SlashTermination.RemoveForAll
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding.{PercentDecoder, UriDecodeException}
 import io.lemonlabs.uri.encoding.NoopEncoder
@@ -77,5 +78,21 @@ class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
 
   "Github Issue #204" should "parse a domain name host with IPv4 prefix" in {
     Host.parse("1.2.3.4.blah") should equal(DomainName("1.2.3.4.blah"))
+  }
+
+  "Github Issue #304" should "remove empty path parts and remove trailing slashes in the path" in {
+    import io.lemonlabs.uri.typesafe.dsl._
+    val url1 = Url.parse("http://example.com/") / "bar"
+    url1.removeEmptyPathParts().toString should equal("http://example.com/bar")
+    url1.normalize(removeEmptyPathParts = true).toString should equal("http://example.com/bar")
+
+    val url2 = Url.parse("https://example.com/")
+    val normalized2 = url2.normalize(removeEmptyPathParts = true, slashTermination = RemoveForAll)
+    normalized2.toString should equal("https://example.com")
+  }
+
+  "Github Issue #318" should "not include private domains from the public suffix list" in {
+    Url.parse("http://475952.temp-dns.com/recipes/").subdomain should equal(Some("475952"))
+    Url.parse("https://allrecipes-01.web.app/").subdomain should equal(Some("allrecipes-01"))
   }
 }

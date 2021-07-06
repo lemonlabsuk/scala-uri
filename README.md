@@ -1,6 +1,6 @@
 # scala-uri
 
-[![Build Status](https://api.travis-ci.org/lemonlabsuk/scala-uri.svg?branch=master)](https://travis-ci.org/lemonlabsuk/scala-uri)
+[![Build Status](https://travis-ci.com/lemonlabsuk/scala-uri.svg?branch=master)](https://travis-ci.com/lemonlabsuk/scala-uri)
 [![codecov.io](http://codecov.io/github/lemonlabsuk/scala-uri/coverage.svg?branch=master)](https://codecov.io/gh/lemonlabsuk/scala-uri/branch/master)
 [![Slack](https://lemonlabs.io/slack/badge.svg)](https://lemonlabs.io/slack)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)

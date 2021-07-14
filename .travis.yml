@@ -25,9 +25,9 @@ jdk:
 
 jobs:
   include:
-    - scala: [2.13.5]
+    - scala: [2.13.6]
       env: PROJECT=scalaUriJVM
-    - scala: [2.13.5]
+    - scala: [2.13.6]
       env: PROJECT=scalaUriJS
     - scala: [2.12.14]
       env: PROJECT=scalaUriJVM

@@ -11,7 +11,7 @@ import com.typesafe.tools.mima.core.{
 }
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPreviousArtifacts, mimaReportBinaryIssues}
 
-name                           := "scala-uri root"
+name := "scala-uri root"
 
 ThisBuild / scalaVersion       := "2.13.6"
 ThisBuild / crossScalaVersions := Seq("2.12.14", scalaVersion.value)

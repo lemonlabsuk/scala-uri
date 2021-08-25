@@ -55,7 +55,7 @@ class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
   "Github Issue #98" should "not allow spaces in hosts" in {
     Seq(" " -> " ", "\n" -> "\\n", "\t" -> "\\t", "\r" -> "\\r").foreach { case (ch, chToString) =>
       val e = the[UriParsingException] thrownBy AbsoluteUrl.parse(s"https://www.goog${ch}le.com?q=i+am+invalid")
-      e.getMessage should startWith(s"Invalid Url could not be parsed. Invalid input '$chToString'")
+      e.getMessage should startWith(s"Invalid Url could not be parsed.")
     }
   }
 

@@ -28,9 +28,8 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
       extractIpv4(a, b, c, d)
     }
 
-  def hexDigit: Parser[Char] = digit | charIn('a' to 'z') | charIn('A' to 'Z')
   def _ip_v6_hex_piece: Parser[String] =
-    hexDigit.rep(1, 4).string
+    _hex_digit.rep(1, 4).string
 
   def _full_ip_v6: Parser[IpV6] =
     for {

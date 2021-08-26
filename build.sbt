@@ -63,7 +63,6 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    "org.parboiled" %%% "parboiled" % "2.3.0",
     "com.chuusai"   %%% "shapeless" % "2.3.7",
     "org.typelevel" %%% "cats-core" % "2.6.1",
     "org.typelevel" %%% "cats-parse" % "0.3.4"

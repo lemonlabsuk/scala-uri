@@ -162,7 +162,7 @@ lazy val scalaUri =
       Test / fork := true
     )
     .jsSettings(
-      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0"
+      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.2.0"
     )
 
 lazy val docs = project

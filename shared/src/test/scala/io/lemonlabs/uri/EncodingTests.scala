@@ -30,7 +30,7 @@ class EncodingTests extends AnyFlatSpec with Matchers {
 
   "URI path double quotes" should "be percent encoded when using conservative encoder" in {
     val url = Url.parse("""http://theon.github.com/blah/"quoted"""")
-    url.toString(UriConfig.conservative) should equal("http://theon.github.com/blah/%22quoted%22")
+    url.toStringWithConfig(UriConfig.conservative) should equal("http://theon.github.com/blah/%22quoted%22")
   }
 
   "URI path spaces" should "be plus encoded if configured" in {
@@ -53,14 +53,14 @@ class EncodingTests extends AnyFlatSpec with Matchers {
 
   "Querystring double quotes" should "be percent encoded when using conservative encoder" in {
     val url = Url.parse("""http://theon.github.com?blah="quoted"""")
-    url.toString(UriConfig.conservative) should equal("http://theon.github.com?blah=%22quoted%22")
+    url.toStringWithConfig(UriConfig.conservative) should equal("http://theon.github.com?blah=%22quoted%22")
   }
 
   "Reserved characters" should "be percent encoded when using conservative encoder" in {
     val url = Url(
       query = QueryString.fromPairs("reserved" -> ":/?#[]@!$&'()*+,;={}\\\n\r")
     )
-    url.toString(UriConfig.conservative) should equal(
+    url.toStringWithConfig(UriConfig.conservative) should equal(
       "?reserved=%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D%7B%7D%5C%0A%0D"
     )
   }

@@ -1,7 +1,7 @@
 package io.lemonlabs.uri.inet
 
 object PublicSuffixes {
-  lazy val exceptions = Set(
+  lazy val exceptions: Set[String] = Set(
     "www.ck",
     "city.kawasaki.jp",
     "city.kitakyushu.jp",
@@ -12,7 +12,7 @@ object PublicSuffixes {
     "city.yokohama.jp"
   )
 
-  lazy val wildcardPrefixes = Set(
+  lazy val wildcardPrefixes: Set[String] = Set(
     "bd",
     "nom.br",
     "ck",
@@ -33,7 +33,7 @@ object PublicSuffixes {
     "sch.uk"
   )
 
-  lazy val set = publicSuffixes0 ++ publicSuffixes1
+  lazy val set: Set[String] = publicSuffixes0 ++ publicSuffixes1
   private def publicSuffixes0 =
     Set(
       "ac",
@@ -620,7 +620,6 @@ object PublicSuffixes {
       "md.ci",
       "gouv.ci",
       "cl",
-      "aprendemas.cl",
       "co.cl",
       "gob.cl",
       "gov.cl",
@@ -5035,11 +5034,11 @@ object PublicSuffixes {
       "org.pe",
       "com.pe",
       "net.pe",
-      "pf"
+      "pf",
+      "com.pf"
     )
   private def publicSuffixes1 =
     Set(
-      "com.pf",
       "org.pf",
       "edu.pf",
       "ph",
@@ -6011,6 +6010,7 @@ object PublicSuffixes {
       "edu.vc",
       "ve",
       "arts.ve",
+      "bib.ve",
       "co.ve",
       "com.ve",
       "e12.ve",
@@ -6022,7 +6022,9 @@ object PublicSuffixes {
       "int.ve",
       "mil.ve",
       "net.ve",
+      "nom.ve",
       "org.ve",
+      "rar.ve",
       "rec.ve",
       "store.ve",
       "tec.ve",
@@ -6721,6 +6723,7 @@ object PublicSuffixes {
       "kerryproperties",
       "kfh",
       "kia",
+      "kids",
       "kim",
       "kinder",
       "kindle",

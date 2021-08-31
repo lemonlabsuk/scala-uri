@@ -144,9 +144,9 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
     until0(charIn("#?[]:") | Parser.end).map { path =>
       val segments = path.split("/", -1)
       if (path.nonEmpty && path.charAt(0) == '/')
-        extractRelPath("/", segments.drop(1).toSeq)
+        extractRelPath("/", segments.drop(1).toVector)
       else
-        extractRelPath("", segments.toSeq)
+        extractRelPath("", segments.toVector)
     }
 
   def _query_param: Parser[(String, Some[String])] =

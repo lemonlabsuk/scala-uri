@@ -28,7 +28,6 @@ class ParsingTests extends AnyFlatSpec with Matchers {
   it should "not allow whitespace in the user" in {
     Seq(" " -> " ", "\n" -> "\\n", "\t" -> "\\t", "\r" -> "\\r").foreach { case (ch, chToString) =>
       val e = the[UriParsingException] thrownBy AbsoluteUrl.parse(s"https://user${ch}name:password@www.example.com")
-      // todo: how exact must the error message be?
       e.getMessage should startWith(s"Invalid Url could not be parsed.")
     }
   }
@@ -149,7 +148,8 @@ class ParsingTests extends AnyFlatSpec with Matchers {
     val nineSegIp = "http://[1:2:3:4:5:6:7:8:9]:9000"
     val e = the[UriParsingException] thrownBy Url.parse(nineSegIp)
 
-    // todo: what to do with these messages?
+    // todo: Improve error messages to be closer to the parboiled2 message below
+    e.getMessage should equal("Invalid URL could not be parsed. Error(7,NonEmptyList(EndOfString(7,31)))")
 //    e.getMessage should equal(
 //      """Invalid URL could not be parsed. Invalid input ']', expected HexDigit or ':' (line 1, column 26):
 //                                |http://[1:2:3:4:5:6:7:8:9]:9000

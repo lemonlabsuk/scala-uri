@@ -71,7 +71,7 @@ class ToUriTests extends AnyWordSpec with Matchers {
       url.password should equal(Some("password"))
       url.path.toString() should equal("/test")
       url.query.params should equal(Vector(("weird=&key", Some("strange%value")), ("arrow", Some("⇔"))))
-      url.toString(UriConfig.conservative) should equal(javaUri.toASCIIString)
+      url.toStringWithConfig(UriConfig.conservative) should equal(javaUri.toASCIIString)
     }
   }
 }

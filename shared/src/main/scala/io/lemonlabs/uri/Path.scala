@@ -15,7 +15,7 @@ import scala.util.Try
 sealed trait Path extends Product with Serializable {
   def config: UriConfig
   def parts: Vector[String]
-  private[uri] def toString(config: UriConfig): String
+  private[uri] def toStringWithConfig(config: UriConfig): String
 
   def isEmpty: Boolean
   def nonEmpty: Boolean = !isEmpty
@@ -24,10 +24,10 @@ sealed trait Path extends Product with Serializable {
     * @return String containing the raw path for this Uri
     */
   def toStringRaw: String =
-    toString(config.withNoEncoding)
+    toStringWithConfig(config.withNoEncoding)
 
   override def toString: String =
-    toString(config)
+    toStringWithConfig(config)
 }
 
 object Path {
@@ -94,7 +94,7 @@ sealed trait UrlPath extends Path {
   /** Returns the encoded path. By default non ASCII characters in the path are percent encoded.
     * @return String containing the path for this Uri
     */
-  private[uri] def toString(c: UriConfig): String = {
+  private[uri] def toStringWithConfig(c: UriConfig): String = {
     val encodedParts = parts.map(p => c.pathEncoder.encode(p, c.charset))
     encodedParts.mkString("/")
   }
@@ -233,7 +233,7 @@ case object EmptyPath extends AbsoluteOrEmptyPath {
   def unapply(path: UrlPath): Boolean =
     path.isEmpty
 
-  override private[uri] def toString(c: UriConfig): String = ""
+  override private[uri] def toStringWithConfig(c: UriConfig): String = ""
 
   override def isSlashTerminated: Boolean = false
 }
@@ -287,8 +287,8 @@ final case class AbsolutePath(parts: Vector[String])(implicit val config: UriCon
   def isEmpty: Boolean =
     false
 
-  override private[uri] def toString(c: UriConfig): String =
-    "/" + super.toString(c)
+  override private[uri] def toStringWithConfig(c: UriConfig): String =
+    "/" + super.toStringWithConfig(c)
 
   override def isSlashTerminated: Boolean =
     parts.lastOption.fold(true)(_ == "")
@@ -314,7 +314,7 @@ final case class UrnPath(nid: String, nss: String)(implicit val config: UriConfi
   def isEmpty: Boolean =
     false
 
-  private[uri] def toString(c: UriConfig): String =
+  private[uri] def toStringWithConfig(c: UriConfig): String =
     nid + ":" + c.pathEncoder.encode(nss, c.charset)
 }
 

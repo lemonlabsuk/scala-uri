@@ -72,7 +72,7 @@ sealed trait Uri extends Product with Serializable {
     * @return a `java.net.URI` matching this `io.lemonlabs.uri.Uri`
     */
   def toJavaURI: java.net.URI =
-    new java.net.URI(toString(config))
+    new java.net.URI(toStringWithConfig(config))
 
   /** Similar to `==` but ignores the ordering of any query string parameters
     */
@@ -82,12 +82,12 @@ sealed trait Uri extends Product with Serializable {
     * @return String containing the raw path for this Uri
     */
   def toStringRaw: String =
-    toString(config.withNoEncoding)
+    toStringWithConfig(config.withNoEncoding)
 
   override def toString: String =
-    toString(config)
+    toStringWithConfig(config)
 
-  private[uri] def toString(config: UriConfig): String
+  private[uri] def toStringWithConfig(config: UriConfig): String
 }
 
 object Uri {
@@ -479,7 +479,7 @@ sealed trait Url extends Uri {
     *         <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
     */
   def toStringPunycode: String =
-    toString(config)
+    toStringWithConfig(config)
 
   protected def queryToString(config: UriConfig): String =
     query.toString(config) match {
@@ -488,7 +488,7 @@ sealed trait Url extends Uri {
     }
 
   def toRedactedString(redactor: Redactor)(implicit conf: UriConfig = UriConfig.default): String =
-    redactor.apply(this).toString(conf)
+    redactor.apply(this).toStringWithConfig(conf)
 
   /** Similar to `==` but ignores the ordering of any query string parameters
     */
@@ -657,8 +657,8 @@ final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option
   def withQueryString(query: QueryString): RelativeUrl =
     copy(query = query)
 
-  private[uri] def toString(c: UriConfig): String =
-    path.toString(c) + queryToString(c) + fragmentToString(c)
+  private[uri] def toStringWithConfig(c: UriConfig): String =
+    path.toStringWithConfig(c) + queryToString(c) + fragmentToString(c)
 
   def removeUserInfo(): RelativeUrl = this
   def removePassword(): RelativeUrl = this
@@ -844,12 +844,12 @@ sealed trait UrlWithAuthority extends Url {
     *         <a href="http://www.ietf.org/rfc/rfc3490.txt">RFC 3490</a>.
     */
   override def toStringPunycode: String =
-    toString(config, _.toStringPunycode)
+    toStringWithConfig(config, _.toStringPunycode)
 
-  private[uri] def toString(c: UriConfig): String =
-    toString(c, _.toString)
+  private[uri] def toStringWithConfig(c: UriConfig): String =
+    toStringWithConfig(c, _.toString())
 
-  private[uri] def toString(c: UriConfig, hostToString: Host => String): String
+  private[uri] def toStringWithConfig(c: UriConfig, hostToString: Host => String): String
 }
 
 object UrlWithAuthority {
@@ -913,8 +913,8 @@ final case class ProtocolRelativeUrl(authority: Authority,
   def withQueryString(query: QueryString): ProtocolRelativeUrl =
     copy(query = query)
 
-  private[uri] def toString(c: UriConfig, hostToString: Host => String): String =
-    "//" + authority.toString(c, hostToString) + path.toString(c) + queryToString(c) + fragmentToString(c)
+  private[uri] def toStringWithConfig(c: UriConfig, hostToString: Host => String): String =
+    "//" + authority.toString(c, hostToString) + path.toStringWithConfig(c) + queryToString(c) + fragmentToString(c)
 
   def normalize(removeEmptyPathParts: Boolean = false,
                 slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
@@ -988,8 +988,10 @@ final case class AbsoluteUrl(scheme: String,
   def withQueryString(query: QueryString): AbsoluteUrl =
     copy(query = query)
 
-  private[uri] def toString(c: UriConfig, hostToString: Host => String): String =
-    scheme + "://" + authority.toString(c, hostToString) + path.toString(c) + queryToString(c) + fragmentToString(c)
+  private[uri] def toStringWithConfig(c: UriConfig, hostToString: Host => String): String =
+    scheme + "://" + authority.toString(c, hostToString) + path.toStringWithConfig(c) + queryToString(
+      c
+    ) + fragmentToString(c)
 
   def normalize(removeEmptyPathParts: Boolean = false,
                 slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
@@ -1132,8 +1134,8 @@ final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query:
   def withQueryString(query: QueryString): SimpleUrlWithoutAuthority =
     copy(query = query)
 
-  private[uri] def toString(c: UriConfig): String =
-    scheme + ":" + path.toString(c) + queryToString(c) + fragmentToString(c)
+  private[uri] def toStringWithConfig(c: UriConfig): String =
+    scheme + ":" + path.toStringWithConfig(c) + queryToString(c) + fragmentToString(c)
 
   def normalize(removeEmptyPathParts: Boolean = false,
                 slashTermination: SlashTermination = SlashTermination.AddForEmptyPath
@@ -1240,7 +1242,7 @@ final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte
   def withQueryString(query: QueryString): DataUrl =
     this
 
-  private[uri] def toString(c: UriConfig): String =
+  private[uri] def toStringWithConfig(c: UriConfig): String =
     scheme + ":" + pathString(c)
 
   override def equals(obj: Any): Boolean = obj match {
@@ -1342,9 +1344,9 @@ final case class ScpLikeUrl(override val user: Option[String], override val host
   def withScheme(scheme: String): AbsoluteUrl =
     AbsoluteUrl(scheme, authority, path.toAbsoluteOrEmpty, QueryString.empty, None)
 
-  private[uri] def toString(c: UriConfig, hostToString: Host => String): String = {
+  private[uri] def toStringWithConfig(c: UriConfig, hostToString: Host => String): String = {
     // Don't do percent encoding. Can't find any reference to it being
-    user.fold("")(_ + "@") + hostToString(host) + ":" + path.toString(config.withNoEncoding)
+    user.fold("")(_ + "@") + hostToString(host) + ":" + path.toStringWithConfig(config.withNoEncoding)
   }
 
   /** For ScpLikeUrls this method is exactly the same as `==`
@@ -1402,8 +1404,8 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
   def toUrl: Url = throw new UriConversionException("Urn cannot be converted to Url")
   def toUrn: Urn = this
 
-  private[uri] def toString(c: UriConfig): String =
-    scheme + ":" + path.toString(c)
+  private[uri] def toStringWithConfig(c: UriConfig): String =
+    scheme + ":" + path.toStringWithConfig(c)
 
   /** For URNs this method is exactly the same as `==`
     */

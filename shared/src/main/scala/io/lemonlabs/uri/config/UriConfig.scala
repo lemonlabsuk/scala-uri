@@ -17,56 +17,6 @@ case class UriConfig(userInfoEncoder: UriEncoder,
                      defaultPorts: Map[String, Int]
 ) {
 
-  def this(userInfoEncoder: UriEncoder,
-           pathEncoder: UriEncoder,
-           queryEncoder: UriEncoder,
-           fragmentEncoder: UriEncoder,
-           userInfoDecoder: UriDecoder,
-           pathDecoder: UriDecoder,
-           queryDecoder: UriDecoder,
-           fragmentDecoder: UriDecoder,
-           charset: String,
-           renderQuery: RenderQuery
-  ) =
-    this(
-      userInfoEncoder,
-      pathEncoder,
-      queryEncoder,
-      fragmentEncoder,
-      userInfoDecoder,
-      pathDecoder,
-      queryDecoder,
-      fragmentDecoder,
-      charset,
-      renderQuery,
-      UriConfig.defaultPorts
-    )
-
-  def copy(userInfoEncoder: UriEncoder = this.userInfoEncoder,
-           pathEncoder: UriEncoder = this.pathEncoder,
-           queryEncoder: UriEncoder = this.queryEncoder,
-           fragmentEncoder: UriEncoder = this.fragmentEncoder,
-           userInfoDecoder: UriDecoder = this.userInfoDecoder,
-           pathDecoder: UriDecoder = this.pathDecoder,
-           queryDecoder: UriDecoder = this.queryDecoder,
-           fragmentDecoder: UriDecoder = this.fragmentDecoder,
-           charset: String = this.charset,
-           renderQuery: RenderQuery = this.renderQuery
-  ): UriConfig =
-    UriConfig(
-      userInfoEncoder,
-      pathEncoder,
-      queryEncoder,
-      fragmentEncoder,
-      userInfoDecoder,
-      pathDecoder,
-      queryDecoder,
-      fragmentDecoder,
-      charset,
-      renderQuery,
-      defaultPorts
-    )
-
   def withDefaultPorts(newDefaultPorts: Map[String, Int]): UriConfig =
     UriConfig(
       userInfoEncoder,

@@ -71,7 +71,7 @@ sealed trait FragmentInstances1 extends FragmentInstances2 {
   implicit final val floatQueryValue: Fragment[Float] = stringFragment.contramap(_.toString)
   implicit final val doubleQueryValue: Fragment[Double] = stringFragment.contramap(_.toString)
   implicit final val uuidQueryValue: Fragment[java.util.UUID] = stringFragment.contramap(_.toString)
-  implicit val noneFragment: Fragment[None.type] = identity
+  implicit val noneFragment: Fragment[None.type] = _ => None
 }
 
 sealed trait FragmentInstances extends FragmentInstances1 {

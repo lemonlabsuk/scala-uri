@@ -15,7 +15,7 @@ import org.scalatest.matchers.should.Matchers
 class NapGithubIssueTests extends AnyFlatSpec with Matchers with OptionValues {
   "Github Issue #2" should "now be fixed. Pluses in querystrings should be encoded when using the conservative encoder" in {
     val uri = Url.parse("http://theon.github.com/").addParam("+", "+")
-    uri.toString(UriConfig.conservative) should equal("http://theon.github.com/?%2B=%2B")
+    uri.toStringWithConfig(UriConfig.conservative) should equal("http://theon.github.com/?%2B=%2B")
   }
 
   "Github Issue #4" should "now be fixed. Port numbers should be rendered by toString" in {

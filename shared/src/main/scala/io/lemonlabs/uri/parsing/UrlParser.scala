@@ -167,7 +167,7 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
   def _query_string: Parser[QueryString] =
     for {
       _ <- char('?')
-      params <- Helper.rep0sep0(_query_param_or_tok, char('&'))
+      params <- rep0sep0(_query_param_or_tok, char('&'))
     } yield extractQueryString(params)
 
   def _maybe_query_string: Parser0[QueryString] =
@@ -425,6 +425,9 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
 
   def parseQueryParam(): Try[(String, Option[String])] =
     mapParseError((_query_param_or_tok <* Parser.end).parseAll(input), "Query Parameter")
+
+  private def rep0sep0[A](data: Parser0[A], separator: Parser[Any]): Parser0[List[A]] =
+    (data.? ~ (separator *> data).rep0).map { case (a, as) => a ++: as }
 }
 
 object UrlParser {
@@ -489,9 +492,4 @@ object UrlParser {
 
   def parseQueryParam(s: String)(implicit config: UriConfig = UriConfig.default): Try[(String, Option[String])] =
     UrlParser(s).parseQueryParam()
-}
-
-object Helper {
-  def rep0sep0[A](data: Parser0[A], separator: Parser[Any]): Parser0[List[A]] =
-    (data.? ~ (separator *> data).rep0).map { case (a, as) => a ++: as }
 }

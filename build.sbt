@@ -63,9 +63,9 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    "org.parboiled" %%% "parboiled" % "2.3.0",
-    "com.chuusai"   %%% "shapeless" % "2.3.7",
-    "org.typelevel" %%% "cats-core" % "2.6.1"
+    "com.chuusai"   %%% "shapeless"  % "2.3.7",
+    "org.typelevel" %%% "cats-core"  % "2.6.1",
+    "org.typelevel" %%% "cats-parse" % "0.3.4"
   ),
   pomPostProcess := { node =>
     new RuleTransformer(new RewriteRule {
@@ -115,7 +115,7 @@ val publishingSettings = Seq(
       </developers>
 )
 
-val previousVersions = Set(0, 4).map(v => s"3.$v.0")
+val previousVersions = Set.empty[String] // Set(0, 4).map(v => s"3.$v.0")
 
 val mimaExcludes = Seq(
   ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*"),

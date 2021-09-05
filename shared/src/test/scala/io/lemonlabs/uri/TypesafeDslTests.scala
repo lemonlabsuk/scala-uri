@@ -268,7 +268,7 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
   }
 
   "# operator" should "merge Urls" in {
-    val uri = "http://host" ? Url.parse("#a")
+    val uri = "http://host" `#` Url.parse("#a")
     uri.fragment should equal(Some("a"))
     uri.toString should equal("http://host#a")
   }

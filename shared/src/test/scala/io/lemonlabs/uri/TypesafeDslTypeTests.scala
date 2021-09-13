@@ -2,8 +2,6 @@ package io.lemonlabs.uri
 
 import io.lemonlabs.uri.config.{ExcludeNones, UriConfig}
 import io.lemonlabs.uri.typesafe._
-import shapeless._
-import shapeless.labelled._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -38,7 +36,7 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
   "Foo" should "render correctly as path part" in {
     final case class Foo(a: String, b: Int)
     object Foo {
-      implicit val pathPart: TraversablePathParts[Foo] =
+      given pathPart: TraversablePathParts[Foo] =
         TraversablePathParts.product
     }
 
@@ -70,7 +68,7 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
     final case class Foo(a: Int, b: String)
 
     object Foo {
-      implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
+      given traversableParams: TraversableParams[Foo] = TraversableParams.product
     }
 
     val uri = "/uris-in-scala.html" addParams Foo(a = 1, b = "bar")
@@ -81,13 +79,13 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
     final case class Foo(a: Int, b: String)
 
     object Foo {
-      implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
+      given traversableParams: TraversableParams[Foo] = TraversableParams.product
     }
 
     final case class Bar(c: Int, foo: Foo)
 
     object Bar {
-      implicit val traversableParams: TraversableParams[Bar] = TraversableParams.product
+      given traversableParams: TraversableParams[Bar] = TraversableParams.product
     }
 
     val uri = "/uris-in-scala.html" addParams Bar(c = 2, foo = Foo(a = 1, b = "bar"))
@@ -98,7 +96,7 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
     final case class Foo(a: Int, b: Option[String])
 
     object Foo {
-      implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
+      given traversableParams: TraversableParams[Foo] = TraversableParams.product
     }
 
     val uriWithB = "/uris-in-scala.html" addParams Foo(a = 1, b = Some("bar"))

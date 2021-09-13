@@ -1,15 +1,15 @@
 package io.lemonlabs.uri.typesafe
 
 import java.util.UUID
-
 import cats.Contravariant
-import cats.syntax.contravariant._
-import shapeless._
-import shapeless.labelled._
+import cats.syntax.contravariant.*
 import simulacrum.typeclass
 
 import scala.language.implicitConversions
 import scala.annotation.implicitNotFound
+import scala.compiletime.package$package.{erasedValue, summonInline}
+import scala.deriving.Mirror
+import scala.deriving.*
 
 @implicitNotFound("Could not find an instance of PathPart for ${A}")
 @typeclass trait PathPart[-A] extends Serializable {
@@ -108,29 +108,22 @@ sealed trait TraversablePathPartsInstances {
 }
 
 object TraversablePathParts extends TraversablePathPartsInstances {
-  implicit def field[K <: Symbol, V](implicit
-      K: Witness.Aux[K],
-      V: PathPart[V]
-  ): TraversablePathParts[FieldType[K, V]] =
-    (a: FieldType[K, V]) => V.splitPath(a)
+  inline def product[A](implicit m: Mirror.ProductOf[A]): TraversablePathParts[A] = {
+    val elemInstances = summonAll[m.MirroredElemTypes]
 
-  implicit def sub[K <: Symbol, V](implicit
-      K: Witness.Aux[K],
-      V: TraversablePathParts[V]
-  ): TraversablePathParts[FieldType[K, V]] =
-    (a: FieldType[K, V]) => V.toSeq(a)
+    new TraversablePathParts[A] {
+      override def toSeq(a: A): Seq[String] =
+        a.asInstanceOf[Product].productIterator.zip(elemInstances)
+          .flatMap { case (field, tc) => tc.asInstanceOf[TraversablePathParts[Any]].toSeq(field) }
+          .toSeq
+    }
+  }
 
-  implicit val hnil: TraversablePathParts[HNil] =
-    (_: HNil) => Seq.empty
-
-  implicit def hcons[H, T <: HList](implicit
-      H: TraversablePathParts[H],
-      T: TraversablePathParts[T]
-  ): TraversablePathParts[H :: T] =
-    (a: H :: T) => H.toSeq(a.head) ++ T.toSeq(a.tail)
-
-  def product[A, R <: HList](implicit gen: Generic.Aux[A, R], R: TraversablePathParts[R]): TraversablePathParts[A] =
-    (a: A) => R.toSeq(gen.to(a))
+  inline private def summonAll[T <: Tuple]: List[TraversablePathParts[_]] =
+    inline erasedValue[T] match {
+      case _: EmptyTuple => Nil
+      case _: (t *: ts)  => summonInline[TraversablePathParts[t]] :: summonAll[ts]
+    }
 
   /* ======================================================================== */
   /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */

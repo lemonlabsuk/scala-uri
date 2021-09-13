@@ -48,7 +48,7 @@ val sharedSettings = Seq(
 //  addCompilerPlugin(scalafixSemanticdb),
 //  scalacOptions ++= Seq(s"-P:semanticdb:targetroot:${baseDirectory.value}/target/.semanticdb", "-Yrangepos"),
   Test / parallelExecution := false,
-  scalafmtOnCompile        := true,
+//  scalafmtOnCompile        := true,
   coverageExcludedPackages := "(io.lemonlabs.uri.inet.Trie.*|io.lemonlabs.uri.inet.PublicSuffixes.*|io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
 )
 
@@ -64,8 +64,6 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    // TODO: Remove for3Use2_13 when scala3 version available https://github.com/milessabin/shapeless/issues/1043
-    ("com.chuusai"   %%% "shapeless"  % "2.3.7").cross(CrossVersion.for3Use2_13),
     "org.typelevel" %%% "cats-core"  % "2.6.1",
     "org.typelevel" %%% "cats-parse" % "0.3.4"
   ),

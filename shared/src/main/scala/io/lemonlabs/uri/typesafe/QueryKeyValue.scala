@@ -1,15 +1,13 @@
 package io.lemonlabs.uri.typesafe
 
 import cats.Contravariant
-import cats.syntax.contravariant._
-import shapeless._
-import shapeless.labelled._
-import shapeless.ops.coproduct.Reify
-import shapeless.ops.hlist.ToList
+import cats.syntax.contravariant.*
 import simulacrum.typeclass
 
 import scala.language.implicitConversions
 import scala.annotation.implicitNotFound
+import scala.compiletime.package$package.{erasedValue, summonInline, summonFrom}
+import scala.deriving.Mirror
 
 @implicitNotFound("Could not find an instance of QueryKey for ${A}")
 @typeclass trait QueryKey[A] extends Serializable {
@@ -83,13 +81,11 @@ sealed trait QueryKeyInstances extends QueryKeyInstances1 {
 }
 
 object QueryValue extends QueryValueInstances {
-  def derive[A]: Derivation[A] = new Derivation[A](())
+  def derive[A] = new Derivation[A](())
 
   class Derivation[A](private val dummy: Unit) extends AnyVal {
-    def by[C <: Coproduct, R <: HList](
-        key: A => String
-    )(implicit gen: Generic.Aux[A, C], reify: Reify.Aux[C, R], toList: ToList[R, A]): QueryValue[A] =
-      a => toList(reify()).iterator.map(x => x -> key(x)).toMap.get(a)
+    def by[B](f: A => B)(implicit qv: QueryValue[B]): QueryValue[A] =
+      a => qv.queryValue(f(a))
   }
 
   /* ======================================================================== */
@@ -232,26 +228,27 @@ sealed trait QueryKeyValueInstances {
 }
 
 object TraversableParams extends TraversableParamsInstances {
-  implicit def field[K <: Symbol, V](implicit K: Witness.Aux[K], V: QueryValue[V]): TraversableParams[FieldType[K, V]] =
-    (a: FieldType[K, V]) => List(K.value.name -> V.queryValue(a))
+  inline def product[A](implicit m: Mirror.ProductOf[A]): TraversableParams[A] = {
+    val elemInstances = summonAll[m.MirroredElemTypes]
 
-  implicit def sub[K <: Symbol, V](implicit
-      K: Witness.Aux[K],
-      V: TraversableParams[V]
-  ): TraversableParams[FieldType[K, V]] =
-    (a: FieldType[K, V]) => V.toSeq(a)
+    new TraversableParams[A] {
+      override def toSeq(a: A): Seq[(String, Option[String])] =
+        a.asInstanceOf[Product].productElementNames
+          .zip(a.asInstanceOf[Product].productIterator)
+          .zip(elemInstances)
+          .flatMap {
+            case ((name, field), tc : QueryValue[_]) => Seq((name, tc.asInstanceOf[QueryValue[Any]].queryValue(field)))
+            case ((name, field), tc : TraversableParams[_]) => tc.asInstanceOf[TraversableParams[Any]].toSeq(field)
+          }
+          .toSeq
+    }
+  }
 
-  implicit val hnil: TraversableParams[HNil] =
-    (_: HNil) => List.empty
-
-  implicit def hcons[H, T <: HList](implicit
-      H: TraversableParams[H],
-      T: TraversableParams[T]
-  ): TraversableParams[H :: T] =
-    (a: H :: T) => H.toSeq(a.head) ++ T.toSeq(a.tail)
-
-  def product[A, R <: HList](implicit gen: LabelledGeneric.Aux[A, R], R: TraversableParams[R]): TraversableParams[A] =
-    (a: A) => R.toSeq(gen.to(a))
+  inline private def summonAll[T <: Tuple]: List[QueryValue[_] | TraversableParams[_]] =
+    inline erasedValue[T] match {
+      case _: EmptyTuple => Nil
+      case _: (t *: ts)  => summonInline[TraversableParams[t] | QueryValue[t]] :: summonAll[ts]
+    }
 
   /* ======================================================================== */
   /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */

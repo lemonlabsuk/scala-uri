@@ -96,7 +96,7 @@ class EqualityTests extends AnyFlatSpec with Matchers with ScalaCheckDrivenPrope
   }
 
   "DataUrl.equals" should "equal itself" in new UriScalaCheckGenerators {
-    forAll { dataUrl: DataUrl =>
+    forAll { (dataUrl: DataUrl) =>
       (dataUrl == dataUrl) should equal(true)
     }
   }
@@ -108,7 +108,7 @@ class EqualityTests extends AnyFlatSpec with Matchers with ScalaCheckDrivenPrope
   }
 
   "DataUrl.hashCode" should "equal itself" in new UriScalaCheckGenerators {
-    forAll { dataUrl: DataUrl =>
+    forAll { (dataUrl: DataUrl) =>
       dataUrl.hashCode() should equal(dataUrl.hashCode())
     }
   }

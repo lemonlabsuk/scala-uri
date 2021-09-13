@@ -14,7 +14,7 @@ import org.scalatest.matchers.should.Matchers
 
 class ConfigTests extends AnyFlatSpec with Matchers {
   "Config constructor without defaultPorts" should "use the default defaultPorts" in {
-    val conf = new UriConfig(
+    val conf = UriConfig(
       userInfoEncoder = PercentEncoder(USER_INFO_CHARS_TO_ENCODE),
       pathEncoder = PercentEncoder(PATH_CHARS_TO_ENCODE),
       queryEncoder = PercentEncoder(QUERY_CHARS_TO_ENCODE),

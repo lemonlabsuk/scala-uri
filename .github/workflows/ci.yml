@@ -68,7 +68,7 @@ jobs:
           cd target &&
           git clone https://github.com/lemonlabsuk/scala-uri-demo.git &&
           cd scala-uri-demo &&
-          sbt -Dscala.ver=$SCALA_VERSION -Dscala.uri.ver=3.5.0 test &&
+          sbt -Dscala.ver=$SCALA_VERSION -Dscala.uri.ver=4.0.0-M2 test &&
           cd "$TRAVIS_BUILD_DIR"
 
       - name: Report to CodeCov

@@ -455,7 +455,7 @@ sealed trait Url extends Uri {
   def toAbsoluteUrl: AbsoluteUrl =
     this match {
       case a: AbsoluteUrl => a
-      case _              => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to AbsoluteUrl")
+      case _ => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to AbsoluteUrl")
     }
 
   def toRelativeUrl: RelativeUrl =
@@ -468,7 +468,7 @@ sealed trait Url extends Uri {
     this match {
       case p: ProtocolRelativeUrl => p
       case a: AbsoluteUrl         => ProtocolRelativeUrl(a.authority, a.path, a.query, a.fragment)
-      case _                      => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to ProtocolRelativeUrl")
+      case _ => throw new UriConversionException(getClass.getSimpleName + " cannot be converted to ProtocolRelativeUrl")
     }
 
   def toUrl: Url = this

@@ -9,7 +9,9 @@ trait TraversablePathPartsDeriving {
 
     new TraversablePathParts[A] {
       override def toSeq(a: A): Seq[String] =
-        a.asInstanceOf[Product].productIterator.zip(elemInstances)
+        a.asInstanceOf[Product]
+          .productIterator
+          .zip(elemInstances)
           .flatMap { case (field, tc) => tc.asInstanceOf[TraversablePathParts[Any]].toSeq(field) }
           .toSeq
     }

@@ -11,18 +11,18 @@ trait TraversableParamsDeriving {
     (a: FieldType[K, V]) => List(K.value.name -> V.queryValue(a))
 
   implicit def sub[K <: Symbol, V](implicit
-                                   K: Witness.Aux[K],
-                                   V: TraversableParams[V]
-                                  ): TraversableParams[FieldType[K, V]] =
+      K: Witness.Aux[K],
+      V: TraversableParams[V]
+  ): TraversableParams[FieldType[K, V]] =
     (a: FieldType[K, V]) => V.toSeq(a)
 
   implicit val hnil: TraversableParams[HNil] =
     (_: HNil) => List.empty
 
   implicit def hcons[H, T <: HList](implicit
-                                    H: TraversableParams[H],
-                                    T: TraversableParams[T]
-                                   ): TraversableParams[H :: T] =
+      H: TraversableParams[H],
+      T: TraversableParams[T]
+  ): TraversableParams[H :: T] =
     (a: H :: T) => H.toSeq(a.head) ++ T.toSeq(a.tail)
 
   def product[A, R <: HList](implicit gen: LabelledGeneric.Aux[A, R], R: TraversableParams[R]): TraversableParams[A] =

@@ -9,12 +9,13 @@ trait TraversableParamsDeriving {
 
     new TraversableParams[A] {
       override def toSeq(a: A): Seq[(String, Option[String])] =
-        a.asInstanceOf[Product].productElementNames
+        a.asInstanceOf[Product]
+          .productElementNames
           .zip(a.asInstanceOf[Product].productIterator)
           .zip(elemInstances)
           .flatMap {
-            case ((name, field), tc : QueryValue[_]) => Seq((name, tc.asInstanceOf[QueryValue[Any]].queryValue(field)))
-            case ((name, field), tc : TraversableParams[_]) => tc.asInstanceOf[TraversableParams[Any]].toSeq(field)
+            case ((name, field), tc: QueryValue[_]) => Seq((name, tc.asInstanceOf[QueryValue[Any]].queryValue(field)))
+            case ((name, field), tc: TraversableParams[_]) => tc.asInstanceOf[TraversableParams[Any]].toSeq(field)
           }
           .toSeq
     }

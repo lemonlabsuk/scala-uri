@@ -20,6 +20,10 @@ publish / skip                 := true // Do not publish the root project
 val simulacrumScalafixVersion = "0.5.4"
 ThisBuild / scalafixDependencies += "org.typelevel" %% "simulacrum-scalafix" % simulacrumScalafixVersion
 
+val isScala3 = Def.setting {
+  CrossVersion.partialVersion(scalaVersion.value).exists(_._1 != 2)
+}
+
 val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
@@ -67,6 +71,7 @@ val scalaUriSettings = Seq(
     "org.typelevel" %%% "cats-core"  % "2.6.1",
     "org.typelevel" %%% "cats-parse" % "0.3.4"
   ),
+  libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.7")),
   pomPostProcess := { node =>
     new RuleTransformer(new RewriteRule {
       override def transform(node: xml.Node): Seq[xml.Node] = {

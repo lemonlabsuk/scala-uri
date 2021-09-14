@@ -1,7 +1,7 @@
 package io.lemonlabs.uri.typesafe
 
 import cats.Contravariant
-import cats.syntax.contravariant.*
+import cats.syntax.contravariant._
 import simulacrum.typeclass
 
 import scala.language.implicitConversions

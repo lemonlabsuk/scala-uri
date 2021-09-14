@@ -59,6 +59,11 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
     uri.toString should equal("/a/5")
   }
 
+  "None" should "render correctly as a Fragment" in {
+    val uri = Url.parse("/a").withFragment(None)
+    uri.toString should equal("/a")
+  }
+
   "Foo" should "render correctly as path part" in {
     final case class Foo(a: String, b: Int)
     implicit val pathPart: TraversablePathParts[Foo] = TraversablePathParts.product

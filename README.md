@@ -1,6 +1,6 @@
 # scala-uri
 
-[![Build Status](https://travis-ci.com/lemonlabsuk/scala-uri.svg?branch=master)](https://travis-ci.com/lemonlabsuk/scala-uri)
+[![scala-uri CI](https://github.com/lemonlabsuk/scala-uri/actions/workflows/ci.yml/badge.svg)](https://github.com/lemonlabsuk/scala-uri/actions/workflows/ci.yml)
 [![codecov.io](http://codecov.io/github/lemonlabsuk/scala-uri/coverage.svg?branch=master)](https://codecov.io/gh/lemonlabsuk/scala-uri/branch/master)
 [![Slack](https://lemonlabs.io/slack/badge.svg)](https://lemonlabs.io/slack)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)
@@ -29,9 +29,13 @@
  * No dependencies on existing web frameworks
 
 To include it in your SBT project from maven central:
-
 ```scala
 "io.lemonlabs" %% "scala-uri" % "3.5.0"
+```
+
+For Scala 3, there is an early build available:
+```scala
+"io.lemonlabs" %% "scala-uri" % "4.0.0-M2"
 ```
 
 ## Migration Guides
@@ -395,7 +399,7 @@ Only percent encode the hash character:
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.encoding._
 
-implicit val config = UriConfig(encoder = percentEncode('#'))
+implicit val config: UriConfig = UriConfig(encoder = percentEncode('#'))
 ```
 
 Percent encode all the default chars, except the plus character:
@@ -404,7 +408,7 @@ Percent encode all the default chars, except the plus character:
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.encoding._
 
-implicit val config = UriConfig(encoder = percentEncode -- '+')
+implicit val config: UriConfig = UriConfig(encoder = percentEncode -- '+')
 ```
 
 Encode all the default chars, and also encode the letters a and b:
@@ -413,7 +417,7 @@ Encode all the default chars, and also encode the letters a and b:
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.encoding._
 
-implicit val config = UriConfig(encoder = percentEncode ++ ('a', 'b'))
+implicit val config: UriConfig = UriConfig(encoder = percentEncode ++ ('a', 'b'))
 ```
 
 ### Encoding spaces as pluses
@@ -428,7 +432,7 @@ import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.encoding._
 import io.lemonlabs.uri.encoding.PercentEncoder._
 
-implicit val config = UriConfig.default.copy(queryEncoder = PercentEncoder())
+implicit val config: UriConfig = UriConfig.default.copy(queryEncoder = PercentEncoder())
 
 val uri = Url.parse("http://theon.github.com?test=uri with space")
 uri.toString // This is http://theon.github.com?test=uri%20with%20space
@@ -443,7 +447,7 @@ import io.lemonlabs.uri.Url
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding._
 
-implicit val config = UriConfig.default.copy(queryDecoder = PercentDecoder)
+implicit val config: UriConfig = UriConfig.default.copy(queryDecoder = PercentDecoder)
 
 val uri = Url.parse("http://theon.github.com?test=uri+with+plus")
 uri.query.param("test") // This is Some("uri+with+plus")
@@ -458,7 +462,7 @@ import io.lemonlabs.uri.Url
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.encoding._
 
-implicit val config = UriConfig(encoder = percentEncode + encodeCharAs(' ', "_"))
+implicit val config: UriConfig = UriConfig(encoder = percentEncode + encodeCharAs(' ', "_"))
 
 val uri = Url.parse("http://theon.github.com/uri with space")
 uri.toString // This is http://theon.github.com/uri_with_space
@@ -484,7 +488,7 @@ import io.lemonlabs.uri.Url
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding.NoopDecoder
 
-implicit val c = UriConfig(decoder = NoopDecoder)
+implicit val c: UriConfig = UriConfig(decoder = NoopDecoder)
 
 val uri = Url.parse("http://example.com/i-havent-%been%-percent-encoded")
 
@@ -507,7 +511,7 @@ import io.lemonlabs.uri.Url
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding.PercentDecoder
 
-implicit val c = UriConfig(
+implicit val c: UriConfig = UriConfig(
   decoder = PercentDecoder(ignoreInvalidPercentEncoding = true)
 )
 val uri = Url.parse("/?x=%3")
@@ -638,7 +642,7 @@ This can be changed like so:
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.Url
 
-implicit val conf = UriConfig(charset = "GB2312")
+implicit val conf: UriConfig = UriConfig(charset = "GB2312")
 
 val uri = Url.parse("http://theon.github.com/uris-in-scala.html?chinese=网址")
 uri.toString // This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F8%D6%B7
@@ -893,18 +897,19 @@ The type class instances exist in the companion objects for these types.
 
 ## Including scala-uri your project
 
+`scala-uri` `4.x.x` is currently built with support for Scala `3`, Scala `2.13.x`, Scala `2.12.x` and Scala.js `1.1.0+`
 `scala-uri` `3.x.x` is currently built with support for Scala `2.13.x`, Scala `2.12.x` and Scala.js `1.1.0+` 
 
  * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
  * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
  * For `2.9.x` support use `scala-uri` `0.3.6` from branch [`0.3.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.3.x)
- * For Scala.js `1.x.x` support, use `scala-uri` `3.5.0`
+ * For Scala.js `1.x.x` support, use `scala-uri` `4.0.0-M2`
  * For Scala.js `0.6.x` support, use `scala-uri` `2.2.3`
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "3.5.0"
+"io.lemonlabs" %% "scala-uri" % "4.0.0-M2"
 ```
 
 For maven users you should use (for 2.13.x):
@@ -913,7 +918,7 @@ For maven users you should use (for 2.13.x):
 <dependency>
     <groupId>io.lemonlabs</groupId>
     <artifactId>scala-uri_2.13</artifactId>
-    <version>3.5.0</version>
+    <version>4.0.0-M2</version>
 </dependency>
 ```
 

@@ -86,9 +86,9 @@ trait UriScalaCheckGenerators {
   // format: off
 
   implicit val randIpV6:Arbitrary[IpV6] =  {
-    val piece = Gen.chooseNum(0, Char.MaxValue)
+    val piece = Gen.chooseNum[Int](0, Char.MaxValue)
     Arbitrary(Gen.zip(piece, piece, piece, piece, piece, piece, piece, piece).map {
-      case (a, b, c, d, e, f, g, h) => IpV6(a, b, c, d, e, f, g, h)
+      case (a, b, c, d, e, f, g, h) => IpV6.apply(a, b, c, d, e, f, g, h)
     })
   }
 

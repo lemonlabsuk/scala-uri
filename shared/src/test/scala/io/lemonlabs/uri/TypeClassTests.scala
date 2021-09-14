@@ -59,12 +59,14 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
     uri.toString should equal("/a/5")
   }
 
+  "None" should "render correctly as a Fragment" in {
+    val uri = Url.parse("/a").withFragment(None)
+    uri.toString should equal("/a")
+  }
+
   "Foo" should "render correctly as path part" in {
     final case class Foo(a: String, b: Int)
-    object Foo {
-      implicit val pathPart: TraversablePathParts[Foo] =
-        TraversablePathParts.product
-    }
+    implicit val pathPart: TraversablePathParts[Foo] = TraversablePathParts.product
 
     val uri = Url.parse("http://example.com") addPathParts Foo(a = "user", b = 1)
     uri.toString should equal("http://example.com/user/1")
@@ -72,9 +74,7 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
   "Foo" should "render correctly as fragment" in {
     final case class Foo(a: String, b: Int)
-    object Foo {
-      implicit val pathPart: Fragment[Foo] = (foo: Foo) => Some(s"${foo.a}-${foo.b}")
-    }
+    implicit val pathPart: Fragment[Foo] = (foo: Foo) => Some(s"${foo.a}-${foo.b}")
 
     val uri = Url.parse("/uris-in-scala.html") withFragment Foo(a = "user", b = 1)
     uri.toString should equal("/uris-in-scala.html#user-1")
@@ -82,9 +82,7 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
   "Foo" should "render correctly as query parameters" in {
     final case class Foo(a: String)
-    object Foo {
-      implicit val fooQueryKeyValue: QueryKeyValue[Foo] = QueryKeyValue(_ => "foo", foo => Option(foo.a))
-    }
+    implicit val fooQueryKeyValue: QueryKeyValue[Foo] = QueryKeyValue(_ => "foo", foo => Option(foo.a))
 
     val uri = Url.parse("/uris-in-scala.html") addParam Foo("foo_value")
     uri.toString should equal("/uris-in-scala.html?foo=foo_value")
@@ -92,10 +90,7 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
   "addPathParts(TraversablePathParts)" should "derive type class for case class correctly" in {
     final case class Foo(a: Int, b: String)
-
-    object Foo {
-      implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
-    }
+    implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
 
     val uri = Url.parse("/uris-in-scala") addPathParts Foo(a = 1, b = "bar")
     uri.toString should equal("/uris-in-scala/1/bar")
@@ -103,16 +98,10 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
   "addPathParts(TraversablePathParts)" should "derive type class for case classes structure correctly" in {
     final case class Foo(a: Int, b: String)
-
-    object Foo {
-      implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
-    }
+    implicit val traversablePathPartsFoo: TraversablePathParts[Foo] = TraversablePathParts.product
 
     final case class Bar(c: Int, foo: Foo)
-
-    object Bar {
-      implicit val traversablePathParts: TraversablePathParts[Bar] = TraversablePathParts.product
-    }
+    implicit val traversablePathPartsBar: TraversablePathParts[Bar] = TraversablePathParts.product
 
     val uri = Url.parse("/uris-in-scala") addPathParts Bar(c = 2, foo = Foo(a = 1, b = "bar"))
     uri.toString should equal("/uris-in-scala/2/1/bar")
@@ -120,10 +109,7 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
   "addPathParts(TraversablePathParts)" should "derive type class for case class with optional field correctly" in {
     final case class Foo(a: Int, b: Option[String])
-
-    object Foo {
-      implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
-    }
+    implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
 
     val uriWithB = Url.parse("/uris-in-scala") addPathParts Foo(a = 1, b = Some("bar"))
     val uriWithoutB = Url.parse("/uris-in-scala") addPathParts Foo(a = 1, b = None)
@@ -133,10 +119,7 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
   "withPathParts(TraversablePathParts)" should "derive type class for case class correctly" in {
     final case class Foo(a: Int, b: String)
-
-    object Foo {
-      implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
-    }
+    implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
 
     val uri = Url.parse("/uris-in-scala") withPathParts Foo(a = 1, b = "bar")
     uri.toString should equal("/1/bar")
@@ -144,16 +127,10 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
   "withPathParts(TraversablePathParts)" should "derive type class for case classes structure correctly" in {
     final case class Foo(a: Int, b: String)
-
-    object Foo {
-      implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
-    }
+    implicit val traversablePathPartsFoo: TraversablePathParts[Foo] = TraversablePathParts.product
 
     final case class Bar(c: Int, foo: Foo)
-
-    object Bar {
-      implicit val traversablePathParts: TraversablePathParts[Bar] = TraversablePathParts.product
-    }
+    implicit val traversablePathPartsBar: TraversablePathParts[Bar] = TraversablePathParts.product
 
     val uri = Url.parse("/uris-in-scala") withPathParts Bar(c = 2, foo = Foo(a = 1, b = "bar"))
     uri.toString should equal("/2/1/bar")
@@ -161,10 +138,7 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
   "withPathParts(TraversablePathParts)" should "derive type class for case class with optional field correctly" in {
     final case class Foo(a: Int, b: Option[String])
-
-    object Foo {
-      implicit val traversablePathParts: TraversablePathParts[Foo] = TraversablePathParts.product
-    }
+    implicit val traversablePathPartsFoo: TraversablePathParts[Foo] = TraversablePathParts.product
 
     val uriWithB = Url.parse("/uris-in-scala") withPathParts Foo(a = 1, b = Some("bar"))
     val uriWithoutB = Url.parse("/uris-in-scala") withPathParts Foo(a = 1, b = None)
@@ -199,10 +173,7 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
   "TraversableParams" should "derive type class for case class correctly" in {
     final case class Foo(a: Int, b: String)
-
-    object Foo {
-      implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
-    }
+    implicit val traversableParamsFoo: TraversableParams[Foo] = TraversableParams.product
 
     val uri = Url.parse("/uris-in-scala.html") addParams Foo(a = 1, b = "bar")
     uri.toString should equal("/uris-in-scala.html?a=1&b=bar")
@@ -210,16 +181,10 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
   "TraversableParams" should "derive type class for case classes structure correctly" in {
     final case class Foo(a: Int, b: String)
-
-    object Foo {
-      implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
-    }
+    implicit val traversableParamsFoo: TraversableParams[Foo] = TraversableParams.product
 
     final case class Bar(c: Int, foo: Foo)
-
-    object Bar {
-      implicit val traversableParams: TraversableParams[Bar] = TraversableParams.product
-    }
+    implicit val traversableParamsBar: TraversableParams[Bar] = TraversableParams.product
 
     val uri = Url.parse("/uris-in-scala.html") addParams Bar(c = 2, foo = Foo(a = 1, b = "bar"))
     uri.toString should equal("/uris-in-scala.html?c=2&a=1&b=bar")
@@ -227,10 +192,7 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
   "TraversableParams" should "derive type class for case class with optional field correctly" in {
     final case class Foo(a: Int, b: Option[String])
-
-    object Foo {
-      implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
-    }
+    implicit val traversableParamsFoo: TraversableParams[Foo] = TraversableParams.product
 
     val uriWithB = Url.parse("/uris-in-scala.html") addParams Foo(a = 1, b = Some("bar"))
     val uriWithoutB = Url.parse("/uris-in-scala.html") addParams Foo(a = 1, b = None)
@@ -259,9 +221,7 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
       val name: String = "B"
     }
 
-    object Foo {
-      implicit val queryValue: QueryValue[Foo] = QueryValue.derive[Foo].by(_.name)
-    }
+    implicit val queryValue: QueryValue[Foo] = QueryValue.derive[Foo].by(_.name)
 
     val uriA = Url.parse("/uris-in-scala.html") addParam ("foo" -> A)
     val uriB = Url.parse("/uris-in-scala.html") addParam ("foo" -> B)

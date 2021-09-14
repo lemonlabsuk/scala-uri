@@ -45,15 +45,15 @@ object UpdatePublicSuffixes {
     p.println("")
     p.println("object PublicSuffixes {")
 
-    p.println("  lazy val exceptions = Set(")
+    p.println("  lazy val exceptions: Set[String] = Set(")
     p.println(exceptions.map(_.tail).map(e => s"""    "$e"""").mkString(",\n"))
     p.println("  )\n")
 
-    p.println("  lazy val wildcardPrefixes = Set(")
+    p.println("  lazy val wildcardPrefixes: Set[String] = Set(")
     p.println(wildcardPrefixes.map(_.drop(2)).map(w => s"""    "$w"""").mkString(",\n"))
     p.println("  )\n")
 
-    p.println("  lazy val set = " + groups.keys.map(i => s"publicSuffixes$i").mkString(" ++ "))
+    p.println("  lazy val set: Set[String] = " + groups.keys.map(i => s"publicSuffixes$i").mkString(" ++ "))
     groups.foreach { case (index, group) =>
       val setArgs = group.map(suffix => s"""      "$suffix"""").mkString(",\n")
       p.println(s"  private def publicSuffixes$index =\n    Set(\n" + setArgs + "\n    )")

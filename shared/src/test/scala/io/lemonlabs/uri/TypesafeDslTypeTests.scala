@@ -2,8 +2,6 @@ package io.lemonlabs.uri
 
 import io.lemonlabs.uri.config.{ExcludeNones, UriConfig}
 import io.lemonlabs.uri.typesafe._
-import shapeless._
-import shapeless.labelled._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -37,10 +35,7 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
 
   "Foo" should "render correctly as path part" in {
     final case class Foo(a: String, b: Int)
-    object Foo {
-      implicit val pathPart: TraversablePathParts[Foo] =
-        TraversablePathParts.product
-    }
+    implicit val pathPart: TraversablePathParts[Foo] = TraversablePathParts.product
 
     val uri = "http://example.com" / Foo(a = "user", b = 1)
     uri.toString should equal("http://example.com/user/1")
@@ -58,9 +53,7 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
 
   "Foo" should "render correctly as query parameters" in {
     final case class Foo(a: String)
-    object Foo {
-      implicit val fooQueryKeyValue: QueryKeyValue[Foo] = QueryKeyValue(_ => "foo", foo => Option(foo.a))
-    }
+    implicit val fooQueryKeyValue: QueryKeyValue[Foo] = QueryKeyValue(_ => "foo", foo => Option(foo.a))
 
     val uri = "/uris-in-scala.html" ? Foo("foo_value")
     uri.toString should equal("/uris-in-scala.html?foo=foo_value")
@@ -68,10 +61,7 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
 
   "TraversableParams" should "derive type class for case class correctly" in {
     final case class Foo(a: Int, b: String)
-
-    object Foo {
-      implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
-    }
+    implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
 
     val uri = "/uris-in-scala.html" addParams Foo(a = 1, b = "bar")
     uri.toString should equal("/uris-in-scala.html?a=1&b=bar")
@@ -79,16 +69,10 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
 
   "TraversableParams" should "derive type class for case classes structure correctly" in {
     final case class Foo(a: Int, b: String)
-
-    object Foo {
-      implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
-    }
+    implicit val traversableParamsFoo: TraversableParams[Foo] = TraversableParams.product
 
     final case class Bar(c: Int, foo: Foo)
-
-    object Bar {
-      implicit val traversableParams: TraversableParams[Bar] = TraversableParams.product
-    }
+    implicit val traversableParamsBar: TraversableParams[Bar] = TraversableParams.product
 
     val uri = "/uris-in-scala.html" addParams Bar(c = 2, foo = Foo(a = 1, b = "bar"))
     uri.toString should equal("/uris-in-scala.html?c=2&a=1&b=bar")
@@ -96,10 +80,7 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
 
   "TraversableParams" should "derive type class for case class with optional field correctly" in {
     final case class Foo(a: Int, b: Option[String])
-
-    object Foo {
-      implicit val traversableParams: TraversableParams[Foo] = TraversableParams.product
-    }
+    implicit val traversableParamsFoo: TraversableParams[Foo] = TraversableParams.product
 
     val uriWithB = "/uris-in-scala.html" addParams Foo(a = 1, b = Some("bar"))
     val uriWithoutB = "/uris-in-scala.html" addParams Foo(a = 1, b = None)
@@ -128,9 +109,7 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
       val name: String = "B"
     }
 
-    object Foo {
-      implicit val queryValue: QueryValue[Foo] = QueryValue.derive[Foo].by(_.name)
-    }
+    implicit val queryValue: QueryValue[Foo] = QueryValue.derive[Foo].by(_.name)
 
     val uriA = "/uris-in-scala.html" ? ("foo" -> A)
     val uriB = "/uris-in-scala.html" ? ("foo" -> B)

@@ -13,19 +13,23 @@ import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPrev
 
 name := "scala-uri root"
 
-ThisBuild / scalaVersion       := "2.13.6"
-ThisBuild / crossScalaVersions := Seq("2.12.14", scalaVersion.value)
+ThisBuild / scalaVersion       := "3.0.1"
+ThisBuild / crossScalaVersions := Seq("2.12.14", "2.13.6", scalaVersion.value)
 publish / skip                 := true // Do not publish the root project
 
 val simulacrumScalafixVersion = "0.5.4"
 ThisBuild / scalafixDependencies += "org.typelevel" %% "simulacrum-scalafix" % simulacrumScalafixVersion
+
+val isScala3 = Def.setting {
+  CrossVersion.partialVersion(scalaVersion.value).exists(_._1 != 2)
+}
 
 val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % simulacrumScalafixVersion,
     "org.scalatest"     %%% "scalatest"                       % "3.2.9"   % Test,
-    "org.scalatestplus" %%% "scalacheck-1-14"                 % "3.2.2.0" % Test,
+    "org.scalatestplus" %%% "scalacheck-1-15"                 % "3.2.9.0" % Test,
     "org.scalacheck"    %%% "scalacheck"                      % "1.15.4"  % Test,
     "org.typelevel"     %%% "cats-laws"                       % "2.6.1"   % Test
   ),
@@ -36,16 +40,15 @@ val sharedSettings = Seq(
     "utf8",
     "-feature",
     "-Xfatal-warnings",
-    "-language:higherKinds"
+    "-language:higherKinds,implicitConversions"
   ) ++ (
     VersionNumber(scalaVersion.value) match {
-      case v if v.matchesSemVer(SemanticSelector(">=2.13")) => Seq("-Ymacro-annotations")
+      case v if v.matchesSemVer(SemanticSelector("=2.13"))  => Seq("-Ymacro-annotations")
       case v if v.matchesSemVer(SemanticSelector("<=2.12")) => Seq("-Ypartial-unification")
       case _                                                => Nil
     }
   ),
-  addCompilerPlugin(scalafixSemanticdb),
-  scalacOptions ++= Seq(s"-P:semanticdb:targetroot:${baseDirectory.value}/target/.semanticdb", "-Yrangepos"),
+  semanticdbEnabled        := true,
   Test / parallelExecution := false,
   scalafmtOnCompile        := true,
   coverageExcludedPackages := "(io.lemonlabs.uri.inet.Trie.*|io.lemonlabs.uri.inet.PublicSuffixes.*|io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
@@ -63,10 +66,10 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    "com.chuusai"   %%% "shapeless"  % "2.3.7",
     "org.typelevel" %%% "cats-core"  % "2.6.1",
     "org.typelevel" %%% "cats-parse" % "0.3.4"
   ),
+  libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.7")),
   pomPostProcess := { node =>
     new RuleTransformer(new RewriteRule {
       override def transform(node: xml.Node): Seq[xml.Node] = {
@@ -162,7 +165,8 @@ lazy val scalaUri =
       Test / fork := true
     )
     .jsSettings(
-      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.2.0"
+      // TODO: Remove for3Use2_13 when scala3 version available https://github.com/scala-js/scala-js-dom/issues/451
+      libraryDependencies += ("org.scala-js" %%% "scalajs-dom" % "1.2.0").cross(CrossVersion.for3Use2_13)
     )
 
 lazy val docs = project

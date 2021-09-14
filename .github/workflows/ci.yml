@@ -13,8 +13,14 @@ jobs:
 
     strategy:
       matrix:
-        scala: [2.12.14, 2.13.6]
+        scala: [2.12.14, 2.13.6, 3.0.1]
         project: [scalaUriJVM, scalaUriJS]
+        exclude:
+          # Unable to run the tests for Scala.js + Scala3. Same issue as described here:
+          # https://github.com/softwaremill/quicklens/issues/67
+          # TODO: Re-enable once resolved
+          - scala: 3.0.1
+            project: scalaUriJS
 
     steps:
       - name: Checkout Code

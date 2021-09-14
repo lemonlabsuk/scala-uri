@@ -7,9 +7,6 @@ import simulacrum.typeclass
 
 import scala.language.implicitConversions
 import scala.annotation.implicitNotFound
-import scala.compiletime.package$package.{erasedValue, summonInline}
-import scala.deriving.Mirror
-import scala.deriving.*
 
 @implicitNotFound("Could not find an instance of PathPart for ${A}")
 @typeclass trait PathPart[-A] extends Serializable {
@@ -107,24 +104,7 @@ sealed trait TraversablePathPartsInstances {
     toSeq(a).toVector
 }
 
-object TraversablePathParts extends TraversablePathPartsInstances {
-  inline def product[A](implicit m: Mirror.ProductOf[A]): TraversablePathParts[A] = {
-    val elemInstances = summonAll[m.MirroredElemTypes]
-
-    new TraversablePathParts[A] {
-      override def toSeq(a: A): Seq[String] =
-        a.asInstanceOf[Product].productIterator.zip(elemInstances)
-          .flatMap { case (field, tc) => tc.asInstanceOf[TraversablePathParts[Any]].toSeq(field) }
-          .toSeq
-    }
-  }
-
-  inline private def summonAll[T <: Tuple]: List[TraversablePathParts[_]] =
-    inline erasedValue[T] match {
-      case _: EmptyTuple => Nil
-      case _: (t *: ts)  => summonInline[TraversablePathParts[t]] :: summonAll[ts]
-    }
-
+object TraversablePathParts extends TraversablePathPartsInstances with TraversablePathPartsDeriving {
   /* ======================================================================== */
   /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
   /* ======================================================================== */

@@ -1,6 +1,6 @@
 # scala-uri
 
-![Build Status](https://github.com/lemonlabsuk/scala-uri/actions/workflows/ci/badge.svg)
+[![scala-uri CI](https://github.com/lemonlabsuk/scala-uri/actions/workflows/ci.yml/badge.svg)](https://github.com/lemonlabsuk/scala-uri/actions/workflows/ci.yml)
 [![codecov.io](http://codecov.io/github/lemonlabsuk/scala-uri/coverage.svg?branch=master)](https://codecov.io/gh/lemonlabsuk/scala-uri/branch/master)
 [![Slack](https://lemonlabs.io/slack/badge.svg)](https://lemonlabs.io/slack)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)

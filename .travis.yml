@@ -13,7 +13,7 @@ install:
     sudo ln -s $HOME/sbt/bin/sbt /usr/local/bin/sbt
 
 script: >
- sbt ++$TRAVIS_SCALA_VERSION check mdoc coverage $PROJECT/test coverageReport &&
+ sbt ++$TRAVIS_SCALA_VERSION check mdoc $COVERAGE $PROJECT/test $COVERAGE &&
  cd target &&
  git clone https://github.com/lemonlabsuk/scala-uri-demo.git &&
  cd scala-uri-demo &&
@@ -26,17 +26,17 @@ jdk:
 jobs:
   include:
     - scala: [ 3.0.1 ]
-      env: PROJECT=scalaUriJVM
+      env: PROJECT=scalaUriJVM COVERAGE="" COVERAGE_REPORT=""
     - scala: [ 3.0.1 ]
-      env: PROJECT=scalaUriJS
+      env: PROJECT=scalaUriJS COVERAGE="" COVERAGE_REPORT=""
     - scala: [2.13.6]
-      env: PROJECT=scalaUriJVM
+      env: PROJECT=scalaUriJVM COVERAGE=coverage COVERAGE_REPORT=coverageReport
     - scala: [2.13.6]
-      env: PROJECT=scalaUriJS
+      env: PROJECT=scalaUriJS COVERAGE=coverage COVERAGE_REPORT=coverageReport
     - scala: [2.12.14]
-      env: PROJECT=scalaUriJVM
+      env: PROJECT=scalaUriJVM COVERAGE=coverage COVERAGE_REPORT=coverageReport
     - scala: [2.12.14]
-      env: PROJECT=scalaUriJS
+      env: PROJECT=scalaUriJS COVERAGE=coverage COVERAGE_REPORT=coverageReport
 
 before_script:
   - nvm install 10 # nodejs < 10 fails finding URL class

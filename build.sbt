@@ -48,9 +48,7 @@ val sharedSettings = Seq(
       case _                                                => Nil
     }
   ),
-  semanticdbEnabled := true,
-//  addCompilerPlugin(scalafixSemanticdb),
-//  scalacOptions ++= Seq(s"-P:semanticdb:targetroot:${baseDirectory.value}/target/.semanticdb", "-Yrangepos"),
+  semanticdbEnabled        := true,
   Test / parallelExecution := false,
   scalafmtOnCompile        := true,
   coverageExcludedPackages := "(io.lemonlabs.uri.inet.Trie.*|io.lemonlabs.uri.inet.PublicSuffixes.*|io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"

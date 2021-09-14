@@ -52,6 +52,7 @@ jobs:
         env:
           SCALA_VERSION: ${{ matrix.scala }}
           PROJECT: ${{ matrix.project }}
+          SBT_OPTS: -Xss10m
         run: >
           sbt ++$SCALA_VERSION check mdoc coverage $PROJECT/test coverageReport &&
           cd target &&

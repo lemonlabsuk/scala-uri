@@ -34,7 +34,7 @@ object PublicSuffixes {
   )
 
   lazy val set: Set[String] = publicSuffixes0 ++ publicSuffixes1
-  private def publicSuffixes0: Set[String] =
+  private def publicSuffixes0 =
     Set(
       "ac",
       "com.ac",
@@ -179,15 +179,19 @@ object PublicSuffixes {
       "it.ao",
       "aq",
       "ar",
+      "bet.ar",
       "com.ar",
+      "coop.ar",
       "edu.ar",
       "gob.ar",
       "gov.ar",
       "int.ar",
       "mil.ar",
       "musica.ar",
+      "mutual.ar",
       "net.ar",
       "org.ar",
+      "senasa.ar",
       "tur.ar",
       "arpa",
       "e164.arpa",
@@ -5031,14 +5035,14 @@ object PublicSuffixes {
       "gob.pe",
       "nom.pe",
       "mil.pe",
-      "org.pe",
+      "org.pe"
+    )
+  private def publicSuffixes1 =
+    Set(
       "com.pe",
       "net.pe",
       "pf",
-      "com.pf"
-    )
-  private def publicSuffixes1: Set[String] =
-    Set(
+      "com.pf",
       "org.pf",
       "edu.pf",
       "ph",

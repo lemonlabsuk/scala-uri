@@ -395,7 +395,7 @@ Only percent encode the hash character:
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.encoding._
 
-implicit val config = UriConfig(encoder = percentEncode('#'))
+implicit val config: UriConfig = UriConfig(encoder = percentEncode('#'))
 ```
 
 Percent encode all the default chars, except the plus character:
@@ -404,7 +404,7 @@ Percent encode all the default chars, except the plus character:
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.encoding._
 
-implicit val config = UriConfig(encoder = percentEncode -- '+')
+implicit val config: UriConfig = UriConfig(encoder = percentEncode -- '+')
 ```
 
 Encode all the default chars, and also encode the letters a and b:
@@ -413,7 +413,7 @@ Encode all the default chars, and also encode the letters a and b:
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.encoding._
 
-implicit val config = UriConfig(encoder = percentEncode ++ ('a', 'b'))
+implicit val config: UriConfig = UriConfig(encoder = percentEncode ++ ('a', 'b'))
 ```
 
 ### Encoding spaces as pluses
@@ -428,7 +428,7 @@ import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.encoding._
 import io.lemonlabs.uri.encoding.PercentEncoder._
 
-implicit val config = UriConfig.default.copy(queryEncoder = PercentEncoder())
+implicit val config: UriConfig = UriConfig.default.copy(queryEncoder = PercentEncoder())
 
 val uri = Url.parse("http://theon.github.com?test=uri with space")
 uri.toString // This is http://theon.github.com?test=uri%20with%20space
@@ -443,7 +443,7 @@ import io.lemonlabs.uri.Url
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding._
 
-implicit val config = UriConfig.default.copy(queryDecoder = PercentDecoder)
+implicit val config: UriConfig = UriConfig.default.copy(queryDecoder = PercentDecoder)
 
 val uri = Url.parse("http://theon.github.com?test=uri+with+plus")
 uri.query.param("test") // This is Some("uri+with+plus")
@@ -458,7 +458,7 @@ import io.lemonlabs.uri.Url
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.encoding._
 
-implicit val config = UriConfig(encoder = percentEncode + encodeCharAs(' ', "_"))
+implicit val config: UriConfig = UriConfig(encoder = percentEncode + encodeCharAs(' ', "_"))
 
 val uri = Url.parse("http://theon.github.com/uri with space")
 uri.toString // This is http://theon.github.com/uri_with_space
@@ -484,7 +484,7 @@ import io.lemonlabs.uri.Url
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding.NoopDecoder
 
-implicit val c = UriConfig(decoder = NoopDecoder)
+implicit val c: UriConfig = UriConfig(decoder = NoopDecoder)
 
 val uri = Url.parse("http://example.com/i-havent-%been%-percent-encoded")
 
@@ -507,7 +507,7 @@ import io.lemonlabs.uri.Url
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.decoding.PercentDecoder
 
-implicit val c = UriConfig(
+implicit val c: UriConfig = UriConfig(
   decoder = PercentDecoder(ignoreInvalidPercentEncoding = true)
 )
 val uri = Url.parse("/?x=%3")
@@ -638,7 +638,7 @@ This can be changed like so:
 import io.lemonlabs.uri.config.UriConfig
 import io.lemonlabs.uri.Url
 
-implicit val conf = UriConfig(charset = "GB2312")
+implicit val conf: UriConfig = UriConfig(charset = "GB2312")
 
 val uri = Url.parse("http://theon.github.com/uris-in-scala.html?chinese=网址")
 uri.toString // This is http://theon.github.com/uris-in-scala.html?chinese=%CD%F8%D6%B7

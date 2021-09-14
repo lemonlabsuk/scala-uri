@@ -13,14 +13,22 @@ jobs:
 
     strategy:
       matrix:
-        scala: [2.12.14, 2.13.6, 3.0.1]
+        scala: [2.12.14, 2.13.6]
         project: [scalaUriJVM, scalaUriJS]
+        coverage: [coverage]
+        coverageReport: [coverageReport]
         exclude:
           # Unable to run the tests for Scala.js + Scala3. Same issue as described here:
           # https://github.com/softwaremill/quicklens/issues/67
           # TODO: Re-enable once resolved
           - scala: 3.0.1
             project: scalaUriJS
+        include:
+          # https://github.com/scoverage/scalac-scoverage-plugin/issues/299
+          - scala: 3.0.1
+            project: scalaUriJVM
+            coverage: ""
+            coverageReport: ""
 
     steps:
       - name: Checkout Code
@@ -52,9 +60,11 @@ jobs:
         env:
           SCALA_VERSION: ${{ matrix.scala }}
           PROJECT: ${{ matrix.project }}
+          COVERAGE: ${{ matrix.coverage }}
+          COVERAGE_REPORT: ${{ matrix.coverageReport }}
           SBT_OPTS: -Xss10m
         run: >
-          sbt ++$SCALA_VERSION check mdoc coverage $PROJECT/test coverageReport &&
+          sbt ++$SCALA_VERSION check mdoc $COVERAGE $PROJECT/test $COVERAGE_REPORT &&
           cd target &&
           git clone https://github.com/lemonlabsuk/scala-uri-demo.git &&
           cd scala-uri-demo &&

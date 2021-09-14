@@ -1,4 +1,4 @@
-name: scala-uri unit tests
+name: scala-uri CI
 
 on:
   push:

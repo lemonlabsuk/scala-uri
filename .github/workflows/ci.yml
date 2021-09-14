@@ -23,6 +23,7 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v2
         with:
+          key: scala-dependencies
           path: |
             ~/.ivy2/cache
             ~/.sbt

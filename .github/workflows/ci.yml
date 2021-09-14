@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        scala: [2.12.14, 2.13.6]
+        scala: [2.12.15, 2.13.6]
         project: [scalaUriJVM, scalaUriJS]
 
     steps:

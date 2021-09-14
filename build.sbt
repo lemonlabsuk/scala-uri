@@ -43,7 +43,7 @@ val sharedSettings = Seq(
     "-language:higherKinds,implicitConversions"
   ) ++ (
     VersionNumber(scalaVersion.value) match {
-      case v if v.matchesSemVer(SemanticSelector("=2.13")) => Seq("-Ymacro-annotations")
+      case v if v.matchesSemVer(SemanticSelector("=2.13"))  => Seq("-Ymacro-annotations")
       case v if v.matchesSemVer(SemanticSelector("<=2.12")) => Seq("-Ypartial-unification")
       case _                                                => Nil
     }
@@ -52,7 +52,7 @@ val sharedSettings = Seq(
 //  addCompilerPlugin(scalafixSemanticdb),
 //  scalacOptions ++= Seq(s"-P:semanticdb:targetroot:${baseDirectory.value}/target/.semanticdb", "-Yrangepos"),
   Test / parallelExecution := false,
-//  scalafmtOnCompile        := true,
+  scalafmtOnCompile        := true,
   coverageExcludedPackages := "(io.lemonlabs.uri.inet.Trie.*|io.lemonlabs.uri.inet.PublicSuffixes.*|io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
 )
 

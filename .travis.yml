@@ -27,8 +27,11 @@ jobs:
   include:
     - scala: [ 3.0.1 ]
       env: PROJECT=scalaUriJVM COVERAGE="" COVERAGE_REPORT=""
-    - scala: [ 3.0.1 ]
-      env: PROJECT=scalaUriJS COVERAGE="" COVERAGE_REPORT=""
+# Unable to run the tests for Scala.js + Scala3. Same issue as described here:
+# https://github.com/softwaremill/quicklens/issues/67
+# TODO: Re-enable once resolved
+#    - scala: [ 3.0.1 ]
+#      env: PROJECT=scalaUriJS COVERAGE="" COVERAGE_REPORT=""
     - scala: [2.13.6]
       env: PROJECT=scalaUriJVM COVERAGE=coverage COVERAGE_REPORT=coverageReport
     - scala: [2.13.6]

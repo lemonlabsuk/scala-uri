@@ -6,8 +6,6 @@ import simulacrum.typeclass
 
 import scala.language.implicitConversions
 import scala.annotation.implicitNotFound
-import scala.compiletime.package$package.{erasedValue, summonInline, summonFrom}
-import scala.deriving.Mirror
 
 @implicitNotFound("Could not find an instance of QueryKey for ${A}")
 @typeclass trait QueryKey[A] extends Serializable {
@@ -227,29 +225,7 @@ sealed trait QueryKeyValueInstances {
     toSeq(a).toVector
 }
 
-object TraversableParams extends TraversableParamsInstances {
-  inline def product[A](implicit m: Mirror.ProductOf[A]): TraversableParams[A] = {
-    val elemInstances = summonAll[m.MirroredElemTypes]
-
-    new TraversableParams[A] {
-      override def toSeq(a: A): Seq[(String, Option[String])] =
-        a.asInstanceOf[Product].productElementNames
-          .zip(a.asInstanceOf[Product].productIterator)
-          .zip(elemInstances)
-          .flatMap {
-            case ((name, field), tc : QueryValue[_]) => Seq((name, tc.asInstanceOf[QueryValue[Any]].queryValue(field)))
-            case ((name, field), tc : TraversableParams[_]) => tc.asInstanceOf[TraversableParams[Any]].toSeq(field)
-          }
-          .toSeq
-    }
-  }
-
-  inline private def summonAll[T <: Tuple]: List[QueryValue[_] | TraversableParams[_]] =
-    inline erasedValue[T] match {
-      case _: EmptyTuple => Nil
-      case _: (t *: ts)  => summonInline[TraversableParams[t] | QueryValue[t]] :: summonAll[ts]
-    }
-
+object TraversableParams extends TraversableParamsInstances with TraversableParamsDeriving {
   /* ======================================================================== */
   /* THE FOLLOWING CODE IS MANAGED BY SIMULACRUM; PLEASE DO NOT EDIT!!!!      */
   /* ======================================================================== */

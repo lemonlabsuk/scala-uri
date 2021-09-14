@@ -77,10 +77,10 @@ case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
     toString(config, _.toStringPunycode)
 
   override def toString: String =
-    toString(config, _.toString)
+    toString(config, _.toString())
 
   def toStringRaw: String =
-    toString(config.withNoEncoding, _.toString)
+    toString(config.withNoEncoding, _.toString())
 
   /** Returns this authority normalized according to
     * <a href="http://www.ietf.org/rfc/rfc3986.txt">RFC 3986</a>

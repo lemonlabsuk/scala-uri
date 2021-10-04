@@ -61,6 +61,13 @@ sealed trait Uri extends Product with Serializable {
     */
   def withScheme(scheme: String): SelfWithScheme
 
+  /** Copies this Uri but with a new UriConfig
+    *
+    * @param config the new config to use
+    * @return a new Uri with the specified config
+    */
+  def withConfig(config: UriConfig): Self
+
   def toUrl: Url
   def toUrn: Urn
 
@@ -643,6 +650,9 @@ final case class RelativeUrl(path: UrlPath, query: QueryString, fragment: Option
   def withHost(host: Host): ProtocolRelativeUrl =
     withAuthority(Authority(host))
 
+  def withConfig(config: UriConfig): RelativeUrl =
+    RelativeUrl(path, query, fragment)(config)
+
   /** Copies this Url but with the path set as the given value.
     *
     * @param path the new path to set
@@ -899,6 +909,9 @@ final case class ProtocolRelativeUrl(authority: Authority,
   def withFragment[T: Fragment](fragment: T): ProtocolRelativeUrl =
     copy(fragment = fragment.fragment)
 
+  def withConfig(config: UriConfig): ProtocolRelativeUrl =
+    ProtocolRelativeUrl(authority, path, query, fragment)(config)
+
   /** Copies this Url but with the path set as the given value.
     *
     * If the specified path is non empty *and* doesn't have a leading slash, one will be added, as per RFC 3986:
@@ -973,6 +986,9 @@ final case class AbsoluteUrl(scheme: String,
 
   def withFragment[T: Fragment](fragment: T): AbsoluteUrl =
     copy(fragment = fragment.fragment)
+
+  def withConfig(config: UriConfig): AbsoluteUrl =
+    AbsoluteUrl(scheme, authority, path, query, fragment)(config)
 
   /** Copies this Url but with the path set as the given value.
     *
@@ -1129,6 +1145,9 @@ final case class SimpleUrlWithoutAuthority(scheme: String, path: UrlPath, query:
   def withFragment[T: Fragment](fragment: T): SimpleUrlWithoutAuthority =
     copy(fragment = fragment.fragment)
 
+  def withConfig(config: UriConfig): SimpleUrlWithoutAuthority =
+    SimpleUrlWithoutAuthority(scheme, path, query, fragment)(config)
+
   def withQueryString(query: QueryString): SimpleUrlWithoutAuthority =
     copy(query = query)
 
@@ -1240,6 +1259,9 @@ final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte
   def withQueryString(query: QueryString): DataUrl =
     this
 
+  def withConfig(config: UriConfig): DataUrl =
+    DataUrl(mediaType, base64, data)(config)
+
   private[uri] def toString(c: UriConfig): String =
     scheme + ":" + pathString(c)
 
@@ -1342,6 +1364,9 @@ final case class ScpLikeUrl(override val user: Option[String], override val host
   def withScheme(scheme: String): AbsoluteUrl =
     AbsoluteUrl(scheme, authority, path.toAbsoluteOrEmpty, QueryString.empty, None)
 
+  def withConfig(config: UriConfig): ScpLikeUrl =
+    ScpLikeUrl(user, host, path)(config)
+
   private[uri] def toString(c: UriConfig, hostToString: Host => String): String = {
     // Don't do percent encoding. Can't find any reference to it being
     user.fold("")(_ + "@") + hostToString(host) + ":" + path.toString(config.withNoEncoding)
@@ -1401,6 +1426,9 @@ final case class Urn(path: UrnPath)(implicit val config: UriConfig = UriConfig.d
 
   def toUrl: Url = throw new UriConversionException("Urn cannot be converted to Url")
   def toUrn: Urn = this
+
+  def withConfig(config: UriConfig): Urn =
+    Urn(path)(config)
 
   private[uri] def toString(c: UriConfig): String =
     scheme + ":" + path.toString(c)

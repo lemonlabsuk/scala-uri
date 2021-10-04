@@ -14,6 +14,13 @@ sealed trait Host {
   def value: String
   override def toString: String = value
 
+  /** Copies this Host but with a new UriConfig
+    *
+    * @param config the new config to use
+    * @return a new Host with the specified config
+    */
+  def withConfig(config: UriConfig): Self
+
   /** Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`
     *  `co.uk` for `www.example.co.uk`
@@ -119,6 +126,9 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
         PublicSuffixes.wildcardPrefixes.contains(suffix.substring(dotIndex + 1))
       }
     }
+
+  def withConfig(config: UriConfig): DomainName =
+    DomainName(value)(config)
 
   /** Returns the longest public suffix for the host in this URI. Examples include:
     *  `com`   for `www.example.com`
@@ -288,6 +298,9 @@ final case class IpV4(octet1: Byte, octet2: Byte, octet3: Byte, octet4: Byte)(im
     (piece1.toChar, piece2.toChar)
   }
 
+  def withConfig(config: UriConfig): IpV4 =
+    IpV4(octet1, octet2, octet3, octet4)(config)
+
   def value: String = s"$octet1Int.$octet2Int.$octet3Int.$octet4Int"
 
   def apexDomain: Option[String] = None
@@ -372,6 +385,9 @@ final case class IpV6(piece1: Char,
 
     longestRun(0, (-1, -1), 0)
   }
+
+  def withConfig(config: UriConfig): IpV6 =
+    IpV6(piece1, piece2, piece3, piece4, piece5, piece6, piece7, piece8)(config)
 
   def apexDomain: Option[String] = None
   def publicSuffix: Option[String] = None

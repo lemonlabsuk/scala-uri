@@ -65,6 +65,9 @@ case class Authority(userInfo: Option[UserInfo], host: Host, port: Option[Int])(
   def longestSubdomain: Option[String] =
     host.longestSubdomain
 
+  def withConfig(config: UriConfig): Authority =
+    Authority(userInfo, host, port)(config)
+
   private[uri] def toString(c: UriConfig, hostToString: Host => String): String = {
     val userInfoStr = userInfo.map(_.toString(c) + "@").getOrElse("")
     userInfoStr + hostToString(host) + port.map(":" + _).getOrElse("")

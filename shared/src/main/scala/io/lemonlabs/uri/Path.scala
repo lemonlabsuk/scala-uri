@@ -82,6 +82,8 @@ sealed trait UrlPath extends Path {
   def toAbsolute: AbsolutePath
   def toAbsoluteOrEmpty: AbsoluteOrEmptyPath
 
+  def withConfig(config: UriConfig): Self
+
   def addPart[P: PathPart](part: P): UrlPath =
     withParts(parts :+ part.path)
 
@@ -218,6 +220,9 @@ case object EmptyPath extends AbsoluteOrEmptyPath {
   def isEmpty: Boolean =
     true
 
+  def withConfig(config: UriConfig): EmptyPath.type =
+    this
+
   def toAbsolute: AbsolutePath =
     AbsolutePath(Vector.empty)
 
@@ -251,6 +256,9 @@ final case class RootlessPath(parts: Vector[String])(implicit val config: UriCon
     if (parts.isEmpty) EmptyPath
     else AbsolutePath(parts)
 
+  def withConfig(config: UriConfig): RootlessPath =
+    RootlessPath(parts)(config)
+
   def withParts(otherParts: Iterable[String]): UrlPath =
     RootlessPath(otherParts.toVector)
 
@@ -281,6 +289,9 @@ final case class AbsolutePath(parts: Vector[String])(implicit val config: UriCon
 
   def withParts(otherParts: Iterable[String]): UrlPath =
     copy(parts = otherParts.toVector)
+
+  def withConfig(config: UriConfig): AbsolutePath =
+    AbsolutePath(parts)(config)
 
   /** Always returns false as we always have at least a leading slash
     */
@@ -313,6 +324,9 @@ final case class UrnPath(nid: String, nss: String)(implicit val config: UriConfi
 
   def isEmpty: Boolean =
     false
+
+  def withConfig(config: UriConfig): UrnPath =
+    UrnPath(nid, nss)(config)
 
   private[uri] def toString(c: UriConfig): String =
     nid + ":" + c.pathEncoder.encode(nss, c.charset)

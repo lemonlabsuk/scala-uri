@@ -74,4 +74,87 @@ class ConfigTests extends AnyFlatSpec with Matchers {
     val conf = UriConfig.default.withDefaultPorts(testDefaultPorts).copy(charset = "UTF-8")
     conf.defaultPorts should equal(testDefaultPorts)
   }
+
+  val percentEncoderI: PercentEncoder = PercentEncoder(Set('i'))
+  val configPercentEncodeI: UriConfig = UriConfig(encoder = percentEncoderI)
+
+  "withConfig" should "replace the config for a RelativeUrl" in {
+    val url = RelativeUrl.parse("/index.html").withConfig(configPercentEncodeI)
+    url.toString() should equal("/%69ndex.html")
+  }
+
+  it should "replace the config for a AbsoluteUrl" in {
+    val url = AbsoluteUrl.parse("https://localhost/index.html").withConfig(configPercentEncodeI)
+    url.toString() should equal("https://localhost/%69ndex.html")
+  }
+
+  it should "replace the config for a ProtocolRelativeUrl" in {
+    val url = ProtocolRelativeUrl.parse("//localhost/index.html").withConfig(configPercentEncodeI)
+    url.toString() should equal("//localhost/%69ndex.html")
+  }
+
+  it should "replace the config for a SimpleUrlWithoutAuthority" in {
+    val url = SimpleUrlWithoutAuthority.parse("mailto:index@example.com").withConfig(configPercentEncodeI)
+    url.toString() should equal("mailto:%69ndex@example.com")
+  }
+
+  it should "replace the config for a DataUrl" in {
+    val url = DataUrl.parse("data:,index").withConfig(configPercentEncodeI)
+    url.toString() should equal("data:,%69ndex")
+  }
+
+  it should "replace the config for a ScpLikeUrl" in {
+    val url = ScpLikeUrl.parse("data:,index").withConfig(configPercentEncodeI)
+    url.config should equal(configPercentEncodeI)
+  }
+
+  it should "replace the config for a Urn" in {
+    val url = Urn.parse("urn:html:index").withConfig(configPercentEncodeI)
+    url.toString() should equal("urn:html:%69ndex")
+  }
+
+  it should "replace the config for a Authority" in {
+    val authority = Authority.parse("index@localhost").withConfig(configPercentEncodeI)
+    authority.toString() should equal("%69ndex@localhost")
+  }
+
+  it should "replace the config for a DomainName" in {
+    val host = DomainName.parse("localhost").withConfig(configPercentEncodeI)
+    host.conf should equal(configPercentEncodeI)
+  }
+
+  it should "replace the config for a IpV4" in {
+    val host = IpV4.parse("127.0.0.1").withConfig(configPercentEncodeI)
+    host.conf should equal(configPercentEncodeI)
+  }
+
+  it should "replace the config for a IpV6" in {
+    val host = IpV6.parse("[::1]").withConfig(configPercentEncodeI)
+    host.conf should equal(configPercentEncodeI)
+  }
+
+  it should "do nothing for EmptyPath" in {
+    val path = EmptyPath.withConfig(configPercentEncodeI)
+    path should equal(EmptyPath)
+  }
+
+  it should "replace the config for a AbsolutePath" in {
+    val path = AbsolutePath.fromParts("index").withConfig(configPercentEncodeI)
+    path.toString() should equal("/%69ndex")
+  }
+
+  it should "replace the config for a RootlessPath" in {
+    val path = RootlessPath.fromParts("index").withConfig(configPercentEncodeI)
+    path.toString() should equal("%69ndex")
+  }
+
+  it should "replace the config for a UrnPath" in {
+    val path = UrnPath.parse("html:index").withConfig(configPercentEncodeI)
+    path.toString() should equal("html:%69ndex")
+  }
+
+  it should "replace the config for a QueryString" in {
+    val qs = QueryString.parse("?index&html").withConfig(configPercentEncodeI)
+    qs.toString() should equal("%69ndex&html")
+  }
 }

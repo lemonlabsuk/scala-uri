@@ -30,7 +30,7 @@
 
 To include it in your SBT project from maven central:
 ```scala
-"io.lemonlabs" %% "scala-uri" % "3.5.0"
+"io.lemonlabs" %% "scala-uri" % "3.6.0"
 ```
 
 For Scala 3, there is an early build available:

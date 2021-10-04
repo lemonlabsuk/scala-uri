@@ -207,6 +207,9 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
   def isEmpty: Boolean = params.isEmpty
   def nonEmpty: Boolean = params.nonEmpty
 
+  def withConfig(config: UriConfig): QueryString =
+    QueryString(params)(config)
+
   type ParamToString = PartialFunction[(String, Option[String]), String]
 
   private[uri] def toString(c: UriConfig): String = {

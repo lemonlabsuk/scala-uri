@@ -1,6 +1,6 @@
 package io.lemonlabs.uri.inet
 
-import org.scalajs.dom.experimental.URL
+import org.scalajs.dom.URL
 
 trait PunycodeSupport {
   def toPunycode(host: String): String = {

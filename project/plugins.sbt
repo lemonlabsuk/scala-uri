@@ -1,4 +1,4 @@
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.9.1")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.9.2")
 
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.1.0")
 

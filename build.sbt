@@ -67,7 +67,7 @@ val scalaUriSettings = Seq(
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
     "org.typelevel" %%% "cats-core"  % "2.6.1",
-    "org.typelevel" %%% "cats-parse" % "0.3.4"
+    "org.typelevel" %%% "cats-parse" % "0.3.5"
   ),
   libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.7")),
   pomPostProcess := { node =>
@@ -165,8 +165,7 @@ lazy val scalaUri =
       Test / fork := true
     )
     .jsSettings(
-      // TODO: Remove for3Use2_13 when scala3 version available https://github.com/scala-js/scala-js-dom/issues/451
-      libraryDependencies += ("org.scala-js" %%% "scalajs-dom" % "1.2.0").cross(CrossVersion.for3Use2_13)
+      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.0.0"
     )
 
 lazy val docs = project

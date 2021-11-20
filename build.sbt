@@ -67,7 +67,7 @@ val scalaUriSettings = Seq(
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
     "org.typelevel" %%% "cats-core"  % "2.6.1",
-    "org.typelevel" %%% "cats-parse" % "0.3.5"
+    "org.typelevel" %%% "cats-parse" % "0.3.6"
   ),
   libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.7")),
   pomPostProcess := { node =>

@@ -12,4 +12,4 @@ addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.4")
 
 addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.2.24")
 
-addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.32")
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.33")

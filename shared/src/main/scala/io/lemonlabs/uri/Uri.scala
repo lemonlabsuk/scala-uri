@@ -1270,9 +1270,9 @@ final case class DataUrl(mediaType: MediaType, base64: Boolean, data: Array[Byte
   override def equals(obj: Any): Boolean = obj match {
     case other: DataUrl =>
       other.canEqual(this) &&
-        mediaType == other.mediaType &&
-        base64 == other.base64 &&
-        util.Arrays.equals(data, other.data)
+      mediaType == other.mediaType &&
+      base64 == other.base64 &&
+      util.Arrays.equals(data, other.data)
     case _ => false
   }
 

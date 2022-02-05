@@ -13,8 +13,8 @@ import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPrev
 
 name := "scala-uri root"
 
-ThisBuild / scalaVersion       := "3.0.2"
-ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.6", scalaVersion.value)
+ThisBuild / scalaVersion       := "3.1.1"
+ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.8", scalaVersion.value)
 publish / skip                 := true // Do not publish the root project
 
 val simulacrumScalafixVersion = "0.5.4"
@@ -28,10 +28,10 @@ val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % simulacrumScalafixVersion,
-    "org.scalatest"     %%% "scalatest"                       % "3.2.10"   % Test,
-    "org.scalatestplus" %%% "scalacheck-1-15"                 % "3.2.10.0" % Test,
+    "org.scalatest"     %%% "scalatest"                       % "3.2.11"   % Test,
+    "org.scalatestplus" %%% "scalacheck-1-15"                 % "3.2.11.0" % Test,
     "org.scalacheck"    %%% "scalacheck"                      % "1.15.4"   % Test,
-    "org.typelevel"     %%% "cats-laws"                       % "2.6.1"    % Test
+    "org.typelevel"     %%% "cats-laws"                       % "2.7.0"    % Test
   ),
   scalacOptions := Seq(
     "-unchecked",
@@ -49,6 +49,7 @@ val sharedSettings = Seq(
     }
   ),
   semanticdbEnabled        := true,
+  semanticdbVersion        := scalafixSemanticdb.revision,
   Test / parallelExecution := false,
   scalafmtOnCompile        := true,
   coverageExcludedPackages := "(io.lemonlabs.uri.inet.Trie.*|io.lemonlabs.uri.inet.PublicSuffixes.*|io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
@@ -66,8 +67,8 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    "org.typelevel" %%% "cats-core"  % "2.6.1",
-    "org.typelevel" %%% "cats-parse" % "0.3.5"
+    "org.typelevel" %%% "cats-core"  % "2.7.0",
+    "org.typelevel" %%% "cats-parse" % "0.3.6"
   ),
   libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.7")),
   pomPostProcess := { node =>
@@ -165,7 +166,7 @@ lazy val scalaUri =
       Test / fork := true
     )
     .jsSettings(
-      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.0.0"
+      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.1.0"
     )
 
 lazy val docs = project

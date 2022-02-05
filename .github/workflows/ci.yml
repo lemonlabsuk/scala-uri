@@ -21,11 +21,11 @@ jobs:
           # Unable to run the tests for Scala.js + Scala3. Same issue as described here:
           # https://github.com/softwaremill/quicklens/issues/67
           # TODO: Re-enable once resolved
-          - scala: 3.1.0
+          - scala: 3.1.1
             project: scalaUriJS
         include:
           # https://github.com/scoverage/scalac-scoverage-plugin/issues/299
-          - scala: 3.1.0
+          - scala: 3.1.1
             project: scalaUriJVM
             coverage: ""
             coverageReport: ""

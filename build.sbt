@@ -14,7 +14,7 @@ import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPrev
 name := "scala-uri root"
 
 ThisBuild / scalaVersion       := "3.1.1"
-ThisBuild / crossScalaVersions := Seq("2.12.14", "2.13.6", scalaVersion.value)
+ThisBuild / crossScalaVersions := Seq("2.12.14", "2.13.8", scalaVersion.value)
 publish / skip                 := true // Do not publish the root project
 
 val simulacrumScalafixVersion = "0.5.4"
@@ -49,6 +49,7 @@ val sharedSettings = Seq(
     }
   ),
   semanticdbEnabled        := true,
+  semanticdbVersion        := scalafixSemanticdb.revision,
   Test / parallelExecution := false,
   scalafmtOnCompile        := true,
   coverageExcludedPackages := "(io.lemonlabs.uri.inet.Trie.*|io.lemonlabs.uri.inet.PublicSuffixes.*|io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"

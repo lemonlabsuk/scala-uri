@@ -1,10 +1,10 @@
 package io.lemonlabs.uri.parsing
 
 import cats.parse.Numbers.digit
-import cats.parse.Parser.*
+import cats.parse.Parser._
 import cats.parse.Rfc5234.alpha
 import cats.parse.{Parser, Parser0}
-import io.lemonlabs.uri.*
+import io.lemonlabs.uri._
 import io.lemonlabs.uri.config.UriConfig
 
 import scala.collection.immutable

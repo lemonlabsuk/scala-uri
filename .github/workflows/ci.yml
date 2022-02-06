@@ -2,9 +2,9 @@ name: scala-uri CI
 
 on:
   push:
-    branches: [ "**" ]
+    branches: [ master ]
   pull_request:
-    branches: [ "**" ]
+    branches: [ master ]
 
 jobs:
   build:

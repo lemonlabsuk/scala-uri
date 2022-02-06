@@ -9,6 +9,8 @@ import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+import scala.util.Success
+
 /** Test Suite to ensure that bugs raised by awesome github peeps NEVER come back
   *
   * These bugs were raised on thr github issues page https://github.com/lemonlabsuk/scala-uri/issues
@@ -94,5 +96,9 @@ class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
   "Github Issue #318" should "not include private domains from the public suffix list" in {
     Url.parse("http://475952.temp-dns.com/recipes/").subdomain should equal(Some("475952"))
     Url.parse("https://allrecipes-01.web.app/").subdomain should equal(Some("allrecipes-01"))
+  }
+
+  "Github Issue #368" should "allow parsing of an empty query" in {
+    QueryString.parseTry("") should equal(Success(QueryString.empty))
   }
 }

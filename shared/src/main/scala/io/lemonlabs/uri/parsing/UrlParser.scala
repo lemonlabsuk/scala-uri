@@ -8,7 +8,7 @@ import io.lemonlabs.uri._
 import io.lemonlabs.uri.config.UriConfig
 
 import scala.collection.immutable
-import scala.util.Try
+import scala.util.{Success, Try}
 
 class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default) extends UriParser {
   val _host_end = ":/?# \t\r\n"
@@ -420,8 +420,12 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
   def parseUrl(): Try[Url] =
     mapParseError((_url <* Parser.end).parseAll(input), "URL")
 
-  def parseQuery(): Try[QueryString] =
-    mapParseError((_query_string <* Parser.end).parseAll(input), "Query String")
+  def parseQuery(): Try[QueryString] = {
+    if (input == "?")
+      Success(QueryString.empty)
+    else
+      mapParseError((_query_string <* Parser.end).parseAll(input), "Query String")
+  }
 
   def parseQueryParam(): Try[(String, Option[String])] =
     mapParseError((_query_param_or_tok <* Parser.end).parseAll(input), "Query Parameter")
@@ -486,7 +490,7 @@ object UrlParser {
     UrlParser(s).parseUrl()
 
   def parseQuery(s: String)(implicit config: UriConfig = UriConfig.default): Try[QueryString] = {
-    val withQuestionMark = if (s.head == '?') s else "?" + s
+    val withQuestionMark = if (s.headOption.contains('?')) s else "?" + s
     UrlParser(withQuestionMark).parseQuery()
   }
 

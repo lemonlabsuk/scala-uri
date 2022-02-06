@@ -33,7 +33,7 @@ val sharedSettings = Seq(
     "org.scalacheck"    %%% "scalacheck"                      % "1.15.4"   % Test,
     "org.typelevel"     %%% "cats-laws"                       % "2.7.0"    % Test
   ),
-  scalacOptions := Seq(
+  scalacOptions ++= Seq(
     "-unchecked",
     "-deprecation",
     "-encoding",
@@ -175,7 +175,7 @@ lazy val docs = project
     // README.md has examples with expected compiler warnings (deprecated code, exhaustive matches)
     // Turn off these warnings to keep this noise down
     // We can remove this if the following is implemented https://github.com/scalameta/mdoc/issues/286
-    scalacOptions   := Seq("--no-warnings"),
+    scalacOptions   ++= Seq("--no-warnings"),
     publish / skip  := true,
     publishArtifact := false
   )

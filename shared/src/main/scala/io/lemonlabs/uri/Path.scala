@@ -82,6 +82,8 @@ sealed trait UrlPath extends Path {
   def toAbsolute: AbsolutePath
   def toAbsoluteOrEmpty: AbsoluteOrEmptyPath
 
+  def nonEmptyRootless: Boolean
+
   def withConfig(config: UriConfig): Self
 
   def addPart[P: PathPart](part: P): UrlPath =
@@ -220,6 +222,9 @@ case object EmptyPath extends AbsoluteOrEmptyPath {
   def isEmpty: Boolean =
     true
 
+  def nonEmptyRootless: Boolean =
+    false
+
   def withConfig(config: UriConfig): EmptyPath.type =
     this
 
@@ -267,6 +272,9 @@ final case class RootlessPath(parts: Vector[String])(implicit val config: UriCon
   def isEmpty: Boolean =
     parts.isEmpty
 
+  def nonEmptyRootless: Boolean =
+    parts.nonEmpty
+
   override def isSlashTerminated: Boolean = parts.lastOption.contains("")
 }
 
@@ -296,6 +304,9 @@ final case class AbsolutePath(parts: Vector[String])(implicit val config: UriCon
   /** Always returns false as we always have at least a leading slash
     */
   def isEmpty: Boolean =
+    false
+
+  def nonEmptyRootless: Boolean =
     false
 
   override private[uri] def toStringWithConfig(c: UriConfig): String =

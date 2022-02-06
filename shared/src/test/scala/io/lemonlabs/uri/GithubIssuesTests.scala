@@ -101,4 +101,16 @@ class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
   "Github Issue #368" should "allow parsing of an empty query" in {
     QueryString.parseTry("") should equal(Success(QueryString.empty))
   }
+
+  "Github Issue #399" should "allow parsing paths with colons" in {
+    Url.parseTry("/this:1/does/not") should equal(
+      Success(RelativeUrl(AbsolutePath.fromParts("this:1", "does", "not"), QueryString.empty, None))
+    )
+  }
+
+  it should "allow parsing paths with square brackets" in {
+    Url.parseTry("/this[1]/does/not") should equal(
+      Success(RelativeUrl(AbsolutePath.fromParts("this[1]", "does", "not"), QueryString.empty, None))
+    )
+  }
 }

@@ -124,8 +124,8 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
       port <- _port.?
     } yield extractAuthority(t._1, t._2, port)
 
-  def _path_segment: Parser[String] =
-    until(charIn("/?#")).string.map(extractPathPart)
+  def _path_segment: Parser0[String] =
+    until0(charIn("/?#")).string.map(extractPathPart)
 
   /** A sequence of path parts that MUST start with a slash
     *
@@ -133,20 +133,15 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
     * or begin with a slash ("/") character.
     */
   def _path_for_authority: Parser0[AbsoluteOrEmptyPath] =
-    char('/') *> until0(charIn("#?[]") | Parser.end).map { path =>
-      extractAbsOrEmptyPath(path.split("/", -1).toList)
-    } |
-      (charIn("#?").peek | Parser.end).as(EmptyPath)
+    (char('/') *> _path_segment).rep0.map { parts =>
+      extractAbsOrEmptyPath(parts)
+    }
 
   /** A sequence of path parts optionally starting with a slash
     */
   def _path: Parser0[UrlPath] =
-    until0(charIn("#?[]:") | Parser.end).map { path =>
-      val segments = path.split("/", -1)
-      if (path.nonEmpty && path.charAt(0) == '/')
-        extractRelPath("/", segments.drop(1).toVector)
-      else
-        extractRelPath("", segments.toVector)
+    (char('/').? ~ rep0sep0(_path_segment, separator = char('/'))).map { case (maybeSlash, parts) =>
+      extractRelPath(maybeSlash, parts)
     }
 
   def _query_param: Parser[(String, Some[String])] =
@@ -193,6 +188,9 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
     for {
       scheme <- _scheme
       _ <- char(':')
+      // If a URI does not contain an authority component,
+      // then the path cannot begin with two slash characters ("//")
+      _ <- not(string("//"))
       path <- _path
       maybe_query_string <- _maybe_query_string
       maybe_fragment <- _fragment.?
@@ -217,6 +215,9 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
   def _data_url_base64: Parser[DataUrl] =
     for {
       _ <- Parser.string("data:")
+      // If a URI does not contain an authority component,
+      // then the path cannot begin with two slash characters ("//")
+      _ <- not(string("//"))
       media_type <- _media_type
       _ <- Parser.string(";base64,")
       data <- Parser.until(Parser.end)
@@ -225,6 +226,9 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
   def _data_url_percent_encoded: Parser[DataUrl] =
     for {
       _ <- Parser.string("data:")
+      // If a URI does not contain an authority component,
+      // then the path cannot begin with two slash characters ("//")
+      _ <- not(string("//"))
       media_type <- _media_type
       _ <- Parser.char(';').?
       _ <- Parser.char(',')
@@ -245,7 +249,14 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
 
   def _rel_url: Parser0[RelativeUrl] =
     for {
+      // If a URI does not contain an authority component,
+      // then the path cannot begin with two slash characters ("//")
+      _ <- not(string("//"))
       path <- _path
+      // In addition, a URI reference (Section 4.1) may be a relative-path reference, in which case the
+      // first path segment cannot contain a colon (":") character
+      colonInFirstSegment = path.nonEmptyRootless && path.parts.headOption.exists(_.contains(':'))
+      _ <- if (colonInFirstSegment) Parser.fail else Parser.unit
       maybe_query_string <- _maybe_query_string
       maybe_fragment <- _fragment.?
     } yield extractRelativeUrl(path, maybe_query_string, maybe_fragment)
@@ -334,15 +345,15 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
 
   val extractAbsOrEmptyPath = (pp: immutable.Seq[String]) =>
     if (pp.isEmpty) EmptyPath
-    else AbsolutePath(pp.toVector.map(extractPathPart))
+    else AbsolutePath(pp.toVector)
 
-  val extractRelPath = (maybeSlash: String, pp: immutable.Seq[String]) =>
+  val extractRelPath = (maybeSlash: Option[Unit], pp: immutable.Seq[String]) =>
     if (maybeSlash.nonEmpty)
-      AbsolutePath(pp.toVector.map(extractPathPart))
+      AbsolutePath(pp.toVector)
     else if (pp == Seq(""))
       UrlPath.empty
     else
-      RootlessPath(pp.toVector.map(extractPathPart))
+      RootlessPath(pp.toVector)
 
   val extractMediaTypeParam = (k: String, v: String) => k -> v
 

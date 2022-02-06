@@ -12,7 +12,7 @@ read -r NEW_VER
 
 sed -i '' "s/$VER/$NEW_VER/g" version.sbt
 sed -i '' "s/$VER/$NEW_VER/g" README.md
-sed -i '' "s/scala.uri.ver=$VER/scala.uri.ver=$NEW_VER/g" .travis.yml
+sed -i '' "s/scala.uri.ver=$VER/scala.uri.ver=$NEW_VER/g" .github/workflows/ci.yml
 
 git commit -am"Bump version to $NEW_VER"
 git tag $NEW_VER

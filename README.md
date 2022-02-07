@@ -35,10 +35,10 @@ To include it in your SBT project from maven central:
 
 ## Migration Guides
 
+ * [4.0.0+](#3xx-to-4xx)
+ * [3.0.0+](#2xx-to-3xx)
  * [2.0.0+](#1xx-to-2xx)
- * [1.5.0+](#1xx-to-15x)
- * [1.0.0+](#05x-to-1xx)
- * [Older versions](#04x-to-05x)
+ * [Older versions](#1xx-to-15x)
 
 There are also demo projects for both [scala](https://github.com/lemonlabsuk/scala-uri-demo) and [Scala.js](https://github.com/lemonlabsuk/scala-uri-scalajs-example) to help you get up and running quickly.
 
@@ -922,6 +922,18 @@ For maven users you should use (for 2.13.x):
 Contributions to `scala-uri` are always welcome. Check out the [Contributing Guidelines](https://github.com/lemonlabsuk/scala-uri/blob/master/README.md)
 
 # Migration guides
+
+## 3.x.x to 4.x.x
+
+ * Scala 3 support has been added. Scala 2.13 and 2.12 support remain
+ * *Binary Incompatibility*: [4765b4e](https://github.com/lemonlabsuk/scala-uri/commit/4765b4e6714a87d53ba0ae9bf58810e1b8be63d5#diff-e33d822268175cadb9ff5e2057fac2042db550f251da28d834f13b7bb44cf09aL45)
+   removed a single `UriConfig.copy()` overload.
+   This overload existed only to maintain binary compatibility with an older version of scala-uri
+   Use the remaining `copy()` method on `UriConfig` instead  
+ * *Binary Incompatibility*: [4765b4e](https://github.com/lemonlabsuk/scala-uri/commit/4765b4e6714a87d53ba0ae9bf58810e1b8be63d5#diff-e33d822268175cadb9ff5e2057fac2042db550f251da28d834f13b7bb44cf09aL20)
+   removed a single `UriConfig` overloaded constructor.
+   This overload existed only to maintain binary compatibility with an older version of scala-uri
+   Use the remaining constructor or `apply` method remaining on `UriConfig` instead
 
 ## 2.x.x to 3.x.x
 

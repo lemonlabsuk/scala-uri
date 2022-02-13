@@ -209,8 +209,8 @@ trait UriScalaCheckGenerators {
   }
 
   implicit val randDataUrl: Arbitrary[DataUrl] =  {
-    val base64Bytes = strGen(unicodeChar, max = 30).map(s => Base64.getEncoder.withoutPadding().encode(s.getBytes()))
-    val plainBytes = strGen(unicodeChar, max = 30).map(_.getBytes)
+    val base64Bytes = strGen(unicodeChar, min = 10, max = 30).map(s => Base64.getEncoder.withoutPadding().encode(s.getBytes()))
+    val plainBytes = strGen(unicodeChar, min = 10, max = 30).map(_.getBytes)
     Arbitrary(Gen.oneOf(
       Gen.zip(randMediaType.arbitrary, Gen.const(true), base64Bytes).map((DataUrl.apply _).tupled),
       Gen.zip(randMediaType.arbitrary, Gen.const(false), plainBytes).map((DataUrl.apply _).tupled)

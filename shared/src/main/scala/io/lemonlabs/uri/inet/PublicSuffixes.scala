@@ -729,10 +729,9 @@ object PublicSuffixes {
       "ekloges.cy",
       "gov.cy",
       "ltd.cy",
-      "name.cy",
+      "mil.cy",
       "net.cy",
       "org.cy",
-      "parliament.cy",
       "press.cy",
       "pro.cy",
       "tm.cy",
@@ -5035,11 +5034,11 @@ object PublicSuffixes {
       "med.pa",
       "nom.pa",
       "pe",
-      "edu.pe"
+      "edu.pe",
+      "gob.pe"
     )
   private def publicSuffixes1 =
     Set(
-      "gob.pe",
       "nom.pe",
       "mil.pe",
       "org.pe",
@@ -6335,7 +6334,6 @@ object PublicSuffixes {
       "broker",
       "brother",
       "brussels",
-      "budapest",
       "bugatti",
       "build",
       "builders",

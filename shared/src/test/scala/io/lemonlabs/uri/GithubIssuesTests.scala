@@ -113,4 +113,10 @@ class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
       Success(RelativeUrl(AbsolutePath.fromParts("this[1]", "does", "not"), QueryString.empty, None))
     )
   }
+
+  "Github Issue #424" should "turn emojis into punycode" in {
+    Url.parseTry("http://👸🏽.cf").map(_.toStringPunycode) should equal(
+      Success("http://xn--on8hvh.cf")
+    )
+  }
 }

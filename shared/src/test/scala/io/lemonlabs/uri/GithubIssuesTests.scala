@@ -119,4 +119,8 @@ class GithubIssuesTests extends AnyFlatSpec with Matchers with OptionValues {
       Success("http://xn--on8hvh.cf")
     )
   }
+
+  "Github Issue #429" should "not allow forward slashes in host" in {
+    Url.parseOption("https://\\") should equal(None)
+  }
 }

@@ -165,9 +165,11 @@ lazy val scalaUri =
       Test / fork := true
     )
     .jsSettings(
-      libraryDependencies ++= Seq(
-        "org.scala-js" %%% "scalajs-dom"               % "2.1.0",
-        "org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0" % Test
+      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.1.0",
+      libraryDependencies ++= (
+        // securerandom used by scoverage in scala 2 tests
+        if (isScala3.value) Nil
+        else Seq("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0" % Test)
       )
     )
 

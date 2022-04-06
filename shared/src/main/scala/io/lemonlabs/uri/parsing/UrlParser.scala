@@ -11,7 +11,7 @@ import scala.collection.immutable
 import scala.util.{Success, Try}
 
 class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default) extends UriParser {
-  val _host_end = ":/?# \t\r\n"
+  val _host_end = ":/\\?# \t\r\n"
 
   def _int(maxLength: Int): Parser[Int] =
     digit.rep(1, maxLength).string.map(extractInt)

@@ -223,8 +223,8 @@ class TypeClassTests extends AnyFlatSpec with Matchers {
 
     implicit val queryValue: QueryValue[Foo] = QueryValue.derive[Foo].by(_.name)
 
-    val uriA = Url.parse("/uris-in-scala.html") addParam ("foo" -> A)
-    val uriB = Url.parse("/uris-in-scala.html") addParam ("foo" -> B)
+    val uriA = Url.parse("/uris-in-scala.html") addParam "foo" -> A
+    val uriB = Url.parse("/uris-in-scala.html") addParam "foo" -> B
     uriA.toString should equal("/uris-in-scala.html?foo=A")
     uriB.toString should equal("/uris-in-scala.html?foo=B")
   }

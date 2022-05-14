@@ -226,7 +226,7 @@ final case class DomainName(value: String)(implicit val conf: UriConfig = UriCon
       if (parts.size == 1) parts
       else {
         parts.tail.foldLeft(Vector(parts.head)) { (subdomainList, part) =>
-          subdomainList :+ (subdomainList.last + '.' + part)
+          subdomainList :+ subdomainList.last + '.' + part
         }
       }
     }
@@ -372,7 +372,7 @@ final case class IpV6(piece1: Char,
     @tailrec def longestRun(index: Int, longest: (Int, Int), currentRunStart: Int): (Int, Int) = {
       def newLongest = {
         val newLength = index - currentRunStart
-        if (newLength > 1 && newLength > (longest._2 - longest._1)) (currentRunStart, index) else longest
+        if (newLength > 1 && newLength > longest._2 - longest._1) (currentRunStart, index) else longest
       }
 
       if (index == 8)

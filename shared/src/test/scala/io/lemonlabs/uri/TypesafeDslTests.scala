@@ -18,12 +18,12 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
   }
 
   "An absolute URI with query string parameters" should "render correctly" in {
-    val uri = "http://theon.github.com/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val uri = "http://theon.github.com/uris-in-scala.html" ? ("testOne" -> "1") & "testTwo" -> "2"
     uri.toString should equal("http://theon.github.com/uris-in-scala.html?testOne=1&testTwo=2")
   }
 
   "A relative URI with query string parameters" should "render correctly" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & "testTwo" -> "2"
     uri.toString should equal("/uris-in-scala.html?testOne=1&testTwo=2")
   }
 
@@ -38,13 +38,13 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
   }
 
   "Multiple query string parameters with the same name" should "render correctly" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testOne" -> "2")
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & "testOne" -> "2"
     uri.toString should equal("/uris-in-scala.html?testOne=1&testOne=2")
   }
 
   "Query string parameters with value None" should "not be rendered with renderQuery=ExcludeNones" in {
     implicit val config: UriConfig = UriConfig(renderQuery = ExcludeNones)
-    val uri = "/uris-in-scala.html" ? ("testOne" -> None) & ("testTwo" -> "2") & ("testThree" -> None)
+    val uri = "/uris-in-scala.html" ? ("testOne" -> None) & "testTwo" -> "2" & "testThree" -> None
     uri.toString should equal("/uris-in-scala.html?testTwo=2")
   }
 
@@ -56,7 +56,7 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
 
   "Query string parameters with value None" should "be rendered with renderQuery=All" in {
     implicit val config: UriConfig = UriConfig(renderQuery = All)
-    val uri = "/uris-in-scala.html" ? ("testOne" -> None) & ("testTwo" -> "2") & ("testThree" -> None)
+    val uri = "/uris-in-scala.html" ? ("testOne" -> None) & "testTwo" -> "2" & "testThree" -> None
     uri.toString should equal("/uris-in-scala.html?testOne&testTwo=2&testThree")
   }
 
@@ -67,7 +67,7 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
   }
 
   "Replace param method" should "replace multiple parameters with a String argument" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testOne" -> "2")
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & "testOne" -> "2"
     val newUri = uri.replaceParams("testOne", "2")
     newUri.toString should equal("/uris-in-scala.html?testOne=2")
   }
@@ -79,19 +79,19 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
   }
 
   "Replace param method" should "not affect other parameters" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & "testTwo" -> "2"
     val newUri = uri.replaceParams("testOne", "3")
     newUri.toString should equal("/uris-in-scala.html?testTwo=2&testOne=3")
   }
 
   "Remove param method" should "remove multiple parameters" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testOne" -> "2")
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & "testOne" -> "2"
     val newUri = uri.removeParams("testOne")
     newUri.toString should equal("/uris-in-scala.html")
   }
 
   "withQueryString" should "replace all query params" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & "testTwo" -> "2"
     val newUri = uri.withQueryString("testThree" -> Some("3"), "testFour" -> Some("4"))
     newUri.toString should equal("/uris-in-scala.html?testThree=3&testFour=4")
   }
@@ -103,31 +103,31 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
   }
 
   "Remove param method" should "not remove other parameters" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & "testTwo" -> "2"
     val newUri = uri.removeParams("testOne")
     newUri.toString should equal("/uris-in-scala.html?testTwo=2")
   }
 
   "Remove param method" should "remove parameters contained in SeqLike" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & "testTwo" -> "2"
     val newUri = uri.removeParams(List("testOne", "testTwo"))
     newUri.toString should equal("/uris-in-scala.html")
   }
 
   "Remove param method" should "not remove parameters uncontained in List" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & "testTwo" -> "2"
     val newUri = uri.removeParams(List("testThree", "testFour"))
     newUri.toString should equal("/uris-in-scala.html?testOne=1&testTwo=2")
   }
 
   "Remove param method" should "remove parameters contained in List and not remove parameters uncontained in List" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & "testTwo" -> "2"
     val newUri = uri.removeParams(List("testOne", "testThree"))
     newUri.toString should equal("/uris-in-scala.html?testTwo=2")
   }
 
   "with empty QueryString" should "remove all query params" in {
-    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & ("testTwo" -> "2")
+    val uri = "/uris-in-scala.html" ? ("testOne" -> "1") & "testTwo" -> "2"
     val newUri = uri.withQueryString(QueryString.empty)
     newUri.toString should equal("/uris-in-scala.html")
   }
@@ -212,7 +212,7 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
   }
 
   "Path and query DSL" should "be possible to use together" in {
-    val uri = "http://host" / "path" / "to" / "resource" ? ("a" -> "1") & ("b" -> "2")
+    val uri = "http://host" / "path" / "to" / "resource" ? ("a" -> "1") & "b" -> "2"
     uri.toString should equal("http://host/path/to/resource?a=1&b=2")
   }
 
@@ -242,7 +242,7 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
   }
 
   "&& operator" should "add a tuple with Some value" in {
-    val uri = "http://host" && ("a" -> Some("1"))
+    val uri = "http://host" && "a" -> Some("1")
     uri.toString should equal("http://host?a=1")
   }
 
@@ -252,7 +252,7 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
   }
 
   "&& operator" should "not add a tuple with None value" in {
-    val uri = "http://host" && ("a" -> None)
+    val uri = "http://host" && "a" -> None
     uri.toString should equal("http://host")
   }
 
@@ -279,12 +279,12 @@ class TypesafeDslTests extends AnyFlatSpec with Matchers {
   }
 
   it should "work alongside the & operator" in {
-    val uri = "http://host" /? ("a" -> "1") & ("b" -> "2")
+    val uri = "http://host" /? ("a" -> "1") & "b" -> "2"
     uri.toString should equal("http://host/?a=1&b=2")
   }
 
   it should "work alongside the / and & operators together" in {
-    val uri = "http://host" / "path" /? ("a" -> "1") & ("b" -> "2")
+    val uri = "http://host" / "path" /? ("a" -> "1") & "b" -> "2"
     uri.toString should equal("http://host/path/?a=1&b=2")
   }
 }

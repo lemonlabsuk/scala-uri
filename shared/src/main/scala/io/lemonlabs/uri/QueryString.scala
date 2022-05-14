@@ -31,7 +31,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @return A new instance with the new parameter added
     */
   def addParam[K: QueryKey, V: QueryValue](k: K, v: V): QueryString =
-    QueryString(params :+ (k.queryKey -> v.queryValue))
+    QueryString(params :+ k.queryKey -> v.queryValue)
 
   /** Adds a new Query String parameter key-value pair.
     *
@@ -41,7 +41,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * By default, pairs without values, such as `("param", None)`, represent query params without values, i.e `?param`
     */
   def addParam[KV: QueryKeyValue](kv: KV): QueryString =
-    QueryString(params :+ (kv.queryKey -> kv.queryValue))
+    QueryString(params :+ kv.queryKey -> kv.queryValue)
 
   /** Adds all the specified key-value pairs as parameters to the query
     */
@@ -179,7 +179,7 @@ case class QueryString(params: Vector[(String, Option[String])])(implicit config
     * @return A new QueryString with the result of the replace
     */
   def replaceAll[K: QueryKey, V: QueryValue](k: K, v: V): QueryString =
-    QueryString(params.filterNot(_._1 == k.queryKey) :+ (k.queryKey -> v.queryValue))
+    QueryString(params.filterNot(_._1 == k.queryKey) :+ k.queryKey -> v.queryValue)
 
   /** Removes all Query String parameters with the specified key
     * @param k Key for the Query String parameter(s) to remove

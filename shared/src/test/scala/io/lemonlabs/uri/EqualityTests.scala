@@ -97,13 +97,13 @@ class EqualityTests extends AnyFlatSpec with Matchers with ScalaCheckDrivenPrope
 
   "DataUrl.equals" should "equal itself" in new UriScalaCheckGenerators {
     forAll { (dataUrl: DataUrl) =>
-      (dataUrl == dataUrl) should equal(true)
+      dataUrl == dataUrl should equal(true)
     }
   }
 
   it should "not equal another DataUrl" in new UriScalaCheckGenerators {
     forAll { (dataUrl: DataUrl, dataUrl2: DataUrl) =>
-      (dataUrl == dataUrl2) should equal(false)
+      dataUrl == dataUrl2 should equal(false)
     }
   }
 

@@ -120,7 +120,7 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
   def _authority: Parser0[Authority] =
     for {
       t <- (_user_info.map(Some.apply) ~ _host_in_authority).backtrack |
-        (Parser.pure(None) ~ _host_in_authority)
+        Parser.pure(None) ~ _host_in_authority
       port <- _port.?
     } yield extractAuthority(t._1, t._2, port)
 

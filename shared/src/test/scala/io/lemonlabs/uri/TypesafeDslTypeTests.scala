@@ -29,7 +29,7 @@ class TypesafeDslTypeTests extends AnyFlatSpec with Matchers {
   }
 
   "Options" should "render correctly" in {
-    val uri = "/uris-in-scala.html" ? ("param" -> Some("some")) & ("param2" -> None)
+    val uri = "/uris-in-scala.html" ? ("param" -> Some("some")) & "param2" -> None
     uri.toString should equal("/uris-in-scala.html?param=some&param2")
   }
 

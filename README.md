@@ -671,8 +671,6 @@ These methods return `None` or `Vector.empty` for URLs without a Host (e.g. Rela
 
 ## Apex Domains
 
-**Note:** *Currently not supported for Scala.js*
-
 The method `apexDomain` returns the [apex domain](https://help.github.com/articles/about-supported-custom-domains/#apex-domains)
 for the URL (e.g. `example.com` for `http://www.example.com/path`)
 

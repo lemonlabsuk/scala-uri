@@ -149,7 +149,7 @@ class ParsingTests extends AnyFlatSpec with Matchers {
     val e = the[UriParsingException] thrownBy Url.parse(nineSegIp)
 
     // todo: Improve error messages to be closer to the parboiled2 message below
-    e.getMessage should equal("Invalid URL could not be parsed. Error(31,NonEmptyList(Fail(31)))")
+    e.getMessage should equal("Invalid URL could not be parsed. Error(31, NonEmptyList(Fail(31)))")
 //    e.getMessage should equal(
 //      """Invalid URL could not be parsed. Invalid input ']', expected HexDigit or ':' (line 1, column 26):
 //                                |http://[1:2:3:4:5:6:7:8:9]:9000

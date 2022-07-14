@@ -14,7 +14,7 @@ import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPrev
 name := "scala-uri root"
 
 ThisBuild / scalaVersion       := "3.1.3"
-ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.8", scalaVersion.value)
+ThisBuild / crossScalaVersions := Seq("2.12.16", "2.13.8", scalaVersion.value)
 publish / skip                 := true // Do not publish the root project
 
 val simulacrumScalafixVersion = "0.5.4"
@@ -31,7 +31,7 @@ val sharedSettings = Seq(
     "org.scalatest"     %%% "scalatest"                       % "3.2.12"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-15"                 % "3.2.11.0" % Test,
     "org.scalacheck"    %%% "scalacheck"                      % "1.16.0"   % Test,
-    "org.typelevel"     %%% "cats-laws"                       % "2.7.0"    % Test
+    "org.typelevel"     %%% "cats-laws"                       % "2.8.0"    % Test
   ),
   scalacOptions ++= Seq(
     "-unchecked",
@@ -66,7 +66,7 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    "org.typelevel" %%% "cats-core"  % "2.7.0",
+    "org.typelevel" %%% "cats-core"  % "2.8.0",
     "org.typelevel" %%% "cats-parse" % "0.3.7"
   ),
   libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.9")),

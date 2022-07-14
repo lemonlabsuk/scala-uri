@@ -2,7 +2,6 @@ pull_request_rules:
   - name: automatically merge scala-steward's PRs
     conditions:
       - author=scala-steward
-      - status-success=continuous-integration/travis-ci/pr
       - status-success=codecov/project
       - status-success=codecov/patch
       - body~=labels:.*semver-patch

@@ -13,7 +13,7 @@ import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPrev
 
 name := "scala-uri root"
 
-ThisBuild / scalaVersion       := "3.1.3"
+ThisBuild / scalaVersion       := "3.2.1"
 ThisBuild / crossScalaVersions := Seq("2.12.16", "2.13.8", scalaVersion.value)
 publish / skip                 := true // Do not publish the root project
 

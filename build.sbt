@@ -14,7 +14,7 @@ import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPrev
 name := "scala-uri root"
 
 ThisBuild / scalaVersion       := "3.1.3"
-ThisBuild / crossScalaVersions := Seq("2.12.16", "2.13.10", scalaVersion.value)
+ThisBuild / crossScalaVersions := Seq("2.12.17", "2.13.10", scalaVersion.value)
 publish / skip                 := true // Do not publish the root project
 
 val simulacrumScalafixVersion = "0.5.4"
@@ -28,9 +28,9 @@ val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % simulacrumScalafixVersion,
-    "org.scalatest"     %%% "scalatest"                       % "3.2.13"   % Test,
+    "org.scalatest"     %%% "scalatest"                       % "3.2.14"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-15"                 % "3.2.11.0" % Test,
-    "org.scalacheck"    %%% "scalacheck"                      % "1.16.0"   % Test,
+    "org.scalacheck"    %%% "scalacheck"                      % "1.17.0"   % Test,
     "org.typelevel"     %%% "cats-laws"                       % "2.8.0"    % Test
   ),
   scalacOptions ++= Seq(

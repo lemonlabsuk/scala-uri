@@ -220,7 +220,7 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
       _ <- not(string("//"))
       media_type <- _media_type
       _ <- Parser.string(";base64,")
-      data <- Parser.until(Parser.end)
+      data <- Parser.until0(Parser.end)
     } yield extractBase64DataUrl(media_type, data)
 
   def _data_url_percent_encoded: Parser[DataUrl] =
@@ -232,7 +232,7 @@ class UrlParser(val input: String)(implicit conf: UriConfig = UriConfig.default)
       media_type <- _media_type
       _ <- Parser.char(';').?
       _ <- Parser.char(',')
-      data <- Parser.until(Parser.end)
+      data <- Parser.until0(Parser.end)
     } yield extractPercentEncodedDataUrl(media_type, data)
 
   def _data_url: Parser[DataUrl] =

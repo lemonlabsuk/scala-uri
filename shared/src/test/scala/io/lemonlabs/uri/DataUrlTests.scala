@@ -152,4 +152,30 @@ class DataUrlTests extends AnyFlatSpec with Matchers {
     val dataUrl = DataUrl.parse("data:,A%20brief%20note")
     dataUrl.dataAsString should equal("One&brief&note")
   }
+
+  "DataUrl.parse" should "return a DataUrl with empty data when there is no data in the path" in {
+    val dataUrl = DataUrl.parse("data:,")
+    dataUrl.data should equal(Array.empty[Byte])
+  }
+
+  "DataUrl.parse" should "return a DataUrl with empty data when there is empty Base64 encoded data" in {
+    val dataUrl = DataUrl.parse("data:text/plain;base64,")
+    dataUrl.data should equal(Array.empty[Byte])
+  }
+
+  "Url.parse" should "return a DataUrl when there is no data in the path" in {
+    val dataUrl = Url.parse("data:,")
+    dataUrl shouldBe a[DataUrl]
+    dataUrl.schemeOption should equal(Some("data"))
+    dataUrl.path.toStringRaw should equal(",")
+    dataUrl.path.toString() should equal(",")
+  }
+
+  "Url.parse" should "return a DataUrl when there is empty Base64 encoded data" in {
+    val dataUrl = Url.parse("data:;base64,")
+    dataUrl shouldBe a[DataUrl]
+    dataUrl.schemeOption should equal(Some("data"))
+    dataUrl.path.toStringRaw should equal(";base64,")
+    dataUrl.path.toString() should equal(";base64,")
+  }
 }

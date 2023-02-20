@@ -165,7 +165,7 @@ lazy val scalaUri =
       Test / fork := true
     )
     .jsSettings(
-      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.3.0",
+      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.4.0",
       libraryDependencies ++= (
         // securerandom used by scoverage in scala 2 tests
         if (isScala3.value) Nil

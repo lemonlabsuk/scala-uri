@@ -28,7 +28,7 @@ val sharedSettings = Seq(
   organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % simulacrumScalafixVersion,
-    "org.scalatest"     %%% "scalatest"                       % "3.2.15"   % Test,
+    "org.scalatest"     %%% "scalatest"                       % "3.2.16"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-16"                 % "3.2.14.0" % Test,
     "org.scalacheck"    %%% "scalacheck"                      % "1.17.0"   % Test,
     "org.typelevel"     %%% "cats-laws"                       % "2.9.0"    % Test
@@ -165,7 +165,7 @@ lazy val scalaUri =
       Test / fork := true
     )
     .jsSettings(
-      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.4.0",
+      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.6.0",
       libraryDependencies ++= (
         // securerandom used by scoverage in scala 2 tests
         if (isScala3.value) Nil

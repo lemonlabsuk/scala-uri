@@ -31,7 +31,7 @@ val sharedSettings = Seq(
     "org.scalatest"     %%% "scalatest"                       % "3.2.16"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-16"                 % "3.2.14.0" % Test,
     "org.scalacheck"    %%% "scalacheck"                      % "1.17.0"   % Test,
-    "org.typelevel"     %%% "cats-laws"                       % "2.9.0"    % Test
+    "org.typelevel"     %%% "cats-laws"                       % "2.10.0"   % Test
   ),
   scalacOptions ++= Seq(
     "-unchecked",
@@ -66,7 +66,7 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    "org.typelevel" %%% "cats-core"  % "2.9.0",
+    "org.typelevel" %%% "cats-core"  % "2.10.0",
     "org.typelevel" %%% "cats-parse" % "0.3.9"
   ),
   libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.10")),

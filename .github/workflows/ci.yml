@@ -13,20 +13,10 @@ jobs:
 
     strategy:
       matrix:
-        scala: [2.12.17, 2.13.10]
+        scala: [2.12.17, 2.13.10, 3.3.1]
         project: [scalaUriJVM, scalaUriJS]
         coverage: [coverage]
         coverageReport: [coverageReport]
-        include:
-          # https://github.com/scoverage/scalac-scoverage-plugin/issues/299
-          - scala: 3.2.2
-            project: scalaUriJVM
-            coverage: ""
-            coverageReport: ""
-          - scala: 3.2.2
-            project: scalaUriJS
-            coverage: ""
-            coverageReport: ""
 
     steps:
       - name: Checkout Code
@@ -52,7 +42,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v2
         with:
-          node-version: '14' # nodejs < 10 fails finding URL class
+          node-version: '18'
 
       - name: Run tests
         env:

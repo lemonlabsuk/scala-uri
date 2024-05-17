@@ -69,7 +69,7 @@ val scalaUriSettings = Seq(
     "org.typelevel" %%% "cats-core"  % "2.9.0",
     "org.typelevel" %%% "cats-parse" % "0.3.9"
   ),
-  libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.10")),
+  libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.11")),
   pomPostProcess := { node =>
     new RuleTransformer(new RewriteRule {
       override def transform(node: xml.Node): Seq[xml.Node] = {

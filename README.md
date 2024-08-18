@@ -1,3 +1,6 @@
+> [!IMPORTANT]  
+> scala-uri is not currently being actively maintained. Feel free to let me know of any actively maintained forks and I will happily list them here
+
 # scala-uri
 
 [![scala-uri CI](https://github.com/lemonlabsuk/scala-uri/actions/workflows/ci.yml/badge.svg)](https://github.com/lemonlabsuk/scala-uri/actions/workflows/ci.yml)

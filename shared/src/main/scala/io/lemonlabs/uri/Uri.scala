@@ -25,7 +25,7 @@ import io.lemonlabs.uri.typesafe.TraversablePathParts.ops._
 import io.lemonlabs.uri.typesafe.Fragment.ops._
 
 import java.util
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 /** Represents a URI. See [[https://www.ietf.org/rfc/rfc3986 RFC 3986]]
   *
@@ -105,7 +105,8 @@ object Uri {
     Some(uri.path)
 
   def parseTry(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Try[Uri] =
-    Try(s.toString).flatMap(UriParser.parseUri)
+    (if (s == null) Failure(new NullPointerException("Parser input is NULL")) else Success(s))
+      .flatMap(s => Try(s.toString).flatMap(UriParser.parseUri))
 
   def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[Uri] =
     parseTry(s).toOption

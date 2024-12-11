@@ -1,5 +1,7 @@
 > [!IMPORTANT]  
-> scala-uri is not currently being actively maintained. Feel free to let me know of any actively maintained forks and I will happily list them here
+> scala-uri is not currently being actively maintained in this repo
+> 
+> There is a maintained fork at https://github.com/indoorvivants/scala-uri
 
 # scala-uri
 

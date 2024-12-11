@@ -1,6 +1,3 @@
-import sbt.Keys.libraryDependencies
-import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
-
 import scala.xml.transform.{RewriteRule, RuleTransformer}
 import com.typesafe.tools.mima.core.{
   DirectMissingMethodProblem,
@@ -13,9 +10,73 @@ import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPrev
 
 name := "scala-uri root"
 
-ThisBuild / scalaVersion       := "3.2.2"
-ThisBuild / crossScalaVersions := Seq("2.12.17", "2.13.10", scalaVersion.value)
-publish / skip                 := true // Do not publish the root project
+val Versions = new {
+  val Scala3 = "3.3.4"
+  val Scala212 = "2.12.20"
+  val Scala213 = "2.13.15"
+  val scalajsDom = "2.6.0"
+
+  val allScala = Seq(Scala3, Scala212, Scala213)
+}
+
+inThisBuild(
+  List(
+    organization     := "com.indoorvivants",
+    organizationName := "Anton Sviridov",
+    homepage := Some(
+      url("https://github.com/indoorvivants/scala-uri")
+    ),
+    licenses := List(
+      "Apache 2" -> url("http://www.apache.org/licenses/LICENSE-2.0")
+    ),
+    developers := List(
+      Developer(
+        "theon",
+        "Ian Forsey",
+        "",
+        url("https://lemonlabs.io")
+      )
+    )
+  )
+)
+
+lazy val root = project.in(file(".")).aggregate(scalaUri.projectRefs*)
+
+lazy val scalaUri =
+  projectMatrix
+    .in(file("core"))
+    .settings(sharedSettings)
+    .settings(scalaUriSettings)
+    .settings(mimaSettings)
+    .jvmPlatform(
+      Versions.allScala,
+      Seq(Test / fork := true)
+    )
+    .jsPlatform(
+      Versions.allScala,
+      Seq(
+        libraryDependencies += "org.scala-js" %%% "scalajs-dom" % Versions.scalajsDom,
+        libraryDependencies ++= (
+          // securerandom used by scoverage in scala 2 tests
+          if (isScala3.value) Nil
+          else Seq("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0" % Test)
+        )
+      )
+    )
+
+lazy val docs = project
+  .in(file("scala-uri-docs"))
+  .settings(
+    // README.md has examples with expected compiler warnings (deprecated code, exhaustive matches)
+    // Turn off these warnings to keep this noise down
+    // We can remove this if the following is implemented https://github.com/scalameta/mdoc/issues/286
+    scalacOptions ++= Seq("--no-warnings"),
+    publish / skip  := true,
+    publishArtifact := false,
+    scalaVersion := Versions.Scala213
+  )
+  .dependsOn(scalaUri.jvm(Versions.Scala213))
+  .enablePlugins(MdocPlugin)
 
 val simulacrumScalafixVersion = "0.5.4"
 ThisBuild / scalafixDependencies += "org.typelevel" %% "simulacrum-scalafix" % simulacrumScalafixVersion
@@ -25,7 +86,6 @@ val isScala3 = Def.setting {
 }
 
 val sharedSettings = Seq(
-  organization := "io.lemonlabs",
   libraryDependencies ++= Seq(
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % simulacrumScalafixVersion,
     "org.scalatest"     %%% "scalatest"                       % "3.2.18"   % Test,
@@ -48,8 +108,6 @@ val sharedSettings = Seq(
       case _                                                => Nil
     }
   ),
-  semanticdbEnabled        := true,
-  semanticdbVersion        := scalafixSemanticdb.revision,
   Test / parallelExecution := false,
   coverageExcludedPackages := "(io.lemonlabs.uri.inet.Trie.*|io.lemonlabs.uri.inet.PublicSuffixes.*|io.lemonlabs.uri.inet.PublicSuffixTrie.*|io.lemonlabs.uri.inet.PunycodeSupport.*)"
 )
@@ -67,7 +125,7 @@ val scalaUriSettings = Seq(
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
     "org.typelevel" %%% "cats-core"  % "2.9.0",
-    "org.typelevel" %%% "cats-parse" % "0.3.9"
+    "org.typelevel" %%% "cats-parse" % "1.0.0"
   ),
   libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.10")),
   pomPostProcess := { node =>
@@ -78,44 +136,6 @@ val scalaUriSettings = Seq(
       }
     }).transform(node).head
   }
-)
-
-val publishingSettings = Seq(
-  publishMavenStyle      := true,
-  publish / skip         := false,
-  Test / publishArtifact := false,
-  pomIncludeRepository := { _ =>
-    false
-  },
-  resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-  resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases",
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (version.value.trim.endsWith("SNAPSHOT"))
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    else
-      Some("releases" at nexus + "service/local/staging/deploy/maven2")
-  },
-  pomExtra :=
-    <url>https://github.com/lemonlabsuk/scala-uri</url>
-      <licenses>
-        <license>
-          <name>Apache 2</name>
-          <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-          <distribution>repo</distribution>
-        </license>
-      </licenses>
-      <scm>
-        <url>git@github.com:lemonlabsuk/scala-uri.git</url>
-        <connection>scm:git@github.com:lemonlabsuk/scala-uri.git</connection>
-      </scm>
-      <developers>
-        <developer>
-          <id>theon</id>
-          <name>Ian Forsey</name>
-          <url>https://lemonlabs.io</url>
-        </developer>
-      </developers>
 )
 
 val previousVersions = Set.empty[String] // Set(0, 4).map(v => s"3.$v.0")
@@ -152,39 +172,6 @@ val mimaSettings = Seq(
   ),
   Test / test := (Test / test).dependsOn(mimaReportBinaryIssues, mimaBinaryIssueFilters).value
 )
-
-lazy val scalaUri =
-  crossProject(JSPlatform, JVMPlatform)
-    .crossType(CrossType.Full)
-    .in(file("."))
-    .settings(sharedSettings)
-    .settings(scalaUriSettings)
-    .settings(publishingSettings)
-    .settings(mimaSettings)
-    .jvmSettings(
-      Test / fork := true
-    )
-    .jsSettings(
-      libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.6.0",
-      libraryDependencies ++= (
-        // securerandom used by scoverage in scala 2 tests
-        if (isScala3.value) Nil
-        else Seq("org.scala-js" %%% "scalajs-java-securerandom" % "1.0.0" % Test)
-      )
-    )
-
-lazy val docs = project
-  .in(file("scala-uri-docs"))
-  .settings(
-    // README.md has examples with expected compiler warnings (deprecated code, exhaustive matches)
-    // Turn off these warnings to keep this noise down
-    // We can remove this if the following is implemented https://github.com/scalameta/mdoc/issues/286
-    scalacOptions ++= Seq("--no-warnings"),
-    publish / skip  := true,
-    publishArtifact := false
-  )
-  .dependsOn(scalaUri.jvm)
-  .enablePlugins(MdocPlugin)
 
 lazy val updatePublicSuffixes =
   taskKey[Unit]("Updates the public suffix Set at io.lemonlabs.uri.internet.PublicSuffixes")

@@ -13,6 +13,8 @@ val Versions = new {
   val Scala212 = "2.12.20"
   val Scala213 = "2.13.15"
   val scalajsDom = "2.6.0"
+  val cats = "2.12.0"
+  val catsParse = "1.1.0"
 
   val allScala = Seq(Scala3, Scala212, Scala213)
 }
@@ -50,6 +52,9 @@ lazy val scalaUri =
     .settings(sharedSettings)
     .settings(scalaUriSettings)
     .settings(mimaSettings)
+    .nativePlatform(
+      Versions.allScala
+    )
     .jvmPlatform(
       Versions.allScala,
       Seq(Test / fork := true)
@@ -89,11 +94,11 @@ val isScala3 = Def.setting {
 
 val sharedSettings = Seq(
   libraryDependencies ++= Seq(
-    "org.typelevel"     %%% "simulacrum-scalafix-annotations" % simulacrumScalafixVersion,
-    "org.scalatest"     %%% "scalatest"                       % "3.2.19"   % Test,
-    "org.scalatestplus" %%% "scalacheck-1-16"                 % "3.2.14.0" % Test,
-    "org.scalacheck"    %%% "scalacheck"                      % "1.18.1"   % Test,
-    "org.typelevel"     %%% "cats-laws"                       % "2.12.0"   % Test
+    "org.typelevel"      %% "simulacrum-scalafix-annotations" % simulacrumScalafixVersion,
+    "org.scalatest"     %%% "scalatest"                       % "3.2.19"      % Test,
+    "org.scalatestplus" %%% "scalacheck-1-18"                 % "3.2.19.0"    % Test,
+    "org.scalacheck"    %%% "scalacheck"                      % "1.18.1"      % Test,
+    "org.typelevel"     %%% "cats-laws"                       % Versions.cats % Test
   ),
   scalacOptions ++= Seq(
     "-unchecked",
@@ -126,8 +131,8 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    "org.typelevel" %%% "cats-core"  % "2.12.0",
-    "org.typelevel" %%% "cats-parse" % "1.0.0"
+    "org.typelevel" %%% "cats-core"  % Versions.cats,
+    "org.typelevel" %%% "cats-parse" % Versions.catsParse
   ),
   libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.12")),
   pomPostProcess := { node =>

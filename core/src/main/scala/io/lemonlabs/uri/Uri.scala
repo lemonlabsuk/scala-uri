@@ -108,7 +108,7 @@ object Uri {
     Try(s.toString).flatMap(UriParser.parseUri)
 
   def parseOption(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Option[Uri] =
-    parseTry(s).toOption
+    Option(s).flatMap(u => parseTry(u).toOption)
 
   def parse(s: CharSequence)(implicit config: UriConfig = UriConfig.default): Uri =
     parseTry(s).get

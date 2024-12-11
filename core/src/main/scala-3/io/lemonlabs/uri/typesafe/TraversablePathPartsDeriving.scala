@@ -3,7 +3,7 @@ package io.lemonlabs.uri.typesafe
 import scala.compiletime.{erasedValue, summonInline}
 import scala.deriving.Mirror
 
-private class TraversablePathPartsDerived[A](elemInstances: List[TraversablePathParts[_]])
+private[typesafe] class TraversablePathPartsDerived[A](elemInstances: List[TraversablePathParts[_]])
     extends TraversablePathParts[A]:
   override def toSeq(a: A): Seq[String] =
     a.asInstanceOf[Product]

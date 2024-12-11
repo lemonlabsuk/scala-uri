@@ -1,14 +1,9 @@
-> [!IMPORTANT]  
-> scala-uri is not currently being actively maintained. Feel free to let me know of any actively maintained forks and I will happily list them here
+> [!IMPORTANT]
+> This is a currently maintained fork of the [original project](https://github.com/lemonlabsuk/scala-uri/)
 
 # scala-uri
 
-[![scala-uri CI](https://github.com/lemonlabsuk/scala-uri/actions/workflows/ci.yml/badge.svg)](https://github.com/lemonlabsuk/scala-uri/actions/workflows/ci.yml)
-[![codecov.io](http://codecov.io/github/lemonlabsuk/scala-uri/coverage.svg?branch=master)](https://codecov.io/gh/lemonlabsuk/scala-uri/branch/master)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.lemonlabs/scala-uri_2.12)
-[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.0.0.svg)](#scalajs-support)
-[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/lemonlabsuk/scala-uri.svg)](http://isitmaintained.com/project/lemonlabsuk/scala-uri "Average time to resolve an issue")
-[![Percentage of issues still open](http://isitmaintained.com/badge/open/lemonlabsuk/scala-uri.svg)](http://isitmaintained.com/project/lemonlabsuk/scala-uri "Percentage of issues still open")
+[![scala-uri Scala version support](https://index.scala-lang.org/indoorvivants/scala-uri/scala-uri/latest.svg)](https://index.scala-lang.org/indoorvivants/scala-uri/scala-uri)
 
 `scala-uri` is a small Scala library that helps you work with URIs. It has the following features:
 
@@ -25,14 +20,15 @@
  * Support for [URNs](#parse-a-urn)
  * Support for [mailto](#mailto) URLs
  * Support for [data](#data-urls) URLs as defined in [RFC2397](https://tools.ietf.org/html/rfc2397)
- * Support for [git](#gitscp-style-urls) scp-like URLs 
+ * Support for [git](#gitscp-style-urls) scp-like URLs
  * Support for [Scala.js](#scalajs-support)
  * Support for [cats](#cats-support)
  * No dependencies on existing web frameworks
 
 To include it in your SBT project from maven central:
+
 ```scala
-"io.lemonlabs" %% "scala-uri" % "4.0.3"
+"com.indoorvivants" %% "scala-uri" % "4.1.0"
 ```
 
 ## Migration Guides
@@ -258,7 +254,7 @@ urlOne === urlTwo   // this is true
 urlOne === urlThree // this is true
 ```
 
-Note: depending on the type you are comparing, you will need to import a different cats `Eq` instance. 
+Note: depending on the type you are comparing, you will need to import a different cats `Eq` instance.
 The following are available:
 
 ```scala mdoc:reset
@@ -769,7 +765,7 @@ dataUrl.base64 // This is false
 dataUrl.dataAsString // This is "the data:1234,5678"
 ```
 
-## git/scp style URLs 
+## git/scp style URLs
 
 git/scp style URLs can be parsed like so:
 
@@ -783,7 +779,7 @@ url.path.toString // This is "lemonlabsuk/scala-uri.git"
 ```
 
 Note that `ScpLikeUrl.parse`, should only be used for git URLs with scp-like syntax (with a `:`
-between the host and path). For all other git URLs, `AbsoluteUrl.parse` or `Url.parse` should 
+between the host and path). For all other git URLs, `AbsoluteUrl.parse` or `Url.parse` should
 be used:
 
 ```scala mdoc:reset
@@ -800,7 +796,7 @@ val httpsUrl  = AbsoluteUrl.parse("https://github.com/lemonlabsuk/scala-uri.git"
 The version of DSL which relies on the types to render urls providing better control over
 the way values would be translated to url parts.
 
-It is possible to use arbitrary types as parts of the url:  
+It is possible to use arbitrary types as parts of the url:
 
 ### Query Strings
 
@@ -883,43 +879,36 @@ See [scala-uri-scalajs-example](https://github.com/lemonlabsuk/scala-uri-scalajs
 ## Cats Support
 
 scala-uri provides type class instances of `cats.Eq`, `cats.Show` and `cats.Order` for:
-`Uri `, `Url`, `RelativeUrl`, `UrlWithAuthority`, `ProtocolRelativeUrl`, `AbsoluteUrl`, 
-`UrlWithoutAuthority`, `SimpleUrlWithoutAuthority`, `DataUrl`, `ScpLikeUrl`, `Urn`, `Authority`, `UserInfo`, 
-`Host`, `DomainName`, `IpV4`, `IpV6`, `MediaType`, `Path`, `UrlPath`, `AbsoluteOrEmptyPath`, 
+`Uri `, `Url`, `RelativeUrl`, `UrlWithAuthority`, `ProtocolRelativeUrl`, `AbsoluteUrl`,
+`UrlWithoutAuthority`, `SimpleUrlWithoutAuthority`, `DataUrl`, `ScpLikeUrl`, `Urn`, `Authority`, `UserInfo`,
+`Host`, `DomainName`, `IpV4`, `IpV6`, `MediaType`, `Path`, `UrlPath`, `AbsoluteOrEmptyPath`,
 `RootlessPath`, `AbsolutePath`, `UrnPath`, `QueryString`
 
 The type class instances exist in the companion objects for these types.
 
 ## Including scala-uri your project
 
-`scala-uri` `4.x.x` is currently built with support for Scala `3`, Scala `2.13.x`, Scala `2.12.x` and Scala.js `1.1.0+`
-`scala-uri` `3.x.x` is currently built with support for Scala `2.13.x`, Scala `2.12.x` and Scala.js `1.1.0+` 
-
- * For `2.11.x` support use `scala-uri` `1.4.10` from branch [`1.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/1.4.x)
- * For `2.10.x` support use `scala-uri` `0.4.17` from branch [`0.4.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.4.x)
- * For `2.9.x` support use `scala-uri` `0.3.6` from branch [`0.3.x`](https://github.com/lemonlabsuk/scala-uri/tree/0.3.x)
- * For Scala.js `1.x.x` support, use `scala-uri` `4.0.0`
- * For Scala.js `0.6.x` support, use `scala-uri` `2.2.3`
+`scala-uri` `4.x.x` is currently built with support for Scala `3`, Scala `2.13.x`, Scala `2.12.x` and Scala.js `1.17.0+`
 
 Release builds are available in maven central. For SBT users just add the following dependency:
 
 ```scala
-"io.lemonlabs" %% "scala-uri" % "4.0.3"
+"com.indoorvivants" %% "scala-uri" % "4.1.0"
 ```
 
 For maven users you should use (for 2.13.x):
 
 ```xml
 <dependency>
-    <groupId>io.lemonlabs</groupId>
+    <groupId>com.indoorvivants</groupId>
     <artifactId>scala-uri_2.13</artifactId>
-    <version>4.0.3</version>
+    <version>4.1.0</version>
 </dependency>
 ```
 
 # Contributions
 
-Contributions to `scala-uri` are always welcome. Check out the [Contributing Guidelines](https://github.com/lemonlabsuk/scala-uri/blob/master/README.md)
+Contributions to `scala-uri` are always welcome. Check out the [Contributing Guidelines](https://github.com/indoorvivants/scala-uri/blob/master/README.md)
 
 # Migration guides
 
@@ -929,7 +918,7 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
  * *Binary Incompatibility*: [4765b4e](https://github.com/lemonlabsuk/scala-uri/commit/4765b4e6714a87d53ba0ae9bf58810e1b8be63d5#diff-e33d822268175cadb9ff5e2057fac2042db550f251da28d834f13b7bb44cf09aL45)
    removed a single `UriConfig.copy()` overload.
    This overload existed only to maintain binary compatibility with an older version of scala-uri
-   Use the remaining `copy()` method on `UriConfig` instead  
+   Use the remaining `copy()` method on `UriConfig` instead
  * *Binary Incompatibility*: [4765b4e](https://github.com/lemonlabsuk/scala-uri/commit/4765b4e6714a87d53ba0ae9bf58810e1b8be63d5#diff-e33d822268175cadb9ff5e2057fac2042db550f251da28d834f13b7bb44cf09aL20)
    removed a single `UriConfig` overloaded constructor.
    This overload existed only to maintain binary compatibility with an older version of scala-uri
@@ -937,15 +926,15 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
 
 ## 2.x.x to 3.x.x
 
- * *Backwards Incompatible*: The space character is now encoded to `+` instead of `%20` in query string parameters by default.   
+ * *Backwards Incompatible*: The space character is now encoded to `+` instead of `%20` in query string parameters by default.
  * *Backwards Incompatible*: The `+` method in `io.lemonlabs.uri.encoding.UriEncoder`, now chains encoders in the opposite order to be more intuitive.
    E.g. `a + b` will encode with encoder `a` first, followed by encoder `b`
  * *Binary Incompatibility*: The following deprecated classes have now been removed:
     * `io.lemonlabs.uri.inet.PublicSuffixTrie`
     * `io.lemonlabs.uri.inet.Trie`
     * `io.lemonlabs.uri.dsl.*`
- * *Binary Incompatibility*: `Url.addParam("key", "value")` and `Url.addParam("key" -> "value")` 
-   now has a return type `Self` rather than `Url`. 
+ * *Binary Incompatibility*: `Url.addParam("key", "value")` and `Url.addParam("key" -> "value")`
+   now has a return type `Self` rather than `Url`.
    E.g. `AbsoluteUrl.addParam` now has a return type of `AbsoluteUrl` and `RelativeUrl.addParam` has a return type of `RelativeUrl`
 
 ## 1.x.x to 2.x.x
@@ -966,17 +955,17 @@ Contributions to `scala-uri` are always welcome. Check out the [Contributing Gui
     * `/(PathPart)` no longer splits the part by slash. If you want to add multiple path parts use `/(TraversablePathParts)` instead
  * Type Classes
    * *Binary Incompatibility*: `Fragment[A].fragment` returns `Option[String]` rather than `String`
-   * *Binary Incompatibility*: `Url.withFragment` now takes argument of type `T: Fragment` rather than `String` and `Option[String]` 
+   * *Binary Incompatibility*: `Url.withFragment` now takes argument of type `T: Fragment` rather than `String` and `Option[String]`
      Type Class instances are provided the method can be used with `String` and `Option[String]` values just as before
    * *Binary Incompatibility*: `Url.addPathParts` and `Url.addPathPart` now takes arguments of type `P: TraversablePathParts` or `P: PathPart` rather than `Iterable[String]` or `String`
      Type Class instances are provided the methods can be used with `String` and `Iterable[String]` values just as before
-   * *Binary Incompatibility*: `Url.withQueryString`, `Url.addParam`, `Url.addParams`, `Url.replaceParams`, `Url.removeParams`, 
+   * *Binary Incompatibility*: `Url.withQueryString`, `Url.addParam`, `Url.addParams`, `Url.replaceParams`, `Url.removeParams`,
      `Url.mapQuery`, `Url.flatMapQuery`, `Url.collectQuery`, `Url.mapQueryNames` and `Url.mapQueryValues` now takes argument of type `KV: QueryKeyValue`, `K: QueryKey` or `V: QueryValue` rather than `(String, String)` or `String`
-     Type Class instances are provided the methods can be used with `(String, String)` or `String` values just as before   
+     Type Class instances are provided the methods can be used with `(String, String)` or `String` values just as before
  * The [URL builder DSL](#url-builder-dsl) has been deprecated in favour of the [Typesafe URL builder DSL](#typesafe-url-builder-dsl)
  * `Authority.parse` no longer expects it's string argument to start with `//`, as this is not part of the Authority, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
  * `UserInfo.parse` no longer expects it's string argument to end with a `@`, as this is not part of the UserInfo, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
- * `QueryString.toString` no longer returns a leading `?`, as this is not part of the query string, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt) 
+ * `QueryString.toString` no longer returns a leading `?`, as this is not part of the query string, it is a delimiter. See [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
  * Forward slashes in paths are now percent encoded by default.
    This means `Url.parse("/%2F/").toString` returns `"/%2F/"` rather than `///` in previous versions
    To return to the previous behavior, you can bring a `UriConfig` like so into scope

@@ -8,8 +8,6 @@ import com.typesafe.tools.mima.core.{
 }
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaBinaryIssueFilters, mimaPreviousArtifacts, mimaReportBinaryIssues}
 
-name := "scala-uri root"
-
 val Versions = new {
   val Scala3 = "3.3.4"
   val Scala212 = "2.12.20"
@@ -40,7 +38,11 @@ inThisBuild(
   )
 )
 
-lazy val root = project.in(file(".")).aggregate(scalaUri.projectRefs*)
+lazy val root =
+  project
+    .in(file("."))
+    .aggregate(scalaUri.projectRefs*)
+    .settings(publish / skip := true, publishLocal / skip := true)
 
 lazy val scalaUri =
   projectMatrix
@@ -73,7 +75,7 @@ lazy val docs = project
     scalacOptions ++= Seq("--no-warnings"),
     publish / skip  := true,
     publishArtifact := false,
-    scalaVersion := Versions.Scala213
+    scalaVersion    := Versions.Scala213
   )
   .dependsOn(scalaUri.jvm(Versions.Scala213))
   .enablePlugins(MdocPlugin)
@@ -88,10 +90,10 @@ val isScala3 = Def.setting {
 val sharedSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel"     %%% "simulacrum-scalafix-annotations" % simulacrumScalafixVersion,
-    "org.scalatest"     %%% "scalatest"                       % "3.2.18"   % Test,
+    "org.scalatest"     %%% "scalatest"                       % "3.2.19"   % Test,
     "org.scalatestplus" %%% "scalacheck-1-16"                 % "3.2.14.0" % Test,
-    "org.scalacheck"    %%% "scalacheck"                      % "1.17.0"   % Test,
-    "org.typelevel"     %%% "cats-laws"                       % "2.9.0"    % Test
+    "org.scalacheck"    %%% "scalacheck"                      % "1.18.1"   % Test,
+    "org.typelevel"     %%% "cats-laws"                       % "2.12.0"   % Test
   ),
   scalacOptions ++= Seq(
     "-unchecked",
@@ -124,10 +126,10 @@ val scalaUriSettings = Seq(
   name        := "scala-uri",
   description := "Simple scala library for building and parsing URIs",
   libraryDependencies ++= Seq(
-    "org.typelevel" %%% "cats-core"  % "2.9.0",
+    "org.typelevel" %%% "cats-core"  % "2.12.0",
     "org.typelevel" %%% "cats-parse" % "1.0.0"
   ),
-  libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.10")),
+  libraryDependencies ++= (if (isScala3.value) Nil else Seq("com.chuusai" %%% "shapeless" % "2.3.12")),
   pomPostProcess := { node =>
     new RuleTransformer(new RewriteRule {
       override def transform(node: xml.Node): Seq[xml.Node] = {

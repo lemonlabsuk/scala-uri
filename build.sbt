@@ -140,8 +140,6 @@ val scalaUriSettings = Seq(
   }
 )
 
-val previousVersions = Set.empty[String] // Set(0, 4).map(v => s"3.$v.0")
-
 val mimaExcludes = Seq(
   ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.typesafe.QueryValueInstances1.*"),
   ProblemFilters.exclude[ReversedMissingMethodProblem]("io.lemonlabs.uri.Host.*"),
@@ -152,10 +150,10 @@ val mimaExcludes = Seq(
 
 val mimaSettings = Seq(
   mimaPreviousArtifacts := {
-    if (VersionNumber(scalaVersion.value).matchesSemVer(SemanticSelector("<=2.13")))
-      previousVersions.map { organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _ }
-    else
-      Set.empty
+    if (VersionNumber(version.value).matchesSemVer(SemanticSelector("<=4.1.0"))) {
+      Set("io.lemonlabs" % s"scala-uri_${scalaBinaryVersion.value}" % "4.0.3")
+    } else
+      Set("com.indoorvivants" % s"scala-uri_${scalaBinaryVersion.value}" % "4.1.0")
   },
   mimaBinaryIssueFilters ++= {
     VersionNumber(scalaVersion.value) match {
